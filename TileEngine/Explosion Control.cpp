@@ -67,11 +67,13 @@
 #include "fov.h"
 #include "Map Information.h"
 #include "Soldier Functions.h"//dnl ch40 200909
+#include "interface Dialogue.h"
 #endif
 
 #include "Soldier Macros.h"
 #include "connect.h"
 #include "debug control.h"
+#include "interface Dialogue.h"
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -202,10 +204,16 @@ void RecountExplosions( void );
 void GenerateExplosionFromExplosionPointer( EXPLOSIONTYPE *pExplosion );
 void HandleBuldingDestruction( INT32 sGridNo, UINT8 ubOwner );
 
-
-//--UB
+//JA25 UB
 void HavePersonAtGridnoStop( INT16 sGridNo );
 BOOLEAN ShouldThePlayerStopWhenWalkingOnBiggensActionItem( UINT8 ubRecordNum );
+//void HandleDestructionOfPowerGenFan();
+//BOOLEAN IsFanGraphicInSectorAtThisGridNo( INT16 sGridNo );
+void HandleExplosionsInTunnelSector( INT16 sGridNo );
+//void HandleSwitchToOpenFortifiedDoor( INT16 sGridNo );
+//void HandleSeeingPowerGenFan( INT16 sGridNo );
+
+
 
 
 INT32 GetFreeExplosion( void )
@@ -618,7 +626,18 @@ BOOLEAN ExplosiveDamageStructureAtGridNo( STRUCTURE * pCurrent, STRUCTURE **ppNe
 		ChangeO3SectorStatue( TRUE );
 		return( TRUE );
 	}
+	
+	//JA25 UB
+	//should we replace the mine entrance graphic
+	if( IsMineEntranceInSectorI13AtThisGridNo( sGridNo ) && ubOwner == NOBODY )
+	{
+		//Yup, replace it
+		ReplaceMineEntranceGraphicWithCollapsedEntrance();
+	}
 
+	//Handle Explosions in the tunnel sectors
+	HandleExplosionsInTunnelSector( sGridNo );
+	
 	// Get xy
 	sX = CenterX( sGridNo );
 	sY = CenterY( sGridNo );
@@ -4010,4 +4029,20 @@ BOOLEAN ShouldThePlayerStopWhenWalkingOnBiggensActionItem( UINT8 ubRecordNum )
 	{
 		return( TRUE );
 	}
+}
+
+
+
+//JA25 UB
+void HandleExplosionsInTunnelSector( INT16 sGridNo )
+{
+	//if this isnt the tunnel sectors
+	if( !( gWorldSectorX == 14 && ( gWorldSectorY == MAP_ROW_J || gWorldSectorY == MAP_ROW_K ) && gbWorldSectorZ == 1 ) )
+	{
+		//get the fuck out...
+		return;
+	}
+
+	//Since the enemy will hear explosions in the tunnel, remember the player made a noise
+	//gJa25SaveStruct.uiJa25GeneralFlags |= JA_GF__DID_PLAYER_MAKE_SOUND_GOING_THROUGH_TUNNEL_GATE;
 }

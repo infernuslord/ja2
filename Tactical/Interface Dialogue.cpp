@@ -168,6 +168,10 @@ extern void EndGameMessageBoxCallBack( UINT8 ubExitValue );
 extern INT32 FindNearestOpenableNonDoor( INT32 sStartGridNo );
 extern void RecalculateOppCntsDueToBecomingNeutral( SOLDIERTYPE * pSoldier );
 
+//JA25 UB
+void ReplaceMineEntranceGraphicWithCollapsedEntrance();
+//BOOLEAN IsMineEntranceInSectorI13AtThisGridNo( INT16 sGridNo );
+
 UINT8	ubTalkMenuApproachIDs[] =
 {
 	APPROACH_REPEAT,
@@ -4985,6 +4989,22 @@ void CarmenLeavesSectorCallback( void )
 
 //JA25 UB
 
+// This function checks if we should replace the mine entrance graphic
+BOOLEAN IsMineEntranceInSectorI13AtThisGridNo( INT16 sGridNo )
+{
+	// First check current sector......
+	if( gWorldSectorX == 13 && gWorldSectorY == MAP_ROW_I && gbWorldSectorZ == 0 )
+	{
+		//if this is the right gridno
+		if( sGridNo == 12421 )
+		{
+			return( TRUE );
+		}
+	}
+
+	return( FALSE );
+}
+
 void HaveBiggensDetonatingExplosivesByTheMine()
 {
 	SOLDIERTYPE *pSoldier = NULL;
@@ -4997,4 +5017,91 @@ void HaveBiggensDetonatingExplosivesByTheMine()
 	}
 	//Have Biggens Triger the bombs by the cave wall
 	SetOffBombsByFrequency( ubID, FIRST_MAP_PLACED_FREQUENCY + 1 );
+}
+
+void ReplaceMineEntranceGraphicWithCollapsedEntrance()
+{
+	UINT16									usTileIndex;
+	UINT16 usGridNo=12745;
+
+	//Make sure wed ont blow things up twice
+	//off
+//	if( gJa25SaveStruct.fBiggensUsedDetonator )
+//		return;
+
+	//Remeber that biggens detonated the explosives
+	//gJa25SaveStruct.fBiggensUsedDetonator = TRUE;  jazz off
+
+	// Turn on permenant changes....
+	ApplyMapChangesToMapTempFile( TRUE );
+
+	// Remove it!
+	// Get index for it...
+	GetTileIndexFromTypeSubIndex( FIRSTOSTRUCT, (INT8)( 1 ), &usTileIndex );
+
+	AddStructToHead( usGridNo, usTileIndex );
+
+	//remove the exit grid from the world
+	RemoveExitGridFromWorld( 12422 );
+	RemoveExitGridFromWorld( 12423 );
+	AddRemoveExitGridToUnloadedMapTempFile( 12422, 13, MAP_ROW_I, 0 );
+	AddRemoveExitGridToUnloadedMapTempFile( 12423, 13, MAP_ROW_I, 0 );
+
+	gpWorldLevelData[ usGridNo ].uiFlags |= MAPELEMENT_REVEALED;
+
+
+	// Re-render the world!
+	gTacticalStatus.uiFlags |= NOHIDE_REDUNDENCY;
+
+	// FOR THE NEXT RENDER LOOP, RE-EVALUATE REDUNDENT TILES
+	InvalidateWorldRedundency( );
+	SetRenderFlags(RENDER_FLAG_FULL);
+
+	// Redo movement costs....
+	RecompileLocalMovementCostsFromRadius( usGridNo, 5 );
+
+
+
+
+	//
+	// Apply changes to the underground mine
+	//
+
+	//Remove the old tunnel pieces first
+
+	//First half of entrance
+	usGridNo = 13057;
+
+	// Get index for it...
+	GetTileIndexFromTypeSubIndex( FIRSTDECORATIONS, (INT8)( 1 ), &usTileIndex );
+
+	RemoveStructFromUnLoadedMapTempFile( usGridNo, usTileIndex, 13, MAP_ROW_I, 1 );
+
+	// Get index for it...
+	GetTileIndexFromTypeSubIndex( FIRSTDECORATIONS, (INT8)( 5 ), &usTileIndex );
+
+	//Apply changes
+	AddStructToUnLoadedMapTempFile( usGridNo, usTileIndex, 13, MAP_ROW_I, 1 );
+
+
+
+	// 2nd half of entrance
+	usGridNo = 12897;
+
+	// Get index for it...
+	GetTileIndexFromTypeSubIndex( FIRSTDECORATIONS, (INT8)( 2 ), &usTileIndex );
+
+	RemoveStructFromUnLoadedMapTempFile( usGridNo, usTileIndex, 13, MAP_ROW_I, 1 );
+
+	// Get index for it...
+	GetTileIndexFromTypeSubIndex( FIRSTDECORATIONS, (INT8)( 6 ), &usTileIndex );
+
+	//Apply changes
+	AddStructToUnLoadedMapTempFile( usGridNo, usTileIndex, 13, MAP_ROW_I, 1 );
+
+	//Remove the exit grid
+	AddRemoveExitGridToUnloadedMapTempFile( usGridNo, 13, MAP_ROW_I, 1 );
+
+	// Turn off permenant changes....
+	ApplyMapChangesToMapTempFile( FALSE );
 }

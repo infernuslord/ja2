@@ -387,6 +387,9 @@ extern UINT32 CalcMedicalCost( UINT8 ubId );
 extern BOOLEAN	gfInTalkPanel;
 
 //JA25 ub
-void HaveBiggensDetonatingExplosivesByTheMine();
+// This function checks if we should replace the mine entrance graphic
+BOOLEAN IsMineEntranceInSectorI13AtThisGridNo( INT16 sGridNo );
+extern void HaveBiggensDetonatingExplosivesByTheMine();
+extern void ReplaceMineEntranceGraphicWithCollapsedEntrance();
 
 #endif

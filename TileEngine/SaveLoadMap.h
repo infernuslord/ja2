@@ -43,6 +43,8 @@ enum
 
 	// Modify window graphic & structure 
 	SLM_WINDOW_HIT,
+	
+	SLM_REMOVE_EXIT_GRID,
 };
 
 typedef struct
@@ -111,5 +113,7 @@ void AddWindowHitToMapTempFile( INT32 uiMapIndex );
 
 BOOLEAN ChangeStatusOfOpenableStructInUnloadedSector( UINT16 usSectorX, UINT16 usSectorY, INT8 bSectorZ, INT32 usGridNo, BOOLEAN fChangeToOpen );
 
+//ja25 ub
+void AddRemoveExitGridToUnloadedMapTempFile( UINT16 usGridNo, INT16 sSectorX, INT16 sSectorY, UINT8 ubSectorZ );
 
 #endif

@@ -32,8 +32,8 @@ BOOLEAN			gfApplyChangesToTempFile = FALSE;
 //	3200 bytes * 8 bits = 25600 map elements
 UINT8				*gpRevealedMap;
 
-
-
+//Ja25
+void AddRemoveExitGridToUnloadedMapTempFile( UINT16 usGridNo, INT16 sSectorX, INT16 sSectorY, UINT8 ubSectorZ );
 
 void RemoveSavedStructFromMap( INT32 uiMapIndex, UINT16 usIndex );
 void AddObjectFromMapTempFileToMap( INT32 uiMapIndex, UINT16 usIndex );
@@ -288,6 +288,14 @@ BOOLEAN LoadAllMapChangesFromMapTempFileAndApplyThem( )
 					//Since the element is being saved back to the temp file, increment the #
 					uiNumberOfElementsSavedBackToFile++;
 				}
+				break;
+				
+			case SLM_REMOVE_EXIT_GRID:
+				//Remove the exit grid
+				RemoveExitGridFromWorld( pMap->usGridNo );
+
+				// Save this struct back to the temp file
+				SaveModifiedMapStructToMapTempFile( pMap, gWorldSectorX, gWorldSectorY, gbWorldSectorZ );
 				break;
 
 			default:
@@ -1205,4 +1213,25 @@ BOOLEAN ChangeStatusOfOpenableStructInUnloadedSector( UINT16 usSectorX, UINT16 u
 	return( TRUE );
 }
 
+//JA25
+void AddRemoveExitGridToUnloadedMapTempFile( UINT16 usGridNo, INT16 sSectorX, INT16 sSectorY, UINT8 ubSectorZ )
+{
+	MODIFY_MAP Map;
 
+	if( !gfApplyChangesToTempFile )
+	{
+		ScreenMsg( FONT_MCOLOR_WHITE, MSG_BETAVERSION, L"Called AddRemoveExitGridToUnloadedMapTempFile() without calling ApplyMapChangesToMapTempFile()" );
+		return;
+	}
+
+	if( gTacticalStatus.uiFlags & LOADING_SAVED_GAME )
+		return;
+
+	memset( &Map, 0, sizeof( MODIFY_MAP ) );
+
+	Map.usGridNo = usGridNo;
+
+	Map.ubType		= SLM_REMOVE_EXIT_GRID;
+
+	SaveModifiedMapStructToMapTempFile( &Map, sSectorX, sSectorY, ubSectorZ );
+}
