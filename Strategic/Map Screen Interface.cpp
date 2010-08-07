@@ -5764,7 +5764,7 @@ BOOLEAN HandleTimeCompressWithTeamJackedInAndGearedToGo( void )
 	SetUpShutDownMapScreenHelpTextScreenMask( );
 
 	// Add e-mail message
-	AddEmail(ENRICO_CONGRATS,ENRICO_CONGRATS_LENGTH,MAIL_ENRICO, GetWorldTotalMin(), -1);
+//	AddEmail(ENRICO_CONGRATS,ENRICO_CONGRATS_LENGTH,MAIL_ENRICO, GetWorldTotalMin(), -1);
 
 
 	return( TRUE );

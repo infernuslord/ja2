@@ -49,6 +49,13 @@
 
 #include "connect.h"
 
+#include "Explosion Control.h"
+#include "Ja25_Tactical.h"
+#include "Ja25 Strategic Ai.h"
+#include "MapScreen Quotes.h"
+#include "email.h"
+#include "interface Dialogue.h"
+
 #ifdef JA2BETAVERSION
 extern BOOLEAN gfMercsNeverQuit;
 #endif
@@ -208,7 +215,7 @@ BOOLEAN ExecuteStrategicEvent( STRATEGICEVENT *pEvent )
 	case EVENT_DAY3_ADD_EMAIL_FROM_SPECK:
 			if(!bMercDayOne)
 			{
-				AddEmail(MERC_INTRO, MERC_INTRO_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin( ), -1 );
+//				AddEmail(MERC_INTRO, MERC_INTRO_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin( ), -1 );
 			}
 			break;
 		case EVENT_DAY2_ADD_EMAIL_FROM_IMP:
@@ -445,6 +452,26 @@ Ja25 No meanwhiles
 			break;
 		case EVENT_POSTAL_SERVICE_SHIPMENT:
 			gPostalService.DeliverShipment(pEvent->uiParam);
+			break;
+			
+		case EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE:
+			ShouldEnemiesBeAddedToInitialSector();
+			break;
+
+		case EVENT_SAY_DELAYED_MERC_QUOTE:
+			DelayedSayingOfMercQuote( pEvent->uiParam );
+			break;
+
+		case EVENT_DELAY_SOMEONE_IN_SECTOR_MSGBOX:
+			SetMsgBoxForPlayerBeNotifiedOfSomeoneElseInSector();
+			break;
+
+		case EVENT_SECTOR_H8_DONT_WAIT_IN_SECTOR:
+			HandleSayingDontStayToLongWarningInSectorH8();
+			break;
+
+		case EVENT_SEND_ENRICO_UNDERSTANDING_EMAIL:
+			HandleEnricosUnderstandingEmail();
 			break;
 
 #ifdef CRIPPLED_VERSION

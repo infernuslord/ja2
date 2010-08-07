@@ -1361,12 +1361,12 @@ void StartInsuranceInvestigation( UINT8	ubPayoutID )
 	if (gStrategicStatus.ubInsuranceInvestigationsCnt == 0)
 	{
 		// first offense
-		AddEmailWithSpecialData( INSUR_SUSPIC, INSUR_SUSPIC_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].iPayOutPrice, LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].ubMercID );
+	//	AddEmailWithSpecialData( INSUR_SUSPIC, INSUR_SUSPIC_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].iPayOutPrice, LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].ubMercID );
 	}
 	else
 	{
 		// subsequent offense
-		AddEmailWithSpecialData( INSUR_SUSPIC_2, INSUR_SUSPIC_2_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].iPayOutPrice, LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].ubMercID );
+	//	AddEmailWithSpecialData( INSUR_SUSPIC_2, INSUR_SUSPIC_2_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].iPayOutPrice, LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].ubMercID );
 	}
 
 	if ( gMercProfiles[ LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].ubMercID ].ubSuspiciousDeath == VERY_SUSPICIOUS_DEATH )
@@ -1394,11 +1394,11 @@ void EndInsuranceInvestigation( UINT8	ubPayoutID )
 	if ( gMercProfiles[ LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].ubMercID ].ubSuspiciousDeath == VERY_SUSPICIOUS_DEATH )
 	{
 		// fraud, no payout!
-		AddEmailWithSpecialData( INSUR_1HOUR_FRAUD, INSUR_1HOUR_FRAUD_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].iPayOutPrice, LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].ubMercID );
+//		AddEmailWithSpecialData( INSUR_1HOUR_FRAUD, INSUR_1HOUR_FRAUD_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].iPayOutPrice, LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].ubMercID );
 	}
 	else
 	{
-		AddEmailWithSpecialData( INSUR_INVEST_OVER, INSUR_INVEST_OVER_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].iPayOutPrice, LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].ubMercID );
+//		AddEmailWithSpecialData( INSUR_INVEST_OVER, INSUR_INVEST_OVER_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].iPayOutPrice, LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].ubMercID );
 
 		// only now make a payment (immediately)
 		InsuranceContractPayLifeInsuranceForDeadMerc( ubPayoutID );
@@ -1427,7 +1427,7 @@ void InsuranceContractPayLifeInsuranceForDeadMerc( UINT8 ubPayoutID )
 	if( gMercProfiles[ LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].ubMercID ].ubSuspiciousDeath == 0 )
 	{
 		//Add an email telling the user that he received an insurance payment
-		AddEmailWithSpecialData( INSUR_PAYMENT, INSUR_PAYMENT_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].iPayOutPrice, LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].ubMercID );
+//		AddEmailWithSpecialData( INSUR_PAYMENT, INSUR_PAYMENT_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].iPayOutPrice, LaptopSaveInfo.pLifeInsurancePayouts[ ubPayoutID ].ubMercID );
 	}
 
 	LaptopSaveInfo.ubNumberLifeInsurancePayoutUsed --;

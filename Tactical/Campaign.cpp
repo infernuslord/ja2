@@ -1278,11 +1278,12 @@ void HandleUnhiredMercDeaths( INT32 iProfileID )
 		gStrategicStatus.ubUnhiredMercDeaths++;
 
 		//send an email as long as the merc is from aim
-		if( iProfileID < BIFF )
-		{
-			//send an email to the player telling the player that a merc died
-			AddEmailWithSpecialData(MERC_DIED_ON_OTHER_ASSIGNMENT, MERC_DIED_ON_OTHER_ASSIGNMENT_LENGTH, AIM_SITE, GetWorldTotalMin(), 0, iProfileID );
-		}
+		//ja25 ub
+		//if( iProfileID < BIFF )
+		//{
+		//	//send an email to the player telling the player that a merc died
+		//	AddEmailWithSpecialData(MERC_DIED_ON_OTHER_ASSIGNMENT, MERC_DIED_ON_OTHER_ASSIGNMENT_LENGTH, AIM_SITE, GetWorldTotalMin(), 0, iProfileID );
+		//}
 	}
 }
 
@@ -1775,6 +1776,8 @@ UINT16 TotalVisitableSurfaceSectors( void )
 
 void MERCMercWentUpALevelSendEmail( UINT8 ubMercMercIdValue )
 {
+//JA25 UB
+	/*
 	UINT8 ubEmailOffset = 0;
 	int iMsgLength = 0;
 
@@ -1814,4 +1817,6 @@ void MERCMercWentUpALevelSendEmail( UINT8 ubMercMercIdValue )
 	}
 
 	AddEmail( ubEmailOffset, iMsgLength, SPECK_FROM_MERC, GetWorldTotalMin(), -1);
+
+	*/
 }

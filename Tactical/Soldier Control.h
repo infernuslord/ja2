@@ -24,6 +24,9 @@
 // TEMP VALUES FOR NAMES
 #define MAXCIVLASTNAMES		30
 extern UINT16 CivLastNames[MAXCIVLASTNAMES][10];
+
+//ja25ub
+#define	NUM_ASSIST_SLOTS				156				//used for when the player asssists in killing the enemty
  
 
 // ANDREW: these are defines for OKDestanation usage - please move to approprite file
@@ -1079,6 +1082,12 @@ public:
 	// HEADROCK HAM 3.6: I'm removing this filler to make room for the above variable. I'm very worried though,
 	// I don't know if this is a good idea at all...
 	//INT16	filler;
+	//ja25
+	BOOLEAN											fIgnoreGetupFromCollapseCheck;
+	TIMECOUNTER									GetupFromJA25StartCounter;
+	BOOLEAN											fWaitingToGetupFromJA25Start;
+
+	UINT8												ubPercentDamageInflictedByTeam[NUM_ASSIST_SLOTS];			//The percent of damage inflicted by the player team.  Each element corresponds to the Soldier ID.  Each element contains the percent damage inflicted by that merc
 
 	char endOfPOD;	// marker for end of POD (plain old data)
 
@@ -2039,6 +2048,13 @@ public:
 
 	INT8	snowCamo;	
 	INT8	wornSnowCamo;
+	
+	
+	BOOLEAN											fIgnoreGetupFromCollapseCheck;
+	TIMECOUNTER									GetupFromJA25StartCounter;
+	BOOLEAN											fWaitingToGetupFromJA25Start;
+
+	UINT8												ubPercentDamageInflictedByTeam[NUM_ASSIST_SLOTS];			//The percent of damage inflicted by the player team.  Each element corresponds to the Soldier ID.  Each element contains the percent damage inflicted by that merc
 
 	UINT8					bFiller[ 36 ];
 

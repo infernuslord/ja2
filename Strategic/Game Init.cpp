@@ -653,6 +653,20 @@ Ja25 no meanwhiles
 		SetPendingNewScreen(LAPTOP_SCREEN);
 		}
 		gubScreenCount = 1;
+		
+		//ja25 ub
+		//Init the initial hweli crash sequence variable
+		InitializeHeliGridnoAndTime( FALSE );
+		SetFactTrue( FACT_TEX_IS_IN_GAME_AND_ALIVE_IN_STORE );
+		
+		//If tex is in the game ( John is NOT in the game )
+		//if( gJa25SaveStruct.fJohnKulbaIsInGame == FALSE )
+		//{
+			//make sure Betty offers his videos for sale
+			//AddTexsVideosToBettysInventory();
+		//}
+
+		InitJerryMiloInfo(); 
 
 		//Set the fact the game is in progress
 		gTacticalStatus.fHasAGameBeenStarted = TRUE;

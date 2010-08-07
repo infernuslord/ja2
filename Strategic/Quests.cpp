@@ -35,7 +35,10 @@
 
 #include "BobbyRMailOrder.h"
 #include "connect.h"
-
+#include "email.h"
+#include "Strategic Merc Handler.h"
+#include "laptop.h"
+#include "Ja25 Strategic Ai.h"
 
 #define TESTQUESTS
 
@@ -1289,6 +1292,57 @@ void InternalEndQuest( UINT8 ubQuest, INT16 sSectorX, INT16 sSectorY, BOOLEAN fU
 		// still in the brothel with Maria...
 		gMercProfiles[ MADAME ].bNPCData = 0;
 		gMercProfiles[ MADAME ].bNPCData2 = 0;
+	}
+	
+	
+	//if the quest is the FIX LAPTOP quest
+	if( ubQuest == QUEST_FIX_LAPTOP )
+	{
+		//Set the fact that AIM and MERC should start selling
+		gJa25SaveStruct.fHaveAimandMercOffferItems = TRUE;
+
+		//Remeber that we should send email in the next sector
+		gJa25SaveStruct.fSendEmail_10_NextSector = TRUE;
+
+		AddEmail( EMAIL_PILOTMISSING, EMAIL_PILOTMISSING_LENGTH, MAIL_ENRICO,  GetWorldTotalMin() ,-1);
+		AddEmail( EMAIL_MAKECONTACT, EMAIL_MAKECONTACT_LENGTH, MAIL_ENRICO,  GetWorldTotalMin() ,-1);
+
+		//Merc and Aim emails
+		AddEmail( EMAIL_AIM_PROMOTION_1, EMAIL_AIM_PROMOTION_1_LENGTH, AIM_SITE,  GetWorldTotalMin(),-1 );
+		AddEmail( EMAIL_MERC_PROMOTION_1, EMAIL_MERC_PROMOTION_1_LENGTH, SPECK_FROM_MERC,  GetWorldTotalMin(),-1);
+		AddEmail( EMAIL_AIM_PROMOTION_2, EMAIL_AIM_PROMOTION_2_LENGTH, AIM_SITE,  GetWorldTotalMin(),-1 );
+
+		//Manuel
+		{
+			SOLDIERTYPE *pSoldier=NULL;
+
+			pSoldier = FindSoldierByProfileID( 60 , TRUE ); //MANUEL
+
+			if( pSoldier != NULL )
+			{
+				//Add the Manuel email
+				AddEmail( EMAIL_MANUEL, EMAIL_MANUEL_LENGTH, MAIL_ENRICO,  GetWorldTotalMin() ,-1);
+			}
+		}
+
+		//Miguel
+		{
+			//if miguel was dead, when importing the save
+			if( gubFact[ FACT_PLAYER_IMPORTED_SAVE_MIGUEL_DEAD ] == FALSE )
+			{
+				//Add the miguel email
+				AddEmail( EMAIL_MIGUELHELLO, EMAIL_MIGUELHELLO_LENGTH, MAIL_MIGUEL,  GetWorldTotalMin(),-1 );
+			}
+		}
+
+		//If any aim mercs were asked to send emails when the get back from duty elsewhere
+		HandleAddingAnyAimAwayEmailsWhenLaptopGoesOnline();
+
+		//Should we send the IMP reminder email when we go back online
+		ShouldImpReminderEmailBeSentWhenLaptopBackOnline();
+
+		//Force which ever of these emails that needed to be sent, to be sent
+		HandleEmailBeingSentWhenEnteringSector( 0, 0, 0, TRUE );
 	}
 
 };

@@ -15,6 +15,7 @@ enum{
 	MAP_EXIT_TO_OPTIONS,
 	MAP_EXIT_TO_LOAD,
 	MAP_EXIT_TO_SAVE,
+	MAP_EXIT_TO_INTRO_SCREEN,
 	// OJW - 20090210 - clean resources on disconnect
 	MAP_EXIT_TO_MAINMENU
 };

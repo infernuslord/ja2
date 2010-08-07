@@ -364,6 +364,17 @@ UINT8 NumPCsInSector( void );
 void SetSoldierNonNeutral( SOLDIERTYPE * pSoldier );
 void SetSoldierNeutral( SOLDIERTYPE * pSoldier );
 
+void HandleThePlayerBeNotifiedOfSomeoneElseInSector();
+void SetMsgBoxForPlayerBeNotifiedOfSomeoneElseInSector();
+
+void HandleDisplayingOfPlayerLostDialogue( void );
+
+// UTILITY FUNCTIONS
+INT8	NumActiveAndConsciousTeamMembers( UINT8 ubTeam );
+UINT8 NumEnemyInSector( );
+UINT8 NumCapableEnemyInSector( );
+INT8	NumMercsOnPlayerTeam( );
+
 
 extern BOOLEAN sniperwarning;
 extern BOOLEAN biggunwarning;

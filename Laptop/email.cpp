@@ -3185,6 +3185,15 @@ BOOLEAN HandleMailSpecialMessages( UINT16 usMessageId, INT32 *iResults, EmailPtr
 		fSpecialCase = TRUE;
 
 		break;
+
+		case AIM_REFUND:
+			ModifyInsuranceEmails( usMessageId, iResults, pMail, AIM_REFUND_LENGTH );
+			break;
+		case MERC_REFUND:
+			ModifyInsuranceEmails( usMessageId, iResults, pMail, MERC_REFUND_LENGTH );
+			break;
+
+/*
 		case( MERC_INTRO ):
 			SetBookMark( MERC_BOOKMARK );
 			fReDrawScreenFlag = TRUE;
@@ -3255,6 +3264,8 @@ BOOLEAN HandleMailSpecialMessages( UINT16 usMessageId, INT32 *iResults, EmailPtr
 			}
 			giPrevMessageId = giMessageId;
 			break;
+
+*/
 	}
 
 	return fSpecialCase;

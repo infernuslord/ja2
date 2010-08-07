@@ -60,6 +60,12 @@
 	#include "GameSettings.h"
 #endif
 #include "connect.h"
+
+#include "Soldier Control.h"
+#include "Ja25 Strategic Ai.h"
+#include "Campaign Types.h"
+#include "MapScreen Quotes.h"
+
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -75,6 +81,8 @@ class SOLDIERTYPE;
 extern BOOLEAN		gfTacticalDoHeliRun;
 extern BOOLEAN		gfFirstHeliRun;
 
+BOOLEAN		gfFirstTimeInGameHeliCrash = FALSE;
+
 // ATE: Globals that dictate where the mercs will land once being hired
 // Default to Omerta
 // Saved in general saved game structure
@@ -83,7 +91,35 @@ INT16 gsMercArriveSectorX = gGameExternalOptions.ubDefaultArrivalSectorX;
 INT16 gsMercArriveSectorY = gGameExternalOptions.ubDefaultArrivalSectorY;
 
 void CheckForValidArrivalSector( );
+void AddItemToMerc( UINT8 ubNewMerc, INT16 sItemType );
 
+#define	NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH		7
+
+INT16	gsInitialHeliGridNo[ NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH ] =
+{
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+};
+
+INT16	gsInitialHeliRandomTimes[ NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH ] =
+{
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0
+};
+
+
+INT16		GetInitialHeliGridNo( );
+UINT16	GetInitialHeliRandomTime();
 
 INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 {
@@ -136,6 +172,8 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 		return( MERC_HIRE_FAILED );
 	}
 
+/*
+Ja25: No enrico, therefore, no email
 	if( DidGameJustStart() )
 	{
 		// OK, CHECK FOR FIRST GUY, GIVE HIM SPECIAL ITEM!
@@ -159,8 +197,36 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 
 		// ATE: Insert for demo , not using the heli sequence....
 		pHireMerc->ubInsertionCode				= INSERTION_CODE_CHOPPER;
+		#endif
+	}
+*/
+/*
+	//MErc mercs come with an umbrella
+	if( ( ubCurrentSoldier >= 40 && ubCurrentSoldier <= 50 ) || ubCurrentSoldier == GASTON || ubCurrentSoldier == STOGIE )
+	{
+		AddItemToMerc( iNewIndex, MERC_UMBRELLA );
 	}
 
+	//if this is an AIM or MERC merc
+	if( gJa25SaveStruct.fHaveAimandMercOffferItems )
+	{
+		//if its an aim merc
+		if( ubCurrentSoldier < 40 )
+		{
+			//give the mercs one of the promo items
+			AddItemToMerc( iNewIndex, SAM_GARVER_COMBAT_KNIFE );
+		}
+
+		// if its a merc merc
+		else if( ubCurrentSoldier <= 50 || ubCurrentSoldier == GASTON || ubCurrentSoldier == STOGIE )
+		{
+			//give the mercs one of the promo items
+			AddItemToMerc( iNewIndex, CHE_GUEVARA_CANTEEN );
+			AddItemToMerc( iNewIndex, MERC_WRISTWATCH );
+			AddItemToMerc( iNewIndex, SAM_GARVER_COMBAT_KNIFE );
+		}
+	}
+*/
 
 	//record how long the merc will be gone for
 	pMerc->bMercStatus = (UINT8)pHireMerc->iTotalContractLength;
@@ -202,10 +268,33 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 	{
 	if( DidGameJustStart() )
 	{
+		//ja25ub
+		//set a flag so we know we are doing the heli crash
+		gfFirstTimeInGameHeliCrash = FALSE; //AA
+
+		// Set time of initial merc arrival in minutes
+
 		pHireMerc->uiTimeTillMercArrives = ( gGameExternalOptions.iGameStartingTime + gGameExternalOptions.iFirstArrivalDelay ) / NUM_SEC_IN_MIN;
+		// Set the gridno for the soldier
+		pSoldier->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
+		pSoldier->usStrategicInsertionData = GetInitialHeliGridNo( );
+
+		//Set a "code" to enable the merc to be in the direction we set!
+		pSoldier->ubInsertionDirection = Random( NUM_WORLD_DIRECTIONS ) + 100;
+
+		if( pSoldier->ubStrategicInsertionCode == 0 )
+		{
+			Assert( 0 );
+		}
+
+		pSoldier->fWaitingToGetupFromJA25Start = TRUE;
+
+		pSoldier->fIgnoreGetupFromCollapseCheck = TRUE;
+
+		RESETTIMECOUNTER( pSoldier->GetupFromJA25StartCounter, GetInitialHeliRandomTime() );
 
 		// Set insertion for first time in chopper
-		pHireMerc->ubInsertionCode				= INSERTION_CODE_CHOPPER;
+		//pHireMerc->ubInsertionCode				= INSERTION_CODE_CHOPPER;
 
 		//set when the merc's contract is finished
 		pSoldier->iEndofContractTime = GetMidnightOfFutureDayInMinutes( pSoldier->iTotalContractLength ) + ( GetHourWhenContractDone( pSoldier ) * 60 );
@@ -299,6 +388,9 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 		pSoldier->ubWhatKindOfMercAmI = MERC_TYPE__NPC;
 		//pSoldier->iTotalContractCharge = -1;
 	}
+
+	//Ja25:  Need to set start time for all mercs
+	pSoldier->iStartContractTime = GetWorldDay( );
 
 	//remove the merc from the Personnel screens departed list ( if they have never been hired before, its ok to call it )
 	RemoveNewlyHiredMercFromPersonnelDepartedList( pSoldier->ubProfile );
@@ -399,7 +491,12 @@ void MercArrivesCallback(	UINT8	ubSoldierID )
 			gsSectorLocatorY = pSoldier->sSectorY;
 
 			TacticalCharacterDialogueWithSpecialEvent( pSoldier, 0, DIALOGUE_SPECIAL_EVENT_MINESECTOREVENT, 2, 0 );
-			TacticalCharacterDialogue( pSoldier, QUOTE_MERC_REACHED_DESTINATION );
+			
+//ja25ub
+			//if its the first time in, dont say anything
+			if( !gfFirstTimeInGameHeliCrash )
+				TacticalCharacterDialogue( pSoldier, QUOTE_MERC_REACHED_DESTINATION );
+
 			TacticalCharacterDialogueWithSpecialEvent( pSoldier, 0, DIALOGUE_SPECIAL_EVENT_MINESECTOREVENT, 3, 0 );
 			TacticalCharacterDialogueWithSpecialEventEx( pSoldier, 0, DIALOGUE_SPECIAL_EVENT_UNSET_ARRIVES_FLAG, 0, 0, 0 );
 		}
@@ -510,6 +607,13 @@ void HandleMercArrivesQuotes( SOLDIERTYPE *pSoldier )
 	INT8										cnt, bHated, bLastTeamID;
 	SOLDIERTYPE							*pTeamSoldier;
 
+	//if we are at the begining of the game going through the initial heli scequence
+	if( pSoldier->fWaitingToGetupFromJA25Start )
+	{
+		//we can "leave" this function cause we dont want to do anything with buddy system
+		return;
+	}
+	
 	// If we are approaching with helicopter, don't say any ( yet )
 	if ( pSoldier->ubStrategicInsertionCode != INSERTION_CODE_CHOPPER )
 	{
@@ -720,3 +824,173 @@ void CheckForValidArrivalSector( )
 	}
 }
 
+INT16	GetInitialHeliGridNo( )
+{
+	UINT8	ubCnt;
+	INT16	sGridNo;
+
+	for( ubCnt=0; ubCnt<NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH-1; ubCnt++)
+	{
+		if( gsInitialHeliGridNo[ ubCnt ] != 0 )
+		{
+			sGridNo = gsInitialHeliGridNo[ ubCnt ];
+			gsInitialHeliGridNo[ ubCnt ] = 0;
+
+			return( sGridNo );
+		}
+	}
+
+	return( 16233 );
+}
+
+UINT16	GetInitialHeliRandomTime()
+{
+	BOOLEAN fDone=FALSE;
+	UINT8		ubRandom;
+	UINT16	usTime;
+	UINT16	usCounter=0;
+
+	while( !fDone )
+	{
+		ubRandom = Random( NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH-1 );
+
+		if( gsInitialHeliRandomTimes[ ubRandom ] != 0 )
+		{
+			usTime = gsInitialHeliRandomTimes[ ubRandom ];
+			gsInitialHeliRandomTimes[ ubRandom ] = 0;
+			return( usTime );
+		}
+
+		if( usCounter > 1000 )
+			fDone = TRUE;
+
+		usCounter++;
+	}
+	return( 1000 + Random( 2000 ) );
+}
+
+void InitializeHeliGridnoAndTime( BOOLEAN fLoading )
+{
+	Assert( NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH == 7 );
+
+	if( !fLoading )
+	{
+		gfFirstTimeInGameHeliCrash = FALSE;
+	}
+
+	gsInitialHeliGridNo[ 0 ] = 14947;
+	gsInitialHeliGridNo[ 1 ] = 15584;//16067;
+	gsInitialHeliGridNo[ 2 ] = 15754;
+	gsInitialHeliGridNo[ 3 ] = 16232;
+	gsInitialHeliGridNo[ 4 ] = 16067;
+	gsInitialHeliGridNo[ 5 ] = 16230;
+	gsInitialHeliGridNo[ 6 ] = 15272;
+
+	gsInitialHeliRandomTimes[ 0 ] = 1300;
+	gsInitialHeliRandomTimes[ 1 ] = 2000;
+	gsInitialHeliRandomTimes[ 2 ] = 2750;
+	gsInitialHeliRandomTimes[ 3 ] = 3400;
+	gsInitialHeliRandomTimes[ 4 ] = 4160;
+	gsInitialHeliRandomTimes[ 5 ] = 4700;
+	gsInitialHeliRandomTimes[ 6 ] = 5630;
+}
+
+void InitJerryMiloInfo()
+{
+    return; //AA
+	//Set Jerry Milo's Gridno h7
+	gMercProfiles[ 76 ].sSectorX = 7;
+	gMercProfiles[ 76 ].sSectorY = 8;
+	gMercProfiles[ 76 ].bSectorZ = 0;
+
+	gMercProfiles[ 76 ].sGridNo = 15109;
+
+	gMercProfiles[ 76 ].fUseProfileInsertionInfo = TRUE;
+
+	gMercProfiles[ 76 ].ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
+	gMercProfiles[ 76 ].usStrategicInsertionData = 15109;
+
+	//init Jerry Milo quotes
+	InitJerryQuotes();
+}
+
+
+void UpdateJerryMiloInInitialSector()
+{
+	SOLDIERTYPE	*pSoldier = NULL;
+	SOLDIERTYPE	*pJerrySoldier=NULL;
+
+    SectorInfo[ SEC_H7 ].fSurfaceWasEverPlayerControlled = TRUE;
+    //SectorInfo[ SEC_H7 ].ubNumAdmins = 2;
+    
+
+	return; //AA
+    
+	//if it is the first sector we are loading up, place Jerry in the map
+	if( !gfFirstTimeInGameHeliCrash )
+		return;
+
+	pSoldier = FindSoldierByProfileID( 76, FALSE ); //JERRY
+	if( pSoldier == NULL )
+	{
+		Assert( 0 );
+	}
+
+	//the internet part of the laptop isnt working.  It gets broken in the heli crash.
+	StartQuest( QUEST_FIX_LAPTOP, -1, -1 );
+
+	//Record the initial sector as ours
+	SectorInfo[ SEC_H7 ].fSurfaceWasEverPlayerControlled = TRUE;
+
+	//Set some variable so Jerry will be on the ground
+	pSoldier->fWaitingToGetupFromJA25Start = TRUE;
+	pSoldier->fIgnoreGetupFromCollapseCheck = TRUE;
+
+//	pSoldier->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
+//	pSoldier->usStrategicInsertionData = GetInitialHeliGridNo( );
+
+	RESETTIMECOUNTER( pSoldier->GetupFromJA25StartCounter, gsInitialHeliRandomTimes[ 6 ] + 800 + Random( 400 ) );
+
+	//should we be on our back or tummy
+	if( Random( 100 ) < 50 )
+		pSoldier->EVENT_InitNewSoldierAnim( STAND_FALLFORWARD_STOP, 1, TRUE );
+	else
+		pSoldier->EVENT_InitNewSoldierAnim( FALLBACKHIT_STOP, 1, TRUE );
+
+
+//Wont work cause it gets reset every frame
+	//make sure we can see Jerry
+	pJerrySoldier = FindSoldierByProfileID(76, FALSE );//JERRY
+	if( pJerrySoldier != NULL )
+	{
+		//Make sure we can see the pilot
+		//gbPublicOpplist[OUR_TEAM][ pJerrySoldier->ubID ] = SEEN_CURRENTLY;
+		pJerrySoldier->bVisible = TRUE;
+	}
+
+
+	//Lock the interface
+	guiPendingOverrideEvent = LU_BEGINUILOCK;
+}
+
+void AddItemToMerc( UINT8 ubNewMerc, INT16 sItemType )
+{
+
+	/*
+	// OK, give this item to our merc!
+	OBJECTTYPE Object;
+	BOOLEAN	fReturn=FALSE;
+
+	// make an objecttype
+	memset( &Object, 0, sizeof( OBJECTTYPE ) );
+	Object.usItem						= sItemType;
+	Object.ubNumberOfObjects = 1;
+	Object.bStatus[0]				= 100;
+
+	// Give it 
+	fReturn = AutoPlaceObject( MercPtrs[ ubNewMerc ], &Object, FALSE );
+	Assert( fReturn );
+
+
+*/
+}

@@ -116,6 +116,7 @@
 #endif
 #include "test_space.h"
 #include "connect.h"
+#include "Ja25 Strategic Ai.h"
 
 // OJW - 20090419
 UINT8	giMAXIMUM_NUMBER_OF_PLAYER_MERCS = CODE_MAXIMUM_NUMBER_OF_PLAYER_MERCS;
@@ -188,6 +189,10 @@ extern void PlaySoldierFootstepSound( SOLDIERTYPE *pSoldier );
 extern void HandleKilledQuote( SOLDIERTYPE *pKilledSoldier, SOLDIERTYPE *pKillerSoldier, INT32 sGridNo, INT8 bLevel );
 extern UINT16 PickSoldierReadyAnimation( SOLDIERTYPE *pSoldier, BOOLEAN fEndReady );
 
+
+extern void PlayStealthySoldierFootstepSound( SOLDIERTYPE *pSoldier );
+
+BOOLEAN CanMsgBoxForPlayerToBeNotifiedOfSomeoneElseInSector();
 
 extern void PlayStealthySoldierFootstepSound( SOLDIERTYPE *pSoldier );
 
@@ -3579,7 +3584,7 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 				pKiller = MercPtrs[ pSoldierOld->ubAttackerID ];
 			}
 
-			BeginHandleDeidrannaDeath( pKiller, pSoldierOld->sGridNo, pSoldierOld->pathing.bLevel );
+		//	BeginHandleDeidrannaDeath( pKiller, pSoldierOld->sGridNo, pSoldierOld->pathing.bLevel );
 		}
 
 		// crows/cows are on the civilian team, but none of the following applies to them
@@ -3636,7 +3641,7 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 			{
 				pKiller = MercPtrs[ pSoldierOld->ubAttackerID ];
 
-				BeginHandleQueenBitchDeath( pKiller, pSoldierOld->sGridNo, pSoldierOld->pathing.bLevel );
+			//	BeginHandleQueenBitchDeath( pKiller, pSoldierOld->sGridNo, pSoldierOld->pathing.bLevel );
 			}
 		}
 
@@ -9002,4 +9007,105 @@ INT8 CheckStatusNearbyFriendlies( SOLDIERTYPE *pSoldier )
 
 	return(sModifier);
 
+}
+
+
+
+void SetMsgBoxForPlayerBeNotifiedOfSomeoneElseInSector()
+{
+	//if the player in the same sector as MANUEL
+	if( !CanMsgBoxForPlayerToBeNotifiedOfSomeoneElseInSector() )
+	{
+		return;
+	}
+
+	gJa25SaveStruct.fShouldMsgBoxComeUpSayingSomeoneImportantIsInSector = TRUE;
+}
+
+void HandleThePlayerBeNotifiedOfSomeoneElseInSector()
+{
+	//if we shouldnt be here, get out
+	if( !gJa25SaveStruct.fShouldMsgBoxComeUpSayingSomeoneImportantIsInSector )
+	{
+		return;
+	}
+
+	//if somehting else is going on, leave
+	if( gTacticalStatus.fAutoBandageMode ||
+			DialogueActive( ) ||
+			gTacticalStatus.fAutoBandagePending ||
+			guiPendingScreen == MSG_BOX_SCREEN ||
+			guiCurrentScreen == MSG_BOX_SCREEN ||
+			AreWeInAUIMenu( )
+		)
+	{
+		return;
+	}
+
+	gJa25SaveStruct.fShouldMsgBoxComeUpSayingSomeoneImportantIsInSector = FALSE;
+
+	//if the player in the same sector as MANUEL
+	if( !CanMsgBoxForPlayerToBeNotifiedOfSomeoneElseInSector() )
+	{
+		return;
+	}
+
+	DoMessageBox( MSG_BOX_BASIC_STYLE, zNewTacticalMessages[ TACT_MSG__SOMEONE_ELSE_IN_SECTOR ], GAME_SCREEN, ( UINT8 )MSG_BOX_FLAG_OK, NULL, NULL );
+
+}
+
+BOOLEAN CanMsgBoxForPlayerToBeNotifiedOfSomeoneElseInSector()
+{
+	// ATE: if this is a custom map, return
+/*	if ( gbWorldSectorZ == 0 )
+	{
+		if ( SectorInfo[ SECTOR( gWorldSectorY, gWorldSectorX ) ].fCustomSector )
+		{
+			return( FALSE );
+		}
+	}
+*/
+	if( ( gWorldSectorX == gMercProfiles[ 60 ].sSectorX && gWorldSectorY == gMercProfiles[ 60 ].sSectorY && gbWorldSectorZ == gMercProfiles[ 60 ].bSectorZ ) )
+	{
+		//IF MANUEL is already hired
+		if( gMercProfiles[ 60 ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
+		{
+			//then we shouldnt display the message
+			return( FALSE );
+		}
+
+		return( TRUE );
+	}
+
+	return( FALSE );
+}
+
+
+INT8 NumMercsOnPlayerTeam( )
+{
+	INT32					cnt;
+	SOLDIERTYPE   *pSoldier;
+	UINT8         ubCount = 0;
+
+	cnt = gTacticalStatus.Team[ OUR_TEAM ].bFirstID;
+
+  // look for all mercs on the same team, 
+  for ( pSoldier = MercPtrs[ cnt ]; cnt <= gTacticalStatus.Team[ OUR_TEAM ].bLastID; cnt++,pSoldier++)
+	{       
+		if( pSoldier->bActive && pSoldier->stats.bLife > 0 )
+		{
+			ubCount++;
+		}
+	}
+
+	return( ubCount );
+}
+
+void HandleDisplayingOfPlayerLostDialogue( void )
+{
+	//if the laptop transmitter is broken, and the player doesnt have any other team members
+	if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTDONE &&  NumMercsOnPlayerTeam( ) == 0 )
+	{
+		gJa25SaveStruct.ubDisplayPlayerLostMsgBox	= 1;	
+	}
 }

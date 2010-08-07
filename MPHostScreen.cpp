@@ -1608,7 +1608,7 @@ void DoneFadeOutForExitMPHScreen( void )
 	}
 	else
 #endif
-		SetIntroType( INTRO_BEGINING );
+	//	SetIntroType( INTRO_BEGINING );
 
 	ExitMPHScreen(); // cleanup please, if we called a fadeout then we didnt do it above
 

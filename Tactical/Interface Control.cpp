@@ -51,6 +51,8 @@
 	#include "civ quotes.h"
 #endif
 
+#include "Dialogue Control.h"
+
 /*	I deleted here declaration of clock coords for tactical screen i will declare them
  *	in functions that Initialize coord for SMPanet and TEAMPanel
  *	any questions? joker
@@ -1008,6 +1010,7 @@ void EraseInterfaceMenus( BOOLEAN fIgnoreUIUnLock )
 	PopDownMovementMenu( );
 	PopDownOpenDoorMenu( );
 	DeleteTalkingMenu( );
+	RemoveJerryMiloBrokenLaptopOverlay();
 }
 
 

@@ -120,6 +120,8 @@
 #include "InterfaceItemImages.h"
 // DEFINES
 
+#include "Ja25 Strategic Ai.h"
+#include "MapScreen Quotes.h"
 
 #define MAX_SORT_METHODS					6
 
@@ -4918,6 +4920,16 @@ UINT32 MapScreenHandle(void)
 		{
 			fFirstTimeInMapScreen = FALSE;
 //			fShowMapScreenHelpText = TRUE;
+			//JA25 UB
+			//Get Jerry Milo to say his opening quote, if he hasnt said it before
+			if( !HasJerryMiloSaidQuoteBefore( MILO_QUOTE__OPENING_GREETING_PART_1 ) )
+				JerryMiloDelayedTalk( MILO_QUOTE__OPENING_GREETING_PART_1, 1100 );
+		}
+		//Should Jerry popup a new quote now
+		else if( DidPlayerInitiallyHaveLessThen6MercsAndNowHaveExactly6AndHasntSaidFullLoadQuote() )
+		{
+			//Get Jerry Milo to say his opening quote
+			JerryMiloDelayedTalk( MILO_QUOTE__ALREADY_HAS_6_MERCS, 500 );
 		}
 
 		fShowMapInventoryPool = FALSE;
@@ -5256,12 +5268,19 @@ UINT32 MapScreenHandle(void)
 	RestoreBackgroundRects( );
 
 	InterruptTimeForMenus( );
+	
+	//JA25 UB
+	//Handle Jerry Milo quotes
+	HandleJerryMiloQuotes( FALSE );
 
 	// place down background
 	BlitBackgroundToSaveBuffer( );
 
 	if( fLeavingMapScreen == TRUE )
 	{
+		//JA25 UB
+		//specify that we are leaving mapscreen
+		HandleJerryMiloQuotes( TRUE );
 		return( MAP_SCREEN );
 	}
 
@@ -13320,6 +13339,11 @@ void TellPlayerWhyHeCantCompressTime( void )
 		ScreenMsg( FONT_MCOLOR_RED, MSG_BETAVERSION, L"(BETA) If permanent, take screenshot now, send with *previous* save & describe what happened since.");
 #endif
 	}
+	else if( DoesPlayerHaveNoMercsHiredAndJerryHasntSaidQuoteYet() )
+	{
+		JerryMiloTalk( MILO_QUOTE__PLAYER_HAS_NO_MERCS ); 
+        DoMapMessageBox( MSG_BOX_BASIC_STYLE, pMapScreenJustStartedHelpText[ 0 ], MAP_SCREEN, MSG_BOX_FLAG_OK, MapScreenDefaultOkBoxCallback );
+	}
 	else if( gfAtLeastOneMercWasHired == FALSE )
 	{
 		// no mercs hired, ever
@@ -13367,6 +13391,12 @@ void TellPlayerWhyHeCantCompressTime( void )
 	else if( fShowMapInventoryPool )
 	{
 		DoMapMessageBox( MSG_BOX_BASIC_STYLE, gzLateLocalizedString[ 55 ], MAP_SCREEN, MSG_BOX_FLAG_OK, MapScreenDefaultOkBoxCallback );
+	}
+	//JA25 UB
+	else if( !WillJerryMiloAllowThePlayerToCompressTimeAtBeginingOfGame() )
+	{
+		//Have jerry say why the player cant compress time
+		HaveJerrySayWhyPlayerCantTimeCompressAtBeginningOfGame();
 	}
 	// ARM: THIS TEST SHOULD BE THE LAST ONE, BECAUSE IT ACTUALLY RESULTS IN SOMETHING HAPPENING NOW.
 	// KM:	Except if we are in a creature lair and haven't loaded the sector yet (no battle yet)

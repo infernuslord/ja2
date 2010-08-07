@@ -71,6 +71,7 @@ typedef struct
 } SAVED_GAME_HEADER;
 
 
+
 extern	UINT32		guiScreenToGotoAfterLoadingSavedGame;
 extern UINT32 guiCurrentSaveGameVersion;
 

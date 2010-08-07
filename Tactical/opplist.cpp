@@ -7334,3 +7334,8 @@ BOOLEAN SoldierHasLimitedVision(SOLDIERTYPE * pSoldier)
 	else
 		return FALSE;
 }
+
+INT32 MaxDistanceVisible( void )
+{
+	return( STRAIGHT * 2 );
+}

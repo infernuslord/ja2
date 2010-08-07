@@ -125,6 +125,8 @@
 #include "Mercs.h"
 #include "INIReader.h"
 
+#include "Ja25 Strategic Ai.h"
+
 #include <vfs/Core/vfs.h>
 //rain
 #include "Rain.h"
@@ -412,78 +414,6 @@ typedef struct
 
 	//UINT8		ubFiller[534];		//This structure should be 1024 bytes
 	
-	//JA25 UB
-	UINT32		uiJerryMiloQuotesFlags;										//used to keep track of the quotes Jerry says.
-	BOOLEAN		fImportCharactersFromOldJa2Save;					// True if we have loaded in merc profiles from JA2
-
-	BOOLEAN		fInCustomMap;
-
-	BOOLEAN		fJohnKulbaIsInGame;												// If true Kulba is in the game, otherwise tex is
-
-	BOOLEAN		fMorrisToSayHurtPlayerQuoteNextTurn;
-	UINT8			ubPlayerMorrisHurt;
-
-	BOOLEAN		fBiggensUsedDetonator;
-
-	BOOLEAN		fSendEmail_10_NextSector;									// True if we are to send email #10 next time the player loads up a sector
-
-	UINT8			ubEmailFromSectorFlag;
-
-	BOOLEAN		fNpcHasBeenAdded;													// True if manuel has been added to sector H10 or i9
-
-	BOOLEAN		fShowMercDestinationDialogWhenHiringMerc;	// 
-
-	BOOLEAN		fHaveAimandMercOffferItems;								// TRUE when MERC and AIM are giving away 'gifts' to the mercs that get hired
-
-	BOOLEAN		fBiffWasKilledWhenImportingSave;					//TRUE is biff was killed when we imported the save
-
-	UINT8			ubImportantSpeckQuotesSaidBefore;					
-
-	BOOLEAN		fShouldMsgBoxComeUpSayingSomeoneImportantIsInSector;		
-
-	UINT8			ubStateOfFanInPowerGenSector;
-
-	UINT8			ubHowPlayerGotThroughFan;
-
-	UINT32		uiJa25TacticalFlags;
-
-	INT32			iPowerGenFanPositionSndID;
-
-	UINT32		uiTacticalTurnCounter;
-
-	UINT32		uiTurnPowerGenFanWentDown;
-
-	UINT32		uiJa25GeneralFlags;
-
-	UINT8			ubStatusOfFortifiedDoor;
-
-	UINT32		uiDisplayCoverCounter;
-	UINT32		uiDisplayLosCounter;
-	UINT32		uiDisplayGunRangeCounter;
-
-	UINT8			ubLoadScreenStairTraversal;
-
-	UINT8			ubMorrisNoteState;
-
-	UINT8			ubJohnKulbaInitialSectorX;
-	UINT8			ubJohnKulbaInitialSectorY;
-
-	UINT8			ubDisplayPlayerLostMsgBox;
-
-	BOOLEAN		fJerryBreakingLaptopOccuring;
-
-	BOOLEAN		fEnemyShouldImmediatelySeekThePlayer;
-	INT8			bSectorTheEnemyWillSeekEnemy;
-
-	INT8			bNewMercProfileIDForSayingMorrisNote;
-
-	UINT8			ubDisplayCommanderMorrisNote;
-
-	UINT16		usFiller1;
-
-	UINT32		uiTurnLastSaidSeeEnemyQuote;
-
-	UINT8			ubFiller[928];	//Struct is originally 1000 bytes in size
 
 } GENERAL_SAVE_INFO;
 
@@ -3260,6 +3190,9 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 		gfUseAlternateMap = TRUE;
 	}
 
+	
+	//Re-init the heli gridnos and time..
+	InitializeHeliGridnoAndTime( TRUE );
 
 	for (int x = 0; x < 256; ++x) {
 		gEnemyPreservedTempFileVersion[x] = guiCurrentSaveGameVersion;

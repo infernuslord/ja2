@@ -1529,8 +1529,8 @@ void DoneFadeOutForExitGameInitOptionScreen( void )
 
 	ExitGIOScreen();
 
-//	gFadeInDoneCallback = DoneFadeInForExitGameInitOptionScreen;
-//	FadeInNextFrame( );
+	gFadeInDoneCallback = DoneFadeInForExitGameInitOptionScreen;
+	FadeInNextFrame( );
 	SetCurrentCursorFromDatabase( VIDEO_NO_CURSOR );
 }
 

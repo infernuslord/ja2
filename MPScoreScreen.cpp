@@ -610,7 +610,7 @@ void DoneFadeOutForExitMPSScreen( void )
 	}
 	else
 #endif
-		SetIntroType( INTRO_BEGINING );
+	//	SetIntroType( INTRO_BEGINING );
 
 	ExitMPSScreen(); // cleanup please, if we called a fadeout then we didnt do it above
 

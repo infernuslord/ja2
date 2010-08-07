@@ -1479,6 +1479,7 @@ void ClearSectorListForCompletedTrainingOfMilitia( void )
 
 void HandleContinueOfTownTraining( void )
 {
+
 	SOLDIERTYPE *pSoldier = NULL;
 	INT32 iCounter = 0;
 	BOOLEAN fContinueEventPosted = FALSE;
@@ -1492,7 +1493,7 @@ void HandleContinueOfTownTraining( void )
 		if( pSoldier->bActive )
 		{
 			fContinueEventPosted = TRUE;
-			SpecialCharacterDialogueEvent( DIALOGUE_SPECIAL_EVENT_CONTINUE_TRAINING_MILITIA, pSoldier->ubProfile, 0, 0, 0, 0 );
+//			SpecialCharacterDialogueEvent( DIALOGUE_SPECIAL_EVENT_CONTINUE_TRAINING_MILITIA, pSoldier->ubProfile, 0, 0, 0, 0 );
 
 			// now set all of these peoples assignment done too
 			//HandleInterfaceMessageForContinuingTrainingMilitia( pSoldier );
@@ -1521,6 +1522,8 @@ void HandleContinueOfTownTraining( void )
 	}
 
 	return;
+	
+	
 }
 
 

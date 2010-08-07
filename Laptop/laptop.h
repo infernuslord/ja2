@@ -205,6 +205,8 @@ extern UINT32 guiLaptopBACKGROUND;
 #define	DEAD_MERC_COLOR_GREEN						55
 #define	DEAD_MERC_COLOR_BLUE						55
 
+//ja25 UB
+void			ShouldImpReminderEmailBeSentWhenLaptopBackOnline();
 
 #endif
 

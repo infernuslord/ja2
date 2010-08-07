@@ -349,3 +349,8 @@ void ResetJA2ClockGlobalTimers( void )
 	guiFlashCursorBaseTime = uiCurrentTime;
 	giPotCharPathBaseTime = uiCurrentTime;
 }
+
+void SetTileAnimCounter( INT32 iTime )
+{
+	giTimerIntervals[ ANIMATETILES ] = iTime;
+}

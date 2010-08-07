@@ -651,6 +651,8 @@ extern	void CheatToGetAll5Merc();
 extern	void DemoHiringOfMercs( );
 #endif
 
+//JA25 UB
+#define		LAPTOP__HAVENT_CREATED_IMP_REMINDER_EMAIL_ARRIVE_TIME				( (8 + Random(4) ) * 60 )
 
 
 void	SetLaptopExitScreen( UINT32 uiExitScreen )
@@ -6462,8 +6464,16 @@ void CreateLaptopButtonHelpText( INT32 iButtonIndex, UINT32 uiButtonHelpTextID )
 {
 	SetButtonFastHelpText( iButtonIndex, gzLaptopHelpText[ uiButtonHelpTextID ] );
 }
-
-
+//ja25 ub
+void ShouldImpReminderEmailBeSentWhenLaptopBackOnline()
+{
+	//if this is past the point of when the IMP email should have been sent
+	if( GetWorldTotalMin() > LAPTOP__HAVENT_CREATED_IMP_REMINDER_EMAIL_ARRIVE_TIME )
+	{
+		//and the email hasnt been sent
+		HaventMadeImpMercEmailCallBack();
+	}
+}
 
 
 

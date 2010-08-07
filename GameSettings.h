@@ -106,10 +106,15 @@ typedef struct
 	UINT32				uiMeanwhileScenesSeenFlags;         // Bit Vector describing seen 'mean whiles..' (not sure why this is in Game Settings )
 
 	BOOLEAN				fHideHelpInAllScreens;              // Controls Help "do not show help again" checkbox
+	
+	//JA25UB
+	BOOLEAN			fPlayerFinishedTheGame;
 
 	UINT8				ubSizeOfDisplayCover;               // The number of grids the player designates thru "Delete + '=' or '-'"
 	UINT8				ubSizeOfLOS;                        // The number of grids the player designates thru "End    + '=' or '-'"
 
+	UINT8		ubFiller[17];
+	
 }	GAME_SETTINGS;
 
 // CHRISL: New Enums to track inventory system

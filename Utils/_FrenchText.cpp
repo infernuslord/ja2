@@ -5050,4 +5050,31 @@ STR16 Additional113Text[]=
 	L"Jagged Alliance 2 v1.13 mode fenêtré exige une profondeur de couleur de 16 bit ou moins.",
 };
 
+STR16	zNewTacticalMessages[]=
+{
+	//L"Distance cible: %d tiles, Brightness: %d/%d",
+	L"Attache le transpondeur à votre PC portable.",
+	L"Vous n'avez pas les moyens d'engager %s",
+	L"Pour une durée limitée, les frais ci-dessus couvrent la mission entière, équipement ci-dessous compris.",
+	L"Engagez %s et découvrez dès à présent notre prix \"tout compris\".  Aussi inclus dans cette incroyable offerte l'équipement personnel du mercenaire sans frais supplémentaires.",
+	L"Frais",
+	L"Il y a quelqu'un d'autre dans le secteur...",
+	//L"Portée arme: %d tiles, Probabilités: %d pourcent",
+	L"Afficher couverture",
+	L"Ligne de vision",
+	L"Les nouvelles recrues ne peuvent arriver ici.",
+	L"Comme votre PC n'a pas de transpondeur, vous ne pouvez engager de nouvelles recrues. Revenez à une sauvegarde précédente et réessayez.",
+	L"%s entend le son de métal broyé provenant d'en dessous du corps de Jerry.  On dirait que l'antenne de votre PC ne sers plus à rien.",  //the %s is the name of a merc.  @@@  Modified
+	L"Apres avoir scanné la note laissée par le Deputy Commander Morris, %s sent une oppurtinité. La note contient les coordonnées pour le lancement de missiles sur Arulco. Elle contient aussi l'emplacement de l'usine d'où les missiles proviennent.",
+	L"En examinant le panneau de contrôle, %s s'aperçoît que less chiffres peuvent être inversés, pour que les missiles détruisent cette même usine.  %s a besoin de trouver un chemin pour s'enfuir.  L'ascenseur semble être la solution la plus rapide...",
+	L"Ceci est un jeu IRON MAN et vous ne pouvez sauvegarder s'il ya des ennemis dans les parages.",	//	@@@  new text
+	L"(ne peut sauvegarder en plein combat)", //@@@@ new text
+	L"Le nom de la campagne actuelle est supérieur à 30 lettres.",							// @@@ new text
+	L"La campagne actuelle est introuvable.",																	// @@@ new text
+	L"Campaign: Defaut ( %S )",																							// @@@ new text
+	L"Campaign: %S",																													// @@@ new text
+	L"Vous avez choisi la campagne %S. Cette campagne est un mod d'unfinished business. Etes vous sûr de vouloir jouer la campagne %S ?",			// @@@ new text
+	L"Pour pouvoir utiliser l'éditeur, veuillez choisir une autre campagne que celle par defaut.",		///@@new
+};
+
 #endif //FRENCH

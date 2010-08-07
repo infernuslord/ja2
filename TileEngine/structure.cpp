@@ -1325,6 +1325,11 @@ STRUCTURE * SwapStructureForPartnerAndStoreChangeInMap( INT32 sGridNo, STRUCTURE
 	return( InternalSwapStructureForPartner( sGridNo, pStructure, TRUE, TRUE ) );
 }
 
+STRUCTURE * SwapStructureForPartnerForcingGraphicalChange( INT32 sGridNo, STRUCTURE * pStructure )
+{
+	return( InternalSwapStructureForPartner( sGridNo, pStructure, FALSE, TRUE ) );
+}
+
 STRUCTURE * FindStructure( INT32 sGridNo, UINT32 fFlags )
 {
 	// finds a structure that matches any of the given flags
