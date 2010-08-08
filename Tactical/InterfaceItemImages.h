@@ -26,11 +26,13 @@ extern UINT32				guiGUNSM;
 extern UINT32				guiP1ITEMS;
 extern UINT32				guiP2ITEMS;
 extern UINT32				guiP3ITEMS;
+extern UINT32				guiP4ITEMS; //UB Items
 // new item image handles
 extern MDItemVideoObjects	g_oGUNSM;
 extern MDItemVideoObjects	g_oP1ITEMS;
 extern MDItemVideoObjects	g_oP2ITEMS;
 extern MDItemVideoObjects	g_oP3ITEMS;
+extern MDItemVideoObjects	g_oP4ITEMS; //UB Items
 
 bool RegisterItemImages();
 

@@ -71,5 +71,5 @@ extern DEALER_POSSIBLE_INV gMickyInventory[MAXITEMS+1];
 extern DEALER_POSSIBLE_INV gArnieInventory[MAXITEMS+1];
 extern DEALER_POSSIBLE_INV gPerkoInventory[MAXITEMS+1];
 extern DEALER_POSSIBLE_INV gFredoInventory[MAXITEMS+1];
-
+extern DEALER_POSSIBLE_INV gBettyInventory[MAXITEMS+1];
 #endif

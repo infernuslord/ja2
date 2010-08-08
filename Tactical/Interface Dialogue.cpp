@@ -195,6 +195,7 @@ void HandleTexFlushingToilet();
 void HandleTexMakingHimselfAlreadyBeIntroduced();
 void DisplayJerryBreakingLaptopTransmitterPopup();
 void HaveNpcOpenUpDealerScreen( UINT8 ubProfileID );
+void HandleTexBecomingCamoed();
 
 UINT8	ubTalkMenuApproachIDs[] =
 {
@@ -4312,27 +4313,27 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 				break;
 
 			case NPC_ACTION_LEAVING_NPC_TALK_MENU:
-				//HandleSpecificQuoteWhenLeavingNpcTalkMenu();
+				HandleSpecificQuoteWhenLeavingNpcTalkMenu();
 				break;
 
 			case NPC_ACTION_RAUL_BLOWS_HIMSELF_UP:
-				//HandleRaulBlowingHimselfUp();
+				HandleRaulBlowingHimselfUp();
 				break;
 
 			case NPC_ACTION_TEX_FLUSHES_TOILET:
-				//HandleTexFlushingToilet();
+				HandleTexFlushingToilet();
 				break;
 
 			case NPC_ACTION_MARK_TEX_AS_ALREADY_INTRODUCED_HIMSELF:
-				//HandleTexMakingHimselfAlreadyBeIntroduced();
+				HandleTexMakingHimselfAlreadyBeIntroduced();
 				break;
 
 			case NPC_ACTION_MAKE_TEX_CAMOED:
-				//HandleTexBecomingCamoed();
+				HandleTexBecomingCamoed();
 				break;
 
 			case NPC_ACTION_HAVE_DEALER_OPEN_BUY_SELL_SCREEN:
-				//HaveNpcOpenUpDealerScreen( ubTargetNPC );
+				HaveNpcOpenUpDealerScreen( ubTargetNPC );
 				break;
 
 			default:

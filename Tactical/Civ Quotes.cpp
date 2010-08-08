@@ -497,7 +497,7 @@ UINT16 DetermineCivQuoteEntry( SOLDIERTYPE *pCiv, UINT16 *pubCivHintToUse, BOOLE
 	
 	for( iCounter2 = NON_CIV_GROUP; iCounter2 < NUM_CIV_GROUPS; iCounter2++ )
 		{	
-			if (pCiv->ubCivilianGroup > QUEENS_CIV_GROUP && pCiv->ubCivilianGroup == iCounter2)
+			if (pCiv->ubCivilianGroup > UNNAMED_CIV_GROUP_19 && pCiv->ubCivilianGroup == iCounter2)
 			{
 				if ( pCiv->aiData.bNeutral )
 					{
@@ -516,7 +516,7 @@ UINT16 DetermineCivQuoteEntry( SOLDIERTYPE *pCiv, UINT16 *pubCivHintToUse, BOOLE
 		//if the civ is not an enemy
 		if ( pCiv->aiData.bNeutral )
 		{
-			return( 43 ); //CIV_QUOTE__CIV_NOT_ENEMY
+			return( CIV_QUOTE__CIV_NOT_ENEMY ); //43
 		}
 		else
 		{
@@ -527,15 +527,15 @@ UINT16 DetermineCivQuoteEntry( SOLDIERTYPE *pCiv, UINT16 *pubCivHintToUse, BOOLE
 			//if the civ can fight
 			if( pCiv->ubBodyType == REGMALE || pCiv->ubBodyType == REGFEMALE || pCiv->ubBodyType == BIGMALE )
 			{
-				return( 40 ); //CIV_QUOTE__CIV_ENEMY_CAN_FIGHT
+				return( CIV_QUOTE__CIV_ENEMY_CAN_FIGHT); //40 
 			}
 			else if( pCiv->stats.bLife < pCiv->stats.bLifeMax )
 			{
-				return( 42 ); //CIV_QUOTE__CIV_HURT
+				return( CIV_QUOTE__CIV_HURT ); //42
 			}
 			else
 			{
-				return( 41 ); //CIV_QUOTE__CIV_ENEMY_GENERIC
+				return( CIV_QUOTE__CIV_ENEMY_GENERIC ); //41
 			}
 		}
 	}

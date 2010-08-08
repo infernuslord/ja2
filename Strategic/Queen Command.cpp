@@ -52,6 +52,15 @@
 #include "connect.h"
 #include "Reinforcement.h"
 #include "MilitiaSquads.h"
+
+#include "Explosion Control.h"
+#include "Ja25_Tactical.h"
+#include "Ja25 Strategic Ai.h"
+#include "MapScreen Quotes.h"
+#include "email.h"
+#include "interface Dialogue.h"
+#include "Arms Dealer Init.h"
+
 #include <vector>
 
 //The sector information required for the strategic AI.  Contains the number of enemy troops,
@@ -75,6 +84,7 @@ extern BOOLEAN gfOverrideSector;
 
 INT32 gsInterrogationGridNo[3] = { 7756, 7757, 7758 };
 
+void HandleBloodCatDeaths( SECTORINFO *pSector );
 
 extern void Ensure_RepairedGarrisonGroup( GARRISON_GROUP **ppGarrison, INT32 *pGarraySize );
 
@@ -1153,6 +1163,10 @@ void ProcessQueenCmdImplicationsOfDeath( SOLDIERTYPE *pSoldier )
 						{
 							pSector->bBloodCats--;
 						}
+						
+							//JA25 UB
+							//handle anything important when bloodcats die
+							HandleBloodCatDeaths( pSector );
 					}
 
 					break;
@@ -2253,3 +2267,41 @@ BOOLEAN CheckPendingEnemies()
 	}
 	return FALSE;
 }
+
+void HandleBloodCatDeaths( SECTORINFO *pSector )
+{
+	//if the current sector is the first part of the town
+	if( gWorldSectorX == 10 && gWorldSectorY == 9 && gbWorldSectorZ == 0 )
+	{
+		//if ALL the bloodcats are killed
+		if( pSector->bBloodCats == 0 )
+		{
+			UINT8 bId1=-1;
+			UINT8 bId2=-1;
+			UINT8 bNum=0;
+
+			SetFactTrue( FACT_PLAYER_KILLED_ALL_BETTYS_BLOODCATS );
+
+			//Instantly have betties missing items show up
+			//DailyCheckOnItemQuantities( TRUE );
+
+			// Now have a merc say the killed bloodcat quote
+			bNum = Get3RandomQualifiedMercs( &bId1, &bId2, NULL );
+
+			//if there are some qualified mercs
+			if( bNum != 0 )
+			{
+				//must make sure TEX doesnt say the quote
+				if( bId1 != NOBODY && Menptr[ bId1 ].ubProfile != 64 )
+				{
+					TacticalCharacterDialogue( &Menptr[ bId1 ], QUOTE_RENEW_REFUSAL_DUE_TO_LACK_OF_FUNDS );
+				}
+				else if( bId2 != NOBODY && Menptr[ bId2 ].ubProfile != 64 )
+				{
+					TacticalCharacterDialogue( &Menptr[ bId2 ], QUOTE_RENEW_REFUSAL_DUE_TO_LACK_OF_FUNDS );
+				}
+			}
+		}
+	}
+}
+

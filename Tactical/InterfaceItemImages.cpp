@@ -16,11 +16,13 @@ UINT32					guiGUNSM;
 UINT32					guiP1ITEMS;
 UINT32					guiP2ITEMS;
 UINT32					guiP3ITEMS;
+UINT32					guiP4ITEMS; //UB Items
 // new item image handles
 MDItemVideoObjects		g_oGUNSM;
 MDItemVideoObjects		g_oP1ITEMS;
 MDItemVideoObjects		g_oP2ITEMS;
 MDItemVideoObjects		g_oP3ITEMS;
+MDItemVideoObjects		g_oP4ITEMS; //UB Items
 
 /******************************************************************************/
 
@@ -151,6 +153,19 @@ bool RegisterItemImages()
 			AssertMsg(0, "Missing INTERFACE\\mdp3items.sti" );
 	}
 	else if(!g_oP3ITEMS.registerItemsFromFilePattern(L"INTERFACE/MDP3ITEMS/*.png"))
+	{
+		return false;
+	}
+	
+	// LOAD INTERFACE UB ITEM PICTURES
+	if(!g_bUsePngItemImages)
+	{
+		VObjectDesc.fCreateFlags = VOBJECT_CREATE_FROMFILE;
+		FilenameForBPP("INTERFACE\\GUN_UB.sti", VObjectDesc.ImageFile);
+		if( !AddVideoObject( &VObjectDesc, &guiP4ITEMS ) )
+			AssertMsg(0, "Missing INTERFACE\\GUN_UB.sti" );
+	}
+	else if(!g_oP4ITEMS.registerItemsFromFilePattern(L"INTERFACE/GUN_UB/*.png"))
 	{
 		return false;
 	}

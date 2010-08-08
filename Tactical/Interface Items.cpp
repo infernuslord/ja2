@@ -6864,6 +6864,11 @@ UINT32 GetInterfaceGraphicForItem( INVTYPE *pItem )
 		TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oP2ITEMS.getVObjectForItem(pItem->ubGraphicNum) : guiP2ITEMS,
 			L"Failed to retrieve P2 item image" );
 	}
+	else if ( pItem->ubGraphicType == 9 ) // Items UB
+	{
+		TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oP4ITEMS.getVObjectForItem(pItem->ubGraphicNum) : guiP4ITEMS,
+			L"Failed to retrieve P4 item image" );
+	}
 	else
 	{
 		TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oP3ITEMS.getVObjectForItem(pItem->ubGraphicNum) : guiP3ITEMS,
@@ -6951,6 +6956,17 @@ BOOLEAN LoadTileGraphicForItem( INVTYPE *pItem, UINT32 *puiVo )
 		else
 		{
 			sprintf( zName, "p2item%d", ubGraphic );
+		}
+	}
+	else if ( pItem->ubGraphicType == 9 ) // UB Items
+	{
+		if ( ubGraphic < 10 )
+		{
+			sprintf( zName, "GUN_UB0%d", ubGraphic );
+		}
+		else
+		{
+			sprintf( zName, "GUN_UB%d", ubGraphic );
 		}
 	}
 	else

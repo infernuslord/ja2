@@ -24,6 +24,8 @@ class SOLDIERTYPE;
 
 extern INT8	gbSelectedArmsDealerID;
 
+//Betty UB
+DEALER_POSSIBLE_INV gBettyInventory[MAXITEMS+1];// =
 
 // CHRISL: Updated this to include IC_LBEGEAR class
 // This table controls the order items appear in inventory at BR's and dealers, and which kinds of items are sold used
@@ -768,6 +770,10 @@ INT8 GetDealersMaxItemAmount( UINT8 ubDealerID, UINT16 usItemIndex )
 		case ARMS_DEALER_MANNY:
 			return( GetMaxItemAmount( gMannyInventory, usItemIndex ) );
 			break;
+			
+		case ARMS_DEALER_BETTY:
+			return( GetMaxItemAmount( gBettyInventory, usItemIndex ) );
+			break;
 
 		default:
 			Assert( FALSE );
@@ -874,6 +880,10 @@ DEALER_POSSIBLE_INV *GetPointerToDealersPossibleInventory( UINT8 ubArmsDealerID 
 
 		case ARMS_DEALER_MANNY:
 			return( gMannyInventory );
+			break;
+			
+		case ARMS_DEALER_BETTY:
+			return( gBettyInventory );
 			break;
 
 		default:

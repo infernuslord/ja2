@@ -72,6 +72,7 @@
 #include "XML.h"
 
 #include "LuaInitNPCs.h"
+#include "Arms Dealer Init.h"
 
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -452,6 +453,29 @@ void InitStrategicLayer( void )
 	// select A9 Omerta as the initial selected sector
 	// HEADROCK HAM 3.5: Actually, this is where we set the starting sector based on external variables.
 	ChangeSelectedMapSector( gGameExternalOptions.ubDefaultArrivalSectorX, gGameExternalOptions.ubDefaultArrivalSectorY, startingZ );
+	
+	
+	
+	INT8	bNumBloodCats=0;
+
+	switch( gGameOptions.ubDifficultyLevel )
+	{
+		case DIF_LEVEL_EASY:
+			bNumBloodCats = 3;
+			break;
+		case DIF_LEVEL_MEDIUM:
+			bNumBloodCats = 4;
+			break;
+		case DIF_LEVEL_HARD:
+			bNumBloodCats = 5;
+			break;
+		case DIF_LEVEL_INSANE:
+			bNumBloodCats = 5;
+			break;			
+	}
+	
+		SectorInfo[ SEC_I10	].bBloodCatPlacements = 5;
+		SectorInfo[ SEC_I10	].bBloodCats = bNumBloodCats;
 
 	// Reset these flags or mapscreen could be disabled and cause major headache.
 	fDisableDueToBattleRoster = FALSE;
@@ -739,6 +763,8 @@ Ja25 no meanwhiles
 		}
 		
 	}
+	
+	AddTexsVideosToBettysInventory();
 
 /*
 	if ( gubScreenCount == 2 )

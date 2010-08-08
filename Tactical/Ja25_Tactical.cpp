@@ -97,6 +97,7 @@ typedef struct
 //Morris items
 UINT32 MORRIS_INSTRUCTION_NOTE = 4000;
 
+UINT8 Get3RandomQualifiedMercs( UINT8 *pSoldierId1, UINT8 *pSoldierId2, UINT8 *pSoldierId3 );
 
 //*******************************************************************
 //
@@ -349,9 +350,9 @@ INT8 RandomArrayOfQualifiedMercs( UINT8 *pRandomSoldierIdArray )
 }
 
 
-INT8 Get3RandomQualifiedMercs( UINT8 *pSoldierId1, UINT8 *pSoldierId2, UINT8 *pSoldierId3 )
+UINT8 Get3RandomQualifiedMercs( UINT8 *pSoldierId1, UINT8 *pSoldierId2, UINT8 *pSoldierId3 )
 {
-	INT8	bNumMercs;
+	UINT8	bNumMercs;
 	UINT8 RandomSoldierIdArray[ NUM_MERCS_WITH_NEW_QUOTES ];
 	UINT8 ubNumberDifMercsAssigned=0;
 
@@ -1782,4 +1783,3 @@ void HandleOpenControlPanelToRevealSwitchInMorrisArea()
 		}
 	}
 }
-

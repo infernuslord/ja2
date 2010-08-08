@@ -35,6 +35,9 @@ enum
 
 // added only in GameVersion 55
 	ARMS_DEALER_MANNY,
+	
+	//Betty UB
+	ARMS_DEALER_BETTY,
 
 	NUM_ARMS_DEALERS,
 };
@@ -109,6 +112,11 @@ enum
 #define		ARMS_DEALER_ALL_WEAPONS			ARMS_DEALER_ALL_GUNS | ARMS_DEALER_BLADE | ARMS_DEALER_LAUNCHER | ARMS_DEALER_KNIFECLASS
 
 
+//Raul
+#define	ARMS_DEALER_FLAG__RAUL_HAS_SOLD_BARRETT_TO_PLAYER					0x00000001	// Raul has sold the Barrett to the player
+#define	ARMS_DEALER_FLAG__RAUL_SAID_QUOTE_48											0x00000002	// Raul said the quote for when the player first puts the hand cannon down
+#define	ARMS_DEALER_FLAG__RAUL_SAID_QUOTE_49											0x00000004	// Quote for when player removes hand cannon from players offer area
+#define	ARMS_DEALER_FLAG__RAUL_SAID_QUOTE_50											0x00000008	// Quote for when player adds the hand cannon AGAIN into the players offer area
 
 
 
@@ -193,6 +201,8 @@ public:
 	BOOLEAN fRepairDelayBeenUsed;		// Set when a repairman has missed his repair time estimate & given his excuse for it
 	BOOLEAN	fUnusedKnowsPlayer;			// Set if the shopkeeper has met with the player before [UNUSED]
 	UINT32	uiTimePlayerLastInSKI;		// game time (in total world minutes) when player last talked to this dealer in SKI
+	
+	BOOLEAN	fHasSoldSomethingToPlayer;	//If set, the player has at some point sold something to the player
 
 	UINT16	ubStrayAmmo[MAXITEMS];			// partially-depleted ammo mags are stored here as #bullets, and can be converted to full packs
 	BOOLEAN	fPreviouslyEligible[MAXITEMS];	// whether or not dealer has been eligible to sell this item in days prior to today
@@ -304,7 +314,7 @@ extern std::vector<ARMS_DEALER_INFO>	armsDealerInfo;
 extern ARMS_DEALER_STATUS		gArmsDealerStatus[ NUM_ARMS_DEALERS ];
 
 
-
+void AddTexsVideosToBettysInventory();
 
 
 
@@ -363,5 +373,6 @@ UINT16	CalcValueOfItemToDealer( UINT8 ubArmsDealer, UINT16 usItemIndex, BOOLEAN 
 UINT32 CalculateOvernightRepairDelay( UINT8 ubArmsDealer, UINT32 uiTimeWhenFreeToStartIt, UINT32 uiMinutesToFix );
 UINT32 CalculateMinutesClosedBetween( UINT8 ubArmsDealer, UINT32 uiStartTime, UINT32 uiEndTime );
 
+extern void DailyCheckOnItemQuantities( BOOLEAN fInstallyHaveItemsAppear ); //Ja25 UB
 
 #endif

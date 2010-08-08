@@ -89,6 +89,8 @@ typedef PARSE_STAGE;
 #define PERKOINVENTORYFILENAME					"NPCInventory\\PerkoInventory.xml"
 #define FREDOINVENTORYFILENAME					"NPCInventory\\FredoInventory.xml"
 
+#define BETTYINVENTORYFILENAME					"NPCInventory\\BettyInventory.xml"
+
 #define BOBBYRAYSTRINGSFILENAME					"BobbyRayStrings.xml"
 #define AMMOCALIBERSTRINGSFILENAME				"AmmoCaliberStrings.xml"
 

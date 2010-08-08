@@ -479,6 +479,11 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, FREDOINVENTORYFILENAME);
 	THROWIFFALSE(ReadInInventoryStats(gFredoInventory,fileName),FREDOINVENTORYFILENAME);
+	
+	strcpy(fileName, directoryName);
+	strcat(fileName, BETTYINVENTORYFILENAME);
+	THROWIFFALSE(ReadInInventoryStats(gBettyInventory,fileName),BETTYINVENTORYFILENAME);
+
 
 
 	strcpy(fileName, directoryName);
