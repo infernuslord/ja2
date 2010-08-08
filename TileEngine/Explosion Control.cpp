@@ -4018,7 +4018,7 @@ BOOLEAN ShouldThePlayerStopWhenWalkingOnBiggensActionItem( UINT8 ubRecordNum )
 {
 	SOLDIERTYPE *pSoldier=NULL;
 
-	pSoldier = FindSoldierByProfileID( BIGGENS, TRUE );
+	pSoldier = FindSoldierByProfileID( 61, TRUE ); //BIGGENS
 
 	//if biggens hasnt said the quote before, or is on the players team
 	if( HasNpcSaidQuoteBefore( 61, ubRecordNum ) || ( pSoldier != NULL || gMercProfiles[ 61 ].bLife <= 0 ) ) //BIGGENS

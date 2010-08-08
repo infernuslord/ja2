@@ -332,8 +332,8 @@ void GameInitMercs()
 //		gubMercArray[ i ] = i+BIFF;
 
 	// WANNE - MP: Initialize the the variables for single player
-	NUMBER_OF_MERCS = 15;
-	LAST_MERC_ID = 14;
+	NUMBER_OF_MERCS = 13;//15;
+	LAST_MERC_ID = 12; //14
 
 	//can now be out of order
 	gubMercArray[ 0 ] = BIFF;
@@ -346,24 +346,24 @@ void GameInitMercs()
 	gubMercArray[ 7 ] = LARRY_NORMAL;		//if changing this values, change in GetMercIDFromMERCArray()
 	gubMercArray[ 8 ] = LARRY_DRUNK;		//if changing this values, change in GetMercIDFromMERCArray()
 	gubMercArray[ 9 ] = NUMB;
-	gubMercArray[ 10 ] = TEX;
-	gubMercArray[ 11 ] = BIGGENS;
-	gubMercArray[ 12 ] = COUGAR;
-	gubMercArray[ 13 ] = GASTON;
-	gubMercArray[ 14 ] = STOGIE;
-	gubMercArray[ 15 ] = 57;//hayden
-	gubMercArray[ 16 ] = 58;
-	gubMercArray[ 17 ] = 59;
-	gubMercArray[ 18 ] = 60;
-	gubMercArray[ 19 ] = 61;
-	gubMercArray[ 20 ] = 63;
-	gubMercArray[ 21 ] = 66;
-	gubMercArray[ 22 ] = 67;
-	gubMercArray[ 23 ] = 68;
-	gubMercArray[ 24 ] = 69;
-	gubMercArray[ 25 ] = 70;
-	gubMercArray[ 26 ] = 72;		
-	gubMercArray[ 27 ] = 64;
+	//gubMercArray[ 10 ] = TEX;
+	//gubMercArray[ 11 ] = BIGGENS;
+	gubMercArray[ 10 ] = COUGAR;
+	gubMercArray[ 11 ] = GASTON;
+	gubMercArray[ 12 ] = STOGIE;
+	gubMercArray[ 13 ] = 57;//hayden
+	gubMercArray[ 14 ] = 58;
+	gubMercArray[ 15 ] = 59;
+	gubMercArray[ 16 ] = 60;
+	gubMercArray[ 17 ] = 61;
+	gubMercArray[ 18 ] = 63;
+	gubMercArray[ 19 ] = 66;
+	gubMercArray[ 20 ] = 67;
+	gubMercArray[ 21 ] = 68;
+	gubMercArray[ 22 ] = 69;
+	gubMercArray[ 23 ] = 70;
+	gubMercArray[ 24 ] = 72;
+	gubMercArray[ 25 ] = 64;
 
 	LaptopSaveInfo.gubPlayersMercAccountStatus = MERC_NO_ACCOUNT;
 	gubCurMercIndex = 0;
@@ -2522,7 +2522,7 @@ void ShouldAnyNewMercMercBecomeAvailable()
 					fNewMercAreAvailable = TRUE;
 				}
 			}
-
+                         /*
 			if( CanMercBeAvailableYet( MERC_ARRIVES_TEX ) )
 			{
 				fNewMercAreAvailable = TRUE;
@@ -2532,7 +2532,7 @@ void ShouldAnyNewMercMercBecomeAvailable()
 			{
 				fNewMercAreAvailable = TRUE;
 			}
-
+                        */
 			//for COUGAR
 			//	if( GetMercIDFromMERCArray( LaptopSaveInfo.gubLastMercIndex ) == COUGAR )
 			{
@@ -2616,7 +2616,7 @@ void NewMercsAvailableAtMercSiteCallBack( )
 			fSendEmail = TRUE;
 		}
 	}
-
+        /*
 	if( CanMercBeAvailableYet( MERC_ARRIVES_TEX ) )
 	{
 		LaptopSaveInfo.gubLastMercIndex++;
@@ -2630,7 +2630,7 @@ void NewMercsAvailableAtMercSiteCallBack( )
 		LaptopSaveInfo.ubLastMercAvailableId = MERC_ARRIVES_BIGGENS;
 		fSendEmail = TRUE;
 	}
-
+           */
 //for COUGAR
 //	if( GetMercIDFromMERCArray( LaptopSaveInfo.gubLastMercIndex ) == COUGAR )
 	{
@@ -2695,7 +2695,6 @@ UINT32 CalcMercDaysServed()
 	}
 	return( uiDaysServed );
 }
-
 
 
 

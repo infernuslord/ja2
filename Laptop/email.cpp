@@ -27,6 +27,9 @@
 	#include <string>
 #endif
 
+#include "Ja25_Tactical.h"
+#include "Ja25 Strategic Ai.h"
+
 #define		EMAIL_EDT_FILE_JA25			"BINARYDATA\\Email25.edt"
 #define		EMAIL_EDT_FILE_JA2		"BINARYDATA\\Email.edt"
 
@@ -3135,6 +3138,25 @@ void HandleAnySpecialEmailMessageEvents(INT32 iMessageId )
 
 	switch( iMessageId )
 	{
+		case EMAIL_MAKECONTACT:
+			if( !( gJa25SaveStruct.ubEmailFromSectorFlag & SECTOR_EMAIL__ANOTHER_SECTOR ) )
+			{
+				AddStrategicEvent( EVENT_SEND_ENRICO_UNDERSTANDING_EMAIL, GetWorldTotalMin() + ( 2 * 60 ) + Random( 120 ), 0 );
+			}
+			break;
+
+		case( IMP_EMAIL_AGAIN ):
+		 SetBookMark(IMP_BOOKMARK);
+		break;
+    case( IMP_EMAIL_INTRO ):
+		 SetBookMark(IMP_BOOKMARK);
+		break;
+	}
+
+	// handles any special message events
+/*
+	switch( iMessageId )
+	{
 
 		case( IMP_EMAIL_AGAIN ):
 		SetBookMark(IMP_BOOKMARK);
@@ -3143,6 +3165,7 @@ void HandleAnySpecialEmailMessageEvents(INT32 iMessageId )
 		SetBookMark(IMP_BOOKMARK);
 		break;
 	}
+*/	
 }
 
 void ReDisplayBoxes( void )

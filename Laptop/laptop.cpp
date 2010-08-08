@@ -1004,8 +1004,8 @@ INT32 EnterLaptop()
 	if (!is_networked)
 		SetBookMark(AIM_BOOKMARK);
 		
-	//Ja25 UB
-	 SetBookMark(IMP_BOOKMARK);
+	//JA25 UB
+	 SetBookMark(MERC_BOOKMARK);
 	
 	LoadLoadPending( );
 
@@ -6477,7 +6477,6 @@ void ShouldImpReminderEmailBeSentWhenLaptopBackOnline()
 		HaventMadeImpMercEmailCallBack();
 	}
 }
-
 
 
 
