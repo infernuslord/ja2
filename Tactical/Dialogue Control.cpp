@@ -1851,17 +1851,17 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 //					sprintf( zFileName,"NPC_SPEECH\\g_%03d_%03d.wav",ubCharacterNum,usQuoteNum );
 //				}
 //			#else
-				sprintf( zFileName,"NPC_SPEECH\\d_%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
+				sprintf( zFileName,"NPC_SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
 				if ( !FileExists( zFileName ) )
 				{
-					sprintf( zFileName,"NPC_SPEECH\\d_%03d_%03d.wav",ubCharacterNum,usQuoteNum );
+					sprintf( zFileName,"NPC_SPEECH\\%03d_%03d.wav",ubCharacterNum,usQuoteNum );
 				}
 //			#endif
 		}
 		else
 		{
 			// assume EDT files are in EDT directory on HARD DRIVE
-			sprintf( zFileName,"NPCDATA\\d_%03d.EDT", ubCharacterNum );
+			sprintf( zFileName,"NPCDATA\\%03d.EDT", ubCharacterNum );
 		}
 	}
 	else if ( ubCharacterNum >= FIRST_RPC && ubCharacterNum < GASTON &&
@@ -1907,10 +1907,12 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 			#ifdef RUSSIAN
 				if( ubCharacterNum >= FIRST_RPC && ubCharacterNum < GASTON && gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
 				{
-					sprintf( zFileName,"SPEECH\\r_%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
+//inshy: fix for UB-1.13 version only					sprintf( zFileName,"SPEECH\\r_%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
+					sprintf( zFileName,"SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
 					if ( !FileExists( zFileName ) )
 					{
-						sprintf( zFileName,"SPEECH\\r_%03d_%03d.wav",ubCharacterNum,usQuoteNum );
+//inshy: fix for UB-1.13 version only						sprintf( zFileName,"SPEECH\\r_%03d_%03d.wav",ubCharacterNum,usQuoteNum );
+						sprintf( zFileName,"SPEECH\\%03d_%03d.wav",ubCharacterNum,usQuoteNum );
 //<SB> Also check for Russian Gold sound files (identical to international ones)
 						if(! FileExists( zFileName ) )
 						{
