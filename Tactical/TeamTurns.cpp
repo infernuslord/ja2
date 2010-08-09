@@ -48,6 +48,9 @@
 	#include "NPC.h"
 #endif
 
+#include "Ja25_Tactical.h"
+#include "Ja25 Strategic Ai.h"
+
 // HEADROCK HAM 3.2: Gamesettings.h for external modifications to team turns.
 #include "GameSettings.h"
 #include "Reinforcement.h"
@@ -444,6 +447,14 @@ void EndTurnEvents( void )
 
 	// decay AI warning values from corpses
 	DecayRottingCorpseAIWarnings();
+	
+	//Ja25 UB
+	
+	//increment the number of tactical turns that have gone by in turn based mode
+	gJa25SaveStruct.uiTacticalTurnCounter++;
+
+	//if the fan should start up
+	HandleStartingFanBackUp();
 }
 
 //rain

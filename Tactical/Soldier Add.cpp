@@ -33,6 +33,8 @@
 class OBJECTTYPE;
 class SOLDIERTYPE;
 
+extern	BOOLEAN		gfFirstTimeInGameHeliCrash; //JA25 UB
+
 // Adds a soldier to a world gridno and set's direction
 void AddSoldierToSectorGridNo( SOLDIERTYPE *pSoldier, INT32 sGridNo, UINT8 ubDirection, BOOLEAN fUseAnimation, UINT16 usAnimState, UINT16 usAnimCode );
 
@@ -1569,6 +1571,28 @@ void AddSoldierToSectorGridNo( SOLDIERTYPE *pSoldier, INT32 sGridNo, UINT8 ubDir
 				// default to standing on arrival
 				if ( pSoldier->usAnimState != HELIDROP )
 				{
+				
+					// DAVE!!!!
+					if ( gfFirstTimeInGameHeliCrash )
+					{
+						//should we be on our back or tummy
+						if( Random( 100 ) < 50 )
+							pSoldier->EVENT_InitNewSoldierAnim( STAND_FALLFORWARD_STOP, 1, TRUE );
+						else
+							 pSoldier->EVENT_InitNewSoldierAnim( FALLBACKHIT_STOP, 1, TRUE );
+
+						pSoldier->bCollapsed = TRUE;
+
+					}					
+					else if ( fUseAnimation )
+					{
+						pSoldier->EVENT_InitNewSoldierAnim( usAnimState, usAnimCode, TRUE );
+					}
+					else if ( pSoldier->ubBodyType != CROW )
+					{
+						pSoldier->EVENT_InitNewSoldierAnim( STANDING, 1, TRUE );
+					}
+					/*
 					if ( fUseAnimation )
 					{
 						pSoldier->EVENT_InitNewSoldierAnim( usAnimState, usAnimCode, TRUE );
@@ -1577,6 +1601,7 @@ void AddSoldierToSectorGridNo( SOLDIERTYPE *pSoldier, INT32 sGridNo, UINT8 ubDir
 					{
 						pSoldier->EVENT_InitNewSoldierAnim( STANDING, 1, TRUE );
 					}
+					*/
 				}
 
 				// ATE: if we are below OK life, make them lie down!

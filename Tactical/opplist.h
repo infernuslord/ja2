@@ -73,6 +73,7 @@ extern INT8 gfKnowAboutOpponents;
 
 extern BOOLEAN	gfPlayerTeamSawJoey;
 extern BOOLEAN	gfMikeShouldSayHi;
+extern BOOLEAN   gfMorrisShouldSayHi; // JA25 UB
 
 
 extern INT32			gsWatchedLoc[ TOTAL_SOLDIERS ][ NUM_WATCHED_LOCS ];

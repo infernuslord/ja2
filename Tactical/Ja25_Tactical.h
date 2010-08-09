@@ -85,7 +85,7 @@ INT8		RandomSoldierIdForAnyMercInSector();
 
 void		HandleFanStartingAtEndOfCombat();
 
-void		HandleInitialEventsInHeliCrash();
+extern void		HandleInitialEventsInHeliCrash();
 
 void		HandleCommanderMorrisNewMercWantsNoteDelayedSpeech();
 

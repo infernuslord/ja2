@@ -198,6 +198,8 @@ extern void PlayStealthySoldierFootstepSound( SOLDIERTYPE *pSoldier );
 
 extern BOOLEAN gfSurrendered;
 
+extern	BOOLEAN		gfFirstTimeInGameHeliCrash; //JA25 UB
+
 // GLOBALS
 #define		 START_DEMO_SCENE				3
 #define	NUM_RANDOM_SCENES	4

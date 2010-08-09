@@ -135,6 +135,11 @@ std::vector<UINT32> uiExternalStaticNPCFaces;
 //	158,
 //};
 
+BOOLEAN AreAllTheMercsFinishedSayingThereInitialHeliCrashQuotes();
+void		InitJerriesSpeechCallBack();
+void		HandlePlayerClosingMorrisNoteDisplayedOnScreen();
+
+
 UINT8	gubMercValidPrecedentQuoteID[ NUMBER_VALID_MERC_PRECEDENT_QUOTES ] =
 					{ 80, 81, 82, 83, 86, 87, 88, 95, 97, 99, 100, 101, 102 };
 
@@ -676,7 +681,70 @@ void HandleDialogue( )
 		UnPauseGame();
 
 	}
+	
+	
+	if ( iQSize == 0 )
+	{
+		if( gfMorrisShouldSayHi )
+		{
+			SOLDIERTYPE * pMorris;
+			SOLDIERTYPE * pSoldier;
+			INT16	sPlayerGridNo;
+			UINT8	ubPlayerID;
+			UINT8	ubQualifiedSoldierIDArray[ NUM_MERCS_WITH_NEW_QUOTES ];
+			UINT8	ubNumQualifiedMercs=0;
+			UINT8	ubCnt=0;
 
+			if( !( gMercProfiles[ 75 ].ubMiscFlags2 & PROFILE_MISC_FLAG2_SAID_FIRSTSEEN_QUOTE ) )
+			{
+				pMorris = FindSoldierByProfileID( 75, FALSE );
+				if ( pMorris && pMorris->stats.bLife >= OKLIFE )
+				{
+					sPlayerGridNo = ClosestPC( pMorris, NULL );
+					if (sPlayerGridNo != NOWHERE )
+					{
+						ubPlayerID = WhoIsThere2( sPlayerGridNo, 0 );
+						if (ubPlayerID != NOBODY)
+						{
+							InitiateConversation( pMorris, MercPtrs[ ubPlayerID ], NPC_INITIAL_QUOTE, 0 );
+							gMercProfiles[ pMorris->ubProfile ].ubMiscFlags2 |= PROFILE_MISC_FLAG2_SAID_FIRSTSEEN_QUOTE;
+						}
+					}
+				}
+			}
+			else
+			{
+				//Get the # of qualified mercs
+				ubNumQualifiedMercs = GetNumSoldierIdAndProfileIdOfTheNewMercsOnPlayerTeam( ubQualifiedSoldierIDArray, NULL );
+
+				//if there is some qualified mercs
+				if( ubNumQualifiedMercs != 0 )
+				{
+					//loop through all the mercs
+					for( ubCnt=0; ubCnt<ubNumQualifiedMercs; ubCnt++ )
+					{
+						pSoldier = MercPtrs[ ubQualifiedSoldierIDArray[ ubCnt ] ];
+
+						TacticalCharacterDialogue( pSoldier, QUOTE_JOINING_CAUSE_LEARNED_TO_LIKE_BUDDY_ON_TEAM );
+						pSoldier->usQuoteSaidExtFlags |= SOLDIER_QUOTE_SAID_EXT_MORRIS;
+					}
+				}
+
+				//Morris should say a new quote
+//				CharacterDialogue( MORRIS, QUOTE_ATTACKED_BY_MULTIPLE_CREATURES, gTalkPanel.iFaceIndex, DIALOGUE_NPC_UI, FALSE, FALSE );
+
+				TriggerNPCRecord( 75, 2 );
+
+				gfMorrisShouldSayHi = FALSE;
+			}
+		}
+
+
+		return;
+	}
+	
+	//Ja25: no mike
+/*
 	if ( iQSize == 0 )
 	{
 
@@ -706,7 +774,7 @@ void HandleDialogue( )
 
 		return;
 	}
-
+*/
 	// ATE: Remove any civ quotes....
 	// ShutDownQuoteBoxIfActive( TRUE );
 
@@ -819,6 +887,14 @@ void HandleDialogue( )
 		// Setup face pointer
 		gpCurrentTalkingFace = &gFacesData[ QItem->iFaceIndex ];
 		gubCurrentTalkingID	= QItem->ubCharacterNum;
+		
+		//Ja25: test
+		if( QItem->ubCharacterNum == 75 ) //MORRIS
+		{
+			if( QItem->usQuoteNum == 0 )
+			{
+			}
+		}
 
 		ExecuteCharacterDialogue( QItem->ubCharacterNum, QItem->usQuoteNum, QItem->iFaceIndex, QItem->bUIHandlerID, QItem->fFromSoldier );
 

@@ -56,6 +56,10 @@
 	#include "strategic.h"
 #endif
 
+
+#include "Ja25_Tactical.h"
+
+
 #include "connect.h"
 #ifdef JA2EDITOR
 	extern BOOLEAN gfProfileDataLoaded;
@@ -1256,6 +1260,9 @@ BOOLEAN RecruitRPC( UINT8 ubCharNum )
 
 	//remove the merc from the Personnel screens departed list ( if they have never been hired before, its ok to call it )
 	RemoveNewlyHiredMercFromPersonnelDepartedList( pSoldier->ubProfile );
+	
+	//If this is a special NPC, play a quote from the team mates
+	HandlePlayingQuoteWhenHiringNpc( pNewSoldier->ubProfile );
 
 	return( TRUE );
 }

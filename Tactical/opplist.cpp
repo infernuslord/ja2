@@ -52,6 +52,7 @@
 	#include "Explosion Control.h"//dnl ch40 200909
 #endif
 
+#include "Ja25_Tactical.h"
 //rain
 //#define VIS_DIST_DECREASE_PER_RAIN_INTENSITY 20
 //end rain
@@ -101,6 +102,10 @@ extern BOOLEAN NobodyAlerted(void);
 BOOLEAN		gfPlayerTeamSawCreatures = FALSE;
 BOOLEAN	gfPlayerTeamSawJoey			= FALSE;
 BOOLEAN	gfMikeShouldSayHi				= FALSE;
+
+//JA25 UB
+BOOLEAN   gfMorrisShouldSayHi				 = FALSE;
+
 
 UINT8			gubBestToMakeSighting[BEST_SIGHTING_ARRAY_SIZE];
 UINT8			gubBestToMakeSightingSize = 0;
@@ -2275,6 +2280,16 @@ No Queen,Joe, or elliot
 		}
 		else if ( pSoldier->bTeam == gbPlayerNum )
 		{
+		
+		  if( (pOpponent->ubProfile == 75 ) && 
+					( GetNumSoldierIdAndProfileIdOfTheNewMercsOnPlayerTeam( NULL, NULL ) != 0 ) && 
+					!( pSoldier->usQuoteSaidExtFlags & SOLDIER_QUOTE_SAID_EXT_MORRIS ) && 
+					!( gMercProfiles[ 75 ].ubMiscFlags2 & PROFILE_MISC_FLAG2_SAID_FIRSTSEEN_QUOTE ) )
+		  {
+				gfMorrisShouldSayHi = TRUE;
+		  }
+		  
+		  /*
 			if ( (pOpponent->ubProfile == MIKE) && ( pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__AIM_MERC ) && !(pSoldier->usQuoteSaidExtFlags & SOLDIER_QUOTE_SAID_EXT_MIKE) )
 			{
 				if (gfMikeShouldSayHi == FALSE)
@@ -2284,6 +2299,7 @@ No Queen,Joe, or elliot
 				TacticalCharacterDialogue( pSoldier, QUOTE_AIM_SEEN_MIKE );
 				pSoldier->usQuoteSaidExtFlags |= SOLDIER_QUOTE_SAID_EXT_MIKE;
 			}
+			*/
 			else if ( pOpponent->ubProfile == JOEY && gfPlayerTeamSawJoey == FALSE )
 			{
 				TacticalCharacterDialogue( pSoldier, QUOTE_SPOTTED_JOEY );

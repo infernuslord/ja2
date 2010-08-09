@@ -180,6 +180,9 @@ extern		BOOLEAN				gfCreatureMeanwhileScenePlayed;
 
 BOOLEAN				gMusicModeToPlay = FALSE;
 
+
+extern		BOOLEAN		gfFirstTimeInGameHeliCrash;
+
 #ifdef JA2BETAVERSION
 BOOLEAN		gfDisplaySaveGamesNowInvalidatedMsg = FALSE;
 #endif
@@ -409,8 +412,12 @@ typedef struct
 	UINT32 uiTotalUpkeepForMilitia;
 
 	// HEADROCK HAM 3.6: Removed 16 fillers (16 bytes) to accomodate the above new variables.
-	
+	//JA25 UB
+	INT8	fMorrisShouldSayHi;
+
+	BOOLEAN		fFirstTimeInGameHeliCrash;
 	BOOLEAN Pokaznazwe[500]; //legion by Jazz
+
 
 	//UINT8		ubFiller[534];		//This structure should be 1024 bytes
 	
@@ -6230,6 +6237,10 @@ BOOLEAN SaveGeneralInfo( HWFILE hFile )
 
 	// HEADROCK HAM 3.6: Save new global variable for militia upkeep
 	sGeneralInfo.uiTotalUpkeepForMilitia = guiTotalUpkeepForMilitia;
+	//ja25 UB
+	sGeneralInfo.fMorrisShouldSayHi					= gfMorrisShouldSayHi;
+	sGeneralInfo.fFirstTimeInGameHeliCrash			= gfFirstTimeInGameHeliCrash;
+
 
 	for (int i=0;i<501;i++)
 	{
@@ -6519,6 +6530,11 @@ BOOLEAN LoadGeneralInfo( HWFILE hFile )
 
 	// HEADROCK HAM 3.6: Load new global variable for militia upkeep
 	guiTotalUpkeepForMilitia = sGeneralInfo.uiTotalUpkeepForMilitia;
+	
+	//JA25 UB
+	gfMorrisShouldSayHi							= sGeneralInfo.fMorrisShouldSayHi;
+	gfFirstTimeInGameHeliCrash			= sGeneralInfo.fFirstTimeInGameHeliCrash;
+
 
 	for (int i=0;i<501;i++)
 	{

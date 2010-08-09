@@ -89,8 +89,10 @@
 #endif
 
 #include "connect.h"
+#include "Ja25_Tactical.h"
 
 #define		ARE_IN_FADE_IN( )		( gfFadeIn || gfFadeInitialized )
+
 
 BOOLEAN	fDirtyRectangleMode = FALSE;
 UINT16	*gpFPSBuffer=NULL;
@@ -105,6 +107,8 @@ BOOLEAN		gfPlayAttnAfterMapLoad = FALSE;
 // VIDEO OVERLAYS
 INT32		giFPSOverlay = 0;
 INT32		giCounterPeriodOverlay = 0;
+
+extern				BOOLEAN		gfFirstTimeInGameHeliCrash;
 
 
 BOOLEAN	gfExitToNewSector					= FALSE;
@@ -600,8 +604,14 @@ UINT32	MainGameScreenHandle(void)
 	if ( gfTacticalDoHeliRun )
 	{
 		gfGameScreenLocateToSoldier = FALSE;
-		InternalLocateGridNo( gMapInformation.sNorthGridNo, TRUE );
 
+		
+		//if it is the first time in the game, and we are doing the heli crash code, locate to a different spot
+		if( gfFirstTimeInGameHeliCrash )
+			InternalLocateGridNo( 15427, TRUE );
+		else
+			InternalLocateGridNo( gMapInformation.sNorthGridNo, TRUE );
+			
 		// Start heli Run...
 		StartHelicopterRun( gMapInformation.sNorthGridNo );
 
@@ -619,12 +629,14 @@ UINT32	MainGameScreenHandle(void)
 		HandleOverheadMap( );
 		return( GAME_SCREEN );
 	}
-/*
+
 	if ( !ARE_IN_FADE_IN( ) )
 	{
-		HandleAirRaid( );
+	//	HandleAirRaid( );
+		
+		HandlePowerGenAlarm();
 	}
-*/
+
 	if ( gfGameScreenLocateToSoldier )
 	{
 		DebugMsg(TOPIC_JA2,DBG_LEVEL_3,String("maingamescreenhandle: tacticalscreenlocatetosoldier"));
@@ -1150,6 +1162,8 @@ void InitHelicopterEntranceByMercs( void )
 		// Madd - nevermind initial air strike.	It just seems silly, since Deidranna doesn't know the mercs are there.
 		//if ( gGameOptions.fAirStrikes )
 		//	ScheduleAirRaid( &AirRaidDef );
+		
+		HandleInitialEventsInHeliCrash(); //JA25 UB
 
 		gfTacticalDoHeliRun = TRUE;
 		gfFirstHeliRun			= TRUE;

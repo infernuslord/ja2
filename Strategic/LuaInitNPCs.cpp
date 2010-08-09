@@ -80,6 +80,9 @@ static int l_GetStartingCashInsane (lua_State *L);
 static int l_AddPreReadEmail (lua_State *L);
 static int l_AddEmail (lua_State *L);
 
+static int l_SectorInfoBloodCats(lua_State *L);
+static int l_SectorEnemy(lua_State *L);
+
 static int lh_getIntegerFromTable(lua_State *L, const char * fieldname);
 static std::string lh_getStringFromTable(lua_State *L, const char * fieldname);;
 static bool locationStringToCoordinates_AltSector(std::string loc, UINT8* x, UINT8* y);
@@ -123,6 +126,10 @@ void IniFunction(lua_State *L)
 	//Email
 	lua_register(L, "AddPreReadEmail", l_AddPreReadEmail);
 	lua_register(L, "AddEmail", l_AddEmail);
+	
+	//Add enemy and bloodcats
+	lua_register(L, "GetSectorInfoBloodCats", l_SectorInfoBloodCats);
+	lua_register(L, "SectorEnemy", l_SectorEnemy);
 }
 
 
@@ -175,6 +182,53 @@ BOOLEAN LetLuaGameInit(UINT8 Init)
 	
 	return true;
 
+}
+
+static int l_SectorInfoBloodCats(lua_State *L)
+{
+UINT8  n = lua_gettop(L);
+int i;
+UINT8 idSector;
+UINT8 val;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) idSector = lua_tointeger(L,i);
+	}
+					
+			val = SectorInfo[ idSector ].bBloodCats;
+		
+	lua_pushinteger(L, val);
+	
+return 1;
+}
+
+static int l_SectorEnemy(lua_State *L)
+{
+UINT16 x = -1;
+UINT16 y = -1;
+UINT16 z = -1;
+UINT8 TROOPS_ILOSC = 0;
+UINT8 ELITA_ILOSC = 0;
+UINT CREATURE_ILOSC = 0;
+
+	if ( ( x >= 1 || x <= 16 ) && ( y >= 1 || y <= 16 ) )
+		{
+			x = lh_getIntegerFromTable(L, "SectorX");
+			y = lh_getIntegerFromTable(L, "SectorY");
+			
+			TROOPS_ILOSC = lh_getIntegerFromTable(L, "Troops");
+			ELITA_ILOSC = lh_getIntegerFromTable(L, "Elite");
+			CREATURE_ILOSC = lh_getIntegerFromTable(L, "Creature");
+				
+			//z = lh_getIntegerFromTable(L, "SectorZ");
+					
+			SectorInfo[ (UINT8)SECTOR(  x,  y ) ].ubNumTroops = TROOPS_ILOSC;
+			SectorInfo[ (UINT8)SECTOR(  x,  y ) ].ubNumElites = ELITA_ILOSC;
+			SectorInfo[ (UINT8)SECTOR(  x,  y ) ].ubNumCreatures = CREATURE_ILOSC;	
+		}
+		
+	return 0;
 }
 
 //AddEmail

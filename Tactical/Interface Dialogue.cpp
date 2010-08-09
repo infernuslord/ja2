@@ -5094,8 +5094,8 @@ void PerformJerryMiloAction302()
 	INT8	bNumMercsPresent=-1;
 	SOLDIERTYPE	*pSoldier=NULL;
 	UINT8		ubId;
-/* off jazz
-	//Get the number and array of the new soldiers
+//off jazz
+/*	//Get the number and array of the new soldiers
 	bNumMercsPresent = GetNumSoldierIdAndProfileIdOfTheNewMercsOnPlayerTeam( ubMercsPresent, NULL );
 
 //Randomly choose one

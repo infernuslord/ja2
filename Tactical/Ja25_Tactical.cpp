@@ -131,7 +131,7 @@ INT8		CountNumberOfMercsOnSameTeamOfSameExpLevel( INT8 bTeam, INT8 bExpLevel );
 
 BOOLEAN	IsSoldierQualifiedGunCommenterMerc( SOLDIERTYPE *pSoldier );
 UINT32	GetNumberOfTurnsPowerGenFanWillBeStoppedFor();
-
+void HandleInitialEventsInHeliCrash();
 
 //ppp
 
