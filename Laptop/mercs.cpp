@@ -123,8 +123,8 @@ enum
 	MERC_ARRIVES_BUBBA,
 	MERC_ARRIVES_LARRY,
 	MERC_ARRIVES_NUMB,
-	MERC_ARRIVES_TEX,
-	MERC_ARRIVES_BIGGENS,
+	//MERC_ARRIVES_TEX,
+	//MERC_ARRIVES_BIGGENS,
 	MERC_ARRIVES_COUGAR,
 	MERC_ARRIVES_GASTON,
 	MERC_ARRIVES_STOGIE,
@@ -145,8 +145,8 @@ CONTITION_FOR_MERC_AVAILABLE gConditionsForMercAvailability[ NUM_MERC_ARRIVALS ]
 	5000, 8,	6,	//BUBBA
 	10000, 15, 7,	//Larry
 	15000, 20, 9,	//Numb
-	16000, 21, 10,	//Tex
-	18000, 23, 11,	//Biggens
+//	16000, 21, 10,	//Tex
+//	18000, 23, 11,	//Biggens
 	20000, 25, 12,	//Cougar
 	25000, 30, 13,	//Gaston
 	26000, 31, 14,	//Stogie
@@ -348,9 +348,9 @@ void GameInitMercs()
 	gubMercArray[ 9 ] = NUMB;
 	//gubMercArray[ 10 ] = TEX;
 	//gubMercArray[ 11 ] = BIGGENS;
-	gubMercArray[ 10 ] = COUGAR;
-	gubMercArray[ 11 ] = GASTON;
-	gubMercArray[ 12 ] = STOGIE;
+	gubMercArray[ 10 ] = 48;//COUGAR;
+	gubMercArray[ 11 ] = 58;//GASTON;
+	gubMercArray[ 12 ] = 59;//STOGIE;
 	gubMercArray[ 13 ] = 57;//hayden
 	gubMercArray[ 14 ] = 58;
 	gubMercArray[ 15 ] = 59;

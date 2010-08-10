@@ -484,8 +484,14 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcat(fileName, BETTYINVENTORYFILENAME);
 	THROWIFFALSE(ReadInInventoryStats(gBettyInventory,fileName),BETTYINVENTORYFILENAME);
 
-
-
+	//UB
+	strcpy(fileName, directoryName);
+	strcat(fileName, RAULINVENTORYFILENAME);
+	if ( FileExists(fileName) )
+	{
+	THROWIFFALSE(ReadInInventoryStats(gPerkoInventory,fileName),RAULINVENTORYFILENAME);
+	}
+	
 	strcpy(fileName, directoryName);
 	strcat(fileName, CITYTABLEFILENAME);
 	THROWIFFALSE(ReadInMapStructure(fileName, FALSE),CITYTABLEFILENAME);
@@ -604,10 +610,12 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 
 	if (gGameExternalOptions.fReadProfileDataFromXML)
 	{
+		
+		
 		// HEADROCK PROFEX: Read in Merc Profile data to replace PROF.DAT data
 		strcpy(fileName, directoryName);
 		strcat(fileName, MERCPROFILESFILENAME);
-		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));		
 		THROWIFFALSE(ReadInMercProfiles(fileName, FALSE), MERCPROFILESFILENAME);
 
 		#ifndef ENGLISH
@@ -620,15 +628,43 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 					}
 		#endif
 
-	
-		
-		
-
 		// HEADROCK PROFEX: Read in Merc Opinion data to replace PROF.DAT data
 		strcpy(fileName, directoryName);
 		strcat(fileName, MERCOPINIONSFILENAME);
-		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));	
 		THROWIFFALSE(ReadInMercOpinions(fileName), MERCOPINIONSFILENAME);
+		
+		
+		
+		// UB25
+		strcpy(fileName, directoryName);
+		strcat(fileName, MERCPROFILESFILENAME25); 
+		
+		if ( FileExists(fileName) )
+		{	
+		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));		
+		THROWIFFALSE(ReadInMercProfiles(fileName, FALSE), MERCPROFILESFILENAME25);
+		
+		#ifndef ENGLISH
+			AddLanguagePrefix(fileName);
+				if ( FileExists(fileName) )
+					{
+					DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+					if(!ReadInMercProfiles(fileName,TRUE))
+					return FALSE;
+					}
+		#endif
+
+		}
+
+		strcpy(fileName, directoryName);
+		strcat(fileName, MERCOPINIONSFILENAME25);
+		if ( FileExists(fileName) )
+		{		
+		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+		THROWIFFALSE(ReadInMercOpinions(fileName), MERCOPINIONSFILENAME25);
+		}
+		
 	}
 
 	// HEADROCK HAM 3.6: Read in customized Bloodcat Placements

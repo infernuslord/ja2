@@ -83,6 +83,10 @@ static int l_AddEmail (lua_State *L);
 static int l_SectorInfoBloodCats(lua_State *L);
 static int l_SectorEnemy(lua_State *L);
 
+//Facts
+static int l_SetFactFalse(lua_State *L);
+static int l_SetFactTrue(lua_State *L);
+
 static int lh_getIntegerFromTable(lua_State *L, const char * fieldname);
 static std::string lh_getStringFromTable(lua_State *L, const char * fieldname);;
 static bool locationStringToCoordinates_AltSector(std::string loc, UINT8* x, UINT8* y);
@@ -130,6 +134,10 @@ void IniFunction(lua_State *L)
 	//Add enemy and bloodcats
 	lua_register(L, "GetSectorInfoBloodCats", l_SectorInfoBloodCats);
 	lua_register(L, "SectorEnemy", l_SectorEnemy);
+	
+	//Fact and Quest
+	lua_register(L, "SetFactTrue", l_SetFactTrue);
+	lua_register(L, "SetFactFalse", l_SetFactFalse);
 }
 
 
@@ -182,6 +190,31 @@ BOOLEAN LetLuaGameInit(UINT8 Init)
 	
 	return true;
 
+}
+
+// set fact = false
+static int l_SetFactFalse(lua_State *L)
+{
+UINT32 FactFalse;
+UINT8 n = lua_gettop(L);
+
+	 FactFalse = lua_tointeger(L,n);
+
+	SetFactFalse (FactFalse);
+	return 0;
+}
+
+//set fact = true
+static int l_SetFactTrue(lua_State *L)
+{
+UINT32 FactTrue;
+UINT8 n = lua_gettop(L);
+
+	FactTrue = lua_tointeger(L,n);
+
+	SetFactTrue (FactTrue);
+
+	return 0;
 }
 
 static int l_SectorInfoBloodCats(lua_State *L)

@@ -681,7 +681,7 @@ Ja25 no meanwhiles
 		//ja25 ub
 		//Init the initial hweli crash sequence variable
 		InitializeHeliGridnoAndTime( FALSE );
-		SetFactTrue( FACT_TEX_IS_IN_GAME_AND_ALIVE_IN_STORE );
+		//SetFactTrue( FACT_TEX_IS_IN_GAME_AND_ALIVE_IN_STORE );
 		
 		//If tex is in the game ( John is NOT in the game )
 		//if( gJa25SaveStruct.fJohnKulbaIsInGame == FALSE )

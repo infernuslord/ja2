@@ -90,6 +90,7 @@ typedef PARSE_STAGE;
 #define FREDOINVENTORYFILENAME					"NPCInventory\\FredoInventory.xml"
 
 #define BETTYINVENTORYFILENAME					"NPCInventory\\BettyInventory.xml"
+#define RAULINVENTORYFILENAME					"NPCInventory\\RaulInventory.xml"
 
 #define BOBBYRAYSTRINGSFILENAME					"BobbyRayStrings.xml"
 #define AMMOCALIBERSTRINGSFILENAME				"AmmoCaliberStrings.xml"
@@ -176,6 +177,11 @@ typedef PARSE_STAGE;
 
 
 #define IMPPORTRAITS					"IMPPortraits.xml"
+
+// UB
+#define MERCPROFILESFILENAME25					"MercProfiles25.xml"
+// UB
+#define MERCOPINIONSFILENAME25					"MercOpinions25.xml"
 
 extern BOOLEAN ReadInItemStats(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteItemStats();

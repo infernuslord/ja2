@@ -143,8 +143,8 @@ void HandleInitialEventsInHeliCrash();
 
 BOOLEAN	IsSoldierQualifiedMerc( SOLDIERTYPE *pSoldier )
 {
-	if( pSoldier->ubProfile == GASTON		||
-			pSoldier->ubProfile == STOGIE		||
+	if( pSoldier->ubProfile == 	58	||  ///  GASTON
+			pSoldier->ubProfile == 	59	||  // STOGIE
 			pSoldier->ubProfile == 64 ||// TEX 			||
 			pSoldier->ubProfile == 62 || //JOHN_K		||
 			pSoldier->ubProfile == 61 || //BIGGENS	||
@@ -180,9 +180,9 @@ BOOLEAN	IsSoldierQualifiedMercForSeeingPowerGenFan( SOLDIERTYPE *pSoldier )
 
 BOOLEAN	IsSoldierQualifiedGunCommenterMerc( SOLDIERTYPE *pSoldier )
 {
-	if( pSoldier->ubProfile == GASTON		||
-			pSoldier->ubProfile == STOGIE		||
-			pSoldier->ubProfile == TEX			||
+	if( pSoldier->ubProfile == 	58	||  //  GASTON
+			pSoldier->ubProfile == 	59	|| //   STOGIE
+			pSoldier->ubProfile == 	64		||   // TEX
 			pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__PLAYER_CHARACTER 
 		)
 	{
@@ -197,8 +197,8 @@ BOOLEAN	IsSoldierQualifiedGunCommenterMerc( SOLDIERTYPE *pSoldier )
 
 BOOLEAN	IsSoldierQualifiedInitialHireMerc( SOLDIERTYPE *pSoldier )
 {
-	if( pSoldier->ubProfile == GASTON		||
-			pSoldier->ubProfile == STOGIE		||
+	if( pSoldier->ubProfile == 	58	|| //  GASTON
+			pSoldier->ubProfile == 	59	||  // STOGIE
 			pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__PLAYER_CHARACTER 
 		)
 	{
@@ -481,7 +481,7 @@ void StopPowerGenFan()
 	SetFactTrue( FACT_FAN_STOPPPED );
 
 	//Is biggens on the team
-	pSoldier = FindSoldierByProfileID( BIGGENS, TRUE );
+	pSoldier = FindSoldierByProfileID( 61, TRUE );       //    BIGGENS
 	if( pSoldier != NULL )
 	{
 		SetFactTrue( FACT_BIGGENS_ON_TEAM_AND_FAN_STOPPED );
@@ -648,15 +648,15 @@ void HandlePowerGenAlarm()
 				UINT8 bSoldierId1, bSoldierId2, bSoldierId3;
 				Get3RandomQualifiedMercs( &bSoldierId1, &bSoldierId2, &bSoldierId3 );
 
-				if( bSoldierId1 != -1 && Menptr[ bSoldierId1 ].ubProfile != BIGGENS )
+				if( bSoldierId1 != -1 && Menptr[ bSoldierId1 ].ubProfile != 61 ) //BIGGENS
 				{
 					TacticalCharacterDialogue( &Menptr[ bSoldierId1 ], QUOTE_PERSONALITY_BIAS_WITH_MERC_1 );
 				}
-				else if( bSoldierId2 != -1 && Menptr[ bSoldierId2 ].ubProfile != BIGGENS )
+				else if( bSoldierId2 != -1 && Menptr[ bSoldierId2 ].ubProfile != 61 ) //BIGGENS
 				{
 					TacticalCharacterDialogue( &Menptr[ bSoldierId2 ], QUOTE_PERSONALITY_BIAS_WITH_MERC_1 );
 				}
-				else if( bSoldierId3 != -1 && Menptr[ bSoldierId3 ].ubProfile != BIGGENS )
+				else if( bSoldierId3 != -1 && Menptr[ bSoldierId3 ].ubProfile != 61 ) // BIGGENS
 				{
 					TacticalCharacterDialogue( &Menptr[ bSoldierId3 ], QUOTE_PERSONALITY_BIAS_WITH_MERC_1 );
 				}
@@ -853,7 +853,7 @@ BOOLEAN SayQuoteFromAllNewHiredMercButDoGastonLast( UINT8 ubProfile, UINT32 uiQu
 	for( iCnt=0; iCnt<bNumMercsPresent; iCnt++ )
 	{
 		//Do Gaston and the newly hired RPC last
-		if( Menptr[ SoldierIdArray[ iCnt ] ].ubProfile == GASTON || Menptr[ SoldierIdArray[ iCnt ] ].ubProfile == ubProfile)
+		if( Menptr[ SoldierIdArray[ iCnt ] ].ubProfile == 58 || Menptr[ SoldierIdArray[ iCnt ] ].ubProfile == ubProfile) //  GASTON
 		{
 			continue;
 		}
@@ -862,7 +862,7 @@ BOOLEAN SayQuoteFromAllNewHiredMercButDoGastonLast( UINT8 ubProfile, UINT32 uiQu
 	}
 
 	//if Gaston is on the team, say his quote
-	pSoldier = FindSoldierByProfileID( GASTON, TRUE );
+	pSoldier = FindSoldierByProfileID( 58, TRUE ); // GASTON
 	if( pSoldier &&
 			pSoldier->sSectorX == gWorldSectorX &&
 			pSoldier->sSectorY == gWorldSectorY &&
