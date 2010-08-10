@@ -33,7 +33,7 @@ enum NPCIDs
 	NUMB,
 	BUBBA,
 
-	MIGUEL = 57,
+	MIGUEL = 58,  	//Ja25:		Was 57
 	CARLOS,
 	IRA,
 	DIMITRI,
@@ -42,7 +42,7 @@ enum NPCIDs
 	ROBOT,
 	HAMOUS,
 	SLAY,
-	RPC65,
+//	RPC65,
 	DYNAMO,
 	SHANK,
 	IGGY,
