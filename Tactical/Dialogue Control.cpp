@@ -1981,7 +1981,7 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 		if ( fWavFile )
 		{
 			#ifdef RUSSIAN
-				if( ubCharacterNum >= FIRST_RPC && /* ubCharacterNum < GASTON*/ && gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
+				if( ubCharacterNum >= FIRST_RPC && /* ubCharacterNum < GASTON  && */ gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
 				{
 //inshy: fix for UB-1.13 version only					sprintf( zFileName,"SPEECH\\r_%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
 					sprintf( zFileName,"SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
