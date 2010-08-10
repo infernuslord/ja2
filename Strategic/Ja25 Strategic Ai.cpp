@@ -234,7 +234,7 @@ void InitJa25StrategicAi()
 {
 	//Initialize the array of new gun quotes
 //	InitNewGunArray();
-
+/*
 	#ifdef ENABLE_CUSTOM_MAP_INTERFACE
 		//if the player is using a CUSTOM MAP SCENARIO disable the S.A.I.
 		if( gJa25SaveStruct.fInCustomMap )
@@ -246,7 +246,7 @@ void InitJa25StrategicAi()
 	#ifdef JA2BETAVERSION
 		InitJa25StrategicAiDecisions( FALSE );
 	#endif
-
+*/
 	// Init and memset AI struct
 //	giNumJA25Sectors = NUM_CAMPAIGN_JA25_SECTORS;
 //	gJa25AiSectorStruct = MemAlloc( sizeof( JA25_SAVE_INFO ) * giNumJA25Sectors );
@@ -259,10 +259,10 @@ void InitJa25StrategicAi()
 //    AddEveryDayStrategicEventUsingSeconds(EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE,JA25_SECTOR_H7_INITIAL_ATTACK * 60,0);
 
 	//Init the underground sectors ( add them to the list of under ground )
-	InitJa25UnderGroundSectors();
+	//InitJa25UnderGroundSectors();
 
 	//Init the # of enemies in all the sectors
-	InitJa25InitialEnemiesInSector();
+	//InitJa25InitialEnemiesInSector();
 
 	//Init the Ja215 Stratigic AI
 	InitJa25StrategicSectorAI( TRUE );
@@ -996,16 +996,16 @@ BOOLEAN SaveJa25SaveInfoToSaveGame( HWFILE hFile )
 	CHAR8		zString[512];
 
 	//Make sure struct is 1000 bytes in size
-	sprintf( zString, "JA2 SaveInfo Struct != 1000, it is: %d", uiSize );
-	AssertMsg( uiSize == 1000, zString );
+//	sprintf( zString, "JA2 SaveInfo Struct != 1000, it is: %d", uiSize );
+//	AssertMsg( uiSize == 1000, zString );
 
 	//Make sure struct is 32 bytes in size
-	sprintf( zString, "AI manager != 32, it is: %d", sizeof( JA25_SECTOR_AI_MANAGER ) );
-	AssertMsg( sizeof( JA25_SECTOR_AI_MANAGER ) == 32, zString );
+//	sprintf( zString, "AI manager != 32, it is: %d", sizeof( JA25_SECTOR_AI_MANAGER ) );
+//	AssertMsg( sizeof( JA25_SECTOR_AI_MANAGER ) == 32, zString );
 
 	//Make sure struct is 840 bytes in size
-	sprintf( zString, "AI sector Struct != 40, it is: %d", sizeof( JA25_SECTOR_AI ) );
-	AssertMsg( sizeof( JA25_SECTOR_AI ) == 40, zString );
+//	sprintf( zString, "AI sector Struct != 40, it is: %d", sizeof( JA25_SECTOR_AI ) );
+//	AssertMsg( sizeof( JA25_SECTOR_AI ) == 40, zString );
 
 
 	FileWrite( hFile, &gJa25SaveStruct, sizeof( JA25_SAVE_INFO ), &uiNumBytesWritten );
@@ -2797,4 +2797,3 @@ void AddJA25AIDataToSector( JA25_SECTOR_AI *pSectorAIInfo )
 	giNumJA25Sectors++;
 */
 }
-

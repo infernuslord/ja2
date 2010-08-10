@@ -71,6 +71,9 @@
 #include "connect.h"
 #include "XML.h"
 
+#include "Ja25 Strategic Ai.h"
+#include "Ja25_Tactical.h"
+
 #include "LuaInitNPCs.h"
 #include "Arms Dealer Init.h"
 
@@ -419,6 +422,13 @@ void InitStrategicLayer( void )
 	InitSquads();
 	// Init vehicles
 	InitAllVehicles( );
+	
+	//JA25 UB
+	//Reset Jerry Quotes
+	HandleJerryMiloQuotes( TRUE ); //AA
+	//Ja25 UB
+	InitJa25StrategicAi( );
+ 
 	// init town loyalty
 	InitTownLoyalty();
 	// init the mine management system
@@ -684,11 +694,11 @@ Ja25 no meanwhiles
 		//SetFactTrue( FACT_TEX_IS_IN_GAME_AND_ALIVE_IN_STORE );
 		
 		//If tex is in the game ( John is NOT in the game )
-		//if( gJa25SaveStruct.fJohnKulbaIsInGame == FALSE )
-		//{
+		if( gJa25SaveStruct.fJohnKulbaIsInGame == FALSE )
+		{
 			//make sure Betty offers his videos for sale
 			//AddTexsVideosToBettysInventory();
-		//}
+		}
 
 		InitJerryMiloInfo(); 
 

@@ -5985,6 +5985,13 @@ BOOLEAN EscapeDirectionIsValid( INT8 * pbDirection )
 
 //------------ub
 
+typedef struct
+{
+	INT16	sSectorID;
+	INT8	bSectorZ;
+	UINT8	ubQuoteNum;
+} ENTER_SECTOR_PLAYER_QUOTE;
+
 void HandlePlayerTeamQuotesWhenEnteringSector( INT16 sSectorX, INT16 sSectorY, INT16 sSectorZ )
 {
 	UINT32	uiCnt;
@@ -6015,11 +6022,6 @@ void HandlePlayerTeamQuotesWhenEnteringSector( INT16 sSectorX, INT16 sSectorY, I
 			//if is the right level
 			if( PlayerSectorDescQuote[ uiCnt ].bSectorZ == sSectorZ )
 			{
-				// ATE: If this sector is a custom sector, break out!
-				if ( !SectorInfo[ iSectorID ].fCampaignSector )
-				{
-					return;
-				}
 
 				// If the player has never said the "enter sector" desc before
 				if( GetSectorFlagStatus( sSectorX, sSectorY, ( UINT8 )sSectorZ, SF_HAVE_SAID_PLAYER_QUOTE_NEW_SECTOR ) != TRUE )
@@ -6053,27 +6055,27 @@ void HandlePlayerTeamQuotesWhenEnteringSector( INT16 sSectorX, INT16 sSectorY, I
 							if( PlayerSectorDescQuote[ uiCnt ].bSectorZ == 0 )
 							{
 								//See if Manuel is on the team
-								pSoldier = FindSoldierByProfileID( MANUEL, TRUE );
+								pSoldier = FindSoldierByProfileID( 60, TRUE );
 
 								//if he is ON the team
 								if( pSoldier != NULL )
 								{
 									//get manuel to say the quote
-									DelayedMercQuote( MANUEL, PlayerSectorDescQuote[ uiCnt ].ubQuoteNum, GetWorldTotalSeconds() + DELAY_FOR_PLAYER_DESC_OF_SECTOR );
+									DelayedMercQuote( 60, PlayerSectorDescQuote[ uiCnt ].ubQuoteNum, GetWorldTotalSeconds() + DELAY_FOR_PLAYER_DESC_OF_SECTOR );
 
 									//get manuel to say his additional quote
-									DelayedMercQuote( MANUEL, QUOTE_ENTER_SECTOR_WITH_FAN_2, GetWorldTotalSeconds() + DELAY_FOR_PLAYER_DESC_OF_SECTOR );
+									DelayedMercQuote( 60, QUOTE_ENTER_SECTOR_WITH_FAN_2, GetWorldTotalSeconds() + DELAY_FOR_PLAYER_DESC_OF_SECTOR );
 								}
 								else
 								{
 									//else if Biggens is not on the team, check for biggens
-									pSoldier = FindSoldierByProfileID( BIGGENS, TRUE );
+									pSoldier = FindSoldierByProfileID( 61, TRUE );
 
 									//if he is ON the team
 									if( pSoldier != NULL )
 									{
 										//get manuel to say the quote
-										DelayedMercQuote( BIGGENS, PlayerSectorDescQuote[ uiCnt ].ubQuoteNum, GetWorldTotalSeconds() + DELAY_FOR_PLAYER_DESC_OF_SECTOR );
+										DelayedMercQuote( 61, PlayerSectorDescQuote[ uiCnt ].ubQuoteNum, GetWorldTotalSeconds() + DELAY_FOR_PLAYER_DESC_OF_SECTOR );
 
 										//Remember he said
 										SetJa25GeneralFlag( JA_GF__BIGGENS_SAID_QUOTE_117 );

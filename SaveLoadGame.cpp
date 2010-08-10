@@ -126,6 +126,7 @@
 #include "INIReader.h"
 
 #include "Ja25 Strategic Ai.h"
+#include "Ja25_Tactical.h"
 
 #include <vfs/Core/vfs.h>
 //rain
@@ -2881,7 +2882,21 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing mail orders");
 		goto FAILED_TO_SAVE;
 	}
+	
+	
+	//save Ja25 info
+	if( !SaveJa25SaveInfoToSaveGame( hFile ) )
+	{
+		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"Ja25 Save info Struct");
+		goto FAILED_TO_SAVE;
+	}
 
+	//Save the tactical info
+	if( !SaveJa25TacticalInfoToSaveGame( hFile ) )
+	{
+		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"Ja25 Tactical info");
+		goto FAILED_TO_SAVE;
+	}
 
 
 	//Close the saved game file
@@ -4226,6 +4241,30 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 
 	uiRelEndPerc += 1;
 	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Final Checks..." );
+	RenderProgressBar( 0, 100 );
+	uiRelStartPerc = uiRelEndPerc;
+	
+	
+		if ( !LoadJa25SaveInfoFromSavedGame( hFile ) )
+		{
+			FileClose( hFile );
+			return( FALSE );
+		}
+		
+	uiRelEndPerc += 1;
+	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Ja25 Save info Struct" );
+	RenderProgressBar( 0, 100 );
+	uiRelStartPerc = uiRelEndPerc;
+	
+
+		if ( !LoadJa25TacticalInfoFromSavedGame( hFile ) )
+		{
+			FileClose( hFile );
+			return( FALSE );
+		}
+
+	uiRelEndPerc += 1;
+	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Ja25 Tactical info" );
 	RenderProgressBar( 0, 100 );
 	uiRelStartPerc = uiRelEndPerc;
 

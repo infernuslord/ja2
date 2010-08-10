@@ -40,6 +40,9 @@
 #include "LOS.h"
 #include "Music Control.h"
 
+#include "Ja25 Strategic Ai.h"
+#include "Ja25_Tactical.h"
+
 extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
@@ -92,6 +95,8 @@ static std::string lh_getStringFromTable(lua_State *L, const char * fieldname);;
 static bool locationStringToCoordinates_AltSector(std::string loc, UINT8* x, UINT8* y);
 static bool locationStringToCoordinates(std::string loc, UINT8* x, UINT8* y, UINT8* z);
 
+static int l_Ja25SaveStructJohnKulbaIsInGame(lua_State *L);
+
 using namespace std;
 
 void IniFunction(lua_State *L)
@@ -138,6 +143,9 @@ void IniFunction(lua_State *L)
 	//Fact and Quest
 	lua_register(L, "SetFactTrue", l_SetFactTrue);
 	lua_register(L, "SetFactFalse", l_SetFactFalse);
+	
+	//john
+	lua_register(L, "Ja25JohnKulbaIsInGame", l_Ja25SaveStructJohnKulbaIsInGame);
 }
 
 
@@ -192,6 +200,19 @@ BOOLEAN LetLuaGameInit(UINT8 Init)
 
 }
 
+//
+//gJa25SaveStruct.fJohnKulbaIsInGame
+static int l_Ja25SaveStructJohnKulbaIsInGame(lua_State *L)
+{
+UINT32 FactFalse;
+UINT8 n = lua_gettop(L);
+
+	 FactFalse = lua_tointeger(L,n);
+
+	gJa25SaveStruct.fJohnKulbaIsInGame = FactFalse;
+	return 0;
+}
+
 // set fact = false
 static int l_SetFactFalse(lua_State *L)
 {
@@ -203,6 +224,7 @@ UINT8 n = lua_gettop(L);
 	SetFactFalse (FactFalse);
 	return 0;
 }
+
 
 //set fact = true
 static int l_SetFactTrue(lua_State *L)
