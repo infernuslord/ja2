@@ -803,7 +803,7 @@ void HandleEarlyMorningEvents( void )
 	UINT32					uiAmount;
 
 	// loop through all *NPCs* and reset "default response used recently" flags
-	for (cnt = FIRST_RPC; cnt < GASTON; cnt++)
+	for (cnt = FIRST_RPC; cnt < NUM_PROFILES; cnt++)  //GASTON
 	{
 		gMercProfiles[cnt].bFriendlyOrDirectDefaultResponseUsedRecently = FALSE;
 		gMercProfiles[cnt].bRecruitDefaultResponseUsedRecently = FALSE;

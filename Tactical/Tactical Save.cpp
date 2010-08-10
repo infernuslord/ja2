@@ -2304,7 +2304,7 @@ BOOLEAN InitTempNpcQuoteInfoForNPCFromTempFile()
 
 
 	//loop through all the npc accounts and write the temp array to disk
-	for( usCnt1=0; usCnt1< ( GASTON-FIRST_RPC ); usCnt1++)
+	for( usCnt1=0; usCnt1< ( NUM_PROFILES-FIRST_RPC ); usCnt1++)    //  GASTON
 	{
 
 		memset( TempNpcQuote, 0, uiSizeOfTempArray );

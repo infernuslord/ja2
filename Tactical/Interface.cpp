@@ -1791,7 +1791,7 @@ void DrawSelectedUIAboveGuy( UINT16 usSoldierID )
 		}
 		}
 
-		if ( pSoldier->ubProfile < FIRST_RPC || pSoldier->ubProfile >= GASTON || RPC_RECRUITED( pSoldier ) || AM_AN_EPC( pSoldier ) || ( pSoldier->flags.uiStatusFlags & SOLDIER_VEHICLE ) )
+		if ( pSoldier->ubProfile < FIRST_RPC /* || pSoldier->ubProfile >= GASTON */ || RPC_RECRUITED( pSoldier ) || AM_AN_EPC( pSoldier ) || ( pSoldier->flags.uiStatusFlags & SOLDIER_VEHICLE ) )
 		{
 			// Adjust for bars!
 
@@ -4334,4 +4334,3 @@ void RenderTopmostMultiPurposeLocator( )
 
 	BltVideoObjectFromIndex(	FRAME_BUFFER, guiRADIO, gbMultiPurposeLocatorFrame, sXPos, sYPos, VO_BLT_SRCTRANSPARENCY, NULL );
 }
-

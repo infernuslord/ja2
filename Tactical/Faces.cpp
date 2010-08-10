@@ -282,10 +282,10 @@ INT32	InternalInitFace( UINT8 usMercProfileID, UINT8 ubSoldierID, UINT32 uiInitF
 		{
 			sprintf( VObjectDesc.ImageFile, "FACES\\b%02de.sti", iFaceFileID );
 		}
-	}
-	else if ( usMercProfileID == TEX )
+	} //Tex
+	else if ( usMercProfileID == 64 )
 	{
-		if( gMercProfiles[ TEX ].bSkillTrait2 == CAMOUFLAGED )
+		if( gMercProfiles[ 64 ].bSkillTrait2 == CAMOUFLAGED )
 		{
 			sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
 		}

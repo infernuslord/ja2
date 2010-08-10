@@ -1872,10 +1872,10 @@ BOOLEAN	GetSpeckConditionalOpening( BOOLEAN fJustEnteredScreen )
 						case BUBBA:
 							StartSpeckTalking( SPECK_QUOTE_ALTERNATE_OPENING_TAG_BUBBA_IS_DEAD );
 							break;
-						case GASTON:
+						case 58: //GASTON:
 							StartSpeckTalking( SPECK_QUOTE_GASTON_DEAD );
 							break;
-						case STOGIE:
+						case 59://STOGIE:
 							StartSpeckTalking( SPECK_QUOTE_STOGIE_DEAD );
 							break;
 					};
@@ -2097,14 +2097,14 @@ void HandlePlayerHiringMerc( UINT8 ubHiredMercID )
 				break;
 
 			//Gaston is hired
-			case GASTON:
+			case 58: //GASTON:
 				//if biff is available, advertise for biff
 				if( IsMercMercAvailable( FLO ) )
 					StartSpeckTalking( SPECK_QUOTE_PLAYER_HIRES_GASTON );
 				break;
 
 			//Stogie is hired
-			case STOGIE:
+			case 59: //STOGIE:
 				//if biff is available, advertise for biff
 				if( IsMercMercAvailable( BIFF ) )
 					StartSpeckTalking( SPECK_QUOTE_PLAYER_HIRES_STOGIE );
@@ -2434,12 +2434,12 @@ BOOLEAN CanMercQuoteBeSaid( UINT32 uiQuoteID )
 				fRetVal = FALSE;
 			break;
 		case SPECK_QUOTE_ADVERTISE_GASTON:
-			if( !IsMercMercAvailable( GASTON ) )
+			if( !IsMercMercAvailable( 58 ) )//GASTON
 				fRetVal = FALSE;
 			break;
 
 		case SPECK_QUOTE_ADVERTISE_STOGIE:
-			if( !IsMercMercAvailable( STOGIE ) )
+			if( !IsMercMercAvailable( 59 ) )//STOGIE
 				fRetVal = FALSE;
 			break;
 	}

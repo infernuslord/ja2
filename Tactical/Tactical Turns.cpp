@@ -40,7 +40,7 @@ extern void DecayPublicOpplist( INT8 bTeam );
 //not in overhead.h!
 extern UINT8 NumEnemyInSector();
 
-
+/*
 
 void HandleRPCDescription(	)
 {
@@ -136,7 +136,7 @@ void HandleRPCDescription(	)
 		}
 	}
 }
-
+  */
 
 void HandleTacticalEndTurn( )
 {
@@ -261,9 +261,8 @@ void HandleTacticalEndTurn( )
 		}
 	}
 
-	HandleRPCDescription( );
+//	HandleRPCDescription( );
 
 }
-
 
 

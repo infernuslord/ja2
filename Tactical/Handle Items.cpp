@@ -4063,7 +4063,7 @@ void SoldierGiveItemFromAnimation( SOLDIERTYPE *pSoldier )
 
 		// Switch on target...
 		// Are we a player dude.. ( target? )
-		if ( ubProfile < FIRST_RPC || RPC_RECRUITED( pTSoldier ) || ubProfile >= GASTON )
+		if ( ubProfile < FIRST_RPC || RPC_RECRUITED( pTSoldier ) ) //|| ubProfile >=  GASTON )
 		{
 			fToTargetPlayer = TRUE;
 		}

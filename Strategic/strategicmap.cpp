@@ -1828,7 +1828,7 @@ void HandleRPCDescriptionOfSector( INT16 sSectorX, INT16 sSectorY, INT16 sSector
 	}
 
   // Handle guide description ( will be needed if a SAM one )
-	HandleRPCDescription( );
+//	HandleRPCDescription( );
 
 }
 

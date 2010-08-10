@@ -5865,7 +5865,7 @@ BOOLEAN HandleItemPointerClick( INT32 usMapPos )
 					EndItemPointer( );
 
 					// If we are giving it to somebody not on our team....
-					if ( MercPtrs[ ubSoldierID ]->ubProfile < FIRST_RPC || MercPtrs[ubSoldierID]->ubProfile >= GASTON || RPC_RECRUITED( MercPtrs[ ubSoldierID ] ) )
+					if ( MercPtrs[ ubSoldierID ]->ubProfile < FIRST_RPC /* || MercPtrs[ubSoldierID]->ubProfile >= GASTON */ || RPC_RECRUITED( MercPtrs[ ubSoldierID ] ) )
 					{
 
 					}

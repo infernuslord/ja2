@@ -8803,7 +8803,7 @@ Ja25: No meanwhiles
 		}
 	}
 
-	if ((ubAttacker != NOBODY) && (Menptr[ubAttacker].bTeam == OUR_TEAM) && (this->ubProfile != NO_PROFILE) && (this->ubProfile >= FIRST_RPC && this->ubProfile < GASTON ))
+	if ((ubAttacker != NOBODY) && (Menptr[ubAttacker].bTeam == OUR_TEAM) && (this->ubProfile != NO_PROFILE) && (this->ubProfile >= FIRST_RPC ))
 	{
 		gMercProfiles[this->ubProfile].ubMiscFlags |= PROFILE_MISC_FLAG_WOUNDEDBYPLAYER;
 		if (this->ubProfile == 114)
@@ -10793,7 +10793,7 @@ void SOLDIERTYPE::EVENT_SoldierBeginFirstAid( INT32 sGridNo, UINT8 ubDirection )
 		// OK, check if we should play quote...
 		if ( pTSoldier->bTeam != gbPlayerNum )
 		{
-			if ( pTSoldier->ubProfile != NO_PROFILE && pTSoldier->ubProfile >= FIRST_RPC && pTSoldier->ubProfile < GASTON && !RPC_RECRUITED( pTSoldier ) )
+			if ( pTSoldier->ubProfile != NO_PROFILE && pTSoldier->ubProfile >= FIRST_RPC /*&& pTSoldier->ubProfile < GASTON */ && !RPC_RECRUITED( pTSoldier ) )
 			{
 				fRefused = PCDoesFirstAidOnNPC( pTSoldier->ubProfile );
 			}

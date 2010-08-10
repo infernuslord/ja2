@@ -1211,7 +1211,7 @@ public:
 	void InternalSetSoldierHeight( FLOAT dNewHeight, BOOLEAN fUpdateLevel );//this function did not have a forward declaration
 
 
-	BOOLEAN DoMercBattleSound( UINT8 ubBattleSoundID );
+    BOOLEAN DoMercBattleSound( UINT8 ubBattleSoundID );
 	BOOLEAN InternalDoMercBattleSound( UINT8 ubBattleSoundID, INT8 bSpecialCode );
 	BOOLEAN GetProfileFlagsFromGridno( UINT16 usAnimState, INT32 sTestGridNo, UINT16 *usFlags );
 	void HaultSoldierFromSighting( BOOLEAN fFromSightingEnemy );
@@ -2077,7 +2077,6 @@ public:
 }; // OLDSOLDIERTYPE_101;	
 
 #endif
-
 
 
 

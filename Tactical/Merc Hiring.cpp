@@ -364,7 +364,7 @@ Ja25: No enrico, therefore, no email
 		pSoldier->usMedicalDeposit = gMercProfiles[ pSoldier->ubProfile ].sMedicalDepositAmount;
 	}
 	//if the merc is from M.E.R.C.
-	else if( ( ubCurrentSoldier >= BIFF && ubCurrentSoldier <= BUBBA ) || ubCurrentSoldier >= GASTON )
+	else if( ( ubCurrentSoldier >= BIFF && ubCurrentSoldier <= BUBBA ) || ( ubCurrentSoldier == 58 || ubCurrentSoldier == 59 ) ) // gaston stogie
 	{
 		pSoldier->ubWhatKindOfMercAmI = MERC_TYPE__MERC;
 		//pSoldier->iTotalContractCharge = -1;

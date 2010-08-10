@@ -691,6 +691,7 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 		case FACT_NPC_WOUNDED_BY_PLAYER:
 			gubFact[FACT_NPC_WOUNDED_BY_PLAYER] = CheckNPCWounded( ubProfileID, TRUE );
 			break;
+		/*
 		case FACT_IRA_NOT_PRESENT:
 			gubFact[FACT_IRA_NOT_PRESENT] = !CheckNPCWithin( ubProfileID, IRA, 10 );
 			break;
@@ -707,6 +708,7 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 				gubFact[FACT_IRA_UNHIRED_AND_ALIVE] = FALSE;
 			}
 			break;
+		*/
 		case FACT_NPC_BLEEDING:
 			gubFact[FACT_NPC_BLEEDING] = CheckNPCBleeding( ubProfileID );
 			break;

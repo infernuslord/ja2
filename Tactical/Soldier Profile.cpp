@@ -868,9 +868,26 @@ void StartSomeMercsOnAssignment(void)
 		}
 
 		pProfile = &(gMercProfiles[ uiCnt ]);
+		
+		//Make sure stigie and Gaston are available at the start of the game
+		if( uiCnt == 59 || uiCnt == 58 )
+		{
+			pProfile->bMercStatus = MERC_OK;
+			pProfile->uiDayBecomesAvailable = 0;
+			pProfile->uiPrecedentQuoteSaid = 0;
+			pProfile->ubDaysOfMoraleHangover = 0;
+
+			continue;
+		}
+
+		//if the merc is dead, dont modify anything
+		if( pProfile->bMercStatus == MERC_IS_DEAD )
+		{
+			continue;
+		}
 
 		// calc chance to start on assignment
-		uiChance = 5 * pProfile->bExpLevel;
+		uiChance = 3 * pProfile->bExpLevel; //5 Ja25 UB
 
 		// tais: added ini option to disable mercs being on assignment at the start
 		if (Random(100) < uiChance && gGameExternalOptions.fMercsOnAssignmentAtStart)
@@ -1236,13 +1253,13 @@ BOOLEAN RecruitRPC( UINT8 ubCharNum )
 			SwapObjs( pNewSoldier, bSlot, HANDPOS, TRUE );
 		}
 	}
-
+/* Ja25 UB
 	if ( ubCharNum == IRA )
 	{
 		// trigger 0th PCscript line
 		TriggerNPCRecord( IRA, 0 );
 	}
-
+*/
 	// Set whatkind of merc am i
 	pNewSoldier->ubWhatKindOfMercAmI = MERC_TYPE__NPC;
 
@@ -1467,14 +1484,14 @@ void UpdateSoldierPointerDataIntoProfile( BOOLEAN fPlayerMercs )
 				// If we are above player mercs
 				if ( fPlayerMercs )
 				{
-					if ( pSoldier->ubProfile < FIRST_RPC || pSoldier->ubProfile >= GASTON )
+					if ( pSoldier->ubProfile < FIRST_RPC ) //|| pSoldier->ubProfile >= GASTON )
 					{
 						fDoCopy = TRUE;
 					}
 				}
 				else
 				{
-					if ( pSoldier->ubProfile >= FIRST_RPC && pSoldier->ubProfile < GASTON )
+					if ( pSoldier->ubProfile >= FIRST_RPC ) //&& pSoldier->ubProfile < GASTON )
 					{
 						fDoCopy = TRUE;
 					}
@@ -1706,7 +1723,8 @@ BOOLEAN IsProfileIdAnAimOrMERCMerc( UINT8 ubProfileID )
 
 	if( ubProfileID < BIFF ||
 			( ubProfileID >= BIFF && ubProfileID <= BUBBA ) ||
-			ubProfileID >= GASTON )
+			ubProfileID == 58 ||  // GASTON
+			ubProfileID == 59 )  //STOGIE
 	{
 		return( TRUE );
 	}

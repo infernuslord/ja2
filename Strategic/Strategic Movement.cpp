@@ -5093,7 +5093,7 @@ BOOLEAN WildernessSectorWithAllProfiledNPCsNotSpokenWith( INT16 sSectorX, INT16 
 	BOOLEAN fFoundSomebody = FALSE;
 
 
-	for ( ubProfile = FIRST_RPC; ubProfile < GASTON; ubProfile++ )
+	for ( ubProfile = FIRST_RPC; ubProfile < NUM_PROFILES; ubProfile++ ) // GASTON
 	{
 		pProfile = &gMercProfiles[ ubProfile ];
 

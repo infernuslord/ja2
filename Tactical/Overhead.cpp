@@ -117,6 +117,7 @@
 #include "test_space.h"
 #include "connect.h"
 #include "Ja25 Strategic Ai.h"
+#include "Soldier Control.h"
 
 // OJW - 20090419
 UINT8	giMAXIMUM_NUMBER_OF_PLAYER_MERCS = CODE_MAXIMUM_NUMBER_OF_PLAYER_MERCS;
@@ -1090,6 +1091,45 @@ BOOLEAN ExecuteOverhead( )
 						*/
 					}
 				}
+				
+				//Ja25 UB
+				// ATE: JA25 additon - poll for getting up from start of game...
+				if( pSoldier->fWaitingToGetupFromJA25Start )
+				{
+					if( !DialogueActive( ) )
+					{
+						///if the timer is done, AND no one is talking
+						if( TIMECOUNTERDONE( pSoldier->GetupFromJA25StartCounter, 0 ) )
+						{
+							//make sure they wont say this again
+							pSoldier->fWaitingToGetupFromJA25Start = FALSE;
+
+							//
+							//Get the soldier that should say the quote
+							//
+
+							//if the merc is one of the mercs who has Quote 80, say that
+							if( pSoldier->ubProfile == 58 ||//GASTON
+									pSoldier->ubProfile == 59 ||//STOGIE
+									pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__PLAYER_CHARACTER )
+							{
+								TacticalCharacterDialogue( pSoldier, QUOTE_REPUTATION_REFUSAL );
+							}
+							else
+							{
+								// Now make them say their curse sound
+								pSoldier->DoMercBattleSound( BATTLE_SOUND_CURSE1 );
+							}
+
+							SpecialCharacterDialogueEvent( DIALOGUE_SPECIAL_EVENT_MULTIPURPOSE, pSoldier->ubProfile, 0, 0, pSoldier->iFaceIndex, 0 );
+						}
+					}
+					else
+					{
+						pSoldier->GetupFromJA25StartCounter += giTimerDiag;
+					}
+				}				
+				
 
 				// Checkout fading
 				if ( pSoldier->flags.fBeginFade )
@@ -3837,10 +3877,13 @@ void MakeCivHostile( SOLDIERTYPE *pSoldier, INT8 bNewSide )
 
 	switch( pSoldier->ubProfile )
 	{
+/*
+Ja25 No Ira, miguel, etc
 	case IRA:
 	case DIMITRI:
 	case MIGUEL:
 	case CARLOS:
+*/	
 	case MADLAB:
 	case DYNAMO:
 	case SHANK:

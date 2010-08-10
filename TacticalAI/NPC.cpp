@@ -147,7 +147,7 @@ NPCQuoteInfo * LoadQuoteFile( UINT8 ubNPC )
 		// use a copy of Herve's data file instead!
 		sprintf( zFileName, "NPCData\\%03d.npc", HERVE );
 	}
-	else if ( ubNPC < FIRST_RPC || ubNPC >= GASTON || (ubNPC < FIRST_NPC && gMercProfiles[ ubNPC ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED ) )
+	else if ( ubNPC < FIRST_RPC || /*ubNPC >= GASTON || */ (ubNPC < FIRST_NPC && gMercProfiles[ ubNPC ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED ) )
 	{
 		sprintf( zFileName, "NPCData\\000.npc", ubNPC );
 	}
@@ -424,10 +424,12 @@ BOOLEAN RefreshNPCScriptRecord( UINT8 ubNPC, UINT8 ubRecord )
 		{
 			RefreshNPCScriptRecord( ubLoop, ubRecord );
 		}
+		/*
 		for ( ubLoop = GASTON; ubLoop < NUM_PROFILES; ubLoop++ ) // need more finesse here
 		{
 			RefreshNPCScriptRecord( ubLoop, ubRecord );
 		}
+		*/
 		for ( ubLoop = FIRST_RPC; ubLoop < FIRST_NPC; ubLoop++ )
 		{
 			if ( gMercProfiles[ ubNPC ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED && gpBackupNPCQuoteInfoArray[ ubNPC ] != NULL )
@@ -651,7 +653,7 @@ BOOLEAN ReloadAllQuoteFiles( void )
 {
 	UINT8		ubProfile, ubLoop;
 
-	for ( ubProfile = FIRST_RPC; ubProfile < GASTON; ubProfile++ )
+	for ( ubProfile = FIRST_RPC; ubProfile < NUM_PROFILES; /*GASTON;*/ ubProfile++ )
 	{
 		// zap backup if any
 		if ( gpBackupNPCQuoteInfoArray[ ubProfile ] != NULL )
@@ -1682,7 +1684,7 @@ void ResetOncePerConvoRecordsForAllNPCsInLoadedSector( void )
 		return;
 	}
 
-	for ( ubLoop = FIRST_RPC; ubLoop < GASTON; ubLoop++ )
+	for ( ubLoop = FIRST_RPC; ubLoop < NUM_PROFILES; /*GASTON; */ ubLoop++ )
 	{
 		if ( gMercProfiles[ ubLoop ].sSectorX == gWorldSectorX &&
 				 gMercProfiles[ ubLoop ].sSectorY == gWorldSectorY &&

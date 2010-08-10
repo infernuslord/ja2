@@ -5,7 +5,7 @@
 #include "Soldier Control.h"
 
 #define NUM_PROFILES		170
-#define FIRST_RPC 57
+#define FIRST_RPC 60	//JA25 was 59
 #define FIRST_NPC 75
 
 #define NAME_LENGTH			30

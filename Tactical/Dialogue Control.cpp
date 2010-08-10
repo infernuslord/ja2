@@ -1940,7 +1940,7 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 			sprintf( zFileName,"NPCDATA\\%03d.EDT", ubCharacterNum );
 		}
 	}
-	else if ( ubCharacterNum >= FIRST_RPC && ubCharacterNum < GASTON &&
+	else if ( ubCharacterNum >= FIRST_RPC && /* ubCharacterNum <  GASTON  && */
 			( !( gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
 			|| ProfileCurrentlyTalkingInDialoguePanel( ubCharacterNum )
 			|| (gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_FORCENPCQUOTE) )
@@ -1981,7 +1981,7 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 		if ( fWavFile )
 		{
 			#ifdef RUSSIAN
-				if( ubCharacterNum >= FIRST_RPC && ubCharacterNum < GASTON && gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
+				if( ubCharacterNum >= FIRST_RPC && /* ubCharacterNum < GASTON*/ && gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
 				{
 //inshy: fix for UB-1.13 version only					sprintf( zFileName,"SPEECH\\r_%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
 					sprintf( zFileName,"SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
@@ -2653,6 +2653,9 @@ void SayQuoteFromAnyBodyInSector( UINT16 usQuoteNum )
 		{
 			if ( gTacticalStatus.bNumFoughtInBattle[ ENEMY_TEAM ] == 0 )
 			{
+			
+/*
+Ja25 No Ira, Miguel etc.
 				// quotes referring to Deidranna's men so we skip quote if there were no army guys fought
 				if ( (usQuoteNum == QUOTE_SECTOR_SAFE) && (pTeamSoldier->ubProfile == IRA || pTeamSoldier->ubProfile == MIGUEL || pTeamSoldier->ubProfile == SHANK ) )
 				{
@@ -2663,6 +2666,7 @@ void SayQuoteFromAnyBodyInSector( UINT16 usQuoteNum )
 				{
 					continue;
 				}
+*/
 			}
 
 			ubMercsInSector[ ubNumMercs ] = (UINT8)cnt;
