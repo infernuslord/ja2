@@ -5050,6 +5050,12 @@ STR16 Additional113Text[]=
 	L"Для запуска Jagged Alliance 2 v1.13 в оконном режиме требуется установить 16-битное качество цветопередачи экрана",//Jagged Alliance 2 v1.13 windowed mode requires a color depth of 16bpp or less.
 };
 
+STR16	gzNewLaptopMessages[]=
+{
+	L"Ask about our special offer!",
+	L"Temporarily Unavailable",
+	L"This special press preview of Jagged Alliance 2: Unfinished Business contains the only first 6 sector maps. The final version of the game will feature many more - please see the included readme file for details.",
+};
 
 STR16	zNewTacticalMessages[]=
 {

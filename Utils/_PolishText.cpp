@@ -5052,6 +5052,14 @@ STR16 Additional113Text[]=
 };
 
 //Ja25 UB
+
+STR16	gzNewLaptopMessages[]=
+{
+	L"Zapytaj o nasz¹ specjaln¹ ofertê!",
+	L"Temporarily Unavailable",
+	L"This special press preview of Jagged Alliance 2: Unfinished Business contains the only first 6 sector maps. The final version of the game will feature many more - please see the included readme file for details.",
+};
+
 STR16	zNewTacticalMessages[]=
 {
 	//L"Odleg³oœæ od celu (w polach): %d, Jasnoœæ = %d/%d",

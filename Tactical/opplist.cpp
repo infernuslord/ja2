@@ -2100,22 +2100,23 @@ void ManSeesMan(SOLDIERTYPE *pSoldier, SOLDIERTYPE *pOpponent, INT32 sOppGridNo,
 						switch( pSoldier->ubProfile )
 						{
 						case CARMEN:
-							if (pOpponent->ubProfile == SLAY ) // 64
-							{
+							//if (pOpponent->ubProfile == SLAY ) // 64
+							//{
 								// Carmen goes to war (against Slay)
-								if ( pSoldier->aiData.bNeutral )
-								{
+								//if ( pSoldier->aiData.bNeutral )
+								//{
 									//SetSoldierNonNeutral( pSoldier );
-									pSoldier->aiData.bAttitude = ATTACKSLAYONLY;
-									TriggerNPCRecord( pSoldier->ubProfile, 28 );
-								}
+								//	pSoldier->aiData.bAttitude = ATTACKSLAYONLY;
+								//	TriggerNPCRecord( pSoldier->ubProfile, 28 );
+								//}
 								/*
 								if ( ! gTacticalStatus.uiFlags & INCOMBAT )
 								{
 								EnterCombatMode( pSoldier->bTeam );
 								}
 								*/
-							}
+							//}
+							
 							break;
 						case ELDIN:
 							if ( pSoldier->aiData.bNeutral )

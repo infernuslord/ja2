@@ -459,11 +459,23 @@ void MercDailyUpdate()
 						iOffset = AIM_REPLY_BARRY;
 
 						//remove the Flag, so if the merc goes on another assignment, the player can leave an email.
-						pProfile->ubMiscFlags3 &= ~PROFILE_MISC_FLAG3_PLAYER_LEFT_MSG_FOR_MERC_AT_AIM;
+						//pProfile->ubMiscFlags3 &= ~PROFILE_MISC_FLAG3_PLAYER_LEFT_MSG_FOR_MERC_AT_AIM;
 
 						// TO DO: send E-mail to player telling him the merc has returned from an assignment
-						AddEmail( ( UINT8 )( iOffset + ( cnt * AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, ( UINT8 )( 6 + cnt ), GetWorldTotalMin(), -1 );
-					}
+						//AddEmail( ( UINT8 )( iOffset + ( cnt * AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, ( UINT8 )( 6 + cnt ), GetWorldTotalMin(), -1 );
+
+						//if the Laptop is NOT broken
+						if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTINPROGRESS )
+						{
+							//remove the Flag, so if the merc goes on another assignment, the player can leave an email.
+							pProfile->ubMiscFlags3 &= ~PROFILE_MISC_FLAG3_PLAYER_LEFT_MSG_FOR_MERC_AT_AIM;
+
+							// TO DO: send E-mail to player telling him the merc has returned from an assignment
+							AddEmail( ( UINT8 )( iOffset + ( cnt * AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, ( UINT8 )( 6 + cnt ), GetWorldTotalMin(),-1 );
+						}
+
+
+						}
 				}
 			}
 		}
@@ -512,7 +524,7 @@ void MercDailyUpdate()
 
 	// build quit list
 	//BuildMercQuitList( pQuitList );
-	HandleSlayDailyEvent( );
+	//HandleSlayDailyEvent( );
 
 	// rebuild list for mapscreen
 	ReBuildCharactersList( );
@@ -1009,7 +1021,7 @@ void UpdateBuddyAndHatedCounters( void )
 											pProfile->bMercOpinion[ubOtherProfileID] = HATED_OPINION;
 											}
 
-											if (pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__MERC || (pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__NPC && (pSoldier->ubProfile == DEVIN || pSoldier->ubProfile == SLAY || pSoldier->ubProfile == IGGY || pSoldier->ubProfile == CONRAD ) ) )
+											if (pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__MERC || (pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__NPC &&  ( /* pSoldier->ubProfile == DEVIN || */ pSoldier->ubProfile == SLAY || pSoldier->ubProfile == IGGY || pSoldier->ubProfile == CONRAD ) ) )
 											{
 												// Leave now! ( handle equipment too )....
 												TacticalCharacterDialogue( pSoldier, QUOTE_MERC_QUIT_LEARN_TO_HATE );

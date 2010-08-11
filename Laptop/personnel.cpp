@@ -6131,8 +6131,13 @@ void DisplayEmploymentinformation( INT32 iId, INT32 iSlot )
 		case 0:
 		{
 			//UINT32 uiTimeUnderThisDisplayAsHours = 24*60;
-			static const UINT32 uiMinutesInDay = 24 * 60;
+			//static const UINT32 uiMinutesInDay = 24 * 60;
+			
+			
+			wcscpy( sString, gpStrategicString[ STR_PB_NOTAPPLICABLE_ABBREVIATION ] );
+			mprintf((INT16)(pPersonnelScreenPoints[iCounter].x+(iSlot*TEXT_BOX_WIDTH)),pPersonnelScreenPoints[iCounter].y,pPersonnelScreenStrings[PRSNL_TXT_CURRENT_CONTRACT]);
 
+/*ja25:
 				if(Menptr[iId].ubWhatKindOfMercAmI == MERC_TYPE__AIM_MERC || Menptr[iId].ubProfile == SLAY )
 				{
 					INT32 iTimeLeftOnContract = CalcTimeLeftOnMercContract( &Menptr[iId] );
@@ -6174,7 +6179,7 @@ void DisplayEmploymentinformation( INT32 iId, INT32 iSlot )
 					wcscpy( sString, gpStrategicString[ STR_PB_NOTAPPLICABLE_ABBREVIATION ] );
 					mprintf((INT16)(pPersonnelScreenPoints[iCounter].x+(iSlot*TEXT_BOX_WIDTH)),pPersonnelScreenPoints[iCounter].y,pPersonnelScreenStrings[PRSNL_TXT_CURRENT_CONTRACT]);
 				}
-
+*/
 		FindFontRightCoordinates((INT16)(pPersonnelScreenPoints[iCounter].x+(iSlot*TEXT_BOX_WIDTH)+Prsnl_DATA_OffSetX),0,TEXT_BOX_WIDTH-20,0,sString, PERS_FONT,	&sX, &sY);
 		mprintf(sX,pPersonnelScreenPoints[iCounter].y,sString);
 		}

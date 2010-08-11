@@ -14571,11 +14571,13 @@ BOOLEAN HandleCtrlOrShiftInTeamPanel( INT8 bCharNumber, BOOLEAN fFromRightClickA
 
 INT32 GetContractExpiryTime( SOLDIERTYPE *pSoldier )
 {
+/* JA25 UB
 	if( ( pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__AIM_MERC ) || ( pSoldier->ubProfile == SLAY ) )
 	{
 		return ( pSoldier->iEndofContractTime );
 	}
 	else
+	*/
 	{
 		// never - really high number
 		return ( 999999 );
@@ -15498,8 +15500,9 @@ void GetMapscreenMercDepartureString( SOLDIERTYPE *pSoldier, CHAR16 sString[], U
 	INT32 iDaysRemaining = 0;
 	INT32 iHoursRemaining = 0;
 
-
-	if( ( pSoldier->ubWhatKindOfMercAmI != MERC_TYPE__AIM_MERC && pSoldier->ubProfile != SLAY ) || pSoldier->stats.bLife == 0 )
+//Ja25:		Removed the aim merc check because aim mercs are hired for a 1 time fee
+//	if( ( pSoldier->ubWhatKindOfMercAmI != MERC_TYPE__AIM_MERC && pSoldier->ubProfile != SLAY ) || pSoldier->stats.bLife == 0 )
+	if( ( pSoldier->ubProfile != SLAY ) || pSoldier->stats.bLife == 0 )
 	{
 		swprintf( sString, L"%s", gpStrategicString[ STR_PB_NOTAPPLICABLE_ABBREVIATION ] );
 	}

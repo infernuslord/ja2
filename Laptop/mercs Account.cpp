@@ -605,7 +605,7 @@ void SettleMercAccounts()
 
 	//Increment the amount of money paid to speck
 	LaptopSaveInfo.uiTotalMoneyPaidToSpeck += iPartialPayment;
-
+/*
 	//If the player only made a partial payment
 	if( iPartialPayment != giMercTotalContractCharge )
 		gusMercVideoSpeckSpeech = SPECK_QUOTE_PLAYER_MAKES_PARTIAL_PAYMENT;
@@ -622,7 +622,7 @@ void SettleMercAccounts()
 		// Since the player has paid, make sure speck wont complain about the lack of payment
 		LaptopSaveInfo.uiSpeckQuoteFlags &= ~SPECK_QUOTE__SENT_EMAIL_ABOUT_LACK_OF_PAYMENT;
 	}
-
+*/
 	//Go to the merc homepage to say the quote
 	guiCurrentLaptopMode = LAPTOP_MODE_MERC;
 	gubArrivedFromMercSubSite = MERC_CAME_FROM_ACCOUNTS_PAGE;

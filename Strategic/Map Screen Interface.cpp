@@ -5876,11 +5876,17 @@ BOOLEAN NotifyPlayerWhenEnemyTakesControlOfImportantSector( INT16 sSectorX, INT1
 
 	if( fContested && bTownId )
 	{
+	
+		/*
 		if( bTownId == SAN_MONA )
 		{ //San Mona isn't important.
 			return( TRUE );
 		}
+		
+		*/
 		swprintf( sStringB, pMapErrorString[ 25 ], sString );
+		
+		HandleDisplayingOfPlayerLostDialogue( );
 
 		// put up the message informing the player of the event
 		DoScreenIndependantMessageBox( sStringB, MSG_BOX_FLAG_OK, MapScreenDefaultOkBoxCallback );

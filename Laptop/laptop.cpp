@@ -86,6 +86,9 @@
 
 #include "connect.h"
 
+#include "Ja25_Tactical.h"
+#include "Ja25 Strategic Ai.h"
+
 
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -741,6 +744,10 @@ UINT32 LaptopScreenInit()
 
 	//reset the flag that enables the 'just hired merc' popup
 	LaptopSaveInfo.sLastHiredMerc.fHaveDisplayedPopUpInLaptop = FALSE;
+	
+	//JA25 UB
+	//Set the internet as WORKING
+	gubQuest[ QUEST_FIX_LAPTOP ] = QUESTNOTSTARTED;
 
 	//Initialize all vars
 	guiCurrentLaptopMode = LAPTOP_MODE_EMAIL;
@@ -772,8 +779,8 @@ UINT32 LaptopScreenInit()
 	GameInitEmail();
 	GameInitCharProfile();
 	GameInitFlorist();
-	GameInitInsurance();
-	GameInitInsuranceContract();
+//JA25:	GameInitInsurance();
+//	GameInitInsuranceContract();
 	GameInitFuneral();
 	GameInitSirTech();
 	GameInitFiles();
@@ -785,6 +792,8 @@ UINT32 LaptopScreenInit()
 	gfAtLeastOneMercWasHired = FALSE;
 
 	//No longer inits the laptop screens, now InitLaptopAndLaptopScreens() does
+	
+	InitJa25SaveStruct();
 
 	return( 1 );
 }
@@ -827,7 +836,7 @@ DrawLapTopText()
 //This is only called once at game shutdown.
 UINT32 LaptopScreenShutdown()
 {
-	InsuranceContractEndGameShutDown();
+//JA25:	InsuranceContractEndGameShutDown();
 	BobbyRayMailOrderEndGameShutDown();
 	ShutDownEmailList();
 
@@ -1219,10 +1228,10 @@ void RenderLaptop()
 			RenderMercsFiles();
 			break;
 		case LAPTOP_MODE_MERC_ACCOUNT:
-			RenderMercsAccount();
+//Ja25						RenderMercsAccount();
 			break;
 		case LAPTOP_MODE_MERC_NO_ACCOUNT:
-			RenderMercsNoAccount();
+//Ja25						RenderMercsNoAccount();
 			break;
 
 		case LAPTOP_MODE_BOBBY_R:
@@ -1264,19 +1273,22 @@ void RenderLaptop()
 			break;
 
 		case LAPTOP_MODE_INSURANCE:
-			RenderInsurance();
+		//	Assert( 0 );
+//JA25:				RenderInsurance();
 			break;
 
 		case LAPTOP_MODE_INSURANCE_INFO:
-			RenderInsuranceInfo();
+		//	Assert( 0 );
+//JA25:			RenderInsuranceInfo();
 			break;
 
 		case LAPTOP_MODE_INSURANCE_CONTRACT:
-			RenderInsuranceContract();
+//JA25:			RenderInsuranceContract();
 			break;
 
 		case LAPTOP_MODE_INSURANCE_COMMENTS:
-			RenderInsuranceComments();
+		//	Assert( 0 );
+//JA25:			RenderInsuranceComments();
 			break;
 
 		case LAPTOP_MODE_FUNERAL:
@@ -1575,10 +1587,10 @@ void EnterNewLaptopMode()
 			EnterMercsFiles();
 			break;
 		case LAPTOP_MODE_MERC_ACCOUNT:
-			EnterMercsAccount();
+//Ja25						EnterMercsAccount();
 			break;
 		case LAPTOP_MODE_MERC_NO_ACCOUNT:
-			EnterMercsNoAccount();
+//Ja25						EnterMercsNoAccount();
 			break;
 
 		case LAPTOP_MODE_BOBBY_R:
@@ -1620,16 +1632,19 @@ void EnterNewLaptopMode()
 			break;
 
 		case LAPTOP_MODE_INSURANCE:
-			EnterInsurance();
+	//		Assert( 0 );
+//JA25:			EnterInsurance();
 			break;
 		case LAPTOP_MODE_INSURANCE_INFO:
-			EnterInsuranceInfo();
+		//	Assert( 0 );
+//JA25:			EnterInsuranceInfo();
 			break;
 		case LAPTOP_MODE_INSURANCE_CONTRACT:
-			EnterInsuranceContract();
+//JA25:			EnterInsuranceContract();
 			break;
 		case LAPTOP_MODE_INSURANCE_COMMENTS:
-			EnterInsuranceComments();
+		//	Assert( 0 );
+//JA25:			EnterInsuranceComments();
 			break;
 
 		case LAPTOP_MODE_FUNERAL:
@@ -1733,10 +1748,10 @@ void HandleLapTopHandles()
 			HandleMercsFiles();
 			break;
 		case LAPTOP_MODE_MERC_ACCOUNT:
-			HandleMercsAccount();
+//Ja25						HandleMercsAccount();
 			break;
 		case LAPTOP_MODE_MERC_NO_ACCOUNT:
-			HandleMercsNoAccount();
+//Ja25						HandleMercsNoAccount();
 			break;
 
 
@@ -1780,18 +1795,21 @@ void HandleLapTopHandles()
 			break;
 
 		case LAPTOP_MODE_INSURANCE:
-			HandleInsurance();
+		//	Assert( 0 );
+//JA25:			HandleInsurance();
 			break;
 
 		case LAPTOP_MODE_INSURANCE_INFO:
-			HandleInsuranceInfo();
+		//	Assert( 0 );
+//JA25:			HandleInsuranceInfo();
 			break;
 
 		case LAPTOP_MODE_INSURANCE_CONTRACT:
-			HandleInsuranceContract();
+//JA25:			HandleInsuranceContract();
 			break;
 		case LAPTOP_MODE_INSURANCE_COMMENTS:
-			HandleInsuranceComments();
+		//	Assert( 0 );
+//JA25:			HandleInsuranceComments();
 			break;
 
 		case LAPTOP_MODE_FUNERAL:
@@ -2220,10 +2238,10 @@ UINT32 ExitLaptopMode(UINT32 uiMode)
 			ExitMercsFiles();
 			break;
 		case LAPTOP_MODE_MERC_ACCOUNT:
-			ExitMercsAccount();
+//Ja25						ExitMercsAccount();
 			break;
 		case LAPTOP_MODE_MERC_NO_ACCOUNT:
-			ExitMercsNoAccount();
+//Ja25			ExitMercsNoAccount();
 			break;
 
 
@@ -2265,20 +2283,23 @@ UINT32 ExitLaptopMode(UINT32 uiMode)
 		case LAPTOP_MODE_FLORIST_CARD_GALLERY:
 			ExitFloristCards();
 			break;
-
+			
 		case LAPTOP_MODE_INSURANCE:
-			ExitInsurance();
+		//	Assert( 0 );
+//JA25:			ExitInsurance();
 			break;
 
 		case LAPTOP_MODE_INSURANCE_INFO:
-			ExitInsuranceInfo();
+		//	Assert( 0 );
+//JA25:			ExitInsuranceInfo();
 			break;
 
 		case LAPTOP_MODE_INSURANCE_CONTRACT:
-			ExitInsuranceContract();
+//JA25:			ExitInsuranceContract();
 			break;
 		case LAPTOP_MODE_INSURANCE_COMMENTS:
-			ExitInsuranceComments();
+		//	Assert( 0 );
+//JA25:			ExitInsuranceComments();
 			break;
 
 		case LAPTOP_MODE_FUNERAL:
@@ -2656,12 +2677,32 @@ BOOLEAN HandleExit( void )
 
 void HaventMadeImpMercEmailCallBack()
 {
+
+	//if the Laptop is NOT broken
+	if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTINPROGRESS )
+	{
+		//if the player STILL hasnt made an imp merc yet
+		if( ( LaptopSaveInfo.fIMPCompletedFlag == FALSE ) && ( LaptopSaveInfo.fSentImpWarningAlready == FALSE ) )
+		{
+			//if the player DIDNT import the save
+			//if( !gubFact[ FACT_PLAYER_IMPORTED_SAVE ] )
+			//{
+				//send a follow up email to the player
+				LaptopSaveInfo.fSentImpWarningAlready = TRUE;
+				AddEmail( IMP_EMAIL_AGAIN, IMP_EMAIL_AGAIN_LENGTH, CHAR_PROFILE_SITE, GetWorldTotalMin( ), -1 );
+			//}
+		}
+	}
+
+/*
 	//if the player STILL hasnt made an imp merc yet
 	if( ( LaptopSaveInfo.fIMPCompletedFlag == FALSE ) && ( LaptopSaveInfo.fSentImpWarningAlready == FALSE ) )
 	{
 		LaptopSaveInfo.fSentImpWarningAlready = TRUE;
 		AddEmail(IMP_EMAIL_AGAIN,IMP_EMAIL_AGAIN_LENGTH,1, GetWorldTotalMin( ), -1 );
 	}
+	
+	*/
 }
 
 
@@ -3648,7 +3689,9 @@ void GoToWebPage(INT32 iPageId )
 	//}
 	//else
 	//	giRainDelayInternetSite = -1;
-
+	//if the laptop is broken
+if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTINPROGRESS )
+{
 	switch(iPageId)
 	{
 		case AIM_BOOKMARK:
@@ -3792,7 +3835,18 @@ void GoToWebPage(INT32 iPageId )
 		break;
 
 	}
+	
+	}
+	//the web is not working
+	else
+	{
+		guiCurrentWWWMode = LAPTOP_MODE_BROKEN_LINK;
+		guiCurrentLaptopMode = LAPTOP_MODE_BROKEN_LINK;
 
+		// slow load
+		fLoadPendingFlag = TRUE;
+		fFastLoadFlag =  FALSE;
+	}
 	gfShowBookmarks=FALSE;
 	fReDrawScreenFlag=TRUE;
 	return;
@@ -3877,6 +3931,13 @@ BOOLEAN DisplayLoadPending( void )
 		iUnitTime += WWaitDelayIncreasedIfRaining( iUnitTime );
 
 		iLoadTime = iUnitTime * 30;
+		
+		//if the site we are going to is the web poage not found page
+		if( guiCurrentLaptopMode == LAPTOP_MODE_BROKEN_LINK )
+		{
+			iLoadTime=1;
+			iUnitTime=1;
+		}
 	}
 
 
@@ -4157,7 +4218,7 @@ void EnterLaptopInitLaptopPages()
 	EnterInitAimPolicies();
 	EnterInitAimHistory();
 	EnterInitFloristGallery();
-	EnterInitInsuranceInfo();
+//JA25:	EnterInitInsuranceInfo();
 	EnterInitBobbyRayOrder();
 	EnterInitMercSite();
 
@@ -5533,7 +5594,7 @@ void HandleKeyBoardShortCutsForLapTop( UINT16 usEvent, UINT32 usParam, UINT16 us
 				SetBookMark( MERC_BOOKMARK );
 				SetBookMark( FUNERAL_BOOKMARK );
 				SetBookMark( FLORIST_BOOKMARK );
-				SetBookMark( INSURANCE_BOOKMARK );
+			//	SetBookMark( INSURANCE_BOOKMARK );
 			}
 	}
 

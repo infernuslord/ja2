@@ -1381,6 +1381,27 @@ BOOLEAN ExitShopKeeperInterface()
 	MSYS_EnableRegion(&gRadarRegion);
 
 	gfSMDisableForItems = FALSE;
+	
+	//JA25 UB
+	//Check to see if a merc should say something
+	//CheckForValidQuotesWhenLeavingDealer( gTalkPanel.ubCharNum );
+
+	//if the laptop was just fixed
+	if( gubQuest[ QUEST_FIX_LAPTOP ] == QUESTDONE && !( gJa25SaveStruct.uiJa25GeneralFlags & JA_GF__PLAYER_SAID_LAPTOP_FIXED_QUOTE ) )
+	{
+		/*
+		INT8	bSoldierID=-1;
+
+			
+		//Have a new merc say a quote
+		bSoldierID = RandomSoldierIdFromNewMercsOnPlayerTeam();
+		if( bSoldierID != -1 )
+		{
+			TacticalCharacterDialogue( &Menptr[ bSoldierID ], QUOTE_SPARE2 );
+		}
+		*/
+		gJa25SaveStruct.uiJa25GeneralFlags |= JA_GF__PLAYER_SAID_LAPTOP_FIXED_QUOTE;
+	}
 
 	return( TRUE );
 }

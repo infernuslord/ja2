@@ -5046,6 +5046,13 @@ STR16 Additional113Text[]=
 	L"Jagged Alliance 2 v1.13 windowed modus vereist een kleurdiepte van 16 bits per pixel.",
 };
 
+STR16	gzNewLaptopMessages[]=
+{
+	L"Ask about our special offer!",
+	L"Temporarily Unavailable",
+	L"This special press preview of Jagged Alliance 2: Unfinished Business contains the only first 6 sector maps. The final version of the game will feature many more - please see the included readme file for details.",
+};
+
 STR16	zNewTacticalMessages[]=
 {
 	//L"Range to target: %d tiles, Brightness: %d/%d",

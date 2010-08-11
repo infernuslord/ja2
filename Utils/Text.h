@@ -34,6 +34,19 @@ enum
 	TCTL_MSG__CANT_EDIT_DEFAULT,
 
 };
+
+//Ja25 UB
+//enums used for zNewLaptopMessages
+enum
+{
+	LPTP_MSG__MERC_SPECIAL_OFFER,
+	LPTP_MSG__TEMP_UNAVAILABLE,
+	LPTP_MSG__PREVIEW_TEXT,
+};
+
+
+//Ja25 UB
+extern	STR16	gzNewLaptopMessages[];
 extern	STR16	zNewTacticalMessages[];
 
 extern CHAR16		zGrod[][500];

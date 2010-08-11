@@ -55,6 +55,7 @@
 #include "MapScreen Quotes.h"
 #include "email.h"
 #include "interface Dialogue.h"
+#include "mercs.h"
 
 #ifdef JA2BETAVERSION
 extern BOOLEAN gfMercsNeverQuit;
@@ -416,7 +417,7 @@ Ja25 No meanwhiles
 			}
 			break;
 		case EVENT_MERC_SITE_BACK_ONLINE:
-			GetMercSiteBackOnline();
+		//	GetMercSiteBackOnline();
 			break;
 		case EVENT_INVESTIGATE_SECTOR:
 			InvestigateSector( (UINT8)pEvent->uiParam );

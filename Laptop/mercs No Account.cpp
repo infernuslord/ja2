@@ -150,7 +150,7 @@ void BtnOpenAccountBoxButtonCallback(GUI_BUTTON *btn,INT32 reason)
 			//Get an account number
 			LaptopSaveInfo.guiPlayersMercAccountNumber = Random( 99999 );
 
-			gusMercVideoSpeckSpeech = SPECK_QUOTE_THANK_PLAYER_FOR_OPENING_ACCOUNT;
+		//	gusMercVideoSpeckSpeech = SPECK_QUOTE_THANK_PLAYER_FOR_OPENING_ACCOUNT;
 
 			guiCurrentLaptopMode = LAPTOP_MODE_MERC;
 			gubArrivedFromMercSubSite = MERC_CAME_FROM_ACCOUNTS_PAGE;

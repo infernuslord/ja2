@@ -74,7 +74,7 @@ BOOLEAN IsMercMercAvailable( UINT8 ubMercID );
 void HandlePlayerHiringMerc( UINT8 ubHiredMercID );
 void EnterInitMercSite();
 
-void GetMercSiteBackOnline();
+//void GetMercSiteBackOnline();
 
 void DisableMercSiteButton();
 
@@ -97,10 +97,13 @@ void NewMercsAvailableAtMercSiteCallBack( );
 
 void CalcAproximateAmountPaidToSpeck();
 
+extern void			MarkSpeckImportantQuoteUsed( UINT32 uiQuoteNum );
+extern BOOLEAN		HasImportantSpeckQuoteBeingSaid( UINT32 uiQuoteNum );
+extern INT8			IsSpeckQuoteImportantQuote( UINT32 uiQuoteNum );
+
 #endif
 
 
 
  
-
 

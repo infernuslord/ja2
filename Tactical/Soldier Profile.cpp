@@ -643,6 +643,7 @@ void MakeRemainingTerroristsTougher( void )
 	{
 		if ( gMercProfiles[ gubTerrorists[ ubLoop ] ].bMercStatus != MERC_IS_DEAD && gMercProfiles[ gubTerrorists[ ubLoop ] ].sSectorX != 0 && gMercProfiles[ gubTerrorists[ ubLoop ] ].sSectorY != 0 )
 		{
+			/*
 			if ( gubTerrorists[ ubLoop ] == SLAY )
 			{
 				if ( FindSoldierByProfileID( SLAY, TRUE ) != NULL )
@@ -651,6 +652,7 @@ void MakeRemainingTerroristsTougher( void )
 					continue;
 				}
 			}
+			*/
 			ubRemainingTerrorists++;
 		}
 	}
@@ -714,6 +716,8 @@ void MakeRemainingTerroristsTougher( void )
 	{
 		if ( gMercProfiles[ gubTerrorists[ ubLoop ] ].bMercStatus != MERC_IS_DEAD && gMercProfiles[ gubTerrorists[ ubLoop ] ].sSectorX != 0 && gMercProfiles[ gubTerrorists[ ubLoop ] ].sSectorY != 0 )
 		{
+		
+			/*
 			if ( gubTerrorists[ ubLoop ] == SLAY )
 			{
 				if ( FindSoldierByProfileID( SLAY, TRUE ) != NULL )
@@ -722,7 +726,7 @@ void MakeRemainingTerroristsTougher( void )
 					continue;
 				}
 			}
-
+			*/
 			if ( usOldItem != NOTHING )
 			{
 				RemoveObjectFromSoldierProfile( gubTerrorists[ ubLoop ], usOldItem );

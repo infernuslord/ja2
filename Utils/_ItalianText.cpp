@@ -5045,6 +5045,13 @@ STR16 Additional113Text[]=
 	L"Jagged Alliance 2 v1.13 modalità finestra richiede una profondità di colore di 16bpp o meno.",
 };
 
+STR16	gzNewLaptopMessages[]=
+{
+	L"Ask about our special offer!",
+	L"Temporarily Unavailable",
+	L"This special press preview of Jagged Alliance 2: Unfinished Business contains the only first 6 sector maps. The final version of the game will feature many more - please see the included readme file for details.",
+};
+
 STR16	zNewTacticalMessages[]=
 {
 	//L"Distanza dal bersaglio: %d caselle, Luminosità: %d/%d",

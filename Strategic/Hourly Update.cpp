@@ -32,7 +32,7 @@ void HourlyLarryUpdate( void );
 
 extern INT32 GetCurrentBalance( void );
 extern void PayOffSkyriderDebtIfAny( );
-void HourlyCheckIfSlayAloneSoHeCanLeave();
+//void HourlyCheckIfSlayAloneSoHeCanLeave();
 
 void UpdateRegenCounters( void );
 
@@ -86,7 +86,7 @@ void HandleHourlyUpdate()
 
 	HourlyLarryUpdate();
 
-	HourlyCheckIfSlayAloneSoHeCanLeave();
+	//HourlyCheckIfSlayAloneSoHeCanLeave();
 
 	// WDS - New AI
 	HourlyCheckStrategicAI();
@@ -336,7 +336,7 @@ void HourlyLarryUpdate( void )
 	}
 
 }
-
+/* JA25 UB
 void HourlyCheckIfSlayAloneSoHeCanLeave()
 {
 	SOLDIERTYPE *pSoldier;
@@ -362,3 +362,4 @@ void HourlyCheckIfSlayAloneSoHeCanLeave()
 		}
 	}
 }
+*/

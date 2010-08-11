@@ -3401,6 +3401,9 @@ void HandlePlayerTeamMemberDeath( SOLDIERTYPE *pSoldier )
 		// handle stuff for Carmen if Slay is killed
 		switch( pSoldier->ubProfile )
 		{
+/*
+Ja25
+No carmen
 		case SLAY:
 			pTeamSoldier = FindSoldierByProfileID( CARMEN, FALSE );			
 			if (pTeamSoldier && pTeamSoldier->aiData.bAttitude == ATTACKSLAYONLY && !TileIsOutOfBounds(ClosestPC( pTeamSoldier, NULL )) )
@@ -3409,6 +3412,7 @@ void HandlePlayerTeamMemberDeath( SOLDIERTYPE *pSoldier )
 				TriggerNPCRecord( CARMEN, 29 );
 			}
 			break;
+*/
 		case ROBOT:
 			if (CheckFact( FACT_FIRST_ROBOT_DESTROYED, 0 ) == FALSE )
 			{
@@ -3493,6 +3497,25 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 
 		switch( pSoldierOld->ubProfile )
 		{
+		/*
+			case 75: //MORRIS
+				{
+					INT8 bSoldierID;
+
+					//Geta a random soldier ID
+					bSoldierID = RandomSoldierIdFromNewMercsOnPlayerTeam();
+
+					//if there is any
+					if( bSoldierID != -1 )
+					{
+						//say the MORRIS dead quote
+						TacticalCharacterDialogue( &Menptr[ bSoldierID ], QUOTE_LEARNED_TO_HATE_MERC_1_ON_TEAM_WONT_RENEW );
+					}					
+				}
+				break;
+		*/
+/*
+Ja25: none of these characters are in the exp.
 		case BRENDA:
 			SetFactTrue( FACT_BRENDA_DEAD );
 			{
@@ -3548,12 +3571,12 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 		case ELDIN:
 			// the security guard...	Results in an extra loyalty penalty for Balime (in addition to civilian murder)
 
-			/* Delayed loyalty effects elimininated.	Sep.12/98.	ARM
+			// Delayed loyalty effects elimininated.	Sep.12/98.	ARM
 			// create the event value, for town BALIME
-			uiLoyaltyValue = BuildLoyaltyEventValue( BALIME, LOYALTY_PENALTY_ELDIN_KILLED, FALSE );
+			//uiLoyaltyValue = BuildLoyaltyEventValue( BALIME, LOYALTY_PENALTY_ELDIN_KILLED, FALSE );
 			// post the event, 30 minute delay
-			AddStrategicEvent( EVENT_TOWN_LOYALTY_UPDATE, GetWorldTotalMin() + 30, uiLoyaltyValue );
-			*/
+			//AddStrategicEvent( EVENT_TOWN_LOYALTY_UPDATE, GetWorldTotalMin() + 30, uiLoyaltyValue );
+			
 			DecrementTownLoyalty( BALIME, LOYALTY_PENALTY_ELDIN_KILLED );
 			break;
 		case JOEY:
@@ -3564,22 +3587,22 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 				// Martha has a heart attack and croaks
 				TriggerNPCRecord( MARTHA, 17 );
 
-				/* Delayed loyalty effects elimininated.	Sep.12/98.	ARM
+				// Delayed loyalty effects elimininated.	Sep.12/98.	ARM
 				// create the event value, for town CAMBRIA
-				uiLoyaltyValue = BuildLoyaltyEventValue( CAMBRIA, LOYALTY_PENALTY_MARTHA_HEART_ATTACK, FALSE );
+				//uiLoyaltyValue = BuildLoyaltyEventValue( CAMBRIA, LOYALTY_PENALTY_MARTHA_HEART_ATTACK, FALSE );
 				// post the event, 30 minute delay
-				AddStrategicEvent( EVENT_TOWN_LOYALTY_UPDATE, GetWorldTotalMin() + 30, uiLoyaltyValue );
-				*/
+				//AddStrategicEvent( EVENT_TOWN_LOYALTY_UPDATE, GetWorldTotalMin() + 30, uiLoyaltyValue );
+				
 				DecrementTownLoyalty( CAMBRIA, LOYALTY_PENALTY_MARTHA_HEART_ATTACK );
 			}
 			else	// Martha doesn't see it.	She lives, but Joey is found a day or so later anyways
 			{
-				/*
+				
 				// create the event value, for town CAMBRIA
-				uiLoyaltyValue = BuildLoyaltyEventValue( CAMBRIA, LOYALTY_PENALTY_JOEY_KILLED, FALSE );
+				//uiLoyaltyValue = BuildLoyaltyEventValue( CAMBRIA, LOYALTY_PENALTY_JOEY_KILLED, FALSE );
 				// post the event, 30 minute delay
-				AddStrategicEvent( EVENT_TOWN_LOYALTY_UPDATE, GetWorldTotalMin() + ( ( 12 + Random(13)) * 60 ), uiLoyaltyValue );
-				*/
+				//AddStrategicEvent( EVENT_TOWN_LOYALTY_UPDATE, GetWorldTotalMin() + ( ( 12 + Random(13)) * 60 ), uiLoyaltyValue );
+				
 				DecrementTownLoyalty( CAMBRIA, LOYALTY_PENALTY_JOEY_KILLED );
 			}
 			break;
@@ -3616,8 +3639,10 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 				HandleNPCDoAction( DOREEN, NPC_ACTION_FREE_KIDS, 0 );
 			}
 			break;
+	*/
 		}
-
+/* Ja25
+no queen
 		// Are we looking at the queen?
 		if ( pSoldierOld->ubProfile == QUEEN )
 		{
@@ -3628,7 +3653,7 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 
 		//	BeginHandleDeidrannaDeath( pKiller, pSoldierOld->sGridNo, pSoldierOld->pathing.bLevel );
 		}
-
+*/
 		// crows/cows are on the civilian team, but none of the following applies to them
 		if ( ( pSoldierOld->ubBodyType != CROW ) && ( pSoldierOld->ubBodyType != COW ) )
 		{
@@ -3675,6 +3700,9 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 	}
 	else	// enemies and creatures... should any of this stuff not be called if a creature dies?
 	{
+	
+	/*
+no queen, or queen monster
 		if ( pSoldierOld->ubBodyType == QUEENMONSTER )
 		{
 			SOLDIERTYPE *pKiller = NULL;
@@ -3686,7 +3714,7 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 			//	BeginHandleQueenBitchDeath( pKiller, pSoldierOld->sGridNo, pSoldierOld->pathing.bLevel );
 			}
 		}
-
+*/
 		if ( pSoldierOld->bTeam == ENEMY_TEAM )
 		{
 			gTacticalStatus.ubArmyGuysKilled++;
@@ -3707,7 +3735,8 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 			// reset the chosen one!
 			gTacticalStatus.ubTheChosenOne = NOBODY;
 		}
-
+/*
+no queen, or queen monster
 		if ( pSoldierOld->ubProfile == QUEEN )
 		{
 			HandleMoraleEvent( NULL, MORALE_DEIDRANNA_KILLED, gWorldSectorX, gWorldSectorY, gbWorldSectorZ	);
@@ -3722,6 +3751,7 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 			HandleNPCDoAction( 0, NPC_ACTION_GRANT_EXPERIENCE_5, 0 );
 
 		}
+		*/
 	}
 
 
@@ -7805,6 +7835,9 @@ BOOLEAN ProcessImplicationsOfPCAttack( SOLDIERTYPE * pSoldier, SOLDIERTYPE ** pp
 	}
 	else
 	{
+	
+/*
+Ja25: No carmen
 		if (pTarget->ubProfile == CARMEN)// Carmen
 		{
 			// Special stuff for Carmen the bounty hunter
@@ -7814,7 +7847,7 @@ BOOLEAN ProcessImplicationsOfPCAttack( SOLDIERTYPE * pSoldier, SOLDIERTYPE ** pp
 				pTarget->aiData.bAttitude = AGGRESSIVE;
 			}
 		}
-
+*/
 		if ( pTarget->ubCivilianGroup && ( (pTarget->bTeam == gbPlayerNum) || pTarget->aiData.bNeutral ) )
 		{
 #ifdef JA2TESTVERSION
