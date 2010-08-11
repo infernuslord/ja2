@@ -32,7 +32,7 @@ typedef struct
 } JA25_TACTICAL_SAVE_STRUCT;
 
 */
-
+extern	BOOLEAN		gfFirstTimeInGameHeliCrash;
 
 INT8		RandomProfileIdFromNewMercsOnPlayerTeam();
 INT8		RandomSoldierIdFromNewMercsOnPlayerTeam();

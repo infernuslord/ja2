@@ -133,6 +133,8 @@ BOOLEAN	IsSoldierQualifiedGunCommenterMerc( SOLDIERTYPE *pSoldier );
 UINT32	GetNumberOfTurnsPowerGenFanWillBeStoppedFor();
 void HandleInitialEventsInHeliCrash();
 
+BOOLEAN		gfFirstTimeInGameHeliCrash = FALSE;
+
 //ppp
 
 //*******************************************************************

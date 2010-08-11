@@ -68,6 +68,7 @@ typedef PARSE_STAGE;
 #define LOADBEARINGEQUIPMENTFILENAME			"LoadBearingEquipment.xml"
 #define LBEPOCKETFILENAME						"Pockets.xml"
 #define MERCSTARTINGGEARFILENAME				"MercStartingGear.xml"
+#define MERCSTARTINGGEAR25FILENAME				"MercStartingGear25.xml"  //ja25 ub
 
 #define TONYINVENTORYFILENAME					"NPCInventory\\TonyInventory.xml"
 #define DEVININVENTORYFILENAME					"NPCInventory\\DevinInventory.xml"

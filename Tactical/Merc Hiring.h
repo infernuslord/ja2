@@ -42,7 +42,7 @@ extern INT16	gsMercArriveSectorX;
 extern INT16	gsMercArriveSectorY;
 
 //ja25ub
-extern	BOOLEAN		gfFirstTimeInGameHeliCrash;
+//extern	BOOLEAN		gfFirstTimeInGameHeliCrash;
 
 
 INT8		HireMerc( MERC_HIRE_STRUCT *pHireMerc);

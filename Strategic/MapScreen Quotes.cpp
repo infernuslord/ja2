@@ -58,6 +58,8 @@
 #include "connect.h"
 
 #include "Ja25 Strategic Ai.h"
+#include "Ja25_Tactical.h"
+
 
 
 #include "MapScreen Quotes.h"
@@ -164,9 +166,9 @@ BOOLEAN Internal_JerryMeloCharacterDialogue( UINT16 usQuoteNum )
 	BOOLEAN fRetVal = FALSE;
 	fTeamPanelDirty = TRUE;
 
-	fRetVal = CharacterDialogue( 76, usQuoteNum, uiExternalStaticNPCFaces[ JERRY_MELO_FACE ], DIALOGUE_EXTERNAL_NPC_UI, FALSE, FALSE );
+	fRetVal = CharacterDialogue( 76, usQuoteNum, uiExternalStaticNPCFacesUB[ JERRY_MELO_FACE ], DIALOGUE_EXTERNAL_NPC_UI, FALSE, FALSE );
 
-	SpecialCharacterDialogueEvent( DIALOGUE_SPECIAL_EVENT_JERRY_MILO, usQuoteNum, 0, 0, uiExternalStaticNPCFaces[ JERRY_MELO_FACE ], DIALOGUE_EXTERNAL_NPC_UI );
+	SpecialCharacterDialogueEvent( DIALOGUE_SPECIAL_EVENT_JERRY_MILO, usQuoteNum, 0, 0, uiExternalStaticNPCFacesUB[ JERRY_MELO_FACE ], DIALOGUE_EXTERNAL_NPC_UI );
 
 	return( fRetVal );
 }

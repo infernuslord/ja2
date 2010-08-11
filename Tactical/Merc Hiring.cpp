@@ -63,6 +63,7 @@
 
 #include "Soldier Control.h"
 #include "Ja25 Strategic Ai.h"
+#include "Ja25_Tactical.h"
 #include "Campaign Types.h"
 #include "MapScreen Quotes.h"
 
@@ -81,7 +82,7 @@ class SOLDIERTYPE;
 extern BOOLEAN		gfTacticalDoHeliRun;
 extern BOOLEAN		gfFirstHeliRun;
 
-BOOLEAN		gfFirstTimeInGameHeliCrash = FALSE;
+//BOOLEAN		gfFirstTimeInGameHeliCrash = FALSE;
 
 // ATE: Globals that dictate where the mercs will land once being hired
 // Default to Omerta

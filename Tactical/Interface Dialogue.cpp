@@ -5057,9 +5057,9 @@ void PerformJerryMiloAction301()
 	//Get the number and array of the new soldiers
 	bNumMercsPresent = GetNumSoldierIdAndProfileIdOfTheNewMercsOnPlayerTeam( ubMercsPresent, NULL );
 
-/*
-Randomly choose one
-	//if there is at least 1 of the desired mercs found
+
+//Randomly choose one
+/*	//if there is at least 1 of the desired mercs found
 	if( bNumMercsPresent != -1 )
 	{
 		ubId = ubMercsPresent[ Random( bNumMercsPresent ) ];
@@ -5070,7 +5070,6 @@ Randomly choose one
 	}
 */
 	//Have them all say their quote
-/* off jazz
 
 	for( cnt=0; cnt<bNumMercsPresent; cnt++ )
 	{
@@ -5080,7 +5079,7 @@ Randomly choose one
 
 		TacticalCharacterDialogue( pSoldier, QUOTE_DEATH_RATE_REFUSAL );
 	}
-*/
+
 	//Trigger Jerry Milo's script record 11 ( call action 302 )
 	TriggerNPCRecord( 76, 11 );
 
@@ -5090,15 +5089,16 @@ Randomly choose one
 
 void PerformJerryMiloAction302()
 {
-	UINT8	ubMercsPresent[3];
+	UINT8	ubMercsPresent[NUM_MERCS_WITH_NEW_QUOTES];
 	INT8	bNumMercsPresent=-1;
 	SOLDIERTYPE	*pSoldier=NULL;
 	UINT8		ubId;
-//off jazz
-/*	//Get the number and array of the new soldiers
+	
+	//off jazz
+	//Get the number and array of the new soldiers
 	bNumMercsPresent = GetNumSoldierIdAndProfileIdOfTheNewMercsOnPlayerTeam( ubMercsPresent, NULL );
 
-//Randomly choose one
+	//Randomly choose one
 	//if there is at least 1 of the desired mercs found
 	if( bNumMercsPresent != 0 )
 	{
@@ -5134,8 +5134,9 @@ void PerformJerryMiloAction302()
 
 		//Say the quote in 15 seconds
 		DelayedMercQuote( ubProfileID, QUOTE_DEPARTING_COMMENT_CONTRACT_NOT_RENEWED_OR_48_OR_MORE, GetWorldTotalSeconds( ) + 15 );
+		
 	}
-*/
+
 	//handle the merc arrives quotes now
 	HandleMercArrivesQuotesFromHeliCrashSequence();
 
@@ -5372,11 +5373,11 @@ void ReplaceMineEntranceGraphicWithCollapsedEntrance()
 
 	//Make sure wed ont blow things up twice
 	//off
-//	if( gJa25SaveStruct.fBiggensUsedDetonator )
-//		return;
+	if( gJa25SaveStruct.fBiggensUsedDetonator )
+		return;
 
 	//Remeber that biggens detonated the explosives
-	//gJa25SaveStruct.fBiggensUsedDetonator = TRUE;  jazz off
+	gJa25SaveStruct.fBiggensUsedDetonator = TRUE;  
 
 	// Turn on permenant changes....
 	ApplyMapChangesToMapTempFile( TRUE );

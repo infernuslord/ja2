@@ -117,6 +117,7 @@
 #include "test_space.h"
 #include "connect.h"
 #include "Ja25 Strategic Ai.h"
+#include "Ja25_Tactical.h"
 #include "Soldier Control.h"
 
 // OJW - 20090419
@@ -199,7 +200,7 @@ extern void PlayStealthySoldierFootstepSound( SOLDIERTYPE *pSoldier );
 
 extern BOOLEAN gfSurrendered;
 
-extern	BOOLEAN		gfFirstTimeInGameHeliCrash; //JA25 UB
+//extern	BOOLEAN		gfFirstTimeInGameHeliCrash; //JA25 UB
 
 // GLOBALS
 #define		 START_DEMO_SCENE				3

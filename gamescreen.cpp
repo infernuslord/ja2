@@ -90,7 +90,7 @@
 
 #include "connect.h"
 #include "Ja25_Tactical.h"
-
+#include "Ja25 Strategic Ai.h"
 #define		ARE_IN_FADE_IN( )		( gfFadeIn || gfFadeInitialized )
 
 
@@ -108,7 +108,7 @@ BOOLEAN		gfPlayAttnAfterMapLoad = FALSE;
 INT32		giFPSOverlay = 0;
 INT32		giCounterPeriodOverlay = 0;
 
-extern				BOOLEAN		gfFirstTimeInGameHeliCrash;
+//extern				BOOLEAN		gfFirstTimeInGameHeliCrash;
 
 
 BOOLEAN	gfExitToNewSector					= FALSE;
@@ -129,8 +129,10 @@ extern				BOOLEAN				gfTopMessageDirty;
 extern				BOOLEAN		gfFailedToSaveGameWhenInsideAMessageBox;
 extern				BOOLEAN		gfFirstHeliRun;
 extern				BOOLEAN		gfRenderFullThisFrame;
+//extern				BOOLEAN		gfFirstTimeInGameHeliCrash;
 
-
+extern				void HandleCannotAffordNpcMsgBox();
+extern				BOOLEAN	gfDisplayMsgBoxSayingCantAffordNPC;
 
 // The InitializeGame function is responsible for setting up all data and Gaming Engine
 // tasks which will run the game
@@ -461,6 +463,9 @@ UINT32	MainGameScreenHandle(void)
 			return( GAME_SCREEN );
 		#endif
 	}
+	//jA25 UB
+	//Handle the strategic AI
+	JA25_HandleUpdateOfStrategicAi();
 
 #if 0
 	{
@@ -684,6 +689,11 @@ UINT32	MainGameScreenHandle(void)
 		}
 	}
 
+	//if we are to display a mesg box about cant afford biggens
+	if( gfDisplayMsgBoxSayingCantAffordNPC )
+	{
+		HandleCannotAffordNpcMsgBox();
+	}
 
 	#ifdef JA2BETAVERSION
 		if( gfDoDialogOnceGameScreenFadesIn )
@@ -695,8 +705,9 @@ UINT32	MainGameScreenHandle(void)
 	HandleHeliDrop( );
 
 	if ( !ARE_IN_FADE_IN( ) )
-	{
-	HandleAutoBandagePending( );
+  {
+	  HandleAutoBandagePending( );
+		HandleThePlayerBeNotifiedOfSomeoneElseInSector();
 	}
 
 

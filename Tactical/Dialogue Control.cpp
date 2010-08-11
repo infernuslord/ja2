@@ -135,6 +135,19 @@ std::vector<UINT32> uiExternalStaticNPCFaces;
 //	158,
 //};
 
+UINT32 uiExternalStaticNPCFacesUB[ NUMBER_OF_EXTERNAL_NPC_FACES ];
+UINT32 uiExternalFaceProfileIdsUB[ NUMBER_OF_EXTERNAL_NPC_FACES ]=
+{
+	97,
+	106,
+	148,
+	156,
+	157,
+	158,
+	76,					//Jerry Melo
+};
+
+
 BOOLEAN AreAllTheMercsFinishedSayingThereInitialHeliCrashQuotes();
 void		InitJerriesSpeechCallBack();
 void		HandlePlayerClosingMorrisNoteDisplayedOnScreen();
@@ -325,10 +338,10 @@ void InitalizeStaticExternalNPCFaces( void )
 	//
 	// Code for loading miners' faces has been moved to LuaMines::InitMinerFaces ...
 	//
-	//for( iCounter = 0; iCounter < NUMBER_OF_EXTERNAL_NPC_FACES; iCounter++ )
-	//{
-	//	uiExternalStaticNPCFaces[ iCounter ] = ( UINT32 )InitFace( ( UINT8 )( uiExternalFaceProfileIds[ iCounter ] ), NOBODY, FACE_FORCE_SMALL );
-	//}
+	for( iCounter = 0; iCounter < NUMBER_OF_EXTERNAL_NPC_FACES; iCounter++ )
+	{
+		uiExternalStaticNPCFacesUB[ iCounter ] = ( UINT32 )InitFace( ( UINT8 )( uiExternalFaceProfileIdsUB[ iCounter ] ), NOBODY, FACE_FORCE_SMALL );
+	}
 	// ... put Skyrider's face at index 0
 	uiExternalStaticNPCFaces.push_back(( UINT32 )InitFace( ( UINT8 )( SKYRIDER ), NOBODY, FACE_FORCE_SMALL ));
 
@@ -347,10 +360,10 @@ void ShutdownStaticExternalNPCFaces( void )
 	fExternFacesLoaded = FALSE;
 
 	// remove all external npc faces
-	//for( iCounter = 0; iCounter < NUMBER_OF_EXTERNAL_NPC_FACES; iCounter++ )
-	//{
-	//	DeleteFace( uiExternalStaticNPCFaces[ iCounter ] );
-	//}
+	for( iCounter = 0; iCounter < NUMBER_OF_EXTERNAL_NPC_FACES; iCounter++ )
+	{
+		DeleteFace( uiExternalStaticNPCFacesUB[ iCounter ] );
+	}
 	for (std::vector<UINT32>::iterator face = uiExternalStaticNPCFaces.begin();
 		face != uiExternalStaticNPCFaces.end(); ++face)
 	{

@@ -646,9 +646,12 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 
 	switch( usFact )
 	{
+/*
+Ja25 No dimitri
 		case FACT_DIMITRI_DEAD:
 			gubFact[ usFact ] = (gMercProfiles[ DIMITRI ].bMercStatus == MERC_IS_DEAD );
 			break;
+*/
 		case FACT_CURRENT_SECTOR_IS_SAFE:
 			gubFact[FACT_CURRENT_SECTOR_IS_SAFE] = !( ( (gTacticalStatus.fEnemyInSector && NPCHeardShot( ubProfileID ) ) || gTacticalStatus.uiFlags & INCOMBAT ) );
 			break;
@@ -722,7 +725,8 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 				gubFact[FACT_NPC_BLEEDING_BUT_OKAY] = FALSE;
 			}
 			break;
-
+/*
+Ja25: NO Carmen
 		case FACT_PLAYER_HAS_HEAD_AND_CARMEN_IN_SAN_MONA:
 			gubFact[usFact] = (CheckNPCSector( CARMEN, 5, MAP_ROW_C, 0 ) && CheckPlayerHasHead() );
 			break;
@@ -734,7 +738,7 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 		case FACT_PLAYER_HAS_HEAD_AND_CARMEN_IN_DRASSEN:
 			gubFact[usFact] = (CheckNPCSector( CARMEN, 13, MAP_ROW_C, 0 ) && CheckPlayerHasHead() );
 			break;
-
+ */
 		case FACT_NPC_OWED_MONEY:
 			gubFact[FACT_NPC_OWED_MONEY] = (gMercProfiles[ubProfileID].iBalance < 0);
 			break;
@@ -858,9 +862,11 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 		case FACT_SHANK_NOT_IN_SECTOR:
 			gubFact[usFact] = ( FindSoldierByProfileID( SHANK, FALSE ) == NULL );
 			break;
+/* Ja25 No queen
 		case FACT_QUEEN_DEAD:
 			gubFact[usFact] = (gMercProfiles[ QUEEN ].bMercStatus == MERC_IS_DEAD);
 			break;
+*/
 		case FACT_MINE_EMPTY:
 			gubFact[usFact] = IsHisMineEmpty( ubProfileID );
 			break;
@@ -999,15 +1005,15 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 			break;
 
 		case FACT_PLAYER_OWNS_2_TOWNS_INCLUDING_OMERTA:
-			gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() == 3 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
+		//	gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() == 3 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
 			break;
 
 		case FACT_PLAYER_OWNS_3_TOWNS_INCLUDING_OMERTA:
-			gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() == 5 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
+		//	gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() == 5 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
 			break;
 
 		case FACT_PLAYER_OWNS_4_TOWNS_INCLUDING_OMERTA:
-			gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() >= 6 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
+		//	gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() >= 6 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
 			break;
 
 		case FACT_PLAYER_FOUGHT_THREE_TIMES_TODAY:
@@ -1110,11 +1116,11 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 		case FACT_WALDO_ALIVE:
 			gubFact[usFact] = gMercProfiles[ WALDO ].bMercStatus != MERC_IS_DEAD;
 			break;
-
+             /*  ja2UB
 		case FACT_PERKO_ALIVE:
 			gubFact[usFact] = gMercProfiles[ PERKO ].bMercStatus != MERC_IS_DEAD;
 			break;
-
+              */
 		case FACT_TONY_ALIVE:
 			gubFact[usFact] = gMercProfiles[ TONY ].bMercStatus != MERC_IS_DEAD;
 			break;
@@ -1382,11 +1388,27 @@ void CheckForQuests( UINT32 uiDay )
 	ScreenMsg( MSG_FONT_RED, MSG_DEBUG, L"Checking For Quests, Day %d", uiDay );
 #endif
 
+
+ // -------------------------------------------------------------------------------
+	// QUEST 23 : Detroy missles
+	// -------------------------------------------------------------------------------
+	// The game always starts with destrouy missles quest, so turn it on if it hasn't
+	// already started
+	if( gubQuest[ QUEST_DESTROY_MISSLES ] == QUESTNOTSTARTED )
+	{
+		StartQuest( QUEST_DESTROY_MISSLES, -1, -1 );
+#ifdef TESTQUESTS
+		ScreenMsg( MSG_FONT_RED, MSG_DEBUG, L"Started DESTORY MISSLES quest");
+#endif
+	}
+
 	// -------------------------------------------------------------------------------
 	// QUEST 0 : DELIVER LETTER
 	// -------------------------------------------------------------------------------
 	// The game always starts with DELIVER LETTER quest, so turn it on if it hasn't
 	// already started
+/*
+Ja25: No deliver letter quest, dont start it
 	if (gubQuest[QUEST_DELIVER_LETTER] == QUESTNOTSTARTED)
 	{
 		StartQuest( QUEST_DELIVER_LETTER, -1, -1 );
@@ -1396,7 +1418,7 @@ void CheckForQuests( UINT32 uiDay )
 		ScreenMsg( MSG_FONT_RED, MSG_DEBUG, L"Started DELIVER LETTER quest");
 #endif
 	}
-
+       */
 	// This quest gets turned OFF through conversation with Miguel - when user hands
 	// Miguel the letter
 }
@@ -1445,7 +1467,6 @@ BOOLEAN LoadQuestInfoFromSavedGameFile( HWFILE hFile )
 
 	return( TRUE );
 }
-
 
 
 

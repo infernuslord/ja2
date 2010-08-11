@@ -88,6 +88,7 @@
 
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
+#include "End Game.h"
 
 
 //forward declarations of common classes to eliminate includes
@@ -1151,6 +1152,11 @@ void ExitLaptop()
 //	CloseLibrary( LIBRARY_LAPTOP );
 	//pause the game because we dont want time to advance in the laptop
 	UnPauseGame();
+//ja25 UB
+	if( gTacticalStatus.uiFlags & IN_ENDGAME_SEQUENCE )
+	{
+		HandleJa25EndGameAndGoToCreditsScreen( FALSE );
+	}
 
 }
 

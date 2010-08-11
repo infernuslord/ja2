@@ -357,10 +357,20 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	}
 #endif
 
+	//JA25 UB
+	strcpy(fileName, directoryName);
+	strcat(fileName, MERCSTARTINGGEAR25FILENAME);
+	if ( FileExists(fileName) )
+	{
+	THROWIFFALSE(ReadInMercStartingGearStats(fileName),MERCSTARTINGGEAR25FILENAME);
+	}
+	else
+	{
 	// CHRISL:
 	strcpy(fileName, directoryName);
 	strcat(fileName, MERCSTARTINGGEARFILENAME);
 	THROWIFFALSE(ReadInMercStartingGearStats(fileName),MERCSTARTINGGEARFILENAME);
+	}
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, WEAPONSFILENAME);

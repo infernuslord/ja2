@@ -23,6 +23,8 @@
 	#include "Exit Grids.h"
 #endif
 
+#include "Ja25 Strategic Ai.h"
+#include "Ja25_Tactical.h"
 
 #include "GameSettings.h"	// ary-05/05/2009 : add forced turn mode
 #include "text.h"			//	: add forced turn mode
@@ -33,7 +35,7 @@
 class OBJECTTYPE;
 class SOLDIERTYPE;
 
-extern	BOOLEAN		gfFirstTimeInGameHeliCrash; //JA25 UB
+//extern	BOOLEAN		gfFirstTimeInGameHeliCrash; //JA25 UB
 
 // Adds a soldier to a world gridno and set's direction
 void AddSoldierToSectorGridNo( SOLDIERTYPE *pSoldier, INT32 sGridNo, UINT8 ubDirection, BOOLEAN fUseAnimation, UINT16 usAnimState, UINT16 usAnimCode );
@@ -1777,5 +1779,4 @@ INT16 GetSoldierIDFromMercID(UINT8 ubMercID)
 
 	return( -1 );
 }
-
 

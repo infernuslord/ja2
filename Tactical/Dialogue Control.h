@@ -214,11 +214,13 @@ enum DialogQuoteIDs
 #define			MULTIPURPOSE_SPECIAL_EVENT_TEAM_MEMBERS_DONE_TALKING	0x20000000
 
 
-
+enum{
+     JERRY_MELO_FACE = 6,
+     NUMBER_OF_EXTERNAL_NPC_FACES,
+};
 
 enum{
 	SKYRIDER_EXTERNAL_FACE =0,
-	JERRY_MELO_FACE = 6,
 	//MINER_FRED_EXTERNAL_FACE,
 	//MINER_MATT_EXTERNAL_FACE,
 	//MINER_OSWALD_EXTERNAL_FACE,
@@ -235,9 +237,9 @@ enum{
 	UPDATE_BOX_REASON_SHOW_BOX,
 };
 
-//extern UINT32 uiExternalStaticNPCFaces[ ];
+extern UINT32 uiExternalStaticNPCFacesUB[ ];
 extern std::vector<UINT32> uiExternalStaticNPCFaces;
-//extern UINT32 uiExternalFaceProfileIds[ ];
+extern UINT32 uiExternalFaceProfileIdsUB[ ];
 
 // Functions for handling dialogue Q
 BOOLEAN InitalizeDialogueControl();

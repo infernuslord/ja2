@@ -13341,7 +13341,7 @@ void TellPlayerWhyHeCantCompressTime( void )
 	}
 	else if( DoesPlayerHaveNoMercsHiredAndJerryHasntSaidQuoteYet() )
 	{
-		JerryMiloTalk( MILO_QUOTE__PLAYER_HAS_NO_MERCS ); 
+		JerryMiloTalk( MILO_QUOTE__PLAYER_HAS_NO_MERCS );
         DoMapMessageBox( MSG_BOX_BASIC_STYLE, pMapScreenJustStartedHelpText[ 0 ], MAP_SCREEN, MSG_BOX_FLAG_OK, MapScreenDefaultOkBoxCallback );
 	}
 	else if( gfAtLeastOneMercWasHired == FALSE )

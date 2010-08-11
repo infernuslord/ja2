@@ -4409,6 +4409,12 @@ void SetupNewStrategicGame( )
 			StrategicMap[ CALCULATE_STRATEGIC_INDEX( sSectorX, sSectorY ) ].fEnemyControlled = TRUE;
 		}
 	}
+	
+	
+	//Ja25
+	// Make the initial sector free of enemies
+//	StrategicMap[ CALCULATE_STRATEGIC_INDEX( 8,7 /*JA2_5_START_SECTOR_X, JA2_5_START_SECTOR_Y */) ].fEnemyControlled = FALSE;
+
 
 	//Initialize the game time
 	InitNewGameClock();
@@ -4422,18 +4428,33 @@ void SetupNewStrategicGame( )
 	AddEveryDayStrategicEvent( EVENT_CHECKFORQUESTS, QUEST_CHECK_EVENT_TIME, 0 );
 	// Some things get updated in the very early morning
 	AddEveryDayStrategicEvent( EVENT_DAILY_EARLY_MORNING_EVENTS, EARLY_MORNING_TIME, 0 );
+	
 	//Daily Update BobbyRay Inventory
+	//Ja25:  BobbyRay stuff is NOT being called, only the arms dealer info, which just happens to be inthe same function
 	AddEveryDayStrategicEvent( EVENT_DAILY_UPDATE_BOBBY_RAY_INVENTORY, BOBBYRAY_UPDATE_TIME, 0 );
+
+	
+	
 	//Daily Update of the M.E.R.C. site.
 	AddEveryDayStrategicEvent( EVENT_DAILY_UPDATE_OF_MERC_SITE, 0, 0 );
+	
+/*
+Ja25:  No insurance for mercs
 	//Daily update of insured mercs
 	AddEveryDayStrategicEvent( EVENT_HANDLE_INSURED_MERCS, INSURANCE_UPDATE_TIME,	0 );
-	//Daily update of mercs
-	AddEveryDayStrategicEvent( EVENT_MERC_DAILY_UPDATE, 0, 0 );
+*/	
+/*
+JA25: There is no mines
 	// Daily mine production processing events
 	AddEveryDayStrategicEvent( EVENT_SETUP_MINE_INCOME, 0, 0 );
+*/
+
+/*
+Ja25 no town opinions
 	// Daily merc reputation processing events
 	AddEveryDayStrategicEvent( EVENT_SETUP_TOWN_OPINION, 0, 0 );
+*/
+
 	// Daily checks for E-mail from Enrico
 	//ja25ub AddEveryDayStrategicEvent( EVENT_ENRICO_MAIL, ENRICO_MAIL_TIME , 0 );
 
