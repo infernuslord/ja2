@@ -642,10 +642,10 @@ void InitNewCampaign()
 
 	BuildUndergroundSectorInfoList();
 
-	if (!is_networked)
+//	if (!is_networked)
 		// allow overhead view of omerta A9 on game onset
 		// HEADROCK HAM 3.5: Externalized.
-		SetSectorFlag( gGameExternalOptions.ubDefaultArrivalSectorX, gGameExternalOptions.ubDefaultArrivalSectorY, startingZ, SF_ALREADY_VISITED ); //hayden
+	//	SetSectorFlag( gGameExternalOptions.ubDefaultArrivalSectorX, gGameExternalOptions.ubDefaultArrivalSectorY, startingZ, SF_ALREADY_VISITED ); //hayden
 
 	//Generates the initial forces in a new campaign.	The idea is to randomize numbers and sectors
 	//so that no two games are the same.
