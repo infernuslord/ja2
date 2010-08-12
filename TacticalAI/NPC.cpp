@@ -3115,7 +3115,9 @@ BOOLEAN LoadNPCInfoFromSavedGameFile( HWFILE hFile, UINT32 uiSaveGameVersion )
 	if ( uiSaveGameVersion < 92 )
 	{
 		RefreshNPCScriptRecord( MATT, 14 );
+		/*
 		RefreshNPCScriptRecord( AUNTIE, 8 );
+		*/
 	}
 	if ( uiSaveGameVersion < 93 )
 	{

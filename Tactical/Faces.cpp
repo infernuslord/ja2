@@ -555,6 +555,15 @@ void GetFaceRelativeCoordinates( FACETYPE *pFace, UINT16 *pusEyesX, UINT16 *pusE
 	usEyesY				= gMercProfiles[ usMercProfileID ].usEyesY;
 	usMouthY			=	gMercProfiles[ usMercProfileID ].usMouthY;
 	usMouthX			= gMercProfiles[ usMercProfileID ].usMouthX;
+	
+	
+  if( usMercProfileID == 64 && gMercProfiles[ 64 ].bSkillTrait2 == CAMOUFLAGED )
+  {
+		usEyesX				= 13;
+		usEyesY				= 34;
+		usMouthX			= 13;
+		usMouthY			=	55;
+  }
 
 	// Use some other values for x,y, base on if we are a RPC!
 	if ( !( pFace->uiFlags & FACE_BIGFACE ) ||( pFace->uiFlags & FACE_FORCE_SMALL ))

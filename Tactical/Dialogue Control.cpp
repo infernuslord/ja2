@@ -1249,7 +1249,7 @@ Ja25: removed the flag, no militia
 					break;
 
 				case JM_SE__HEADING_TO_TRACONA:
-
+					//tu wy³¹czone
 					// play the heli crash video
 					SetIntroType( INTRO_HELI_CRASH );
 

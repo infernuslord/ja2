@@ -138,7 +138,7 @@ JA25_SAVE_INFO	gJa25SaveStruct;
 
 //JA25_SECTOR_AI	*gJa25AiSectorStruct = NULL;
 
-//JA25_SECTOR_AI_MANAGER gJa25StrategicAi;
+JA25_SECTOR_AI_MANAGER gJa25StrategicAi;
 
 
 //BOOLEAN	gfEnemyShouldImmediatelySeekThePlayer=FALSE;
@@ -1019,11 +1019,11 @@ BOOLEAN SaveJa25SaveInfoToSaveGame( HWFILE hFile )
 	//
 	// Ai Manager
 	//
-//	FileWrite( hFile, &gJa25StrategicAi, sizeof( JA25_SECTOR_AI_MANAGER ), &uiNumBytesWritten );
-//	if( uiNumBytesWritten != sizeof( JA25_SECTOR_AI_MANAGER ) )
-//	{
-//		return( FALSE );
-//	}
+	FileWrite( hFile, &gJa25StrategicAi, sizeof( JA25_SECTOR_AI_MANAGER ), &uiNumBytesWritten );
+	if( uiNumBytesWritten != sizeof( JA25_SECTOR_AI_MANAGER ) )
+	{
+		return( FALSE );
+	}
 
 	//
 	// Sector Info
@@ -1081,11 +1081,11 @@ BOOLEAN LoadJa25SaveInfoFromSavedGame( HWFILE hFile )
 	//
 	// Ai Manager
 	//
-//	FileRead( hFile, &gJa25StrategicAi, sizeof( JA25_SECTOR_AI_MANAGER ), &uiNumBytesRead );
-//	if( uiNumBytesRead != sizeof( JA25_SECTOR_AI_MANAGER ) )
-//	{
-//		return( FALSE );
-//	}
+	FileRead( hFile, &gJa25StrategicAi, sizeof( JA25_SECTOR_AI_MANAGER ), &uiNumBytesRead );
+	if( uiNumBytesRead != sizeof( JA25_SECTOR_AI_MANAGER ) )
+	{
+		return( FALSE );
+	}
 
 	//
 	// Sector Info

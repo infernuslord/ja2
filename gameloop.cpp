@@ -37,6 +37,8 @@
 
 #include "Lua Interpreter.h"
 
+#include "legion cfg.h"
+
 // rain
 #include "Rain.h"
 // end rain
@@ -118,6 +120,7 @@ BOOLEAN InitializeGame(void)
 	// Moved this up because some settings are used during other inits
 	LoadGameAPBPConstants();
 	LoadGameExternalOptions();
+	LoadGameLegionOptions(); // JA25 UB
 	InitSightRange(); //lal
 
 	// Initlaize mouse subsystems

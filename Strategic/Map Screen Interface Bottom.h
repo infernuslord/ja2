@@ -7,6 +7,7 @@
 
 #define MAX_MESSAGES_ON_MAP_BOTTOM	9
 
+extern	INT8 gbExitingMapScreenToWhere;
 
 // exit to where defines
 enum{

@@ -55,7 +55,7 @@ const ARMS_DEALER_INFO	DefaultarmsDealerInfo[ NUM_ARMS_DEALERS ] =
 /* Jake Cameron */	{ 0.8f,		1.1f,	JAKE,		ARMS_DEALER_BUYS_SELLS,	2500,	ARMS_DEALER_ONLY_USED_ITEMS | ARMS_DEALER_GIVES_CHANGE, 2500,  2500,  0, 1, 10, 0, 100, 1, 2, false, true },
 /* Gabby Mulnick*/	{ 1.0f,		1.0f,	GABBY,		ARMS_DEALER_BUYS_SELLS,	3000,	ARMS_DEALER_GIVES_CHANGE							,	3000,  3000,  0, 1, 10, 0, 100, 1, 2, false, true },
 
-/* Devin Connell*/	{ 0.75f,	1.25f,	DEVIN,		ARMS_DEALER_SELLS_ONLY,	5000,	ARMS_DEALER_GIVES_CHANGE							,	5000,  5000,  0, 3, 10, 0, 10, 2, 3, false, false },
+/* Devin Connell*/	//ja25 ub Biggins//{ 0.75f,	1.25f,	DEVIN,		ARMS_DEALER_SELLS_ONLY,	5000,	ARMS_DEALER_GIVES_CHANGE							,	5000,  5000,  0, 3, 10, 0, 10, 2, 3, false, false },
 /* Howard Filmore*/	{ 1.0f,		1.0f,	HOWARD,		ARMS_DEALER_SELLS_ONLY,	3000,	ARMS_DEALER_GIVES_CHANGE							,	3000,  3000,  0, 1, 10, 0, 100, 1, 2, false, true },
 /* Sam Rozen */		{ 1.0f,		1.0f,	SAM,		ARMS_DEALER_SELLS_ONLY,	3000,	ARMS_DEALER_GIVES_CHANGE							,	3000,  3000,  0, 1, 10, 0, 100, 1, 2, false, true },
 /* Frank */		{ 1.0f,		1.0f,	FRANK,		ARMS_DEALER_SELLS_ONLY,	500,	ARMS_DEALER_ACCEPTS_GIFTS							,	500,   500,   0, 1, 10, 0, 100, 1, 2, false, true },

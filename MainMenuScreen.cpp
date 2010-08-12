@@ -38,6 +38,7 @@
 #include "mercs.h"
 #include "gamesettings.h"
 #include "connect.h"
+#include "legion cfg.h"
 #include <vfs/Core/vfs.h>
 #include <vfs/Core/vfs_profile.h>
 
@@ -406,6 +407,7 @@ void InitDependingGameStyleOptions()
 	LoadGameAPBPConstants();
 	// Load ja2_options.ini
 	LoadGameExternalOptions();
+	LoadGameLegionOptions(); // JA25 UB
 	InitSightRange(); //lal
 
 	ReStartingGame();
@@ -830,6 +832,5 @@ void RestoreButtonBackGrounds()
 	}
 #endif
 }
-
 
 

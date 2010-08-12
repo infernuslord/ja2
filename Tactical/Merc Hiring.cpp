@@ -66,6 +66,7 @@
 #include "Ja25_Tactical.h"
 #include "Campaign Types.h"
 #include "MapScreen Quotes.h"
+#include "opplist.h"
 
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -271,7 +272,7 @@ Ja25: No enrico, therefore, no email
 	{
 		//ja25ub
 		//set a flag so we know we are doing the heli crash
-		gfFirstTimeInGameHeliCrash = FALSE; //AA
+		gfFirstTimeInGameHeliCrash = TRUE; //AA FALSE ??
 
 		// Set time of initial merc arrival in minutes
 
@@ -898,7 +899,7 @@ void InitializeHeliGridnoAndTime( BOOLEAN fLoading )
 
 void InitJerryMiloInfo()
 {
-    return; //AA
+  //  return; //AA
 	//Set Jerry Milo's Gridno h7
 	gMercProfiles[ 76 ].sSectorX = 7;
 	gMercProfiles[ 76 ].sSectorY = 8;
@@ -925,7 +926,7 @@ void UpdateJerryMiloInInitialSector()
     //SectorInfo[ SEC_H7 ].ubNumAdmins = 2;
     
 
-	return; //AA
+//	return; //AA
     
 	//if it is the first sector we are loading up, place Jerry in the map
 	if( !gfFirstTimeInGameHeliCrash )
@@ -947,8 +948,8 @@ void UpdateJerryMiloInInitialSector()
 	pSoldier->fWaitingToGetupFromJA25Start = TRUE;
 	pSoldier->fIgnoreGetupFromCollapseCheck = TRUE;
 
-//	pSoldier->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
-//	pSoldier->usStrategicInsertionData = GetInitialHeliGridNo( );
+	//pSoldier->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO; //to by³o wy³¹czone
+	//pSoldier->usStrategicInsertionData = GetInitialHeliGridNo( ); //to by³o wy³¹czone
 
 	RESETTIMECOUNTER( pSoldier->GetupFromJA25StartCounter, gsInitialHeliRandomTimes[ 6 ] + 800 + Random( 400 ) );
 
@@ -965,7 +966,7 @@ void UpdateJerryMiloInInitialSector()
 	if( pJerrySoldier != NULL )
 	{
 		//Make sure we can see the pilot
-		//gbPublicOpplist[OUR_TEAM][ pJerrySoldier->ubID ] = SEEN_CURRENTLY;
+		gbPublicOpplist[OUR_TEAM][ pJerrySoldier->ubID ] = SEEN_CURRENTLY;
 		pJerrySoldier->bVisible = TRUE;
 	}
 

@@ -1896,12 +1896,12 @@ void HandleLoyaltyChangeForNPCAction( UINT8 ubNPCProfileId )
 			// NOTE: This affects Chitzena,too, a second time, so first value is discounted for it
 			IncrementTownLoyaltyEverywhere( LOYALTY_BONUS_YANNI_WHEN_CHALICE_RETURNED_GLOBAL );
 			break;
-
+                 /*
 		case AUNTIE:
 			// Bloodcats killed
 			IncrementTownLoyalty( ALMA, LOYALTY_BONUS_AUNTIE_WHEN_BLOODCATS_KILLED );
 			break;
-
+                    */
 		case MATT:
 			// Brother Dynamo freed
 			IncrementTownLoyalty( ALMA, LOYALTY_BONUS_MATT_WHEN_DYNAMO_FREED );
@@ -2031,5 +2031,4 @@ void HandleFacilityDebtLoyaltyHit( void )
 		DecrementTownLoyaltyEverywhere( iLoyaltyHit );
 	}
 }
-
 

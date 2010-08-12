@@ -1114,6 +1114,7 @@ extern INT32 GetNumberOfMercsInUpdateList( void );
 extern INT32 SellItem( OBJECTTYPE& object, BOOLEAN useModifier = TRUE );
 void DeleteAllItemsInInventoryPool();
 
+void HandleWhenPlayerHasNoMercsAndNoLaptop();
 
 #ifdef JA2TESTVERSION
 void TestDumpStatChanges( void );
@@ -5698,6 +5699,13 @@ UINT32 MapScreenHandle(void)
 		// handle exiting from mapscreen due to both exit button clicks and keyboard equivalents
 		HandleExitsFromMapScreen( );
 	}
+	
+	//Ja25 ub
+	//Handle the strategic AI
+	JA25_HandleUpdateOfStrategicAi();
+
+	//Should the msg box come up telling the user that they lost?
+	HandleWhenPlayerHasNoMercsAndNoLaptop(); //AA
 
 
 	return( MAP_SCREEN );
@@ -16013,4 +16021,23 @@ INT32 GetTotalContractExpenses ( void )
 		ubCounter++;
 	}
 	return (iTotalCost);
+}
+
+void HandleWhenPlayerHasNoMercsAndNoLaptop()
+{
+	const UINT8	ubNumLoopsToDisplay=50;
+
+	if( gJa25SaveStruct.ubDisplayPlayerLostMsgBox == 0 || 
+			gJa25SaveStruct.ubDisplayPlayerLostMsgBox >= ubNumLoopsToDisplay ||
+			guiCurrentScreen == MSG_BOX_SCREEN )
+	{
+		return;
+	}
+
+	gJa25SaveStruct.ubDisplayPlayerLostMsgBox += 1;
+
+	if( gJa25SaveStruct.ubDisplayPlayerLostMsgBox == ubNumLoopsToDisplay )
+	{
+		DoMapMessageBox( MSG_BOX_BASIC_STYLE, zNewTacticalMessages[ TCTL_MSG__PLAYER_LOST_SHOULD_RESTART ], MAP_SCREEN, MSG_BOX_FLAG_OK, NULL );
+	}
 }

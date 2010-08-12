@@ -28,6 +28,8 @@
 #include "connect.h"
 #include "saveloadscreen.h"
 
+#include "Legion cfg.h"
+
 ////////////////////////////////////////////
 //
 //	Global Defines
@@ -449,6 +451,9 @@ BOOLEAN		EnterGIOScreen()
 	//
 	//Check box to toggle Game settings ( realistic, sci fi )
 	//
+	
+	if ( gGameLegionOptions.SF_UB == TRUE ) 
+	{
 
 	usPosY = GIO_GAME_SETTINGS_Y - GIO_OFFSET_TO_TOGGLE_BOX_Y;
 	for( cnt=0; cnt<NUM_GAME_STYLES; cnt++)
@@ -460,11 +465,39 @@ BOOLEAN		EnterGIOScreen()
 
 		usPosY += GIO_GAP_BN_SETTINGS;
 	}
+	}
+	else
+	{
+	usPosY = GIO_GAME_SETTINGS_Y - GIO_OFFSET_TO_TOGGLE_BOX_Y;
+	for( cnt=0; cnt<NUM_GAME_STYLES-1; cnt++)
+	{
+		guiGameStyleToggles[ cnt ] = CreateCheckBoxButton(	GIO_GAME_SETTINGS_X+GIO_OFFSET_TO_TOGGLE_BOX, usPosY,
+																		"INTERFACE\\OptionsCheck.sti", MSYS_PRIORITY_HIGH+10,
+																		BtnGameStyleTogglesCallback );
+		MSYS_SetBtnUserData( guiGameStyleToggles[ cnt ], 0, cnt );
 
+		usPosY += GIO_GAP_BN_SETTINGS;
+	}	
+	
+	}
+
+	
+	if ( gGameLegionOptions.SF_UB == TRUE )
+	{
 	if( gGameOptions.ubGameStyle == STYLE_SCIFI )
 		ButtonList[ guiGameStyleToggles[ GIO_SCI_FI ] ]->uiFlags |= BUTTON_CLICKED_ON;
 	else // if(gGameOptions.ubGameStyle == STYLE_REALISTIC)
 		ButtonList[ guiGameStyleToggles[ GIO_REALISTIC ] ]->uiFlags |= BUTTON_CLICKED_ON;
+	}
+	else
+	{
+		gGameOptions.ubGameStyle = GIO_REALISTIC;
+		ButtonList[ guiGameStyleToggles[ GIO_REALISTIC ] ]->uiFlags |= BUTTON_CLICKED_ON;
+	}
+		
+		
+		
+		
 //	else
 //		ButtonList[ guiGameStyleToggles[ GIO_PLATINUM ] ]->uiFlags |= BUTTON_CLICKED_ON;		
 
@@ -791,9 +824,11 @@ BOOLEAN		RenderGIOScreen()
 	DisplayWrappedString( (UINT16)(GIO_GAME_SETTINGS_X+GIO_OFFSET_TO_TEXT), usPosY, GIO_GAME_SETTINGS_WIDTH, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ GIO_REALISTIC_TEXT ], FONT_MCOLOR_BLACK, FALSE, LEFT_JUSTIFIED );
 
 	usPosY += GIO_GAP_BN_SETTINGS;
+	if ( gGameLegionOptions.SF_UB == TRUE )
+	{
 	//DrawTextToScreen( gzGIOScreenText[ GIO_SCI_FI_TEXT ], (UINT16)(GIO_GAME_SETTINGS_X+GIO_OFFSET_TO_TEXT), usPosY, GIO_MAIN_TITLE_WIDTH, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, FONT_MCOLOR_BLACK, FALSE, LEFT_JUSTIFIED );	
 	DisplayWrappedString( (UINT16)(GIO_GAME_SETTINGS_X+GIO_OFFSET_TO_TEXT), usPosY, GIO_GAME_SETTINGS_WIDTH, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ GIO_SCI_FI_TEXT ],	FONT_MCOLOR_BLACK, FALSE, LEFT_JUSTIFIED );
-
+	}
 	//usPosY += GIO_GAP_BN_SETTINGS;
 	//DrawTextToScreen( gzGIOScreenText[ GIO_SCI_FI_TEXT ], (UINT16)(GIO_GAME_SETTINGS_X+GIO_OFFSET_TO_TEXT), usPosY, GIO_MAIN_TITLE_WIDTH, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, FONT_MCOLOR_BLACK, FALSE, LEFT_JUSTIFIED );	
 	//DisplayWrappedString( (UINT16)(GIO_GAME_SETTINGS_X+GIO_OFFSET_TO_TEXT), usPosY, GIO_GAME_SETTINGS_WIDTH, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ GIO_PLATINUM_TEXT ],	FONT_MCOLOR_BLACK, FALSE, LEFT_JUSTIFIED );

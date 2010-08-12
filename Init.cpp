@@ -417,11 +417,11 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, TONYINVENTORYFILENAME);
 	THROWIFFALSE(ReadInInventoryStats(gTonyInventory,fileName),TONYINVENTORYFILENAME);
-
+/* ja25 ub Biggins
 	strcpy(fileName, directoryName);
 	strcat(fileName, DEVININVENTORYFILENAME);
 	THROWIFFALSE(ReadInInventoryStats(gDevinInventory,fileName),DEVININVENTORYFILENAME);
-
+*/
 	strcpy(fileName, directoryName);
 	strcat(fileName, FRANZINVENTORYFILENAME);
 	THROWIFFALSE(ReadInInventoryStats(gFranzInventory,fileName),FRANZINVENTORYFILENAME);

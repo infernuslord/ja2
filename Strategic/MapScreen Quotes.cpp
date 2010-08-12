@@ -125,7 +125,7 @@ void HandleJerryMiloQuotes( BOOLEAN fReset )
 		gusWaitingQuote = MILO_NO_QUOTE;
 		return;
 	}
-    return;//AA
+ //   return;//AA
 	if( gusWaitingQuote == MILO_NO_QUOTE )
 	{
 		return;
@@ -445,7 +445,7 @@ void InitJerryQuotes()
 
 BOOLEAN HasJerryAlreadySaidTheMapScreenIntroSequence()
 {
-    return TRUE; //AA
+   // return TRUE; //AA
 	if( HasJerryMiloSaidQuoteBefore( MILO_QUOTE__HEADED_TO_TRACONA_QUOTE ) )
 	{
 		return( TRUE );

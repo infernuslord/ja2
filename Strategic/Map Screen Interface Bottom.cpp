@@ -56,6 +56,10 @@
 #include "MapScreen Quotes.h"
 #include "connect.h"
 
+#include "SaveLoadGame.h"
+
+#include "strategicmap.h"
+
 /* CHRISL: Adjusted settings to allow new Map_Screen_Bottom_800x600.sti to work.  This is needed if we
 want to have the new inventory panel not overlap the message text area. */
 #define MAP_BOTTOM_X							0
@@ -112,7 +116,6 @@ enum{
 
 
 // GLOBALS
-
 
 // the dirty state of the mapscreen interface bottom
 BOOLEAN fMapScreenBottomDirty = TRUE;
@@ -1748,7 +1751,7 @@ BOOLEAN AnyUsableRealMercenariesOnTeam( void )
 
 void RequestTriggerExitFromMapscreen( INT8 bExitToWhere )
 {
-	Assert( ( bExitToWhere >= MAP_EXIT_TO_LAPTOP ) && ( bExitToWhere <= MAP_EXIT_TO_MAINMENU ) );
+	Assert( ( bExitToWhere >= MAP_EXIT_TO_LAPTOP ) && ( bExitToWhere <= MAP_EXIT_TO_INTRO_SCREEN ));//MAP_EXIT_TO_MAINMENU ) );
 
 	// if allowed to do so
 	if ( AllowedToExitFromMapscreenTo( bExitToWhere ) )
@@ -1791,7 +1794,7 @@ void RequestTriggerExitFromMapscreen( INT8 bExitToWhere )
 
 BOOLEAN AllowedToExitFromMapscreenTo( INT8 bExitToWhere )
 {
-	Assert( ( bExitToWhere >= MAP_EXIT_TO_LAPTOP ) && ( bExitToWhere <= MAP_EXIT_TO_MAINMENU ) );
+	Assert( ( bExitToWhere >= MAP_EXIT_TO_LAPTOP ) && ( bExitToWhere <= MAP_EXIT_TO_INTRO_SCREEN)); //MAP_EXIT_TO_MAINMENU ) );
 
 	// if already leaving, disallow any other attempts to exit
 	if ( fLeavingMapScreen )
@@ -1965,6 +1968,11 @@ void HandleExitsFromMapScreen( void )
 					// Re-initialise the game
 					ReStartingGame();
 					SetPendingNewScreen( MAINMENU_SCREEN );
+					break;
+				//JA25 ub
+				case MAP_EXIT_TO_INTRO_SCREEN:
+				//	SetPendingNewScreen( INTRO_SCREEN );
+					BeginLoadScreen();
 					break;
 				default:
 					// invalid exit type

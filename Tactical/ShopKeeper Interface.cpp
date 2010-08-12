@@ -6237,12 +6237,12 @@ void EvaluateItemAddedToPlayersOfferArea( INT8 bSlotID, BOOLEAN fFirstOne )
 
 	// say "Hmm... Let's see" once per trading session to start evaluation
 	// SPECIAL: Devin doesn't have this quote (he's the only one)
-	if( !gfDealerHasSaidTheEvaluateQuoteOnceThisSession && ( gbSelectedArmsDealerID != ARMS_DEALER_DEVIN ) )
+/*	if( !gfDealerHasSaidTheEvaluateQuoteOnceThisSession && ( gbSelectedArmsDealerID != ARMS_DEALER_DEVIN ) )
 	{
 		gfDealerHasSaidTheEvaluateQuoteOnceThisSession = TRUE;
 		StartShopKeeperTalking( SK_QUOTES_PLAYER_REQUESTED_EVALUATION );
 	}
-
+*/
 
 	//Can this particular kind of item be sold/repaired here
 	if( WillShopKeeperRejectObjectsFromPlayer( gbSelectedArmsDealerID, bSlotID ) == FALSE )

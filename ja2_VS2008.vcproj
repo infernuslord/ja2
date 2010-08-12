@@ -501,6 +501,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\legion cfg.h"
+				>
+			</File>
+			<File
 				RelativePath="Loading Screen.h"
 				>
 			</File>
@@ -700,6 +704,10 @@
 			</File>
 			<File
 				RelativePath="Language Defines.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\legion cfg.cpp"
 				>
 			</File>
 			<File

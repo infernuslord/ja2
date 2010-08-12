@@ -34,6 +34,13 @@
 
 #include <vfs/Core/vfs.h>
 
+
+#include "strategicmap.h"
+#include "Map Screen Interface Map.h"
+#include "Map Screen Interface.h"
+
+
+
 extern STR16	gzIntroScreen[];
 extern HVSURFACE ghFrameBuffer;
 
@@ -78,6 +85,9 @@ enum
 
 	SMKINTRO_SPLASH_SCREEN,
 	SMKINTRO_SPLASH_TALONSOFT,
+	
+	SMKINTRO_HELI_CRASH_SCENE_1,
+//	SMKINTRO_HELI_CRASH_SCENE_2,
 
 	//there are no more videos shown for the endgame
 	SMKINTRO_LAST_END_GAME,
@@ -103,6 +113,13 @@ CHAR		*gpzSmackerFileNames[] =
 
 	"INTRO\\SplashScreen.smk",
 	"INTRO\\TalonSoftid_endhold.smk",
+	
+	//Ja25: New vidoes
+	"INTRO\\Intro.smk",
+//	"INTRO\\Fade.bik",
+
+	"INTRO\\MissileEnding.smk"
+
 };
 
 
@@ -356,6 +373,15 @@ void PrepareToExitIntroScreen()
 		//go to the init screen
 		guiIntroExitScreen = INIT_SCREEN;
 	}
+	else if( gbIntroScreenMode == INTRO_HELI_CRASH )
+	{
+		//go to the init screen
+//Ja25: no longer going to initscreen ( cause this is now AFTER mapscreen )
+//		guiIntroExitScreen = INIT_SCREEN;
+
+		guiIntroExitScreen = GAME_SCREEN;
+		SetCurrentWorldSector( sSelMapX, sSelMapY, ( UINT8 )iCurrentMapSectorZ );
+	}
 	else if( gbIntroScreenMode == INTRO_SPLASH )
 	{
 		//display a logo when exiting
@@ -363,6 +389,16 @@ void PrepareToExitIntroScreen()
 
 		gfDoneWithSplashScreen = TRUE;
 		guiIntroExitScreen = INIT_SCREEN;
+	}
+	else if( gbIntroScreenMode == INTRO_ENDING )
+	{
+		guiIntroExitScreen = GAME_SCREEN;
+		SetCurrentWorldSector( 16, 11, 0 );
+
+		//EnterTacticalInFinalSector();
+
+		//Dont leave tactical
+		gfEnteringMapScreen = FALSE;
 	}
 	else
 	{
@@ -410,6 +446,15 @@ INT32 GetNextIntroVideo( UINT32 uiCurrentVideo )
 			}
 		}
 		break;
+		
+		case INTRO_HELI_CRASH:
+			switch( uiCurrentVideo )
+			{
+				case SMKINTRO_FIRST_VIDEO:
+					iStringToUse = SMKINTRO_HELI_CRASH_SCENE_1;
+					break;
+			}
+			break;
 
 		//end game
 		case INTRO_ENDING:
@@ -488,6 +533,10 @@ void SetIntroType( INT8 bIntroType )
 	if( bIntroType == INTRO_BEGINING )
 	{
 		gbIntroScreenMode = INTRO_BEGINING;
+	}
+	else if( bIntroType == INTRO_HELI_CRASH )
+	{
+		gbIntroScreenMode = INTRO_HELI_CRASH;
 	}
 	else if( bIntroType == INTRO_ENDING )
 	{

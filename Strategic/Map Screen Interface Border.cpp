@@ -26,7 +26,7 @@
 #endif
 
 
-
+#include "legion cfg.h"
 
 
 //#define MAP_BORDER_CORNER_X 584
@@ -407,6 +407,65 @@ BOOLEAN CreateButtonsForMapBorder( void )
 
 //	SetButtonCursor(guiMapBorderLandRaiseButtons[ 0 ], MSYS_NO_CURSOR );
 //	SetButtonCursor(guiMapBorderLandRaiseButtons[ 1 ], MSYS_NO_CURSOR );
+
+
+
+    //EnableButton
+      
+	if (gGameLegionOptions.ZAIKONA1 == TRUE)  
+	   { 
+	   EnableButton( giMapBorderButtons[ MAP_BORDER_TOWN_BTN ]); 
+	   }  
+	   else
+	   {
+	   DisableButton( giMapBorderButtons[ MAP_BORDER_TOWN_BTN ]); 
+	   }
+	   
+	if (gGameLegionOptions.ZAIKONA2 == TRUE)  
+	   { 
+	   EnableButton( giMapBorderButtons[ MAP_BORDER_MINE_BTN ]); 
+	   }  
+	   else
+	   {
+	   DisableButton( giMapBorderButtons[ MAP_BORDER_MINE_BTN ]); 
+	   }
+	
+	if (gGameLegionOptions.ZAIKONA3 == TRUE)  
+	   { 
+	   EnableButton( giMapBorderButtons[ MAP_BORDER_TEAMS_BTN ]); 
+	   }  
+	   else
+	   {
+	   DisableButton( giMapBorderButtons[ MAP_BORDER_TEAMS_BTN ]); 
+	   }
+	
+	if (gGameLegionOptions.ZAIKONA4 == TRUE)  
+	   { 
+	   EnableButton( giMapBorderButtons[ MAP_BORDER_MILITIA_BTN ]); 
+	   }  
+	   else
+	   {
+	   DisableButton( giMapBorderButtons[ MAP_BORDER_MILITIA_BTN ]); 
+	   }      
+	   
+	if (gGameLegionOptions.ZAIKONA5 == TRUE)  
+	   { 
+	   EnableButton( giMapBorderButtons[ MAP_BORDER_AIRSPACE_BTN ]); 
+	   }  
+	   else
+	   {
+	   DisableButton( giMapBorderButtons[ MAP_BORDER_AIRSPACE_BTN ]); 
+	   }      
+
+	if (gGameLegionOptions.ZAIKONA6 == TRUE)  
+	   { 
+	   EnableButton( giMapBorderButtons[ MAP_BORDER_ITEM_BTN ]); 
+	   }  
+	   else
+	   {
+	   DisableButton( giMapBorderButtons[ MAP_BORDER_ITEM_BTN ]); 
+	   }  
+
 
 	InitializeMapBorderButtonStates( );
 

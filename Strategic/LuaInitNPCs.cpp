@@ -97,6 +97,11 @@ static bool locationStringToCoordinates(std::string loc, UINT8* x, UINT8* y, UIN
 
 static int l_Ja25SaveStructJohnKulbaIsInGame(lua_State *L);
 
+static int l_Ja25SaveStructubJohnKulbaInitialSectorY(lua_State *L);
+static int l_Ja25SaveStructubJohnKulbaInitialSectorX(lua_State *L);
+
+
+
 using namespace std;
 
 void IniFunction(lua_State *L)
@@ -146,6 +151,9 @@ void IniFunction(lua_State *L)
 	
 	//john
 	lua_register(L, "Ja25JohnKulbaIsInGame", l_Ja25SaveStructJohnKulbaIsInGame);
+	lua_register(L, "Ja25JohnKulbaInitialSectorY", l_Ja25SaveStructubJohnKulbaInitialSectorY);
+	lua_register(L, "Ja25JohnKulbaInitialSectorX", l_Ja25SaveStructubJohnKulbaInitialSectorX);	
+
 }
 
 
@@ -200,14 +208,36 @@ BOOLEAN LetLuaGameInit(UINT8 Init)
 
 }
 
+static int l_Ja25SaveStructubJohnKulbaInitialSectorY(lua_State *L)
+{
+UINT32 Y;
+UINT8 n = lua_gettop(L);
+
+	 Y = lua_tointeger(L,n);
+
+	gJa25SaveStruct.ubJohnKulbaInitialSectorY = Y;
+	return 0;
+}
+
+static int l_Ja25SaveStructubJohnKulbaInitialSectorX(lua_State *L)
+{
+UINT32 X;
+UINT8 n = lua_gettop(L);
+
+	 X = lua_tointeger(L,n);
+
+	gJa25SaveStruct.ubJohnKulbaInitialSectorX = X;
+	return 0;
+}
+
 //
 //gJa25SaveStruct.fJohnKulbaIsInGame
 static int l_Ja25SaveStructJohnKulbaIsInGame(lua_State *L)
 {
-UINT32 FactFalse;
+BOOLEAN FactFalse;
 UINT8 n = lua_gettop(L);
 
-	 FactFalse = lua_tointeger(L,n);
+	 FactFalse = lua_toboolean(L,n);
 
 	gJa25SaveStruct.fJohnKulbaIsInGame = FactFalse;
 	return 0;

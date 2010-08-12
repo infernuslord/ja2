@@ -53,7 +53,7 @@ UINT8 GetDealerItemCategoryNumber( UINT16 usItemIndex );
 BOOLEAN CanDealerItemBeSoldUsed( UINT16 usItemIndex );
 
 extern DEALER_POSSIBLE_INV gTonyInventory[MAXITEMS+1]; 
-extern DEALER_POSSIBLE_INV gDevinInventory[MAXITEMS+1];
+//extern DEALER_POSSIBLE_INV gDevinInventory[MAXITEMS+1]; //ja25 ub Biggins
 extern DEALER_POSSIBLE_INV gFranzInventory[MAXITEMS+1];
 extern DEALER_POSSIBLE_INV gKeithInventory[MAXITEMS+1];
 extern DEALER_POSSIBLE_INV gSamInventory[MAXITEMS+1];

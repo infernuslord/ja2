@@ -268,7 +268,7 @@ DEALER_POSSIBLE_INV gTonyInventory[MAXITEMS+1];// =
 //
 // Devin		( Explosives )
 //
-DEALER_POSSIBLE_INV gDevinInventory[MAXITEMS+1];// =
+//DEALER_POSSIBLE_INV gDevinInventory[MAXITEMS+1];// =  // ja25ub Biggins
 //{
 //	{	STUN_GRENADE,							3 },
 //	{	TEARGAS_GRENADE,					3 },
@@ -759,10 +759,10 @@ INT8 GetDealersMaxItemAmount( UINT8 ubDealerID, UINT16 usItemIndex )
 			return( GetMaxItemAmount( gGabbyInventory, usItemIndex ) );
 			break;
 
-		case ARMS_DEALER_DEVIN:
+	/*	case ARMS_DEALER_DEVIN: //ja25 ub Biggins
 			return( GetMaxItemAmount( gDevinInventory, usItemIndex ) );
 			break;
-
+	*/
 		case ARMS_DEALER_ELGIN:
 			return( GetMaxItemAmount( gElginInventory, usItemIndex ) );
 			break;
@@ -870,10 +870,10 @@ DEALER_POSSIBLE_INV *GetPointerToDealersPossibleInventory( UINT8 ubArmsDealerID 
 			return( gGabbyInventory );
 			break;
 
-		case ARMS_DEALER_DEVIN:
+/*		case ARMS_DEALER_DEVIN: //ja25 Biggins
 			return( gDevinInventory );
 			break;
-
+*/
 		case ARMS_DEALER_ELGIN:
 			return( gElginInventory );
 			break;

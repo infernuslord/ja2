@@ -120,6 +120,8 @@
 #include "Timer Control.h"
 #include "Soldier Control.h"
 
+#include "Map Screen Interface Bottom.h"
+
 #include <vfs/Core/vfs.h>
 #include <vfs/Tools/vfs_log.h>
 
@@ -1357,6 +1359,13 @@ Ja25: No meanwhiles
 	ColorFillVideoSurfaceArea( FRAME_BUFFER, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Get16BPPColor( FROMRGB( 0, 0, 0 ) ) );
 	InvalidateScreen( );
 	RefreshScreen( NULL );
+	
+	//if we are going to the intro screen, return before putting up a loadscreen
+	if( gbExitingMapScreenToWhere == MAP_EXIT_TO_INTRO_SCREEN )
+	{
+		SetPendingNewScreen( INTRO_SCREEN );
+		return;
+	}
 
 	//If we are loading a saved game, use the Loading screen we saved into the SavedGameHeader file
 	// ( which gets reloaded into gubLastLoadingScreenID )
