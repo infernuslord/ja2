@@ -96,11 +96,12 @@ static bool locationStringToCoordinates_AltSector(std::string loc, UINT8* x, UIN
 static bool locationStringToCoordinates(std::string loc, UINT8* x, UINT8* y, UINT8* z);
 
 static int l_Ja25SaveStructJohnKulbaIsInGame(lua_State *L);
+static int l_Ja25SaveCheckStructJohnKulbaIsInGame(lua_State *L);
 
 static int l_Ja25SaveStructubJohnKulbaInitialSectorY(lua_State *L);
 static int l_Ja25SaveStructubJohnKulbaInitialSectorX(lua_State *L);
 
-
+static int l_GuaranteeAtLeastXItemsOfIndex(lua_State *L);
 
 using namespace std;
 
@@ -151,8 +152,12 @@ void IniFunction(lua_State *L)
 	
 	//john
 	lua_register(L, "Ja25JohnKulbaIsInGame", l_Ja25SaveStructJohnKulbaIsInGame);
+	lua_register(L, "Ja25CheckJohnKulbaIsInGame", l_Ja25SaveCheckStructJohnKulbaIsInGame);
 	lua_register(L, "Ja25JohnKulbaInitialSectorY", l_Ja25SaveStructubJohnKulbaInitialSectorY);
 	lua_register(L, "Ja25JohnKulbaInitialSectorX", l_Ja25SaveStructubJohnKulbaInitialSectorX);	
+	
+	//Shop
+	lua_register(L, "GuaranteeAtLeastXItemsOfIndex", l_GuaranteeAtLeastXItemsOfIndex);	
 
 }
 
@@ -208,6 +213,27 @@ BOOLEAN LetLuaGameInit(UINT8 Init)
 
 }
 
+static int l_GuaranteeAtLeastXItemsOfIndex(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+UINT8 ShopID;
+UINT16 ItemsID;
+UINT32 VAL;
+int i;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) ShopID = lua_tointeger(L,i);
+		if (i == 2 ) ItemsID = lua_tointeger(L,i);
+		if (i == 3 ) VAL = lua_tointeger(L,i);
+	}
+
+		
+	GuaranteeAtLeastXItemsOfIndex( ShopID, ItemsID, VAL );
+	
+	return 0;
+}
+
 static int l_Ja25SaveStructubJohnKulbaInitialSectorY(lua_State *L)
 {
 UINT32 Y;
@@ -230,7 +256,20 @@ UINT8 n = lua_gettop(L);
 	return 0;
 }
 
-//
+//gJa25SaveStruct.fJohnKulbaIsInGame
+static int l_Ja25SaveCheckStructJohnKulbaIsInGame(lua_State *L)
+{
+BOOLEAN FactFalse;
+UINT8 n = lua_gettop(L);
+
+	FactFalse = gJa25SaveStruct.fJohnKulbaIsInGame;
+	
+	lua_pushboolean(L, FactFalse);
+
+	return 1;
+}
+
+
 //gJa25SaveStruct.fJohnKulbaIsInGame
 static int l_Ja25SaveStructJohnKulbaIsInGame(lua_State *L)
 {

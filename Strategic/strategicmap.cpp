@@ -6330,7 +6330,7 @@ void ShouldNpcBeAddedToSector( INT16 sMapX, INT16 sMapY, INT8 bMapZ )
 	if( !( gJa25SaveStruct.fNpcHasBeenAdded & SECTOR_ADDED_NPC__JOHN_K ) )
 	{
 		//and John is TO be added ( Tex not in game )
-	//	if( !gubFact[ FACT_TEX_IS_IN_GAME_AND_ALIVE_IN_STORE ] )
+		//if( !gubFact[ FACT_TEX_IS_IN_GAME_AND_ALIVE_IN_STORE ] )
 	//	{
 			//if it is the right sector
 			if( sMapX == gJa25SaveStruct.ubJohnKulbaInitialSectorX && 

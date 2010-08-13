@@ -103,6 +103,8 @@ BOOLEAN AdjustCertainDealersInventory();
 void		LimitArmsDealersInventory( UINT8 ubArmsDealer, UINT32 uDealerItemType, UINT8 ubMaxNumberOfItemType );
 void		GuaranteeAtLeastOneItemOfType( UINT8 ubArmsDealer, UINT32 uiDealerItemType );
 void		GuaranteeAtLeastXItemsOfIndex( UINT8 ubArmsDealer, UINT16 usItemIndex, UINT8 ubHowMany );
+void		GuaranteeAtMostNumOfItemsForItem( UINT8 ubArmsDealer, INT16 sItemIndex, UINT8 ubAtMostNumItems );
+
 
 void		ArmsDealerGetsFreshStock( UINT8 ubArmsDealer, UINT16 usItemIndex, UINT8 ubNumItems );
 BOOLEAN ItemContainsLiquid( UINT16 usItemIndex );
@@ -624,12 +626,18 @@ BOOLEAN AdjustCertainDealersInventory( )
 	}
 	else
 	{
-		GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, 4500, 0 ); //LAPTOP_TRANSMITTER
+		GuaranteeAtMostNumOfItemsForItem( ARMS_DEALER_BETTY, 4500, 0 ); //LAPTOP_TRANSMITTER
 	}
 
-	GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, 4501, 1 );
-	GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, 4502, 1 );
-	GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, 4503, 1 );
+	if( gubQuest[ QUEST_GET_RID_BLOODCATS_AT_BETTYS ] != QUESTDONE )
+	{
+		//make sure she doesnt sell these items just yet
+		GuaranteeAtMostNumOfItemsForItem( ARMS_DEALER_BETTY, FIRSTAIDKIT, 0 );
+		GuaranteeAtMostNumOfItemsForItem( ARMS_DEALER_BETTY, MEDICKIT, 0 );
+		GuaranteeAtMostNumOfItemsForItem( ARMS_DEALER_BETTY, COMPOUND18, 0 );
+		GuaranteeAtMostNumOfItemsForItem( ARMS_DEALER_BETTY, CERAMIC_PLATES, 0 );
+		GuaranteeAtMostNumOfItemsForItem( ARMS_DEALER_BETTY, LAME_BOY, 0 );
+	}
 
 	//Guarntee 1 laptop transmitter to be at betty's
 	GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, PORNOS, 1 );
@@ -2390,4 +2398,68 @@ BOOLEAN CanThisItemBeSoldToSimulatedCustomer( UINT8 ubArmsDealerID, UINT16 usIte
 	}
 
 	return( TRUE );
+}
+
+void GuaranteeAtMostNumOfItemsForItem( UINT8 ubArmsDealer, INT16 sItemIndex, UINT8 ubAtMostNumItems )
+{
+
+	if( gArmsDealerStatus[ ubArmsDealer ].fOutOfBusiness )
+		return;
+
+	//ADB, ya, a whole 1 line of extra code!
+	// not permitted for repair dealers - would take extra code to avoid counting items under repair!
+	//Assert( !DoesDealerDoRepairs( ubArmsDealer ) );
+	int itemsIHave = 0;
+	for (DealerItemList::iterator iter = gArmsDealersInventory[ ubArmsDealer ].begin();
+		iter != gArmsDealersInventory[ ubArmsDealer ].end(); ++iter) {
+		if (iter->ItemIsInInventory() == true
+			&& iter->object.usItem == sItemIndex
+			&& iter->IsUnderRepair() == false) {
+			itemsIHave -= iter->object.ubNumberOfObjects;
+			//if there are any of these in stock
+
+		}
+	}
+
+
+/*	UINT16	usCnt=0;
+	UINT8		ubNumToRemove=0;
+	SPECIAL_ITEM_INFO SpclItemInfo;
+	UINT8			ubNumLeftToRemove=0;
+	INT8			bItemCondition=0;
+	UINT8			bElementToRemove=0;
+
+
+	//if the num items in stock is greater then the num past in
+	if( gArmsDealersInventory[ ubArmsDealer ][ sItemIndex ].ubTotalItems > ubAtMostNumItems )
+	{
+		ubNumToRemove = gArmsDealersInventory[ ubArmsDealer ][ sItemIndex ].ubTotalItems - ubAtMostNumItems;
+
+		ubNumLeftToRemove = ubNumToRemove;
+
+		//loop through the specified #of times
+		while( ubNumLeftToRemove > 0 )
+		{
+			SetSpecialItemInfoToDefaults( &SpclItemInfo );
+
+			//remove special ones first
+			if( gArmsDealersInventory[ ubArmsDealer ][ sItemIndex ].ubTotalItems > gArmsDealersInventory[ ubArmsDealer ][ sItemIndex ].ubPerfectItems )
+			{
+				bElementToRemove = GetFirstValidSpecialItemFromDealer( ubArmsDealer, sItemIndex );
+
+				RemoveSpecialItemFromArmsDealerInventoryAtElement( ubArmsDealer, sItemIndex, bElementToRemove );
+
+				ubNumLeftToRemove -= 1;
+			}
+			else
+			{
+				//lower the number to the required number
+				RemoveItemFromArmsDealerInventory( ubArmsDealer, sItemIndex, &SpclItemInfo, ubNumLeftToRemove );
+
+				ubNumLeftToRemove = 0;
+			}
+		}
+	}
+	
+	*/
 }

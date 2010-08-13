@@ -1389,7 +1389,7 @@ BOOLEAN ExitShopKeeperInterface()
 	//if the laptop was just fixed
 	if( gubQuest[ QUEST_FIX_LAPTOP ] == QUESTDONE && !( gJa25SaveStruct.uiJa25GeneralFlags & JA_GF__PLAYER_SAID_LAPTOP_FIXED_QUOTE ) )
 	{
-		/*
+
 		INT8	bSoldierID=-1;
 
 			
@@ -1399,7 +1399,7 @@ BOOLEAN ExitShopKeeperInterface()
 		{
 			TacticalCharacterDialogue( &Menptr[ bSoldierID ], QUOTE_SPARE2 );
 		}
-		*/
+
 		gJa25SaveStruct.uiJa25GeneralFlags |= JA_GF__PLAYER_SAID_LAPTOP_FIXED_QUOTE;
 	}
 
@@ -3386,8 +3386,9 @@ UINT8		ubItemsNotCounted = 0; //ja25 UB
 		}
 	}
 
+        //JA25UB
 	//if the dealer is Raul
-/*	if( gbSelectedArmsDealerID == ARMS_DEALER_BETTY )
+	if( gbSelectedArmsDealerID == ARMS_DEALER_BETTY )
 	{
 		//if the item is the antique musket
 	//	if( usItemID == TEX_MOVIE_ATTACK_CLYDESDALES || usItemID == TEX_MOVIE_WILD_EAST || usItemID == TEX_MOVIE_HAVE_HONDA )
@@ -3397,7 +3398,7 @@ UINT8		ubItemsNotCounted = 0; //ja25 UB
 			uiTotalPrice = Item[ usItemID ].usPrice;
 		}
 	}
-*/
+
 	
 	return( uiTotalPrice );
 }
@@ -6374,9 +6375,9 @@ void EvaluateItemAddedToPlayersOfferArea( INT8 bSlotID, BOOLEAN fFirstOne )
 		switch ( uiEvalResult )
 		{
 			case EVAL_RESULT_DONT_HANDLE:
-			/*
+
 			//JA25 UB
-			if( ArmsDealerInfo[ gbSelectedArmsDealerID ].ubTypeOfArmsDealer == ARMS_DEALER_SELLS_ONLY )
+			if( armsDealerInfo[ gbSelectedArmsDealerID ].ubTypeOfArmsDealer == ARMS_DEALER_SELLS_ONLY )
 				{
 					// then he doesn't have quotes 17, 19, or 20, always use 4.  Devin doesn't have 18 either,
 					// while the text of 18 seems wrong for Sam & Howard if offered something they should consider valuable.
@@ -6400,7 +6401,7 @@ void EvaluateItemAddedToPlayersOfferArea( INT8 bSlotID, BOOLEAN fFirstOne )
 						sQuoteNum = SK_QUOTES_DURING_EVALUATION_STUFF_REJECTED;
 					}
 				}
-			*/
+
 				if( armsDealerInfo[ gbSelectedArmsDealerID ].ubTypeOfArmsDealer == ARMS_DEALER_SELLS_ONLY )
 				{
 					// then he doesn't have quotes 17, 19, or 20, always use 4.  Devin doesn't have 18 either,

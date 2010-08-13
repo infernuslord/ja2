@@ -3498,7 +3498,7 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 
 		switch( pSoldierOld->ubProfile )
 		{
-		/*
+
 			case 75: //MORRIS
 				{
 					INT8 bSoldierID;
@@ -3514,7 +3514,7 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 					}					
 				}
 				break;
-		*/
+
 /*
 Ja25: none of these characters are in the exp.
 		case BRENDA:
