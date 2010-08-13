@@ -1658,7 +1658,7 @@ BOOLEAN	CompatibleItemForApplyingOnMerc( OBJECTTYPE *pTestObject )
 	// ATE: Would be nice to have flag here to check for these types....
 	if ( Item[usItem].camouflagekit || usItem == ADRENALINE_BOOSTER || usItem == REGEN_BOOSTER ||
 			 usItem == SYRINGE_3		 || usItem == SYRINGE_4 || usItem == SYRINGE_5 ||
-			 Item[usItem].alcohol  || Item[usItem].canteen || usItem == JAR_ELIXIR )
+			 Item[usItem].alcohol  || Item[usItem].canteen || usItem == JAR_ELIXIR || usItem == 4504 ) // JA25 UB  CHE_GUEVARA_CANTEEN
 	{
 		return( TRUE );
 	}

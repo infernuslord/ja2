@@ -202,11 +202,11 @@ Ja25: No enrico, therefore, no email
 		#endif
 	}
 */
-/*
+	//JA25 UB
 	//MErc mercs come with an umbrella
-	if( ( ubCurrentSoldier >= 40 && ubCurrentSoldier <= 50 ) || ubCurrentSoldier == GASTON || ubCurrentSoldier == STOGIE )
+	if( ( ubCurrentSoldier >= 40 && ubCurrentSoldier <= 50 ) || ubCurrentSoldier == 58 /*GASTON*/ || ubCurrentSoldier == 59 /*STOGIE*/ )
 	{
-		AddItemToMerc( iNewIndex, MERC_UMBRELLA );
+		AddItemToMerc( iNewIndex, 4507 ); //MERC_UMBRELLA
 	}
 
 	//if this is an AIM or MERC merc
@@ -216,19 +216,19 @@ Ja25: No enrico, therefore, no email
 		if( ubCurrentSoldier < 40 )
 		{
 			//give the mercs one of the promo items
-			AddItemToMerc( iNewIndex, SAM_GARVER_COMBAT_KNIFE );
+			AddItemToMerc( iNewIndex, 4506 ); //SAM_GARVER_COMBAT_KNIFE
 		}
 
 		// if its a merc merc
-		else if( ubCurrentSoldier <= 50 || ubCurrentSoldier == GASTON || ubCurrentSoldier == STOGIE )
+		else if( ubCurrentSoldier <= 50 || ubCurrentSoldier == 58 /*GASTON*/ || ubCurrentSoldier == 59 /*STOGIE*/ )
 		{
 			//give the mercs one of the promo items
-			AddItemToMerc( iNewIndex, CHE_GUEVARA_CANTEEN );
-			AddItemToMerc( iNewIndex, MERC_WRISTWATCH );
-			AddItemToMerc( iNewIndex, SAM_GARVER_COMBAT_KNIFE );
+			AddItemToMerc( iNewIndex, 4504 ); //CHE_GUEVARA_CANTEEN
+			AddItemToMerc( iNewIndex, 4505 ); //MERC_WRISTWATCH
+			AddItemToMerc( iNewIndex, 4506 ); //SAM_GARVER_COMBAT_KNIFE
 		}
 	}
-*/
+
 
 	//record how long the merc will be gone for
 	pMerc->bMercStatus = (UINT8)pHireMerc->iTotalContractLength;

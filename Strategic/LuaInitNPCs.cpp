@@ -36,6 +36,7 @@
 #include "AIInternals.h"
 #include "Handle Doors.h"
 #include "soldier profile type.h"
+#include "Soldier Profile.h"
 
 #include "LOS.h"
 #include "Music Control.h"
@@ -103,6 +104,8 @@ static int l_Ja25SaveStructubJohnKulbaInitialSectorX(lua_State *L);
 
 static int l_GuaranteeAtLeastXItemsOfIndex(lua_State *L);
 
+static int l_gMercProfileGearset(lua_State *L);
+
 using namespace std;
 
 void IniFunction(lua_State *L)
@@ -158,6 +161,8 @@ void IniFunction(lua_State *L)
 	
 	//Shop
 	lua_register(L, "GuaranteeAtLeastXItemsOfIndex", l_GuaranteeAtLeastXItemsOfIndex);	
+	
+	lua_register(L, "MercProfileSetBIGPOCK2POS", l_gMercProfileGearset);	
 
 }
 
@@ -211,6 +216,34 @@ BOOLEAN LetLuaGameInit(UINT8 Init)
 	
 	return true;
 
+}
+
+static int l_gMercProfileGearset(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+UINT8 ID;
+UINT16 inv;
+UINT8 status;
+UINT8 number;
+UINT8 drop;
+int i;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) ID = lua_tointeger(L,i);
+		if (i == 2 ) inv = lua_tointeger(L,i);
+		if (i == 3 ) number = lua_tointeger(L,i);
+		if (i == 4 ) status = lua_tointeger(L,i);
+		if (i == 5 ) drop = lua_tointeger(L,i);
+	}
+
+		
+gMercProfileGear[ID].inv[BIGPOCK2POS] = inv;
+gMercProfileGear[ID].iNumber[BIGPOCK2POS] = number;
+gMercProfileGear[ID].iStatus[BIGPOCK2POS] = status;
+gMercProfileGear[ID].iDrop[BIGPOCK2POS] = drop;
+	
+	return 0;
 }
 
 static int l_GuaranteeAtLeastXItemsOfIndex(lua_State *L)

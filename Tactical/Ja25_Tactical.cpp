@@ -95,7 +95,7 @@ typedef struct
 
 
 //Morris items
-UINT32 MORRIS_INSTRUCTION_NOTE = 4000;
+UINT32 MORRIS_INSTRUCTION_NOTE = 4508;
 
 UINT8 Get3RandomQualifiedMercs( UINT8 *pSoldierId1, UINT8 *pSoldierId2, UINT8 *pSoldierId3 );
 
