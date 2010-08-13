@@ -978,21 +978,17 @@ void UpdateJerryMiloInInitialSector()
 void AddItemToMerc( UINT8 ubNewMerc, INT16 sItemType )
 {
 
-	/*
+
 	// OK, give this item to our merc!
-	OBJECTTYPE Object;
+	OBJECTTYPE gTempObject;
 	BOOLEAN	fReturn=FALSE;
 
 	// make an objecttype
-	memset( &Object, 0, sizeof( OBJECTTYPE ) );
-	Object.usItem						= sItemType;
-	Object.ubNumberOfObjects = 1;
-	Object.bStatus[0]				= 100;
+        CreateItem(sItemType, 100, &gTempObject);
 
 	// Give it 
-	fReturn = AutoPlaceObject( MercPtrs[ ubNewMerc ], &Object, FALSE );
+	fReturn = AutoPlaceObject( MercPtrs[ ubNewMerc ], &gTempObject, FALSE );
 	Assert( fReturn );
+	
 
-
-*/
 }
