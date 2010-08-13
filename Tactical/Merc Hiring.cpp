@@ -988,6 +988,12 @@ void AddItemToMerc( UINT8 ubNewMerc, INT16 sItemType )
 
 	// Give it 
 	fReturn = AutoPlaceObject( MercPtrs[ ubNewMerc ], &gTempObject, FALSE );
+	
+			if(!fReturn && (UsingNewInventorySystem() == true))
+			{
+				(MercPtrs[ubNewMerc]->inv[NUM_INV_SLOTS-1]) = gTempObject;
+				fReturn=TRUE;
+			}
 	Assert( fReturn );
 	
 
