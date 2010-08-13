@@ -51,6 +51,9 @@
 #include "message.h"
 #include "fresh_header.h"
 
+#include "Ja25_Tactical.h"
+#include "Ja25 Strategic Ai.h"
+
 // THESE 3 DIFFICULTY FACTORS MUST ALWAYS ADD UP TO 100% EXACTLY!!!
 #define DIFF_FACTOR_PLAYER_PROGRESS			50
 #define DIFF_FACTOR_PALACE_DISTANCE			30
@@ -3037,6 +3040,19 @@ void CopyProfileItems( SOLDIERTYPE *pSoldier, SOLDIERCREATE_STRUCT *pCreateStruc
 						// to provide one which doesn't work and would confuse everything.
 						switch( pCreateStruct->ubProfile )
 						{
+						
+							case 75: //MORRIS:
+								if ( pProfile->inv[ cnt ] >= KEY_1 && pProfile->inv[ cnt ] <= KEY_32)
+								{
+									fRet = CreateKeyObject( &gTempObject , pProfile->bInvNumber[ cnt ], 32 );
+									//CreateKeyObject( &(pSoldier->inv[ cnt ] ), pProfile->bInvNumber[ cnt ], 32 );
+								}
+								//else
+								//{
+								//	memset( &(pSoldier->inv[cnt]), 0, sizeof( OBJECTTYPE ) );
+								//}
+								break;
+
 							// WANNE: Changed KEY_32 to KEY_8 because we only have 8 keys defined in Items.xml
 							case BREWSTER:
 								if ( pProfile->inv[ cnt ] >= KEY_1 && pProfile->inv[ cnt ] <= KEY_8){

@@ -59,6 +59,9 @@
 
 #include "connect.h"
 
+#include "Ja25_Tactical.h"
+#include "Ja25 Strategic Ai.h"
+
 extern void PauseAITemporarily( void );
 extern void UpdateEnemyUIBar( void );
 extern void DisplayHiddenTurnbased( SOLDIERTYPE * pActingSoldier );
@@ -854,6 +857,19 @@ void StartNPCAI(SOLDIERTYPE *pSoldier)
 	// If we are not in an interrupt situation!
 	if ( (( gTacticalStatus.uiFlags & TURNBASED ) && ( gTacticalStatus.uiFlags & INCOMBAT )) && gubOutOfTurnPersons == 0 )
 	{
+	
+			//JA25 UB
+				//if this is Morris
+			if( pSoldier->ubProfile == 75  ) //MORRIS
+			{
+				//if we are to say the line if we are hurt the player
+				if( gJa25SaveStruct.fMorrisToSayHurtPlayerQuoteNextTurn )
+				{
+					TriggerNPCRecord( 75, 6 ); //MORRIS
+				}
+			}
+			
+			
 		if( ( ( pSoldier->bVisible != -1 && pSoldier->stats.bLife) || ( gTacticalStatus.uiFlags & SHOW_ALL_MERCS ) ) && ( fInValidSoldier == FALSE ) )
 		{
 			// If we are on a roof, set flag for rendering...

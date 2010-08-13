@@ -37,6 +37,10 @@
 	#include "Creature Spreading.h"
 #endif
 
+#include "Explosion Control.h"
+#include "Ja25 Strategic Ai.h"
+#include "Ja25_Tactical.h"
+
 BOOLEAN		gfInSectorExitMenu = FALSE;
 
 void CheckLoadMapCallback( GUI_BUTTON *btn, INT32 reason );
@@ -760,6 +764,15 @@ void RemoveSectorExitMenu( BOOLEAN fOk )
 
 		if ( fOk )
 		{
+		
+			//ja25 ub
+			//If this is the sector with the power fan
+			if( gWorldSectorX == 13 && gWorldSectorY == 10 && gbWorldSectorZ == 0 )
+			{
+				//Remeber how the player got through
+				HandleHowPlayerGotThroughFan();
+			}
+			
 			// Handle the effects here!
 			if ( gExitDialog.fAllMove && gExitDialog.fGotoSector && gExitDialog.fGotoSectorText )
 			{

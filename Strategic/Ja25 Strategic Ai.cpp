@@ -423,6 +423,7 @@ void InitJa25UnderGroundSectors()
 void SetNumberJa25EnemiesInSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites )
 {
 	//if its a ground level
+	
 	if( bSectorZ == 0 )
 	{
 		SetNumberJa25EnemiesInSurfaceSector( SECTOR( sSectorX, sSectorY ), ubNumAdmins, ubNumTroops, ubNumElites );
@@ -433,6 +434,7 @@ void SetNumberJa25EnemiesInSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ
 	{
 		SetNumberJa25EnemiesInUnderGroundSector( sSectorX, sSectorY, bSectorZ, ubNumAdmins, ubNumTroops, ubNumElites );
 	}
+	
 }
 
 void SetNumberJa25EnemiesInSurfaceSector( INT32 iSectorID, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites )

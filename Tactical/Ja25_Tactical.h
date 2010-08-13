@@ -66,7 +66,7 @@ void HandlePowerGenAlarm();
 
 BOOLEAN HandlePlayerSayingQuoteWhenFailingToOpenGateInTunnel( SOLDIERTYPE *pSoldier, BOOLEAN fSayQuoteOnlyOnce );
 
-void HandleHowPlayerGotThroughFan();
+extern void HandleHowPlayerGotThroughFan();
 
 //void RevealAllDroppedEnemyItems();
 

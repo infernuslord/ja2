@@ -98,7 +98,12 @@
 #include "Debug Control.h"
 #endif
 
+#include "Ja25_Tactical.h"
+#include "Ja25 Strategic Ai.h"
+
 #include "fresh_header.h"
+
+
 
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -8823,6 +8828,38 @@ Ja25: No meanwhiles
 	if ( this->stats.bLife < OKLIFE )
 	{
 		DecayIndividualOpplist( this );
+	}
+	
+	
+	//if the attacker is MORRIS, AND he didnt kill the person
+	if( Menptr[ ubAttacker ].ubProfile == 75 )	//MORRIS			
+	{
+		//if the soldier is hurt, but not dead
+		if( this->stats.bLife < bOldLife && this->stats.bLife > 0 )
+		{
+			//if he hasnt said his quote #1 before
+			if( !( Menptr[ ubAttacker ].usQuoteSaidExtFlags & SOLDIER_QUOTE_SAID_THOUGHT_KILLED_YOU ) )
+			{
+				//said a flag so morris can say this quote next turn
+				gJa25SaveStruct.fMorrisToSayHurtPlayerQuoteNextTurn = TRUE;
+
+				//Remeber who Morris is saying the quote too
+				gJa25SaveStruct.ubPlayerMorrisHurt = this->ubProfile;
+			}
+		}
+
+		// else if morris is to say the quote, he hasnt said it yet and he just killed the person he WAS going to say it to
+		else if(	gJa25SaveStruct.fMorrisToSayHurtPlayerQuoteNextTurn && 
+							gJa25SaveStruct.ubPlayerMorrisHurt == this->ubProfile &&
+							this->stats.bLife <= 0 &&
+							!( Menptr[ ubAttacker ].usQuoteSaidExtFlags & SOLDIER_QUOTE_SAID_THOUGHT_KILLED_YOU ) )
+		{
+			//said a flag so morris can say this quote next turn
+			gJa25SaveStruct.fMorrisToSayHurtPlayerQuoteNextTurn = FALSE;
+
+			//Remeber who Morris is saying the quote too
+			gJa25SaveStruct.ubPlayerMorrisHurt = NO_PROFILE;
+		}
 	}
 
 

@@ -892,6 +892,37 @@ void ProcessQueenCmdImplicationsOfDeath( SOLDIERTYPE *pSoldier )
 
 	switch( pSoldier->ubProfile )
 	{
+	
+		case 75://MORRIS:
+
+			if( !pSoldier->bSectorZ )
+			{
+				pSector = &SectorInfo[ SECTOR( pSoldier->sSectorX, pSoldier->sSectorY ) ];
+				if( pSector->ubNumElites )
+				{
+					pSector->ubNumElites--;
+				}
+				if( pSector->ubElitesInBattle )
+				{
+					pSector->ubElitesInBattle--;
+				}
+			}
+			 else
+			{
+				UNDERGROUND_SECTORINFO *pUnderground;
+				pUnderground = FindUnderGroundSector( (UINT8)pSoldier->sSectorX, (UINT8)pSoldier->sSectorY, (UINT8)pSoldier->bSectorZ );
+				Assert( pUnderground );
+				if( pUnderground->ubNumElites )
+				{
+					pUnderground->ubNumElites--;
+				}
+				if( pUnderground->ubElitesInBattle )
+				{
+					pUnderground->ubElitesInBattle--;
+				}
+			}
+			break;
+			
 		case MIKE:
 		case IGGY:
 			if( pSoldier->ubProfile == IGGY && !gubFact[ FACT_IGGY_AVAILABLE_TO_ARMY ] )

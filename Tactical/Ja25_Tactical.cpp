@@ -67,6 +67,7 @@
 #include "Soldier Control.h"
 #include "End Game.h"
 #include "structure.h"
+#include "Explosion Control.h"
 
 //*******************************************************************
 //
@@ -134,6 +135,8 @@ UINT32	GetNumberOfTurnsPowerGenFanWillBeStoppedFor();
 void HandleInitialEventsInHeliCrash();
 
 BOOLEAN		gfFirstTimeInGameHeliCrash = FALSE;
+
+void HandleHowPlayerGotThroughFan();
 
 //ppp
 
@@ -926,8 +929,8 @@ BOOLEAN HandleNewGunComment( SOLDIERTYPE *pSoldier, INT32 iItemIndex, BOOLEAN fF
 	//if it is a new merc
 	if( fNewMerc )
 	{
-/*		//if the item is the hand cannon
-		if( iItemIndex == HAND_CANNON )
+		//if the item is the hand cannon
+		if( iItemIndex == 4498 )   //  HAND_CANNON
 		{
 			//say the new gun quote
 			TacticalCharacterDialogue( pSoldier, QUOTE_PRECEDENT_TO_REPEATING_ONESELF_RENEW );
@@ -937,7 +940,7 @@ BOOLEAN HandleNewGunComment( SOLDIERTYPE *pSoldier, INT32 iItemIndex, BOOLEAN fF
 			//say the new gun quote
 			TacticalCharacterDialogue( pSoldier, QUOTE_HATE_MERC_1_ON_TEAM_WONT_RENEW );
 		}
-*/
+
 		//rememeber we have played the quote
 		SetNewGunQuoteToBePlayedForThisGun( iItemIndex );
 	}

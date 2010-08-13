@@ -226,6 +226,7 @@ UINT16 inv;
 UINT8 status;
 UINT8 number;
 UINT8 drop;
+UINT8 slot;
 int i;
 
 	for (i= 1; i<=n; i++ )
@@ -235,13 +236,14 @@ int i;
 		if (i == 3 ) number = lua_tointeger(L,i);
 		if (i == 4 ) status = lua_tointeger(L,i);
 		if (i == 5 ) drop = lua_tointeger(L,i);
+		if (i == 6 ) slot = lua_tointeger(L,i);
 	}
 
 		
-gMercProfileGear[ID].inv[BIGPOCK2POS] = inv;
-gMercProfileGear[ID].iNumber[BIGPOCK2POS] = number;
-gMercProfileGear[ID].iStatus[BIGPOCK2POS] = status;
-gMercProfileGear[ID].iDrop[BIGPOCK2POS] = drop;
+gMercProfileGear[ID].inv[slot] = inv;
+gMercProfileGear[ID].iNumber[slot] = number;
+gMercProfileGear[ID].iStatus[slot] = status;
+gMercProfileGear[ID].iDrop[slot] = drop;
 	
 	return 0;
 }
