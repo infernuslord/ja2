@@ -278,7 +278,7 @@ INT8	RandomProfileIdFromNewMercsOnPlayerTeam()
 	//Get the number and array of the new soldiers
 	bNumMercsPresent = GetNumSoldierIdAndProfileIdOfTheNewMercsOnPlayerTeam( NULL, ProfileIdArray );
 
-	Assert( bNumMercsPresent < NUM_MERCS_WITH_NEW_QUOTES );
+	//Assert( bNumMercsPresent < NUM_MERCS_WITH_NEW_QUOTES );
 
 	if( bNumMercsPresent != 0 )
 	{
@@ -300,7 +300,7 @@ INT8	RandomSoldierIdFromNewMercsOnPlayerTeam()
 	//Get the number and array of the new soldiers
 	bNumMercsPresent = GetNumSoldierIdAndProfileIdOfTheNewMercsOnPlayerTeam( SoldierIdArray, NULL );
 
-	Assert( bNumMercsPresent < NUM_MERCS_WITH_NEW_QUOTES );
+	//Assert( bNumMercsPresent < NUM_MERCS_WITH_NEW_QUOTES );
 
 	if( bNumMercsPresent != 0 )
 	{
@@ -329,7 +329,7 @@ INT8 RandomArrayOfQualifiedMercs( UINT8 *pRandomSoldierIdArray )
 	//Get the number and array of the new soldiers
 	bNumMercsPresent = GetNumSoldierIdAndProfileIdOfTheNewMercsOnPlayerTeam( SoldierIdArray, NULL );
 
-	Assert( bNumMercsPresent < NUM_MERCS_WITH_NEW_QUOTES );
+	//Assert( bNumMercsPresent < NUM_MERCS_WITH_NEW_QUOTES );
 
 	if( bNumMercsPresent != 0 )
 	{
