@@ -67,6 +67,7 @@
 
 #include "Interface.h"
 #include "Strategic Town Loyalty.h"
+#include "legion cfg.h"
 
 #include "Civ Quotes.h"
 #include "Sector Summary.h"
@@ -530,15 +531,20 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcat(fileName, SAMSITESFILENAME);
 	THROWIFFALSE(ReadInSAMInfo(fileName),SAMSITESFILENAME);
 
+	if ( gGameLegionOptions.EnemyXML == TRUE ) 
+	{
 	// Lesh: army externalization
 	strcpy(fileName, directoryName);
 	strcat(fileName, GARRISONFILENAME);
 	THROWIFFALSE(ReadInGarrisonInfo(fileName),GARRISONFILENAME);
-
+	}
+	
+	if ( gGameLegionOptions.EnemyXML == TRUE ) 
+	{
 	strcpy(fileName, directoryName);
 	strcat(fileName, PATROLFILENAME);
 	THROWIFFALSE(ReadInPatrolInfo(fileName),PATROLFILENAME);
-
+	}
 	strcpy(fileName, directoryName);
 	strcat(fileName, COMPOSITIONFILENAME);
 	THROWIFFALSE(ReadInArmyCompositionInfo(fileName),COMPOSITIONFILENAME);

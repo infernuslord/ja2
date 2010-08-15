@@ -38,7 +38,7 @@
 #include "strategicmap.h"
 #include "Map Screen Interface Map.h"
 #include "Map Screen Interface.h"
-
+#include "End Game.h"
 
 
 extern STR16	gzIntroScreen[];
@@ -395,7 +395,7 @@ void PrepareToExitIntroScreen()
 		guiIntroExitScreen = GAME_SCREEN;
 		SetCurrentWorldSector( 16, 11, 0 );
 
-		//EnterTacticalInFinalSector();
+		EnterTacticalInFinalSector();
 
 		//Dont leave tactical
 		gfEnteringMapScreen = FALSE;

@@ -106,12 +106,13 @@
 	#include "cursors.h"
 #endif
 
-
+#include "Ja25Update.h"
 #include "Ja25 Strategic Ai.h"
 #include "MapScreen Quotes.h"
 #include "email.h"
 #include "SaveLoadGame.h"
-
+#include "Campaign.h"
+#include "Strategic Status.h"
 //** Defines *******************************************************************
 
 #define		JA25_SECTOR_H7_INITIAL_ATTACK													( 7 * 60 + 10 )
@@ -254,28 +255,28 @@ void InitJa25StrategicAi()
 
 
 	//add event at 7:03
-	//AddSameDayStrategicEvent( EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE, JA25_SECTOR_H7_INITIAL_ATTACK, 0 );
+	AddSameDayStrategicEvent( EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE, JA25_SECTOR_H7_INITIAL_ATTACK, 0 );
     
-//    AddEveryDayStrategicEventUsingSeconds(EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE,JA25_SECTOR_H7_INITIAL_ATTACK * 60,0);
+    AddEveryDayStrategicEventUsingSeconds(EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE,JA25_SECTOR_H7_INITIAL_ATTACK * 60,0);
 
 	//Init the underground sectors ( add them to the list of under ground )
-	//InitJa25UnderGroundSectors();
+	InitJa25UnderGroundSectors();
 
 	//Init the # of enemies in all the sectors
-	//InitJa25InitialEnemiesInSector();
+	InitJa25InitialEnemiesInSector();
 
 	//Init the Ja215 Stratigic AI
 	InitJa25StrategicSectorAI( TRUE );
 	
-//	gStrategicStatus.ubHighestProgress = CurrentPlayerProgressPercentage();
+	gStrategicStatus.ubHighestProgress = CurrentPlayerProgressPercentage();
 
-	InitJohnKulbaInitialSector();
+	//InitJohnKulbaInitialSector(); // wy³¹czone, skrypt lua
 }
 
 
 BOOLEAN ShouldEnemiesBeAddedToInitialSector()
 {
-/*	//if there are still players in the first sector
+	//if there are still players in the first sector
 	if( gfWorldLoaded && 
 			gWorldSectorX == JA2_5_START_SECTOR_X && 
 			gWorldSectorY == JA2_5_START_SECTOR_Y &&
@@ -289,13 +290,13 @@ BOOLEAN ShouldEnemiesBeAddedToInitialSector()
 			return( FALSE );
 		}
 	}
-*/
+
 	return( TRUE );
 }
 
 BOOLEAN	AddEnemiesToInitialSectorH7()
 {
-/*	GROUP *pGroup;
+	GROUP *pGroup;
 	UINT8 ubSector;
 	UINT32 uiWorldMin;
 
@@ -306,8 +307,8 @@ BOOLEAN	AddEnemiesToInitialSectorH7()
 	UINT8	ubNumRemovedAdmins=0;
 	UINT8	ubNumRemovedTroops=0;
 	UINT8	ubNumRemovedElites=0;
-*/
-/*	ubSector = SECTOR( JA2_5_START_SECTOR_X, JA2_5_START_SECTOR_Y );
+
+	ubSector = SECTOR( JA2_5_START_SECTOR_X, JA2_5_START_SECTOR_Y );
 
 	//Get the number of enemies in the guard post sector
 	GetNumberOfJA25EnemiesInSector( 8, MAP_ROW_H, 0, &ubNumAdmins, &ubNumTroops, &ubNumElites );
@@ -352,7 +353,7 @@ BOOLEAN	AddEnemiesToInitialSectorH7()
 
 //	AddStrategicEvent( EVENT_GROUP_ARRIVAL, pGroup->uiArrivalTime, pGroup->ubGroupID );
 	AddAdvancedStrategicEvent( ONETIME_EVENT, EVENT_GROUP_ARRIVAL, GetWorldTotalSeconds( ) + 1, pGroup->ubGroupID );
-*/
+
 	return( TRUE );
 }
 
@@ -382,10 +383,10 @@ void InitJa25InitialEnemiesInSector()
 	//
 	// Set the number of enemies in each of the sectors
 	//
-	InitNumberOfEnemiesInAboveGroundSectors( );
+	//InitNumberOfEnemiesInAboveGroundSectors( ); //wy³¹czono, skrypt lua
 
 	//Below Ground
-	InitNumberOfEnemiesInUnderGroundSectors( );
+	//InitNumberOfEnemiesInUnderGroundSectors( ); //wy³¹czono, skrypt lua
 }
 
 void InitJa25UnderGroundSectors()
@@ -495,6 +496,11 @@ void InitNumberOfEnemiesInAboveGroundSectors( )
 				ubNumTroops = 0 + Random( 0 );
 				ubNumElites = 0 + Random( 0 );
 				break;
+			case DIF_LEVEL_INSANE:
+				ubNumAdmins = 0 + Random( 0 );
+				ubNumTroops = 0 + Random( 0 );
+				ubNumElites = 0 + Random( 0 );
+				break;
 		}
 		SetNumberJa25EnemiesInSurfaceSector( SEC_H7, ubNumAdmins, ubNumTroops, ubNumElites );
 	}
@@ -518,6 +524,11 @@ void InitNumberOfEnemiesInAboveGroundSectors( )
 			case DIF_LEVEL_HARD:
 				ubNumAdmins = 0 + Random( 0 );
 				ubNumTroops = 16 + Random( 6 );
+				ubNumElites = 2 + Random( 2 );
+				break;
+			case DIF_LEVEL_INSANE:
+				ubNumAdmins = 0 + Random( 0 );
+				ubNumTroops = 19 + Random( 9 );
 				ubNumElites = 2 + Random( 2 );
 				break;
 		}
@@ -545,6 +556,11 @@ void InitNumberOfEnemiesInAboveGroundSectors( )
 				ubNumTroops = 19 + Random( 4 );
 				ubNumElites = 3 + Random( 2 );
 				break;
+			case DIF_LEVEL_INSANE:
+				ubNumAdmins = 0 + Random( 0 );
+				ubNumTroops = 19 + Random( 6 );
+				ubNumElites = 3 + Random( 2 );
+				break;
 		}
 
 		SetNumberJa25EnemiesInSurfaceSector( SEC_H9, ubNumAdmins, ubNumTroops, ubNumElites );
@@ -567,6 +583,11 @@ void InitNumberOfEnemiesInAboveGroundSectors( )
 			case DIF_LEVEL_HARD:
 				ubNumAdmins = 0 + Random( 0 );
 				ubNumTroops = 10 + Random( 4 );
+				ubNumElites = 2 + Random( 4 );
+				break;
+			case DIF_LEVEL_INSANE:
+				ubNumAdmins = 0 + Random( 0 );
+				ubNumTroops = 20 + Random( 4 );
 				ubNumElites = 2 + Random( 4 );
 				break;
 		}
@@ -597,6 +618,11 @@ void InitNumberOfEnemiesInAboveGroundSectors( )
 				ubNumTroops = 10 + Random( 4 );
 				ubNumElites = 2 + Random( 4 );
 				break;
+			case DIF_LEVEL_INSANE:
+				ubNumAdmins = 0 + Random( 0 );
+				ubNumTroops = 20 + Random( 6 );
+				ubNumElites = 2 + Random( 4 );
+				break;
 		}
 
 		SetNumberJa25EnemiesInSurfaceSector( SEC_I9, ubNumAdmins, ubNumTroops, ubNumElites );
@@ -620,6 +646,11 @@ void InitNumberOfEnemiesInAboveGroundSectors( )
 			case DIF_LEVEL_HARD:
 				ubNumAdmins = 0 + Random( 0 );
 				ubNumTroops = 14 + Random( 4 );
+				ubNumElites = 5 + Random( 3 );
+				break;
+			case DIF_LEVEL_INSANE:
+				ubNumAdmins = 0 + Random( 0 );
+				ubNumTroops = 20 + Random( 4 );
 				ubNumElites = 5 + Random( 3 );
 				break;
 		}
@@ -647,6 +678,11 @@ void InitNumberOfEnemiesInAboveGroundSectors( )
 				ubNumTroops = 14 + Random( 4 );
 				ubNumElites = 5 + Random( 4 );
 				break;
+			case DIF_LEVEL_INSANE:
+				ubNumAdmins = 0 + Random( 0 );
+				ubNumTroops = 17 + Random( 4 );
+				ubNumElites = 5 + Random( 4 );
+				break;
 		}
 
 		SetNumberJa25EnemiesInSurfaceSector( SEC_I11, ubNumAdmins, ubNumTroops, ubNumElites );
@@ -671,6 +707,11 @@ void InitNumberOfEnemiesInAboveGroundSectors( )
 				ubNumTroops = 12 + Random( 6 );
 				ubNumElites = 3 + Random( 2 );
 				break;
+			case DIF_LEVEL_INSANE:
+				ubNumAdmins = 0 + Random( 0 );
+				ubNumTroops = 20 + Random( 6 );
+				ubNumElites = 3 + Random( 2 );
+				break;
 		}
 
 		SetNumberJa25EnemiesInSurfaceSector( SEC_I12, ubNumAdmins, ubNumTroops, ubNumElites );
@@ -692,6 +733,11 @@ void InitNumberOfEnemiesInAboveGroundSectors( )
 				ubNumElites = 0 + Random( 0 );
 				break;
 			case DIF_LEVEL_HARD:
+				ubNumAdmins = 0 + Random( 0 );
+				ubNumTroops = 0 + Random( 0 );
+				ubNumElites = 0 + Random( 0 );
+				break;
+			case DIF_LEVEL_INSANE:
 				ubNumAdmins = 0 + Random( 0 );
 				ubNumTroops = 0 + Random( 0 );
 				ubNumElites = 0 + Random( 0 );
@@ -720,6 +766,11 @@ void InitNumberOfEnemiesInAboveGroundSectors( )
 				ubNumTroops = 11 + Random( 5 );
 				ubNumElites = 6 + Random( 3 );
 				break;
+			case DIF_LEVEL_INSANE:
+				ubNumAdmins = 0 + Random( 0 );
+				ubNumTroops = 20 + Random( 5 );
+				ubNumElites = 6 + Random( 3 );
+				break;
 		}
 
 		SetNumberJa25EnemiesInSurfaceSector( SEC_J11, ubNumAdmins, ubNumTroops, ubNumElites );
@@ -742,6 +793,11 @@ void InitNumberOfEnemiesInAboveGroundSectors( )
 			case DIF_LEVEL_HARD:
 				ubNumAdmins = 0 + Random( 0 );
 				ubNumTroops = 11 + Random( 3 );
+				ubNumElites = 3 + Random( 2 );
+				break;
+			case DIF_LEVEL_INSANE:
+				ubNumAdmins = 0 + Random( 0 );
+				ubNumTroops = 21 + Random( 3 );
 				ubNumElites = 3 + Random( 2 );
 				break;
 		}
@@ -769,6 +825,11 @@ void InitNumberOfEnemiesInAboveGroundSectors( )
 				ubNumTroops = 18 + Random( 4 );
 				ubNumElites = 6 + Random( 3 );
 				break;
+			case DIF_LEVEL_INSANE:
+				ubNumAdmins = 0 + Random( 0 );
+				ubNumTroops = 18 + Random( 4 );
+				ubNumElites = 7 + Random( 3 );
+				break;
 		}
 
 		SetNumberJa25EnemiesInSurfaceSector( SEC_J13, ubNumAdmins, ubNumTroops, ubNumElites );
@@ -790,6 +851,11 @@ void InitNumberOfEnemiesInAboveGroundSectors( )
 				ubNumElites = 4 + Random( 2 );
 				break;
 			case DIF_LEVEL_HARD:
+				ubNumAdmins = 0 + Random( 0 );
+				ubNumTroops = 17 + Random( 3 );
+				ubNumElites = 8 + Random( 2 );
+				break;
+			case DIF_LEVEL_INSANE:
 				ubNumAdmins = 0 + Random( 0 );
 				ubNumTroops = 17 + Random( 3 );
 				ubNumElites = 8 + Random( 2 );
@@ -1836,8 +1902,8 @@ INT8	GetTheFurthestSectorPlayerOwns()
 
 void SetJa25SectorOwnedStatus( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, BOOLEAN fPlayerOwned )
 {
-	INT8 bSector;
-/*
+/*	INT8 bSector;
+
 	//get the sector id
 	bSector = (INT8)GetJA25SectorID( sSectorX, sSectorY, bSectorZ );
 
@@ -1888,9 +1954,9 @@ void SetJa25SectorOwnedStatus( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, BO
 
 INT16 GetJA25SectorID( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ )
 {
-	INT8 bCnt=0;
+/*	INT8 bCnt=0;
 	INT16	sSector = 0;
-/*
+
 	if ( gJa25AiSectorStruct == NULL )
 	{
 		return( -1 );
@@ -1937,12 +2003,12 @@ BOOLEAN	GetSectorJa25SaiWillAttack( INT8 *pbSectorToAttack, INT8 *pbFromDirectio
 
 void JA25_HandleUpdateOfStrategicAi()
 {
-	UINT32 uiCurrentTime=0;
+/*	UINT32 uiCurrentTime=0;
 	INT8	bSectorToAttackID=-1;
 	INT8	bAttackDirection=-1;
 	INT8	bRandom=0;
 	INT16	sGridNo=-1;
-/*
+
 	if ( !gJa25AiSectorStruct )
 	{
 		return;
@@ -2302,9 +2368,9 @@ INT16 GetGridNoEnemyWillSeekWhenAttacking( INT8 bSaiSector )
 
 void Ja25SAI_DetermineWhichLevelToAttackFrom( INT16 sSaiSector, INT16 *psSector, INT8 *pbLevel )
 {
-	INT8	bLevel=0;
+/*	INT8	bLevel=0;
 	INT16 sSector=0;
-/*
+
 	switch( sSaiSector )
 	{
 		case JA25_K15_1:
@@ -2735,6 +2801,11 @@ void SetH11NumEnemiesInSector()
 			case DIF_LEVEL_HARD:
 				ubNumAdmins = 0 + Random( 0 );
 				ubNumTroops = 10 + Random( 4 );
+				ubNumElites = 4 + Random( 3 );
+				break;
+			case DIF_LEVEL_INSANE:
+				ubNumAdmins = 0 + Random( 0 );
+				ubNumTroops = 20 + Random( 4 );
 				ubNumElites = 4 + Random( 3 );
 				break;
 		}

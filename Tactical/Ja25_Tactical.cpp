@@ -896,14 +896,14 @@ BOOLEAN HandleNewGunComment( SOLDIERTYPE *pSoldier, INT32 iItemIndex, BOOLEAN fF
 		//if this is morris's note, handle it
 		HandlePickingUpMorrisInstructionNote( pSoldier, iItemIndex );
 	}
-
+	/*
 	//if the quote has already been said
 	if( HasNewGunQuoteBeenPlayedForThisGun( iItemIndex ) )
 	{
 		//get out
 		return( TRUE );
 	}
-
+	
 	//if we are not in tactical or map screen, 
 	if( guiCurrentScreen != GAME_SCREEN && guiCurrentScreen != MAP_SCREEN )
 	{
@@ -925,7 +925,7 @@ BOOLEAN HandleNewGunComment( SOLDIERTYPE *pSoldier, INT32 iItemIndex, BOOLEAN fF
 			pSoldier->usQuoteSaidFlags |= SOLDIER_QUOTE_SAID_FOUND_SOMETHING_NICE;
 		}
 	}
-
+*/
 	//if it is a new merc
 	if( fNewMerc )
 	{
@@ -935,14 +935,14 @@ BOOLEAN HandleNewGunComment( SOLDIERTYPE *pSoldier, INT32 iItemIndex, BOOLEAN fF
 			//say the new gun quote
 			TacticalCharacterDialogue( pSoldier, QUOTE_PRECEDENT_TO_REPEATING_ONESELF_RENEW );
 		}
-		else
-		{
+		//else
+		//{
 			//say the new gun quote
-			TacticalCharacterDialogue( pSoldier, QUOTE_HATE_MERC_1_ON_TEAM_WONT_RENEW );
-		}
+		//	TacticalCharacterDialogue( pSoldier, QUOTE_HATE_MERC_1_ON_TEAM_WONT_RENEW );
+		//}
 
 		//rememeber we have played the quote
-		SetNewGunQuoteToBePlayedForThisGun( iItemIndex );
+		//SetNewGunQuoteToBePlayedForThisGun( iItemIndex );
 	}
 	
 	return( TRUE );

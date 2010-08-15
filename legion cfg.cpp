@@ -327,6 +327,8 @@ void LoadGameLegionOptions()
 	gGameLegionOptions.ZAIKONA6 = iniReader.ReadBoolean("UB","BORDER_ITEM", TRUE);
 	
 	gGameLegionOptions.SF_UB = iniReader.ReadBoolean("UB","SF", FALSE);
+	
+	gGameLegionOptions.EnemyXML = iniReader.ReadBoolean("UB","EnemyXML", TRUE);
 	/* 
 	gGameLegionOptions.LAPTOPZAIKONA1	 		 = iniReader.ReadBoolean("UB","BUTTON_MAIL", TRUE);
 	gGameLegionOptions.LAPTOPZAIKONA2	 		 = iniReader.ReadBoolean("UB","BUTTON_WWW", TRUE);

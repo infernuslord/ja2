@@ -54,6 +54,9 @@
 	#include "debug control.h"
 #endif
 
+#include "Ja25_Tactical.h"
+#include "Ja25 Strategic Ai.h"
+
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -5533,6 +5536,9 @@ BOOLEAN PlaceObject( SOLDIERTYPE * pSoldier, INT8 bPos, OBJECTTYPE * pObj )
 			KeyTable[ (*pObj)[0]->data.key.ubKeyID ].usSectorFound = SECTOR( pSoldier->sSectorX, pSoldier->sSectorY );
 		}
 	}
+	
+	
+
 
     // Lesh: bugfix - replacing weapon in auto with another weapon w/o auto-mode
     if (bPos == HANDPOS && Item[ pObj->usItem ].usItemClass == IC_GUN)
@@ -5553,7 +5559,9 @@ BOOLEAN PlaceObject( SOLDIERTYPE * pSoldier, INT8 bPos, OBJECTTYPE * pObj )
     }
     // Lesh: end
 
-
+	//handle the placing up of a new ja25 gun
+	HandleNewGunComment( pSoldier, pObj->usItem, FALSE );
+	
 	pInSlot = &(pSoldier->inv[bPos]);
 
 	//we are placing an object, how we handle this depends on what is in the slot already

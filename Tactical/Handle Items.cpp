@@ -63,6 +63,9 @@
 	#include "Map Screen Interface Map Inventory.h"
 #endif
 
+#include "Ja25_Tactical.h"
+#include "Ja25 Strategic Ai.h"
+
 #define					NUM_ITEMS_LISTED			8
 #define					NUM_ITEM_FLASH_SLOTS	50
 #define					MIN_LOB_RANGE					6
@@ -1738,6 +1741,8 @@ void SoldierGetItemFromWorld( SOLDIERTYPE *pSoldier, INT32 iItemIndex, INT32 sGr
 	BOOLEAN					fDidSayCoolQuote = FALSE;
 	BOOLEAN		 fSaidBoobyTrapQuote = FALSE;
 
+	UINT16					usItem=0;
+
 	// OK. CHECK IF WE ARE DOING ALL IN THIS POOL....
 	if ( iItemIndex == ITEM_PICKUP_ACTION_ALL || iItemIndex == ITEM_PICKUP_SELECTION )
 	{
@@ -1928,6 +1933,14 @@ void SoldierGetItemFromWorld( SOLDIERTYPE *pSoldier, INT32 iItemIndex, INT32 sGr
 				fDidSayCoolQuote = TRUE;
 			}
 		}
+	}
+	
+	//JA25 ub
+	//if the item is valid
+	if( usItem != 0 )
+	{
+		//handle the picking up of a new ja25 gun
+		HandleNewGunComment( pSoldier, usItem, TRUE );
 	}
 
 	// Aknowledge....

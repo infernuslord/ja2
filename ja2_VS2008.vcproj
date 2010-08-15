@@ -489,6 +489,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Ja25Update.h"
+				>
+			</File>
+			<File
 				RelativePath="JA2Prototypes.h"
 				>
 			</File>
@@ -696,6 +700,10 @@
 			</File>
 			<File
 				RelativePath="JA2 Splash.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Ja25Update.cpp"
 				>
 			</File>
 			<File

@@ -43,6 +43,8 @@
 
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
+#include "Ja25Update.h"
+
 
 extern "C" {
 #include "lua.h"
@@ -106,6 +108,9 @@ static int l_GuaranteeAtLeastXItemsOfIndex(lua_State *L);
 
 static int l_gMercProfileGearset(lua_State *L);
 
+
+static int l_SetNumberJa25EnemiesInSurfaceSector(lua_State *L);
+
 using namespace std;
 
 void IniFunction(lua_State *L)
@@ -163,7 +168,8 @@ void IniFunction(lua_State *L)
 	lua_register(L, "GuaranteeAtLeastXItemsOfIndex", l_GuaranteeAtLeastXItemsOfIndex);	
 	
 	lua_register(L, "MercProfileSetBIGPOCK2POS", l_gMercProfileGearset);	
-
+	
+	lua_register(L, "SetNumberJa25EnemiesInSurfaceSector", l_SetNumberJa25EnemiesInSurfaceSector);	
 }
 
 
@@ -216,6 +222,31 @@ BOOLEAN LetLuaGameInit(UINT8 Init)
 	
 	return true;
 
+}
+
+
+static int l_SetNumberJa25EnemiesInSurfaceSector(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+
+int i;
+	UINT8	ubNumAdmins=0;
+	UINT8	ubNumTroops=0;
+	UINT8	ubNumElites=0;
+	
+INT16 sSectorX;
+INT16 sSectorY;
+	
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) sSectorX = lua_tointeger(L,i);
+		if (i == 2 ) sSectorY = lua_tointeger(L,i);
+		if (i == 3 ) ubNumAdmins = lua_tointeger(L,i);
+		if (i == 4 ) ubNumTroops = lua_tointeger(L,i);
+		if (i == 5 ) ubNumElites = lua_tointeger(L,i);
+	}	
+		SetNumberJa25EnemiesInSurfaceSector( SECTOR( sSectorX, sSectorY ), ubNumAdmins, ubNumTroops, ubNumElites );
+	return 0;
 }
 
 static int l_gMercProfileGearset(lua_State *L)

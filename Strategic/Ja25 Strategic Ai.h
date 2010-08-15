@@ -190,11 +190,12 @@ BOOLEAN ShouldEnemiesBeAddedToInitialSector();
 
 void InitJa25StrategicAi();
 
-void SetNumberJa25EnemiesInSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites );
+extern void SetNumberJa25EnemiesInSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites );
 
 void InitJa25SaveStruct();
 
 void InitJa25StrategicAiBloodcats( );
+extern void			SetNumberJa25EnemiesInSurfaceSector( INT32 iSectorID, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites );
 
 BOOLEAN SaveJa25SaveInfoToSaveGame( HWFILE hFile );
 BOOLEAN LoadJa25SaveInfoFromSavedGame( HWFILE hFile );
