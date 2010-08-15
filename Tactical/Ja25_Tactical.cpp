@@ -278,7 +278,7 @@ INT8	RandomProfileIdFromNewMercsOnPlayerTeam()
 	//Get the number and array of the new soldiers
 	bNumMercsPresent = GetNumSoldierIdAndProfileIdOfTheNewMercsOnPlayerTeam( NULL, ProfileIdArray );
 
-	//Assert( bNumMercsPresent < NUM_MERCS_WITH_NEW_QUOTES );
+	Assert( bNumMercsPresent < NUM_MERCS_WITH_NEW_QUOTES );
 
 	if( bNumMercsPresent != 0 )
 	{
@@ -300,7 +300,7 @@ INT8	RandomSoldierIdFromNewMercsOnPlayerTeam()
 	//Get the number and array of the new soldiers
 	bNumMercsPresent = GetNumSoldierIdAndProfileIdOfTheNewMercsOnPlayerTeam( SoldierIdArray, NULL );
 
-	//Assert( bNumMercsPresent < NUM_MERCS_WITH_NEW_QUOTES );
+	Assert( bNumMercsPresent < NUM_MERCS_WITH_NEW_QUOTES );
 
 	if( bNumMercsPresent != 0 )
 	{
@@ -329,7 +329,7 @@ INT8 RandomArrayOfQualifiedMercs( UINT8 *pRandomSoldierIdArray )
 	//Get the number and array of the new soldiers
 	bNumMercsPresent = GetNumSoldierIdAndProfileIdOfTheNewMercsOnPlayerTeam( SoldierIdArray, NULL );
 
-	//Assert( bNumMercsPresent < NUM_MERCS_WITH_NEW_QUOTES );
+	Assert( bNumMercsPresent < NUM_MERCS_WITH_NEW_QUOTES );
 
 	if( bNumMercsPresent != 0 )
 	{
@@ -1627,7 +1627,7 @@ void DisplayCommanderMorrisNote( SOLDIERTYPE *pSoldier )
 	{
 		gJa25SaveStruct.ubDisplayCommanderMorrisNote = DMN__DISPLAY_PART_1; 
 
-//		swprintf( zString, zNewTacticalMessages[ TCTL_MSG__END_GAME_POPUP_TXT_1 ], pSoldier->name );
+		swprintf( zString, zNewTacticalMessages[ TCTL_MSG__END_GAME_POPUP_TXT_1 ], pSoldier->name );
 	}
 
 	//if it si the second part of the note to be displayed
@@ -1635,7 +1635,7 @@ void DisplayCommanderMorrisNote( SOLDIERTYPE *pSoldier )
 	{
 		gJa25SaveStruct.ubDisplayCommanderMorrisNote = DMN__DISPLAY_PART_2; 
 
-//		swprintf( zString, zNewTacticalMessages[ TCTL_MSG__END_GAME_POPUP_TXT_2 ], pSoldier->name, pSoldier->name );
+		swprintf( zString, zNewTacticalMessages[ TCTL_MSG__END_GAME_POPUP_TXT_2 ], pSoldier->name, pSoldier->name );
 	}
 
 	//Display it
@@ -1758,22 +1758,23 @@ void HandleOpenControlPanelToRevealSwitchInMorrisArea()
 			gJa25SaveStruct.ubMorrisNoteState == MN__FINISHED )
 	{
 		STRUCTURE *		pStructure;
-		INT32					iItemIndex;
+		INT32			iItemIndex;
 		ITEM_POOL *		pItemPool;
 		
 
 		// first, find the switch item and turn off its trap level
-/*
+
 		if ( ItemTypeExistsAtLocation( 15231, SWITCH, 0, &iItemIndex ) )
 		{
-			gWorldItems[ iItemIndex ]->data.bTrap = 0;
+			//gWorldItems[ iItemIndex ]->data.bTrap = 0;
+			gWorldItems[ iItemIndex ].object[0]->data.bTrap;
 			GetItemPool( 15231, &pItemPool, 0 );
 			if ( pItemPool )
 			{
 				SetItemPoolVisibilityOn( pItemPool, ANY_VISIBILITY_VALUE, FALSE );
 			}
 		}
-*/
+
 		//Open up the Control Panel so the switch is visibile
 		pStructure = FindStructure( 15231, STRUCTURE_GENERIC );
 		if( pStructure == NULL )

@@ -3161,6 +3161,130 @@ UINT8 GetLocationModifier( UINT8 ubSoldierClass )
 	fSuccess = GetCurrentBattleSectorXYZ( &sSectorX, &sSectorY, &sSectorZ );
 	Assert( fSuccess );
 
+	//Ja25 UB
+	//switch on the sector, to determine modifer
+	//the modifier is based between 0 and 40.  40 being the "hardest"
+	switch( SECTOR( sSectorX, sSectorY ) )
+	{
+		//Starting sector
+		case SEC_H7:
+			ubLocationModifier = 4;
+			break;
+
+		//First sector that has enemies in it
+		case SEC_H8:
+			ubLocationModifier = 8;
+			break;
+
+		//Guard Post
+		case SEC_H9:
+			ubLocationModifier = 14;
+			break;
+
+		// The 2 "empty" sectors before the town ( north and west of town )
+		case SEC_H10:
+		case SEC_I9:
+			ubLocationModifier = 12;
+			break;
+
+		//the town of varrez
+		case SEC_I10:
+			ubLocationModifier = 16;
+			break;
+		case SEC_I11:
+			ubLocationModifier = 19;
+			break;
+
+
+		// The 2 "empty" sectors after the town ( east and south of town )
+		case SEC_I12:
+		case SEC_J11:
+			ubLocationModifier = 22;
+			break;
+
+		//The abandoned mine
+		case SEC_I13:
+			ubLocationModifier = 22;
+			break;
+
+		//"empty field" that player can take to avoid going through the mine
+		case SEC_J12:
+			ubLocationModifier = 22;
+			break;
+
+		//The power Generator facility
+		case SEC_J13:
+			{
+				//the top floor
+				switch( sSectorZ )
+				{
+					//Main floor
+					case 0:
+						ubLocationModifier = 26;
+						break;
+
+					//Basement level
+					case 1:
+						ubLocationModifier = 15;
+						break;
+					default:
+						Assert( 0 );
+						break;
+				}
+			}
+			break;
+
+		//tunnel levels, no enemies
+		case SEC_J14:
+		case SEC_K14:
+			ubLocationModifier = 35;
+			break;
+
+		case SEC_K15:
+		{
+				//the top floor
+				switch( sSectorZ )
+				{
+					//Main floor
+					case 0:
+						ubLocationModifier = 30;
+						break;
+
+					//Basement level
+					case 1:
+						ubLocationModifier = 28;
+						break;
+					case 2:
+						ubLocationModifier = 35;
+						break;
+
+					default:
+						Assert( 0 );
+						break;
+				}
+		}
+		break;
+		case SEC_L15:
+		{
+				//the top floor
+				switch( sSectorZ )
+				{
+					//Basement level
+					case 2:
+						ubLocationModifier = 40;
+						break;
+					case 3:
+						ubLocationModifier = 40;
+						break;
+
+					default:
+						Assert( 0 );
+						break;
+				}
+		}
+		break;
+	}
+/*	
 	// ignore sSectorZ - treat any underground enemies as if they were on the surface!
 	bTownId = GetTownIdForSector( sSectorX, sSectorY );
 
@@ -3190,7 +3314,7 @@ UINT8 GetLocationModifier( UINT8 ubSoldierClass )
 
 	// adjust for distance from Queen's palace (P3) (0 to +30)
 	ubLocationModifier = ( ( MAX_PALACE_DISTANCE - ubPalaceDistance ) * DIFF_FACTOR_PALACE_DISTANCE ) / MAX_PALACE_DISTANCE;
-
+*/
 	return( ubLocationModifier );
 }
 

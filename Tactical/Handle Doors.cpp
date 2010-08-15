@@ -39,10 +39,20 @@
 #include "fresh_header.h"
 #include "connect.h"
 
+#include "Explosion Control.h"
+#include "Ja25_Tactical.h"
+#include "Ja25 Strategic Ai.h"
+#include "MapScreen Quotes.h"
+#include "email.h"
+#include "interface Dialogue.h"
+#include "mercs.h"
+#include "legion cfg.h"
+
 BOOLEAN gfSetPerceivedDoorState = FALSE;
 
 
 BOOLEAN HandleDoorsOpenClose( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE * pStructure, BOOLEAN fNoAnimations );
+void HandleForceingTheTunnelGate( INT16 sGridNo ); //Ja25 UB
 
 void HandleDoorChangeFromGridNo( SOLDIERTYPE *pSoldier, INT32 sGridNo, BOOLEAN fNoAnimations )
 {
@@ -599,6 +609,11 @@ BOOLEAN HandleOpenableStruct( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE *p
 								// it's locked....
 								pSoldier->ChangeSoldierState( GetAnimStateForInteraction( pSoldier, fDoor, END_OPEN_LOCKED_DOOR ), 0, FALSE );
 
+								//JA25 UB
+								//If this is the tunnel sector, and the merc failed opening the fence door, play a quote
+								HandlePlayerSayingQuoteWhenFailingToOpenGateInTunnel( pSoldier, FALSE );
+								
+								
 								// Do we have a quote for locked stuff?
 								// Now just show on message bar
 								if ( !AM_AN_EPC( pSoldier ) )
@@ -636,20 +651,30 @@ BOOLEAN HandleOpenableStruct( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE *p
 						}
 						else
 						{
-							// Attempt to force door
-							if ( AttemptToSmashDoor( pSoldier, pDoor ) )
+							//JA25 UB
+							//If this is the tunnel sector, and the merc failed opening the fence door, play a quote
+							if( HandlePlayerSayingQuoteWhenFailingToOpenGateInTunnel( pSoldier, TRUE ) )
 							{
-								//ScreenMsg( MSG_FONT_YELLOW, MSG_INTERFACE, TacticalStr[ DOOR_LOCK_DESTROYED_STR ] );
-								// pSoldier->DoMercBattleSound( BATTLE_SOUND_COOL1 );
-								fHandleDoor = TRUE;
 							}
 							else
 							{
+								// Attempt to force door
+								if ( AttemptToSmashDoor( pSoldier, pDoor ) )
+								{
+									//ScreenMsg( MSG_FONT_YELLOW, MSG_INTERFACE, TacticalStr[ DOOR_LOCK_DESTROYED_STR ] );
+									// pSoldier->DoMercBattleSound( BATTLE_SOUND_COOL1 );
+									fHandleDoor = TRUE;
+								}
+								else
+								{
 								//ScreenMsg( MSG_FONT_YELLOW, MSG_INTERFACE, TacticalStr[ DOOR_LOCK_NOT_DESTROYED_STR ] );
-								UpdateDoorPerceivedValue( pDoor );
+									UpdateDoorPerceivedValue( pDoor );
+								}
+								ProcessImplicationsOfPCMessingWithDoor( pSoldier );
 							}
-							ProcessImplicationsOfPCMessingWithDoor( pSoldier );
 						}
+						//Handle Special code for the gate in the tunnel
+						HandleForceingTheTunnelGate( sGridNo ); //JA25 UB
 						break;
 
 
@@ -735,6 +760,9 @@ BOOLEAN HandleOpenableStruct( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE *p
 							}
 							else
 							{
+								//If this is the tunnel sector, and the merc failed opening the fence door, play a quote
+								HandlePlayerSayingQuoteWhenFailingToOpenGateInTunnel( pSoldier, FALSE );
+
 								//ScreenMsg( MSG_FONT_YELLOW, MSG_INTERFACE, TacticalStr[ DOOR_LOCK_HAS_NOT_BEEN_PICKED_STR ] );
 							}
 							ProcessImplicationsOfPCMessingWithDoor( pSoldier );
@@ -758,6 +786,10 @@ BOOLEAN HandleOpenableStruct( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE *p
 						}
 						else
 						{
+						
+							//If this is the tunnel sector, and the merc failed opening the fence door, play a quote
+							HandlePlayerSayingQuoteWhenFailingToOpenGateInTunnel( pSoldier, FALSE ); //JA25 UB
+
 							if ( ExamineDoorForTraps( pSoldier, pDoor ) )
 							{
 								// We have a trap. Use door pointer to determine what type, etc
@@ -821,10 +853,15 @@ BOOLEAN HandleOpenableStruct( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE *p
 								// Now just show on message bar
 								//ScreenMsg( MSG_FONT_YELLOW, MSG_INTERFACE, TacticalStr[ DOOR_NOT_PROPER_KEY_STR ], pSoldier->name );
 
-								// OK PLay damn battle sound
-								if ( Random( 2 ) )
+								
+								//If this is the tunnel sector, and the merc failed opening the fence door, play a quote
+								if( HandlePlayerSayingQuoteWhenFailingToOpenGateInTunnel( pSoldier, FALSE ) ) //JA25 UB
 								{
-									pSoldier->DoMercBattleSound( BATTLE_SOUND_CURSE1 );
+									// OK PLay damn battle sound
+									if ( Random( 2 ) )
+									{
+										pSoldier->DoMercBattleSound( BATTLE_SOUND_CURSE1 );
+									}
 								}
 							}
 						}
@@ -1482,4 +1519,24 @@ void SetDoorString( INT32 sGridNo )
 #endif
 	}
 
+}
+
+
+//Ja25 UB
+void HandleForceingTheTunnelGate( INT16 sGridNo )
+{
+	//if this isnt the Last sector of the tunnel
+	if( !( gWorldSectorX == 14 && gWorldSectorY == MAP_ROW_K && gbWorldSectorZ == 1 ) )
+	{
+		return;
+	}
+
+	//if it is not the right gridno
+	if( sGridNo != 4742 )
+	{
+		return;
+	}
+
+	//If the player blew up the fan, then the enemies can hear it in the tunnel and prepare for it.
+	gJa25SaveStruct.uiJa25GeneralFlags |= JA_GF__DID_PLAYER_MAKE_SOUND_GOING_THROUGH_TUNNEL_GATE;
 }

@@ -113,6 +113,7 @@
 #include "SaveLoadGame.h"
 #include "Campaign.h"
 #include "Strategic Status.h"
+#include "legion cfg.h"
 //** Defines *******************************************************************
 
 #define		JA25_SECTOR_H7_INITIAL_ATTACK													( 7 * 60 + 10 )
@@ -255,9 +256,11 @@ void InitJa25StrategicAi()
 
 
 	//add event at 7:03
-	AddSameDayStrategicEvent( EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE, JA25_SECTOR_H7_INITIAL_ATTACK, 0 );
-    
-    AddEveryDayStrategicEventUsingSeconds(EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE,JA25_SECTOR_H7_INITIAL_ATTACK * 60,0);
+	if ( gGameLegionOptions.EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE_UB == TRUE )
+	{
+		AddSameDayStrategicEvent( EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE, JA25_SECTOR_H7_INITIAL_ATTACK, 0 );
+		AddEveryDayStrategicEventUsingSeconds(EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE,JA25_SECTOR_H7_INITIAL_ATTACK * 60,0);
+	}
 
 	//Init the underground sectors ( add them to the list of under ground )
 	InitJa25UnderGroundSectors();

@@ -37,6 +37,15 @@
 	#include "Tactical Save.h"
 #endif
 
+#include "Explosion Control.h"
+#include "Ja25_Tactical.h"
+#include "Ja25 Strategic Ai.h"
+#include "MapScreen Quotes.h"
+#include "email.h"
+#include "interface Dialogue.h"
+#include "mercs.h"
+#include "legion cfg.h"
+
 #include "email.h"
 
 
@@ -1298,6 +1307,10 @@ void HandleUnhiredMercDeaths( INT32 iProfileID )
 // returns a number between 0-100, this is an estimate of how far a player has progressed through the game
 UINT8 CurrentPlayerProgressPercentage(void)
 {
+
+	INT8	bFurthestSectorPlayerOwns=-1; //JA25 UB
+	UINT8 ubCurrentProgress;
+	
 	UINT32 uiCurrentIncome;
 	UINT32 uiPossibleIncome;
 	UINT16 usCurrentProgress;
@@ -1315,8 +1328,130 @@ UINT8 CurrentPlayerProgressPercentage(void)
 	UINT16 usMaxIncomeProgress;
 	UINT16 usMaxControlProgress;
 	UINT16 usMaxVisitProgress;
+	
+	
+	//Get the furthest sector the player owns
+	bFurthestSectorPlayerOwns = GetTheFurthestSectorPlayerOwns();
+	
+	switch( bFurthestSectorPlayerOwns )
+	{
+		//initial sector
+		case JA25_H7:
+			ubCurrentProgress = 44;
+			break;
+
+		case JA25_H8:
+			ubCurrentProgress = 45;
+			break;
+
+		//guard post
+		case JA25_H9:
+			ubCurrentProgress = 55;
+			break;
+
+		//field
+		case JA25_H10:
+			ubCurrentProgress = 58;
+			break;
+
+		//field
+		case JA25_I9:
+			ubCurrentProgress = 60;
+			break;
+
+		//first part of town
+		case JA25_I10:
+			ubCurrentProgress = 63;
+			break;
+
+		//second part of town
+		case JA25_I11:
+			ubCurrentProgress = 65;
+			break;
+
+		//field
+		case JA25_I12:
+			ubCurrentProgress = 68;
+			break;
+
+		//Abondoned mine
+		case JA25_I13:
+			ubCurrentProgress = 70;
+			break;
+
+		// cave under abondoned mine
+		case JA25_I13_1:
+			ubCurrentProgress = 72;
+			break;
+
+		//field
+		case JA25_J11:
+			ubCurrentProgress = 70;
+			break;
+
+		//field
+		case JA25_J12:
+			ubCurrentProgress = 70;
+			break;
+
+		//power gen plant
+		case JA25_J13:
+			ubCurrentProgress = 75;
+			break;
+
+			//power gen plant, sub level
+		case JA25_J13_1:
+			ubCurrentProgress = 75;
+			break;
+
+		//first part of tunnel
+		case JA25_J14_1:
+			ubCurrentProgress = 80;
+			break;
+
+		//second part of tunnel
+		case JA25_K14_1:
+			ubCurrentProgress = 82;
+			break;
+
+		//ground level of complex
+		case JA25_K15:
+			ubCurrentProgress = 90;
+			break;
+
+		//initial sector of complex
+		case JA25_K15_1:
+			ubCurrentProgress = 85;
+			break;
+
+		// 2nd level down of complex
+		case JA25_K15_2:
+			ubCurrentProgress = 95;
+			break;
+
+		//2nd last sector
+		case JA25_L15_2:
+			ubCurrentProgress = 98;
+			break;
+
+		//last sector
+		case JA25_L15_3:
+			ubCurrentProgress = 100;
+			break;
+
+		default:
+
+			// OK, use percentage complete from map...
+			//Assert( 0 );
+			//ubCurrentProgress = SectorInfo[ bFurthestSectorPlayerOwns ].ubCurrentProgressValue;
+			ubCurrentProgress = 50;
+			break;
+	}
+
+	return(ubCurrentProgress);
 
 
+/*
 	if( gfEditMode )
 		return 0;
 
@@ -1458,6 +1593,8 @@ UINT8 CurrentPlayerProgressPercentage(void)
 	usCurrentProgress = __max(gGameExternalOptions.ubGameProgressMinimum, __max(0, usCurrentProgress));
 
 	return((UINT8)usCurrentProgress);
+	
+	*/
 }
 
 UINT8 HighestPlayerProgressPercentage(void)

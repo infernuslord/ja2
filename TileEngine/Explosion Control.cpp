@@ -78,6 +78,7 @@
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
 #include "Dialogue Control.h"
+#include "legion cfg.h"
 
 
 //forward declarations of common classes to eliminate includes
@@ -4098,7 +4099,11 @@ void HandleDestructionOfPowerGenFan()
 
 	//Since the player is making LOTS of noise, add more enemies to the tunnel sector
 //	AddEnemiesToJa25TunnelMaps();
-	HandleAddingEnemiesToTunnelMaps();
+
+	if ( gGameLegionOptions.HandleAddingEnemiesToTunnelMaps_UB == TRUE )
+        {
+        	HandleAddingEnemiesToTunnelMaps();
+	}
 
 	//Make sure to apply these changes to the map
 	ApplyMapChangesToMapTempFile( TRUE );

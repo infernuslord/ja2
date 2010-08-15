@@ -63,6 +63,15 @@
 
 #include "InterfaceItemImages.h"
 
+#include "Explosion Control.h"
+#include "Ja25_Tactical.h"
+#include "Ja25 Strategic Ai.h"
+#include "MapScreen Quotes.h"
+#include "email.h"
+#include "interface Dialogue.h"
+#include "mercs.h"
+#include "legion cfg.h"
+
 #include "connect.h"
 //const UINT32 INTERFACE_START_X			= 0;
 //const UINT32 INTERFACE_START_Y			= ( SCREEN_HEIGHT - INTERFACE_HEIGHT );
@@ -2816,31 +2825,45 @@ void BtnDoorMenuCallback(GUI_BUTTON *btn,INT32 reason)
 		{
 			// OK, set cancle code!
 			gOpenDoorMenu.fMenuHandled = 2;
+			
+			//Handle someone trying to open the door in the tunnel gate`
+			HandlePlayerSayingQuoteWhenFailingToOpenGateInTunnel( gOpenDoorMenu.pSoldier, FALSE ); //Ja25 UB
+
 		}
 
 		// Switch on command....
 		if ( uiBtnID == iActionIcons[ OPEN_DOOR_ICON ] )
 		{
-			// Open door normally...
-			// Check APs
-			if ( EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_OPEN_DOOR], APBPConstants[BP_OPEN_DOOR], FALSE ) )
+		
+			//Handle someone trying to open the door in the tunnel gate`
+			if( HandlePlayerSayingQuoteWhenFailingToOpenGateInTunnel( gOpenDoorMenu.pSoldier, TRUE ) ) //Ja25 UB
 			{
-				// Set UI
-				SetUIBusy( (UINT8)gOpenDoorMenu.pSoldier->ubID );
-
-				if ( gOpenDoorMenu.fClosingDoor )
-				{
-					gOpenDoorMenu.pSoldier->ChangeSoldierState( GetAnimStateForInteraction( gOpenDoorMenu.pSoldier, TRUE, CLOSE_DOOR ), 0 , FALSE );
-				}
-				else
-				{
-					InteractWithClosedDoor( gOpenDoorMenu.pSoldier, HANDLE_DOOR_OPEN );
-				}
+				// OK, set cancle code!
+				gOpenDoorMenu.fMenuHandled = 2;
 			}
 			else
 			{
-				// OK, set cancel code!
-				gOpenDoorMenu.fMenuHandled = 2;
+				// Open door normally...
+				// Check APs
+				if ( EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_OPEN_DOOR], APBPConstants[BP_OPEN_DOOR], FALSE ) )
+				{
+				// Set UI
+					SetUIBusy( (UINT8)gOpenDoorMenu.pSoldier->ubID );
+
+					if ( gOpenDoorMenu.fClosingDoor )
+					{
+						gOpenDoorMenu.pSoldier->ChangeSoldierState( GetAnimStateForInteraction( gOpenDoorMenu.pSoldier, TRUE, CLOSE_DOOR ), 0 , FALSE );
+					}
+					else
+					{
+						InteractWithClosedDoor( gOpenDoorMenu.pSoldier, HANDLE_DOOR_OPEN );
+					}
+				}
+				else
+				{
+					// OK, set cancel code!
+					gOpenDoorMenu.fMenuHandled = 2;
+				}
 			}
 		}
 
@@ -2914,18 +2937,27 @@ void BtnDoorMenuCallback(GUI_BUTTON *btn,INT32 reason)
 
 		if ( uiBtnID == iActionIcons[ EXPLOSIVE_DOOR_ICON ] )
 		{
-			// Explode
-			if ( EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_EXPLODE_DOOR], APBPConstants[BP_EXPLODE_DOOR], FALSE ) )
-			{
-				// Set UI
-				SetUIBusy( (UINT8)gOpenDoorMenu.pSoldier->ubID );
-
-				InteractWithClosedDoor( gOpenDoorMenu.pSoldier, HANDLE_DOOR_EXPLODE );
-			}
-			else
+			//Handle someone trying to open the door in the tunnel gate`
+			if( HandlePlayerSayingQuoteWhenFailingToOpenGateInTunnel( gOpenDoorMenu.pSoldier, TRUE ) ) //Ja25 UB
 			{
 				// OK, set cancle code!
 				gOpenDoorMenu.fMenuHandled = 2;
+			}
+			else
+			{
+					// Explode
+				if ( EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_EXPLODE_DOOR], APBPConstants[BP_EXPLODE_DOOR], FALSE ) )
+				{
+					// Set UI
+					SetUIBusy( (UINT8)gOpenDoorMenu.pSoldier->ubID );
+
+					InteractWithClosedDoor( gOpenDoorMenu.pSoldier, HANDLE_DOOR_EXPLODE );
+				}
+				else
+				{
+					// OK, set cancle code!
+					gOpenDoorMenu.fMenuHandled = 2;
+				}
 			}
 		}
 
@@ -2948,18 +2980,28 @@ void BtnDoorMenuCallback(GUI_BUTTON *btn,INT32 reason)
 
 		if ( uiBtnID == iActionIcons[ USE_CROWBAR_ICON ] )
 		{
-			// Explode
-			if ( EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_USE_CROWBAR], APBPConstants[BP_USE_CROWBAR], FALSE ) )
-			{
-				// Set UI
-				SetUIBusy( (UINT8)gOpenDoorMenu.pSoldier->ubID );
-
-				InteractWithClosedDoor( gOpenDoorMenu.pSoldier, HANDLE_DOOR_CROWBAR );
-			}
-			else
+		
+			//Handle someone trying to open the door in the tunnel gate`
+			if( HandlePlayerSayingQuoteWhenFailingToOpenGateInTunnel( gOpenDoorMenu.pSoldier, TRUE ) ) //JA25 UB
 			{
 				// OK, set cancle code!
 				gOpenDoorMenu.fMenuHandled = 2;
+			}
+			else
+			{
+				// Explode
+				if ( EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_USE_CROWBAR], APBPConstants[BP_USE_CROWBAR], FALSE ) )
+				{
+					// Set UI
+					SetUIBusy( (UINT8)gOpenDoorMenu.pSoldier->ubID );
+
+					InteractWithClosedDoor( gOpenDoorMenu.pSoldier, HANDLE_DOOR_CROWBAR );
+				}
+				else
+				{
+					// OK, set cancle code!
+					gOpenDoorMenu.fMenuHandled = 2;
+				}
 			}
 		}
 

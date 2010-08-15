@@ -71,6 +71,16 @@ class SOLDIERTYPE;
 // HEADROCK HAM 3.5: Include Facility data
 #include "Facilities.h"
 
+
+#include "Explosion Control.h"
+#include "Ja25_Tactical.h"
+#include "Ja25 Strategic Ai.h"
+#include "MapScreen Quotes.h"
+#include "email.h"
+#include "interface Dialogue.h"
+#include "mercs.h"
+#include "legion cfg.h"
+
 // various reason an assignment can be aborted before completion
 enum{
 	NO_MORE_MED_KITS = 40,
@@ -500,6 +510,9 @@ SOLDIERTYPE *GetSelectedAssignSoldier( BOOLEAN fNullOK );
 BOOLEAN RepairObject( SOLDIERTYPE * pSoldier, SOLDIERTYPE * pOwner, OBJECTTYPE * pObj, UINT8 * pubRepairPtsLeft );
 void RepairItemsOnOthers( SOLDIERTYPE *pSoldier, UINT8 *pubRepairPtsLeft );
 BOOLEAN UnjamGunsOnSoldier( SOLDIERTYPE *pOwnerSoldier, SOLDIERTYPE *pRepairSoldier, UINT8 *pubRepairPtsLeft );
+
+void HaveMercSayWhyHeWontLeave( SOLDIERTYPE *pSoldier ); //Ja25 UB
+BOOLEAN CanMercBeAllowedToLeaveTeam( SOLDIERTYPE *pSoldier ); //JA25 UB
 
 /* No point in allowing SAM site repair any more.	Jan/13/99.	ARM
 BOOLEAN IsTheSAMSiteInSectorRepairable( INT16 sSectorX, INT16 sSectorY, INT16 sSectorZ );
@@ -7450,6 +7463,15 @@ void BeginRemoveMercFromContract( SOLDIERTYPE *pSoldier )
 	// This function will setup the quote, then start dialogue beginning the actual leave sequence
 	if( ( pSoldier->stats.bLife > 0 ) && ( pSoldier->bAssignment != ASSIGNMENT_POW ) )
 	{
+	
+		//Ja25 UB
+		//if the merc cant leave
+		if( !CanMercBeAllowedToLeaveTeam( pSoldier ) )
+		{
+			HaveMercSayWhyHeWontLeave( pSoldier );
+			return;
+		}
+		
 		if( ( pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__MERC ) || ( pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__NPC ) )
 		{
 			HandleImportantMercQuote( pSoldier,	QUOTE_RESPONSE_TO_MIGUEL_SLASH_QUOTE_MERC_OR_RPC_LETGO );
@@ -15326,4 +15348,37 @@ void HandleShadingOfLinesForFacilityAssignmentMenu( void )
 		}
 	}
 	return;
+}
+
+
+//Ja25 UB
+
+BOOLEAN CanMercBeAllowedToLeaveTeam( SOLDIERTYPE *pSoldier )
+{
+/*
+	//if we are in sector... J14_1 && K14_1
+	if( gWorldSectorX == 14 && gWorldSectorY == MAP_ROW_J && gbWorldSectorZ == 1 ||	
+			gWorldSectorX == 14 && gWorldSectorY == MAP_ROW_K && gbWorldSectorZ == 1 )
+*/
+	//if we are in, or passed the tunnels
+	if( pSoldier->sSectorX >= 14 )
+	{
+		//dont allow anyone to leave
+		return( FALSE );
+	}
+
+	return( TRUE );
+}
+
+void HaveMercSayWhyHeWontLeave( SOLDIERTYPE *pSoldier )
+{
+	//if the merc is qualified
+	if( IsSoldierQualifiedMerc( pSoldier ) )
+	{
+		TacticalCharacterDialogue( pSoldier, QUOTE_ANSWERING_MACHINE_MSG );
+	}
+	else
+	{
+		TacticalCharacterDialogue( pSoldier, QUOTE_REFUSING_ORDER );
+	}
 }

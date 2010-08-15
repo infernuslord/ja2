@@ -329,6 +329,10 @@ void LoadGameLegionOptions()
 	gGameLegionOptions.SF_UB = iniReader.ReadBoolean("UB","SF", FALSE);
 	
 	gGameLegionOptions.EnemyXML = iniReader.ReadBoolean("UB","EnemyXML", TRUE);
+	
+	gGameLegionOptions.EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE_UB = iniReader.ReadBoolean("UB","EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE", TRUE);
+	gGameLegionOptions.HandleAddingEnemiesToTunnelMaps_UB = iniReader.ReadBoolean("UB","HANDLE_ADDING_ENEMIES_TO_TUNNEL_MAPS", TRUE);
+
 	/* 
 	gGameLegionOptions.LAPTOPZAIKONA1	 		 = iniReader.ReadBoolean("UB","BUTTON_MAIL", TRUE);
 	gGameLegionOptions.LAPTOPZAIKONA2	 		 = iniReader.ReadBoolean("UB","BUTTON_WWW", TRUE);

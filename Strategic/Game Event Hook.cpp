@@ -56,6 +56,7 @@
 #include "email.h"
 #include "interface Dialogue.h"
 #include "mercs.h"
+#include "legion cfg.h"
 
 #ifdef JA2BETAVERSION
 extern BOOLEAN gfMercsNeverQuit;
@@ -455,8 +456,12 @@ Ja25 No meanwhiles
 			gPostalService.DeliverShipment(pEvent->uiParam);
 			break;
 			
+		//Ja25 UB	
 		case EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE:
+			if ( gGameLegionOptions.EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE_UB == TRUE )
+			{
 			ShouldEnemiesBeAddedToInitialSector();
+			}
 			break;
 
 		case EVENT_SAY_DELAYED_MERC_QUOTE:
