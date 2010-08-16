@@ -333,6 +333,11 @@ void LoadGameLegionOptions()
 	gGameLegionOptions.EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE_UB = iniReader.ReadBoolean("UB","EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE", TRUE);
 	gGameLegionOptions.HandleAddingEnemiesToTunnelMaps_UB = iniReader.ReadBoolean("UB","HANDLE_ADDING_ENEMIES_TO_TUNNEL_MAPS", TRUE);
 
+	gGameLegionOptions.AUTO_RESOLVE_UB = iniReader.ReadBoolean("UB","AUTO_RESOLVE", FALSE);
+	
+//	gGameLegionOptions.BobbyRayInventory_UB = iniReader.ReadBoolean("UB","INIT_BOBBYRAY_INVENTORY", FALSE);
+//	gGameLegionOptions.InitTownLoyalty_UB = iniReader.ReadBoolean("UB","INIT_TOWN_LOYALTY", FALSE);
+
 	/* 
 	gGameLegionOptions.LAPTOPZAIKONA1	 		 = iniReader.ReadBoolean("UB","BUTTON_MAIL", TRUE);
 	gGameLegionOptions.LAPTOPZAIKONA2	 		 = iniReader.ReadBoolean("UB","BUTTON_WWW", TRUE);

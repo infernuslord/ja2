@@ -246,7 +246,7 @@ void ShutDownQuoteBox( BOOLEAN fForce )
 	gCivQuoteData.iDialogueBox = -1;
 
 		gCivQuoteData.bActive = FALSE;
-
+/*
 		// do we need to do anything at the end of the civ quote?
 		if ( gCivQuoteData.pCiv && gCivQuoteData.pCiv->aiData.bAction == AI_ACTION_OFFER_SURRENDER )
 		{
@@ -261,6 +261,7 @@ void ShutDownQuoteBox( BOOLEAN fForce )
 				ActionDone( gCivQuoteData.pCiv );
 			}
 		}
+*/
 	}
 }
 

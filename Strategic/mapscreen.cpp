@@ -118,6 +118,11 @@
 #include "connect.h" //hayden
 #include "fresh_header.h"
 #include "InterfaceItemImages.h"
+
+#include "Strategic Movement.h"
+
+
+//#include "Strategic Movement Costs.h"
 // DEFINES
 
 #include "Ja25 Strategic Ai.h"
@@ -5100,6 +5105,14 @@ UINT32 MapScreenHandle(void)
 			return( MAP_SCREEN );
 		}
 	}
+	
+	//Ja25 UB
+	//if ( gfProcessCustomMaps )
+	//{
+		//MakeBadSectorListFromMapsOnHardDrive( TRUE );
+
+	//	gfProcessCustomMaps = FALSE;
+	//}
 
 
 	// check to see if we need to rebuild the characterlist for map screen
@@ -7316,7 +7329,15 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 						CopySectorInventoryToInventoryPoolQ(0);
 						break;
 					}
-					RequestContractMenu();
+					//Ja25 UB
+					//if ( fAlt )
+					//{
+					//	MakeBadSectorListFromMapsOnHardDrive( TRUE );
+					//}
+					//else
+					//{
+						RequestContractMenu();
+					//}
 					break;
 
 				case 'd':
@@ -7566,6 +7587,28 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 					}
 					break;
 				case 'm':
+					//JA25 UB
+					// only handle border button keyboard equivalents if the button is visible!
+					/*if ( fAlt )
+					{
+						INT16 sMapX, sMapY;
+
+						// Get sector that is hilighted...
+						if ( GetMouseMapXY(&sMapX, &sMapY) )
+						{
+							AddCustomMap( sMapY, sMapX, TRUE, TRUE );
+							UpdateCustomMapMovementCosts();
+						}
+					}
+					else
+					{
+						if ( !fShowMapInventoryPool )
+						{
+							// toggle show mines flag
+							ToggleShowMinesMode();
+						}
+					}
+					*/
 					// only handle border button keyboard equivalents if the button is visible!
 					if ( !fShowMapInventoryPool )
 					{

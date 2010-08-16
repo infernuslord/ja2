@@ -119,6 +119,7 @@
 #include "Ja25_Tactical.h"
 #include "Timer Control.h"
 #include "Soldier Control.h"
+#include "Ja25Update.h"
 
 #include "Map Screen Interface Bottom.h"
 
@@ -4422,7 +4423,7 @@ void SetupNewStrategicGame( )
 	
 	//Ja25
 	// Make the initial sector free of enemies
-//	StrategicMap[ CALCULATE_STRATEGIC_INDEX( 8,7 /*JA2_5_START_SECTOR_X, JA2_5_START_SECTOR_Y */) ].fEnemyControlled = FALSE;
+	StrategicMap[ CALCULATE_STRATEGIC_INDEX( JA2_5_START_SECTOR_X, JA2_5_START_SECTOR_Y ) ].fEnemyControlled = FALSE;
 
 
 	//Initialize the game time

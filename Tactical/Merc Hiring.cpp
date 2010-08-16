@@ -67,6 +67,7 @@
 #include "Campaign Types.h"
 #include "MapScreen Quotes.h"
 #include "opplist.h"
+#include "Ja25Update.h"
 
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -901,8 +902,8 @@ void InitJerryMiloInfo()
 {
   //  return; //AA
 	//Set Jerry Milo's Gridno h7
-	gMercProfiles[ 76 ].sSectorX = 7;
-	gMercProfiles[ 76 ].sSectorY = 8;
+	gMercProfiles[ 76 ].sSectorX = JA2_5_START_SECTOR_X;
+	gMercProfiles[ 76 ].sSectorY = JA2_5_START_SECTOR_Y;
 	gMercProfiles[ 76 ].bSectorZ = 0;
 
 	gMercProfiles[ 76 ].sGridNo = 15109;

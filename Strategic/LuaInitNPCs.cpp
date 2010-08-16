@@ -110,6 +110,7 @@ static int l_gMercProfileGearset(lua_State *L);
 
 
 static int l_SetNumberJa25EnemiesInSurfaceSector(lua_State *L);
+static int l_SetNumberOfJa25BloodCatsInSector(lua_State *L);
 
 using namespace std;
 
@@ -170,6 +171,9 @@ void IniFunction(lua_State *L)
 	lua_register(L, "MercProfileSetBIGPOCK2POS", l_gMercProfileGearset);	
 	
 	lua_register(L, "SetNumberJa25EnemiesInSurfaceSector", l_SetNumberJa25EnemiesInSurfaceSector);	
+	
+	lua_register(L, "SetNumberOfJa25BloodCatsInSector", l_SetNumberOfJa25BloodCatsInSector);		
+	
 }
 
 
@@ -222,6 +226,73 @@ BOOLEAN LetLuaGameInit(UINT8 Init)
 	
 	return true;
 
+}
+
+BOOLEAN LuaInitStrategicLayer(UINT8 Init)
+{
+	char * filename = "scripts\\InitStrategicLayer.lua";
+	UINT32 size, bytesRead;
+	char* buffer;
+
+	HWFILE file = FileOpen(filename, FILE_ACCESS_READ, FALSE);
+
+	if (!file)
+		return false;
+
+	size = FileSize(filename);
+	buffer = new char[size+1];
+	buffer[size] = 0;
+	FileRead(file, buffer, size, &bytesRead);
+	FileClose(file);
+
+	lua_State *L = lua_open();
+	luaL_openlibs(L);
+
+	IniFunction(L);
+	IniGlobalGameSetting(L);
+	
+	if (luaL_dostring(L, buffer))
+	{
+		// oh noes, error
+		// TODO: write to log or something
+		return false;
+	}
+	
+	if ( Init == 0 )
+	{
+		lua_getglobal(L , "InitStrategicLayer");
+		lua_call(L,0,0); 
+	}
+	
+	lua_close(L);
+
+	delete[] buffer;
+	
+	
+	return true;
+
+}
+
+static int l_SetNumberOfJa25BloodCatsInSector(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+int i;
+INT8	bNumBloodCats=0;
+INT8	bBloodCatPlacements=0;	
+INT16 sSectorX;
+INT16 sSectorY;
+	
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) sSectorX = lua_tointeger(L,i);
+		if (i == 2 ) sSectorY = lua_tointeger(L,i);
+		if (i == 3 ) bNumBloodCats = lua_tointeger(L,i);
+		if (i == 4 ) bBloodCatPlacements = lua_tointeger(L,i);
+	}	
+		
+		SectorInfo[ SECTOR( sSectorX, sSectorY ) ].bBloodCatPlacements = bBloodCatPlacements;
+		SectorInfo[ SECTOR( sSectorX, sSectorY ) ].bBloodCats = bNumBloodCats;
+	return 0;
 }
 
 

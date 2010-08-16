@@ -208,6 +208,9 @@ extern UINT32 guiLaptopBACKGROUND;
 //ja25 UB
 void			ShouldImpReminderEmailBeSentWhenLaptopBackOnline();
 
+extern BOOLEAN gfProcessCustomMaps;
+
+
 #endif
 
 

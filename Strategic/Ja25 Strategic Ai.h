@@ -329,5 +329,6 @@ void HandleRemovingEnemySoldierInitLinksIfPlayerEverWonInSector();
 INT8 GetSectorEnemyIsToImmediatelySeekEnemyIn();
 
 void AddJA25AIDataToSector( JA25_SECTOR_AI *pSectorAIInfo );
+extern void	SetNumberOfJa25BloodCatsInSector( INT32 iSectorID, INT8 bNumBloodCats, INT8 bBloodCatPlacements  );
 
 #endif

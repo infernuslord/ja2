@@ -5763,7 +5763,7 @@ BOOLEAN HandleTimeCompressWithTeamJackedInAndGearedToGo( void )
 
 	SetUpShutDownMapScreenHelpTextScreenMask( );
 
-	// Add e-mail message
+	// Add e-mail message //no ja25 UB
 //	AddEmail(ENRICO_CONGRATS,ENRICO_CONGRATS_LENGTH,MAIL_ENRICO, GetWorldTotalMin(), -1);
 
 

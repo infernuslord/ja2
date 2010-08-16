@@ -41,6 +41,9 @@
 
 #include "Campaign Init.h"
 #include "connect.h"
+#include "Strategic Movement.h"
+
+//#include "Strategic Movement Costs.h"
 
 BOOLEAN gfSchedulesHosed = FALSE;
 extern UINT32 guiBrokenSaveGameVersion;
@@ -2281,6 +2284,15 @@ void DoneFadeOutForSaveLoadScreen( void )
 	//			EnterTacticalScreen( );
 				FadeInGameScreen( );
 			}
+			
+			//JA25 UB
+			// ATE: Validate any new maps...
+			// OK, if we're a camapign, check for new maps
+			//if ( !InDefaultCampaign( ) )
+			//{
+			//MakeBadSectorListFromMapsOnHardDrive( TRUE );
+			//}
+			
 		#ifdef JA2BETAVERSION
 		}
 		#endif

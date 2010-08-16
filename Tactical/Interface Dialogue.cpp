@@ -89,6 +89,7 @@
 #include "Soldier macros.h"
 #include "LOS.h"
 #include "Soldier Control.h"
+#include "Ja25Update.h"
 
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -5179,7 +5180,7 @@ void DelayedSayingOfMercQuote( UINT32 uiParam )
 		if( usQuoteNum == QUOTE_DEPARTING_COMMENT_CONTRACT_NOT_RENEWED_OR_48_OR_MORE )
 		{
 			//if the soldier is saying the 'brr its cold' quote, and he has left the sector
-			if( pSoldier->sSectorX != 7 || pSoldier->sSectorY != 8 && pSoldier->bSectorZ != 0 )
+			if( pSoldier->sSectorX != JA2_5_START_SECTOR_X || pSoldier->sSectorY != JA2_5_START_SECTOR_Y && pSoldier->bSectorZ != 0 )
 			{
 				//dont say the quote
 				return;

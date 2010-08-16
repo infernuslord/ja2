@@ -426,13 +426,17 @@ void InitStrategicLayer( void )
 	//JA25 UB
 	//Reset Jerry Quotes
 	HandleJerryMiloQuotes( TRUE ); //AA
+	
 	//Ja25 UB
 	InitJa25StrategicAi( );
  
 	// init town loyalty
-	InitTownLoyalty();
+	////if ( gGameLegionOptions.InitTownLoyalty_UB == TRUE )
+	//	InitTownLoyalty(); //Ja25 no loyalty
+
 	// init the mine management system
 	InitializeMines();
+	
 	// initialize map screen flags
 	InitMapScreenFlags();
 	// initialize NPCs, select alternate maps, etc
@@ -456,6 +460,9 @@ void InitStrategicLayer( void )
 	ShutDownLeaveList( );
 	// re-set up leave list arrays for dismissed mercs
 	InitLeaveList( );
+	
+	
+	LuaInitStrategicLayer(0); //JA25 UB InitStrategicLayer.lua 
 
 	// reset time compression mode to X0 (this will also pause it)
 	SetGameTimeCompressionLevel( TIME_COMPRESS_X0 );
@@ -463,29 +470,6 @@ void InitStrategicLayer( void )
 	// select A9 Omerta as the initial selected sector
 	// HEADROCK HAM 3.5: Actually, this is where we set the starting sector based on external variables.
 	ChangeSelectedMapSector( gGameExternalOptions.ubDefaultArrivalSectorX, gGameExternalOptions.ubDefaultArrivalSectorY, startingZ );
-	
-	
-	
-	INT8	bNumBloodCats=0;
-
-	switch( gGameOptions.ubDifficultyLevel )
-	{
-		case DIF_LEVEL_EASY:
-			bNumBloodCats = 3;
-			break;
-		case DIF_LEVEL_MEDIUM:
-			bNumBloodCats = 4;
-			break;
-		case DIF_LEVEL_HARD:
-			bNumBloodCats = 5;
-			break;
-		case DIF_LEVEL_INSANE:
-			bNumBloodCats = 5;
-			break;			
-	}
-	
-		SectorInfo[ SEC_I10	].bBloodCatPlacements = 5;
-		SectorInfo[ SEC_I10	].bBloodCats = bNumBloodCats;
 
 	// Reset these flags or mapscreen could be disabled and cause major headache.
 	fDisableDueToBattleRoster = FALSE;
@@ -499,9 +483,18 @@ void ShutdownStrategicLayer()
 	DeleteAllStrategicEvents();
 	RemoveAllGroups();
 	TrashUndergroundSectorInfo();
+
+	//DeleteCreatureDirectives(); //Ja25 No creatures
+
+	//KillStrategicAI();//  Ja25 No strategic ai
+	
 	DeleteCreatureDirectives();
 	KillStrategicAI();
+	
+	
 	ClearTacticalMessageQueue();
+	
+
 }
 
 BOOLEAN InitNewGame( BOOLEAN fReset )
@@ -560,7 +553,9 @@ Ja25 no meanwhiles
 	{
 		//Init all the arms dealers inventory
 		InitAllArmsDealers();
-		InitBobbyRayInventory();
+		
+		//if ( gGameLegionOptions.BobbyRayInventory_UB == TRUE )
+		//	InitBobbyRayInventory();  //Ja25 UB
 	}
 
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"InitNewGame: clearing messages");
@@ -691,8 +686,7 @@ Ja25 no meanwhiles
 		//ja25 ub
 		//Init the initial hweli crash sequence variable
 		InitializeHeliGridnoAndTime( FALSE );
-		//SetFactTrue( FACT_TEX_IS_IN_GAME_AND_ALIVE_IN_STORE );
-		
+	
 		//If tex is in the game ( John is NOT in the game )
 		//if( gJa25SaveStruct.fJohnKulbaIsInGame == FALSE )
 		//{
@@ -700,7 +694,7 @@ Ja25 no meanwhiles
 			//AddTexsVideosToBettysInventory();
 		//}
 
-		InitJerryMiloInfo(); 
+		InitJerryMiloInfo(); //JA25 UB
 
 		//Set the fact the game is in progress
 		gTacticalStatus.fHasAGameBeenStarted = TRUE;
@@ -774,7 +768,7 @@ Ja25 no meanwhiles
 		
 	}
 	
-	AddTexsVideosToBettysInventory();
+//	AddTexsVideosToBettysInventory();
 
 /*
 	if ( gubScreenCount == 2 )

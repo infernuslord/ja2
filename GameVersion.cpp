@@ -28,7 +28,7 @@ CHAR16 zVersionLabel[256]		= { L"Beta v. 0.98" };
 #else
 
 	//RELEASE BUILD VERSION	
-	CHAR16		zVersionLabel[256]		= { L"Release v1.13.3528 Beta" };
+	CHAR16		zVersionLabel[256]		= { L"Release Unfinished Business v1.0 - v1.13.3528 Beta" };
 
 #endif
 										

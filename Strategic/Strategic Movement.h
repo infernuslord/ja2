@@ -5,7 +5,6 @@
 #include "Soldier Control.h"
 #include "FileMan.h"
 
-
 enum //enemy intentions,
 {
 	NO_INTENTIONS,			//enemy intentions are undefined.

@@ -46,6 +46,8 @@
 	#include "Cheats.h"
 #endif
 
+#include "legion cfg.h"
+
 extern void InitializeTacticalStatusAtBattleStart();
 extern BOOLEAN gfDelayAutoResolveStart;
 extern BOOLEAN gfTransitionMapscreenToAutoResolve;
@@ -761,6 +763,9 @@ void InitPreBattleInterface( GROUP *pBattleGroup, BOOLEAN fPersistantPBI )
 	EnableDisAbleMapScreenOptionsButton( FALSE );
 
 	SetMusicMode( MUSIC_TACTICAL_ENEMYPRESENT );
+	
+	if ( gGameLegionOptions.AUTO_RESOLVE_UB == FALSE )
+		DisableButton( iPBButton[0] );
 
 	DoTransitionFromMapscreenToPreBattleInterface();
 }

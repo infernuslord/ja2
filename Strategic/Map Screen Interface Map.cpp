@@ -322,6 +322,8 @@ UINT32 guiBULLSEYE;
 #define HELI_SHADOW_ICON_WIDTH	19
 #define HELI_SHADOW_ICON_HEIGHT	11
 
+// list of map sectors that player isn't allowed to even highlight
+BOOLEAN sBadSectorsList[ WORLD_MAP_X ][ WORLD_MAP_X ];
 
 // the militia box buttons and images
 INT32 giMapMilitiaButtonImage[ 5 ];
@@ -382,10 +384,6 @@ UINT32 guiMapBorderEtaPopUp;
 
 // heli pop up
 UINT32 guiMapBorderHeliSectors;
-
-// list of map sectors that player isn't allowed to even highlight
-BOOLEAN sBadSectorsList[ WORLD_MAP_X ][ WORLD_MAP_X ];
-
 
 INT16 sBaseSectorList[ MAX_TOWNS - 1 ];/*={
 	// NOTE: These co-ordinates must match the top left corner of the 3x3 town tiles cutouts in Interface/MilitiaMaps.sti!
@@ -563,6 +561,8 @@ void AnimateRoute( PathStPtr pPath );
 
 extern void EndConfirmMapMoveMode( void );
 extern BOOLEAN CanDrawSectorCursor( void );
+
+void SetUpValidCampaignSectors( void );
 
 
 
@@ -3861,9 +3861,9 @@ void DisplayThePotentialPathForHelicopter(INT16 sMapX, INT16 sMapY )
 
 BOOLEAN IsTheCursorAllowedToHighLightThisSector( INT16 sSectorX, INT16 sSectorY )
 {
+	//Ja25UB
 	// check to see if this sector is a blocked out sector?
-
-	if( sBadSectorsList[ sSectorX ][ sSectorY ] )
+/*	if ( !SectorInfo[ ( SECTOR( sSectorX, sSectorY ) ) ].fValidSector )
 	{
 		return  ( FALSE );
 	}
@@ -3872,6 +3872,20 @@ BOOLEAN IsTheCursorAllowedToHighLightThisSector( INT16 sSectorX, INT16 sSectorY 
 		// return cursor is allowed to highlight this sector
 		return ( TRUE );
 	}
+*/	
+	// check to see if this sector is a blocked out sector?
+
+	if( sBadSectorsList[ sSectorX ][ sSectorY ] )//|| SectorInfo[ ( SECTOR( sSectorX, sSectorY ) ) ].fValidSector )
+	{
+		return  ( FALSE );
+	}
+	else
+	{
+		// return cursor is allowed to highlight this sector
+		return ( TRUE );
+	}
+	
+	
 }
 
 
@@ -7191,4 +7205,21 @@ void MilitiaDisbandYesNoBoxCallback( UINT8 bExitValue )
 	}
 
 	return;
+}
+
+void SetUpValidCampaignSectors( void )
+{
+	INT32			iRow, iCol;
+	
+	for( iRow=1; iRow<=16; iRow++ )
+	{
+		for( iCol=1; iCol<=16; iCol++ )
+		{
+			SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fValidSector = FALSE;
+			sBadSectorsList[iCol][iRow] = 1;
+//			SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fCampaignSector = FALSE;
+		}
+	}
+
+
 }

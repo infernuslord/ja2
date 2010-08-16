@@ -96,6 +96,9 @@ class OBJECTTYPE;
 class SOLDIERTYPE;
 
 
+BOOLEAN gfProcessCustomMaps  = FALSE; //ja25 UB
+
+
 // icons text id's
 enum{
 	MAIL=0,
@@ -2538,6 +2541,10 @@ BOOLEAN LeaveLapTopScreen( void )
 				fExitingLaptopFlag = TRUE;
 				InitNewGame( FALSE );
 				gfDontStartTransitionFromLaptop = TRUE;
+				
+				//Ja25 UB
+				// ATE: Set flag to look for custom maps
+				gfProcessCustomMaps = TRUE;
 				return( TRUE );
 			}
 		}

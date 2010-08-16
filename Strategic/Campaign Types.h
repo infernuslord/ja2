@@ -455,6 +455,8 @@ typedef struct SECTORINFO
 
 	UINT32	uiNumberOfWorldItemsInTempFileThatCanBeSeenByPlayer;
 
+	BOOLEAN	fValidSector; //ja25 UB
+
 	INT8	bPadding[ 41 ];
 
 }SECTORINFO;
