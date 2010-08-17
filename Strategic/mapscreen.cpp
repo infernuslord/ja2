@@ -118,6 +118,7 @@
 #include "connect.h" //hayden
 #include "fresh_header.h"
 #include "InterfaceItemImages.h"
+#include "laptop.h"
 
 #include "Strategic Movement.h"
 
@@ -157,6 +158,8 @@
 #define ASSIGNMENT_DONE_FLASH_TIME	500
 
 #define	MINS_TO_FLASH_CONTRACT_TIME	(4 * 60)
+
+void MakeBadSectorListFromMapsOnHardDrive( BOOLEAN fDisplayMessages ); // ja25 UB
 
 // CHRISL: Reclassify all coordinates as int variables and declare their values in an initialization function.
 int TOWN_INFO_X;
@@ -5107,12 +5110,12 @@ UINT32 MapScreenHandle(void)
 	}
 	
 	//Ja25 UB
-	//if ( gfProcessCustomMaps )
-	//{
-		//MakeBadSectorListFromMapsOnHardDrive( TRUE );
+	if ( gfProcessCustomMaps )
+	{
+		MakeBadSectorListFromMapsOnHardDrive( TRUE );
 
-	//	gfProcessCustomMaps = FALSE;
-	//}
+		gfProcessCustomMaps = FALSE;
+	}
 
 
 	// check to see if we need to rebuild the characterlist for map screen

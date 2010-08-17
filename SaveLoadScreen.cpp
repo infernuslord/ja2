@@ -278,6 +278,8 @@ void			MoveSelectionUpOrDown( BOOLEAN fUp );
 void			SaveGameToSlotNum();
 void			StartFadeOutForSaveLoadScreen();
 
+extern void MakeBadSectorListFromMapsOnHardDrive( BOOLEAN fDisplayMessages ); // ja25 UB
+
 //ppp
 
 
@@ -2290,7 +2292,7 @@ void DoneFadeOutForSaveLoadScreen( void )
 			// OK, if we're a camapign, check for new maps
 			//if ( !InDefaultCampaign( ) )
 			//{
-			//MakeBadSectorListFromMapsOnHardDrive( TRUE );
+			MakeBadSectorListFromMapsOnHardDrive( TRUE );
 			//}
 			
 		#ifdef JA2BETAVERSION

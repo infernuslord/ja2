@@ -52,7 +52,6 @@
 #include "MilitiaSquads.h"
 #include "Vehicles.h"
 #include "Ja25Update.h"
-#include "Summary Info.h"
 //#include "Map Screen Interface Map.h"
 
 #include "connect.h"

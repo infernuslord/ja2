@@ -17,12 +17,14 @@
 #include "strategicmap.h"
 #include "Map Screen Interface Map.h"
 #include "Strategic Movement.h"
+#include "Summary Info.h"
 
 extern BOOLEAN sBadSectorsList[ WORLD_MAP_X ][ WORLD_MAP_X ];
 
 extern void UpdateCustomMapMovementCosts(); // ja25 UB
 extern void MakeBadSectorListFromMapsOnHardDrive( BOOLEAN fDisplayMessages ); // ja25 UB
 extern void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMessageIfNotExist ); //ja25 UB
+extern UNDERGROUND_SECTORINFO* NewUndergroundNode( UINT8 ubSectorX, UINT8 ubSectorY, UINT8 ubSectorZ );
 
 typedef enum
 {
@@ -3467,8 +3469,8 @@ BOOLEAN InitStrategicMovementCosts()
 	}
 	#endif
 	
-	//UpdateCustomMapMovementCosts(); //Ja25 UB
-	MakeBadSectorListFromMapsOnHardDrive( TRUE ); //ja25 UB
+	UpdateCustomMapMovementCosts(); //Ja25 UB
+	//MakeBadSectorListFromMapsOnHardDrive( TRUE ); //ja25 UB
 
 	return( TRUE );
 }
@@ -3478,8 +3480,11 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 {
 	CHAR8			zMapName[200];
 	//SUMMARYFILE *pSummary;
+	//SUMMARYFILE *pSummary
 	INT8			bLevel;
-	UNDERGROUND_SECTORINFO *pSector=NULL;
+	UNDERGROUND_SECTORINFO *pSector;
+	UNDERGROUND_SECTORINFO *curr;
+	//SECTORINFO			   *pSector = NULL;
 
 	// if we are the first secotr, ignore!
 	//if ( iRow == JA2_5_START_SECTOR_Y && iCol == JA2_5_START_SECTOR_X )
@@ -3490,59 +3495,10 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 
 	for ( bLevel = 0; bLevel < 4; bLevel++ )
 	{
-	
-	
-		if ( bLevel == 0 )
-		{
-			sprintf( zMapName, "Maps\\%c%d.dat", iRow + 'A' -1, iCol );
-		}
-
-		//check to see if there is a map here
-		if ( FileExistsNoDB( zMapName ) )
-		{
-			if ( bLevel == 0 )
-			{
-				sBadSectorsList[iCol][iRow] = 0;
-				SectorInfo[ ( SECTOR( iCol , iRow ) ) ].ubTravelRating = 50;
-				
-				if ( fDisplayMessages )
-			//	{
-					ScreenMsg( FONT_MCOLOR_WHITE, MSG_CHAT, L"Added Custom map: %S.", zMapName );
-					//ScreenMsg( FONT_MCOLOR_DKRED, MSG_INTERFACE, L"Map file does not exist." );
-				//}
-				
-			/*	
-				if( iRow > 1 )
-				{
-					SectorInfo[ ( SECTOR( iCol, iRow-1 ) ) ].ubTraversability[ SOUTH_STRATEGIC_MOVE ] = PLAINS;
-				}
-					
-				if( iCol > 1 )
-				{
-					SectorInfo[ ( SECTOR( iCol-1, iRow ) ) ].ubTraversability[ EAST_STRATEGIC_MOVE ] = PLAINS;
-				}
-					
-				if( iRow < 16 )
-				{
-					SectorInfo[ ( SECTOR( iCol, iRow+1 ) ) ].ubTraversability[ NORTH_STRATEGIC_MOVE ] = PLAINS;
-				}
-					
-				if( iCol < 16 )
-				{
-					SectorInfo[ ( SECTOR( iCol+1, iRow ) ) ].ubTraversability[ WEST_STRATEGIC_MOVE ] = PLAINS;
-				}
-			*/	
-			}
-		}
-		else
-		{
-			sBadSectorsList[iCol][iRow] = 1;
-		}
-		
 		
 		// ATE: Check for existance of 'remove' file - if so, remove this sector from list, adjust
 		// movement costs accordingly...
-		/*if ( bLevel == 0 )
+		if ( bLevel == 0 )
 		{
 			sprintf( zMapName, "Maps\\%c%d.nomap", iRow + 'A' -1, iCol );
 			//sprintf( zMapName, "Maps\\%s%s%s.DAT", pVertStrings[sMapY], pHortStrings[sMapX], bExtensionString );
@@ -3626,13 +3582,13 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 				{
 					ScreenMsg( MSG_FONT_RED, MSG_CHAT, L"Failed to add map: %S.", zMapName );
 					ScreenMsg( FONT_MCOLOR_DKRED, MSG_INTERFACE, L"Map has already been visited." );
+					
+					SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fValidSector = TRUE;
+					sBadSectorsList[iCol][iRow] = 0;					
 				}
 				continue;
 			}
 			
-				SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fValidSector = FALSE;
-				sBadSectorsList[iCol][iRow] = 0;
-
 		}
 		else
 		{
@@ -3662,7 +3618,34 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 			}
 			continue;
 		}
-		*/
+		
+		
+			//We're good!
+			if ( fDisplayMessages )
+			{
+				ScreenMsg( FONT_MCOLOR_WHITE, MSG_CHAT, L"Added Custom map: %S.", zMapName );
+			}
+					
+			if ( bLevel == 0 )
+			{
+				SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fValidSector = TRUE;
+				sBadSectorsList[iCol][iRow] = 0;
+				//SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fCustomSector = TRUE;
+			}
+			else
+			{
+			
+				pSector = FindUnderGroundSector( (UINT8)iCol, (UINT8)iRow, bLevel );
+				if ( pSector )
+				{
+					//ScreenMsg( MSG_FONT_RED, MSG_CHAT, L"Failed to add map: %S.", zMapName );
+				}
+				else
+				{
+					pSector = NewUndergroundNode( (UINT8)iCol, (UINT8)iRow, bLevel );
+				}
+			}
+	
 		// I guess we need to load level to get the map information....?
 		// we don't want to destroy the level we're in, however....
 		//pSummary = (SUMMARYFILE*)MemAlloc( sizeof( SUMMARYFILE ) );
@@ -3919,36 +3902,51 @@ void UpdateCustomMapMovementCosts()
 	{
 		for( iCol=1; iCol<=16; iCol++ )
 		{
+		
+		
 			if( SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fValidSector ) //&& SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fCustomSector )
 			{
-				SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ THROUGH_STRATEGIC_MOVE ] = PLAINS;
-
+				
+				//if ( SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ THROUGH_STRATEGIC_MOVE ] == EDGEOFWORLD )
+					SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ THROUGH_STRATEGIC_MOVE ] = PLAINS;
+				
 				//sector above is clear
 				if( iRow > 1 && SectorInfo[ ( SECTOR( iCol , iRow - 1 ) ) ].fValidSector )
 				{
-					SectorInfo[ ( SECTOR( iCol, iRow-1 ) ) ].ubTraversability[ SOUTH_STRATEGIC_MOVE ] = PLAINS;
-					SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ NORTH_STRATEGIC_MOVE ] = PLAINS;
+				
+					//if ( SectorInfo[ ( SECTOR( iCol, iRow-1 ) ) ].ubTraversability[ SOUTH_STRATEGIC_MOVE ] == EDGEOFWORLD )
+						SectorInfo[ ( SECTOR( iCol, iRow-1 ) ) ].ubTraversability[ SOUTH_STRATEGIC_MOVE ] = PLAINS;
+					//if ( SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ NORTH_STRATEGIC_MOVE ] == EDGEOFWORLD )
+						SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ NORTH_STRATEGIC_MOVE ] = PLAINS;
+					
+					
 				}
 					
 				//sector west is clear
 				if( iCol > 1 && SectorInfo[ ( SECTOR( iCol - 1 , iRow ) ) ].fValidSector )
 				{
-					SectorInfo[ ( SECTOR( iCol-1, iRow ) ) ].ubTraversability[ EAST_STRATEGIC_MOVE ] = PLAINS;
-					SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ WEST_STRATEGIC_MOVE ] = PLAINS;
+					//if ( SectorInfo[ ( SECTOR( iCol-1, iRow ) ) ].ubTraversability[ EAST_STRATEGIC_MOVE ] == EDGEOFWORLD )
+						SectorInfo[ ( SECTOR( iCol-1, iRow ) ) ].ubTraversability[ EAST_STRATEGIC_MOVE ] = PLAINS;
+					//if ( SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ WEST_STRATEGIC_MOVE ] == EDGEOFWORLD )
+						SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ WEST_STRATEGIC_MOVE ] = PLAINS;
 				}
 					
 				//sector south is clear
 				if( iRow < 16 && SectorInfo[ ( SECTOR( iCol , iRow + 1 ) ) ].fValidSector )
 				{
-					SectorInfo[ ( SECTOR( iCol, iRow+1 ) ) ].ubTraversability[ NORTH_STRATEGIC_MOVE ] = PLAINS;
-					SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ SOUTH_STRATEGIC_MOVE ] = PLAINS;
+					//if ( SectorInfo[ ( SECTOR( iCol, iRow+1 ) ) ].ubTraversability[ NORTH_STRATEGIC_MOVE ] == EDGEOFWORLD )
+						SectorInfo[ ( SECTOR( iCol, iRow+1 ) ) ].ubTraversability[ NORTH_STRATEGIC_MOVE ] = PLAINS;
+					//if ( SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ SOUTH_STRATEGIC_MOVE ] == EDGEOFWORLD )
+						SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ SOUTH_STRATEGIC_MOVE ] = PLAINS;
 				}
 					
 				//sector east is clear
 				if( iCol < 16 && SectorInfo[ ( SECTOR( iCol + 1 , iRow ) ) ].fValidSector )
 				{
-					SectorInfo[ ( SECTOR( iCol+1, iRow ) ) ].ubTraversability[ WEST_STRATEGIC_MOVE ] = PLAINS;
-					SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ EAST_STRATEGIC_MOVE ] = PLAINS;
+					//if ( SectorInfo[ ( SECTOR( iCol+1, iRow ) ) ].ubTraversability[ WEST_STRATEGIC_MOVE ] == EDGEOFWORLD )
+						SectorInfo[ ( SECTOR( iCol+1, iRow ) ) ].ubTraversability[ WEST_STRATEGIC_MOVE ] = PLAINS;
+					//if ( SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ EAST_STRATEGIC_MOVE ] == EDGEOFWORLD )
+						SectorInfo[ ( SECTOR( iCol, iRow ) ) ].ubTraversability[ EAST_STRATEGIC_MOVE ] = PLAINS;
 				}
 			}
 		}
