@@ -1,6 +1,8 @@
 #ifndef _LEGION_CFG_H
 #define _LEGION_CFG_H
 
+#include "soldier profile type.h"
+
 extern BOOLEAN sUSTAW[500];
 extern BOOLEAN sNPCSPEECH[171];
 extern BOOLEAN sSPEECH[171];
@@ -50,11 +52,18 @@ extern UINT32	ProfileNum_Legion[200];
 extern SLOTY_LEGION_VALUES gLegionSloty[200];
 //---------------------------------------------------
 
+
 typedef struct
 {
+	UINT16		uiIndex; // add
+	BOOLEAN EnabledSound;
 
-	
-    
+} SOUND_PROFILE_VALUES;
+
+extern SOUND_PROFILE_VALUES gSoundProfileValue[NUM_PROFILES];
+
+typedef struct
+{
     BOOLEAN ZAIKONA1;
     BOOLEAN ZAIKONA2;
     BOOLEAN ZAIKONA3;
@@ -78,9 +87,11 @@ typedef struct
 	BOOLEAN BobbyRayInventory_UB;
 	BOOLEAN InitTownLoyalty_UB;
 	BOOLEAN AUTO_RESOLVE_UB;
+	BOOLEAN ADD_RANDOM_ENEMY_TO_SECTOR_UB;
        
 } GAME_LEGION_OPTIONS;
 
 extern GAME_LEGION_OPTIONS gGameLegionOptions; 
 extern Legion2Dane	gLegion2Dane; //legion
+extern void RandomAddEnemy( UINT8 SectorX, UINT8 SectorY, UINT8 Level );
 #endif

@@ -18,6 +18,7 @@
 #include "Map Screen Interface Map.h"
 #include "Strategic Movement.h"
 #include "Summary Info.h"
+#include "legion cfg.h"
 
 extern BOOLEAN sBadSectorsList[ WORLD_MAP_X ][ WORLD_MAP_X ];
 
@@ -3501,7 +3502,7 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 		if ( bLevel == 0 )
 		{
 			sprintf( zMapName, "Maps\\%c%d.nomap", iRow + 'A' -1, iCol );
-			//sprintf( zMapName, "Maps\\%s%s%s.DAT", pVertStrings[sMapY], pHortStrings[sMapX], bExtensionString );
+
 			if ( FileExistsNoDB( zMapName ) )
 			{
 				SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fValidSector = FALSE;
@@ -3630,7 +3631,30 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 			{
 				SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fValidSector = TRUE;
 				sBadSectorsList[iCol][iRow] = 0;
-				//SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fCustomSector = TRUE;
+				
+								
+				if ( gGameLegionOptions.ADD_RANDOM_ENEMY_TO_SECTOR_UB == TRUE )
+					{
+						if ( SECTOR( iCol , iRow ) == SEC_H7 || SECTOR( iCol , iRow )  == SEC_H8  || SECTOR( iCol , iRow ) == SEC_H9  ||
+							 SECTOR( iCol , iRow ) == SEC_H10 || SECTOR( iCol , iRow ) == SEC_H11 || SECTOR( iCol , iRow ) == SEC_I9  ||
+							 SECTOR( iCol , iRow ) == SEC_I10 || SECTOR( iCol , iRow ) == SEC_I11 || SECTOR( iCol , iRow ) == SEC_I12 ||
+							 SECTOR( iCol , iRow ) == SEC_I13 || SECTOR( iCol , iRow ) == SEC_J11 || SECTOR( iCol , iRow ) == SEC_J12 ||
+							 SECTOR( iCol , iRow ) == SEC_J13 || SECTOR( iCol , iRow ) == SEC_K14 || SECTOR( iCol , iRow ) == SEC_K15 ||
+							 SECTOR( iCol , iRow ) == SEC_K16 || SECTOR( iCol , iRow ) == SEC_L15 || 
+							 ( SECTOR( iCol , iRow ) == SEC_I13 && bLevel == 1) || ( SECTOR( iCol , iRow ) == SEC_J13 && bLevel == 1) ||
+							 ( SECTOR( iCol , iRow ) == SEC_J14 && bLevel == 1) || ( SECTOR( iCol , iRow ) == SEC_K15 && bLevel == 1) ||
+							 ( SECTOR( iCol , iRow ) == SEC_K15 && bLevel == 2) || ( SECTOR( iCol , iRow ) == SEC_L15 && bLevel == 2) ||
+							 ( SECTOR( iCol , iRow ) == SEC_L15 && bLevel == 3) )
+							 {
+							 }
+							 else
+							 {
+								ScreenMsg( FONT_MCOLOR_WHITE, MSG_CHAT, L"Added Random Enemy to sector : %S.", zMapName );
+								RandomAddEnemy( iCol, iRow, bLevel );
+							 }
+					}
+			
+			//SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fCustomSector = TRUE;
 			}
 			else
 			{
@@ -3642,7 +3666,31 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 				}
 				else
 				{
+					ScreenMsg( FONT_MCOLOR_WHITE, MSG_CHAT, L"Finds and Added New Underground : %S.", zMapName );
 					pSector = NewUndergroundNode( (UINT8)iCol, (UINT8)iRow, bLevel );
+				
+					if ( gGameLegionOptions.ADD_RANDOM_ENEMY_TO_SECTOR_UB == TRUE )
+						{
+						if ( SECTOR( iCol , iRow ) == SEC_H7 || SECTOR( iCol , iRow )  == SEC_H8  || SECTOR( iCol , iRow ) == SEC_H9  ||
+							 SECTOR( iCol , iRow ) == SEC_H10 || SECTOR( iCol , iRow ) == SEC_H11 || SECTOR( iCol , iRow ) == SEC_I9  ||
+							 SECTOR( iCol , iRow ) == SEC_I10 || SECTOR( iCol , iRow ) == SEC_I11 || SECTOR( iCol , iRow ) == SEC_I12 ||
+							 SECTOR( iCol , iRow ) == SEC_I13 || SECTOR( iCol , iRow ) == SEC_J11 || SECTOR( iCol , iRow ) == SEC_J12 ||
+							 SECTOR( iCol , iRow ) == SEC_J13 || SECTOR( iCol , iRow ) == SEC_K14 || SECTOR( iCol , iRow ) == SEC_K15 ||
+							 SECTOR( iCol , iRow ) == SEC_K16 || SECTOR( iCol , iRow ) == SEC_L15 || 
+							 ( SECTOR( iCol , iRow ) == SEC_I13 && bLevel == 1) || ( SECTOR( iCol , iRow ) == SEC_J13 && bLevel == 1) ||
+							 ( SECTOR( iCol , iRow ) == SEC_J14 && bLevel == 1) || ( SECTOR( iCol , iRow ) == SEC_K15 && bLevel == 1) ||
+							 ( SECTOR( iCol , iRow ) == SEC_K15 && bLevel == 2) || ( SECTOR( iCol , iRow ) == SEC_L15 && bLevel == 2) ||
+							 ( SECTOR( iCol , iRow ) == SEC_L15 && bLevel == 3) )
+							 {
+							 }
+							 else
+							 {
+								ScreenMsg( FONT_MCOLOR_WHITE, MSG_CHAT, L"Added Random Enemy to sector : %S.", zMapName );
+								RandomAddEnemy( iCol, iRow, bLevel );
+							 }
+			
+						}
+				
 				}
 			}
 	

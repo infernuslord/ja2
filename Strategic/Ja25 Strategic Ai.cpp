@@ -154,21 +154,21 @@ BOOLEAN		AddEnemiesToInitialSectorH7();
 UINT32		GetNumberOfJA25EnemiesInSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 *pNumAdmins, UINT8 *pNumTroops, UINT8 *pNumElites );
 void			SetNumberJa25EnemiesInSurfaceSector( INT32 iSectorID, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites );
 
+void SetNumberJa25EnemiesInSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites );
+void InitJa25InitialEnemiesInSector();
+void InitJa25UnderGroundSectors();
+void InitNumberOfEnemiesInAboveGroundSectors( );
+void InitNumberOfEnemiesInUnderGroundSectors( );
+void SetNumberOfJa25BloodCatsInSector( INT32 iSectorID, INT8 bNumBloodCats, INT8 bBloodCatPlacements  );
+void SetNumberJa25EnemiesInUnderGroundSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites );
 
-void			InitJa25InitialEnemiesInSector();
-void			InitJa25UnderGroundSectors();
-void			InitNumberOfEnemiesInAboveGroundSectors( );
-void			InitNumberOfEnemiesInUnderGroundSectors( );
-void			SetNumberOfJa25BloodCatsInSector( INT32 iSectorID, INT8 bNumBloodCats, INT8 bBloodCatPlacements  );
-void			SetNumberJa25EnemiesInUnderGroundSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites );
-
-void			ResetJa25SectorProbabilities();
-BOOLEAN		InitJa25StrategicSectorAI( BOOLEAN fReset );
+void ResetJa25SectorProbabilities();
+BOOLEAN	InitJa25StrategicSectorAI( BOOLEAN fReset );
 
 
 BOOLEAN		HandleAddingEnemiesToSector( INT16 sSaiSector, UINT8 ubNumEnemies, INT8 bAttackDirection, INT16 sGridNo );
 BOOLEAN		HandleAddEnemiesToSectorPlayerIsntIn( INT16 sSaiSector, UINT8 ubNumEnemies );
-void			Ja25SAI_DetermineWhichLevelToAttackFrom( INT16 sSaiSector, INT16 *psSector, INT8 *pbLevel );
+void		Ja25SAI_DetermineWhichLevelToAttackFrom( INT16 sSaiSector, INT16 *psSector, INT8 *pbLevel );
 
 BOOLEAN		AreAllPlayerMercTraversingBetweenSectors();
 

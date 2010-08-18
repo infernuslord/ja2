@@ -86,6 +86,8 @@
 //	#include "XMLWriter.h"
 #endif
 
+#include "Ja25 Strategic Ai.h"
+
 #include "legion cfg.h" //legion2
 #include "Campaign Types.h"
 #include "Interface.h"
@@ -103,6 +105,8 @@ Legion2Dane	gLegion2Dane; //legion
 UINT32	ProfileNum_Legion[200];
 SLOTY_LEGION_VALUES gLegionSloty[200];
 
+SOUND_PROFILE_VALUES gSoundProfileValue[NUM_PROFILES];
+
 #define				GAME_LEGION_OPTIONS_FILE	"UB_Options.ini"
 #define				LAPTOP_OPTIONS_FILE	"Ja2_laptop.ini"
 
@@ -113,10 +117,94 @@ extern void Ustaw_parametry ();
 
 void LoadGameLegionOptions();
 
+void RandomAddEnemy( UINT8 SectorX, UINT8 SectorY, UINT8 Level );
+
 
 BOOLEAN sUSTAW[500]; //legion2
 BOOLEAN sNPCSPEECH[171]; //legion2
 BOOLEAN sSPEECH[171]; //legion2
+
+
+void RandomAddEnemy( UINT8 SectorX, UINT8 SectorY, UINT8 Level )
+{
+UNDERGROUND_SECTORINFO *pSector;
+UINT8 ubNumAdmins = 0;
+UINT8 ubNumTroops = 0;
+UINT8 ubNumElites = 0;
+
+	if ( Level != 0 )
+	{
+	pSector = FindUnderGroundSector( SectorX, SectorY, Level );
+	if ( pSector )
+	{
+		if ( pSector->fVisited != TRUE )
+		{
+			switch( gGameOptions.ubDifficultyLevel )
+			{
+			case DIF_LEVEL_EASY:
+				ubNumAdmins = Random( 0 );
+				ubNumTroops = 16 + Random( 5 );
+				ubNumElites = Random( 4 );			
+				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
+				break;
+			case DIF_LEVEL_MEDIUM:
+				ubNumAdmins = Random( 0 );
+				ubNumTroops = 20 + Random( 8 );
+				ubNumElites = 1 + Random( 2 );		
+				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
+				break;
+			case DIF_LEVEL_HARD:
+				ubNumAdmins = Random( 0 );
+				ubNumTroops = 23 + Random( 7);
+				ubNumElites = 2 + Random( 2 );	
+				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
+				break;
+			case DIF_LEVEL_INSANE:
+				ubNumAdmins = Random( 0 );
+				ubNumTroops = 15 + Random( 3 );
+				ubNumElites = 8 + Random( 3 );		
+				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
+				break;
+			}
+		}
+		
+	}
+	
+	}
+	else
+	{
+		if ( !GetSectorFlagStatus( SectorX, SectorY, Level, SF_ALREADY_VISITED ) )
+		{
+			switch( gGameOptions.ubDifficultyLevel )
+			{
+			case DIF_LEVEL_EASY:
+				ubNumAdmins = Random( 0 );
+				ubNumTroops = 16 + Random( 5 );
+				ubNumElites = Random( 4 );			
+				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
+				break;
+			case DIF_LEVEL_MEDIUM:
+				ubNumAdmins = Random( 0 );
+				ubNumTroops = 20 + Random( 8 );
+				ubNumElites = 1 + Random( 2 );		
+				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
+				break;
+			case DIF_LEVEL_HARD:
+				ubNumAdmins = Random( 0 );
+				ubNumTroops = 23 + Random( 7);
+				ubNumElites = 2 + Random( 2 );	
+				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
+				break;
+			case DIF_LEVEL_INSANE:
+				ubNumAdmins = Random( 0 );
+				ubNumTroops = 15 + Random( 3 );
+				ubNumElites = 8 + Random( 3 );		
+				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
+				break;
+			}
+		}
+	}
+}
 
 //----LEGION 2---------
 BOOLEAN HandleSlotA( SOLDIERTYPE *pSoldier, UINT32 uiHandPos, UINT16 usReplaceItem, UINT8 Profil_Legion, UINT32 Przedmiot, UINT8 Tekst_EDT )
@@ -334,6 +422,8 @@ void LoadGameLegionOptions()
 	gGameLegionOptions.HandleAddingEnemiesToTunnelMaps_UB = iniReader.ReadBoolean("UB","HANDLE_ADDING_ENEMIES_TO_TUNNEL_MAPS", TRUE);
 
 	gGameLegionOptions.AUTO_RESOLVE_UB = iniReader.ReadBoolean("UB","AUTO_RESOLVE", FALSE);
+	
+	gGameLegionOptions.ADD_RANDOM_ENEMY_TO_SECTOR_UB = iniReader.ReadBoolean("UB","ADD_RANDOM_ENEMY_TO_SECTOR", FALSE);
 	
 //	gGameLegionOptions.BobbyRayInventory_UB = iniReader.ReadBoolean("UB","INIT_BOBBYRAY_INVENTORY", FALSE);
 //	gGameLegionOptions.InitTownLoyalty_UB = iniReader.ReadBoolean("UB","INIT_TOWN_LOYALTY", FALSE);

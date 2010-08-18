@@ -45,6 +45,8 @@
 #include "Ja25_Tactical.h"
 #include "Ja25Update.h"
 
+#include "Queen Command.h"
+
 
 extern "C" {
 #include "lua.h"
@@ -112,6 +114,13 @@ static int l_gMercProfileGearset(lua_State *L);
 static int l_SetNumberJa25EnemiesInSurfaceSector(lua_State *L);
 static int l_SetNumberOfJa25BloodCatsInSector(lua_State *L);
 
+static int l_FindUnderGroundSector(lua_State *L);
+static int l_AddEnemyToUnderGroundSector(lua_State *L);
+static int l_FindUnderGroundSectorVisited(lua_State *L);
+
+UNDERGROUND_SECTORINFO* NewUndergroundNode( UINT8 ubSectorX, UINT8 ubSectorY, UINT8 ubSectorZ );
+
+
 using namespace std;
 
 void IniFunction(lua_State *L)
@@ -172,10 +181,58 @@ void IniFunction(lua_State *L)
 	
 	lua_register(L, "SetNumberJa25EnemiesInSurfaceSector", l_SetNumberJa25EnemiesInSurfaceSector);	
 	
-	lua_register(L, "SetNumberOfJa25BloodCatsInSector", l_SetNumberOfJa25BloodCatsInSector);		
+	lua_register(L, "SetNumberOfJa25BloodCatsInSector", l_SetNumberOfJa25BloodCatsInSector);	
+
+	lua_register(L, "FindUnderGroundSector", l_FindUnderGroundSector);
+	lua_register(L, "AddEnemyToUnderGroundSector", l_AddEnemyToUnderGroundSector);
+	lua_register(L, "FindUnderGroundSectorVisited", l_FindUnderGroundSectorVisited);
 	
 }
 
+BOOLEAN LetLuaMakeBadSectorListFromMapsOnHardDrive(UINT8 Init)
+{
+	char * filename = "scripts\\MakeMapsOnHardDrive.lua";
+	UINT32 size, bytesRead;
+	char* buffer;
+
+	HWFILE file = FileOpen(filename, FILE_ACCESS_READ, FALSE);
+
+	if (!file)
+		return false;
+
+	size = FileSize(filename);
+	buffer = new char[size+1];
+	buffer[size] = 0;
+	FileRead(file, buffer, size, &bytesRead);
+	FileClose(file);
+
+	lua_State *L = lua_open();
+	luaL_openlibs(L);
+
+	IniFunction(L);
+	IniGlobalGameSetting(L);
+	
+	if (luaL_dostring(L, buffer))
+	{
+		// oh noes, error
+		// TODO: write to log or something
+		return false;
+	}
+	
+	if ( Init == 0 )
+	{
+		lua_getglobal(L , "MakeBadSectorListFromMapsOnHardDrive");
+		lua_call(L,0,0); 
+	}
+
+	lua_close(L);
+
+	delete[] buffer;
+	
+	
+	return true;
+
+}
 
 BOOLEAN LetLuaGameInit(UINT8 Init)
 {
@@ -271,6 +328,107 @@ BOOLEAN LuaInitStrategicLayer(UINT8 Init)
 	
 	return true;
 
+}
+	
+static int l_FindUnderGroundSectorVisited(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+int i;
+UINT8 sSectorX;
+UINT8 sSectorY;
+UINT8 bLevel;
+UNDERGROUND_SECTORINFO *pSector;
+BOOLEAN bol;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) sSectorX = lua_tointeger(L,i);
+		if (i == 2 ) sSectorY = lua_tointeger(L,i);
+		if (i == 3 ) bLevel = lua_tointeger(L,i);
+	}
+
+				pSector = FindUnderGroundSector( sSectorX, sSectorY, bLevel );
+
+			if ( pSector )
+			{
+				if ( pSector->fVisited )
+				{
+					bol = TRUE;
+				}
+				else
+				{
+					bol = FALSE;
+				}
+			}
+						
+	lua_pushboolean(L, bol);
+	
+return 1;
+}
+
+static int l_FindUnderGroundSector(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+int i;
+UINT8 sSectorX;
+UINT8 sSectorY;
+UINT8 bLevel;
+UNDERGROUND_SECTORINFO *pSector;
+BOOLEAN bol;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) sSectorX = lua_tointeger(L,i);
+		if (i == 2 ) sSectorY = lua_tointeger(L,i);
+		if (i == 3 ) bLevel = lua_tointeger(L,i);
+	}
+
+				pSector = FindUnderGroundSector( sSectorX, sSectorY, bLevel );
+				if ( pSector )
+				{
+					bol = TRUE; //ScreenMsg( MSG_FONT_RED, MSG_CHAT, L"Failed to add map: %S.", zMapName );
+				}
+				else
+				{
+					bol = FALSE; //pSector = NewUndergroundNode( (UINT8)iCol, (UINT8)iRow, bLevel );
+				}
+				
+	lua_pushboolean(L, bol);
+	
+return 1;
+}
+
+static int l_AddEnemyToUnderGroundSector(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+int i;
+UINT8 sSectorX;
+UINT8 sSectorY;
+UNDERGROUND_SECTORINFO *pSector;
+BOOLEAN bol;
+UINT8 bLevel;
+UINT8 ubNumAdmins;
+UINT8 ubNumTroops;
+UINT8 ubNumElites;
+
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) sSectorX = lua_tointeger(L,i);
+		if (i == 2 ) sSectorY = lua_tointeger(L,i);
+		if (i == 3 ) bLevel = lua_tointeger(L,i);
+		if (i == 4 ) ubNumAdmins = lua_tointeger(L,i);
+		if (i == 5 ) ubNumTroops = lua_tointeger(L,i);
+		if (i == 6 ) ubNumElites = lua_tointeger(L,i);
+		
+	}
+
+				pSector = FindUnderGroundSector( sSectorX, sSectorY, bLevel );
+				pSector->ubNumAdmins = ubNumAdmins;
+				pSector->ubNumTroops = ubNumTroops;
+				pSector->ubNumElites = ubNumElites;
+				
+return 0;
 }
 
 static int l_SetNumberOfJa25BloodCatsInSector(lua_State *L)

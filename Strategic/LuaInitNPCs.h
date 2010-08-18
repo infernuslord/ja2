@@ -5,5 +5,6 @@
 
 extern BOOLEAN LetLuaGameInit(UINT8 Init);
 extern BOOLEAN LuaInitStrategicLayer(UINT8 Init);
+extern BOOLEAN LetLuaMakeBadSectorListFromMapsOnHardDrive(UINT8 Init);
 
 #endif

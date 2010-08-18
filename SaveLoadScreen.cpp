@@ -45,6 +45,8 @@
 
 //#include "Strategic Movement Costs.h"
 
+#include "LuaInitNPCs.h"
+
 BOOLEAN gfSchedulesHosed = FALSE;
 extern UINT32 guiBrokenSaveGameVersion;
 
@@ -2293,6 +2295,8 @@ void DoneFadeOutForSaveLoadScreen( void )
 			//if ( !InDefaultCampaign( ) )
 			//{
 			MakeBadSectorListFromMapsOnHardDrive( TRUE );
+			LetLuaMakeBadSectorListFromMapsOnHardDrive( 0 );
+
 			//}
 			
 		#ifdef JA2BETAVERSION

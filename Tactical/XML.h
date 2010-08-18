@@ -7,6 +7,7 @@
 #include "faces.h"
 #include "Interface.h"
 #include "XML_SenderNameList.h"
+#include "legion cfg.h"
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -183,6 +184,8 @@ typedef PARSE_STAGE;
 #define MERCPROFILESFILENAME25					"MercProfiles25.xml"
 // UB
 #define MERCOPINIONSFILENAME25					"MercOpinions25.xml"
+
+#define SOUNDPROFILE					"SoundsProfiles.xml"
 
 extern BOOLEAN ReadInItemStats(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteItemStats();
@@ -374,4 +377,7 @@ extern BOOLEAN ReadInEnemyRank(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteEnemyRank( STR fileName);
 extern BOOLEAN ReadInIMPPortraits(STR fileName, BOOLEAN localizedVersion);
 extern void LoadIMPPortraitsTEMP();
+
+extern BOOLEAN ReadInSoundProfile(SOUND_PROFILE_VALUES *pSoundProfile, STR fileName);
+extern BOOLEAN WriteSoundProfile(SOUND_PROFILE_VALUES *pSoundProfile, STR fileName);
 #endif

@@ -129,6 +129,8 @@
 #include "Ja25 Strategic Ai.h"
 #include "MapScreen Quotes.h"
 
+#include "LuaInitNPCs.h"
+
 #define MAX_SORT_METHODS					6
 
 // Cursors
@@ -5113,6 +5115,7 @@ UINT32 MapScreenHandle(void)
 	if ( gfProcessCustomMaps )
 	{
 		MakeBadSectorListFromMapsOnHardDrive( TRUE );
+		LetLuaMakeBadSectorListFromMapsOnHardDrive( 0 );
 
 		gfProcessCustomMaps = FALSE;
 	}

@@ -304,7 +304,7 @@ enum
 extern	BOOLEAN	gfEnemyShouldImmediatelySeekThePlayer;
 //extern  INT32	giNumJA25Sectors;
 
-
+extern void SetNumberJa25EnemiesInSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites );
 void		SetJa25SectorOwnedStatus( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, BOOLEAN fPlayerOwned );
 INT8		GetTheFurthestSectorPlayerOwns();
 void		Ja25_UpdateTimeOfEndOfLastBattle( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ );
@@ -316,6 +316,7 @@ void		JA25_HandleUpdateOfStrategicAi();
 void		SetEnemiesToFindThePlayerMercs();
 
 void HandleSayingDontStayToLongWarningInSectorH8();
+extern void SetNumberJa25EnemiesInSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites );
 
 #ifdef JA2BETAVERSION
 	BOOLEAN InitJa25StrategicAiDecisions( BOOLEAN fLoadedGame );

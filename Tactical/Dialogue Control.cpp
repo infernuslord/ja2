@@ -62,6 +62,8 @@
 #include "connect.h"
 #include "Intro.h"
 
+#include "legion cfg.h"
+
 #include "MapScreen Quotes.h"
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
@@ -1940,11 +1942,17 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 //					sprintf( zFileName,"NPC_SPEECH\\g_%03d_%03d.wav",ubCharacterNum,usQuoteNum );
 //				}
 //			#else
-				sprintf( zFileName,"NPC_SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
-				if ( !FileExists( zFileName ) )
+
+				if ( gSoundProfileValue[ubCharacterNum].EnabledSound == TRUE )
 				{
+					sprintf( zFileName,"NPC_SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
+					if ( !FileExists( zFileName ) )
+					{
 					sprintf( zFileName,"NPC_SPEECH\\%03d_%03d.wav",ubCharacterNum,usQuoteNum );
+					}
+				
 				}
+				
 //			#endif
 		}
 		else
@@ -1976,11 +1984,14 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 
 		if ( fWavFile )
 		{
-			// Lesh: patch to allow playback ogg speech files
-			sprintf( zFileName,"NPC_SPEECH\\%03d_%03d.ogg",ubFileNumID,usQuoteNum );
-			if ( !FileExists( zFileName ) )
+			if ( gSoundProfileValue[ubFileNumID].EnabledSound == TRUE )
 			{
-				sprintf( zFileName,"NPC_SPEECH\\%03d_%03d.wav",ubFileNumID,usQuoteNum );
+				// Lesh: patch to allow playback ogg speech files
+				sprintf( zFileName,"NPC_SPEECH\\%03d_%03d.ogg",ubFileNumID,usQuoteNum );
+				if ( !FileExists( zFileName ) )
+				{
+					sprintf( zFileName,"NPC_SPEECH\\%03d_%03d.wav",ubFileNumID,usQuoteNum );
+				}
 			}
 		}
 		else
@@ -1997,6 +2008,8 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 				if( ubCharacterNum >= FIRST_RPC && /* ubCharacterNum < GASTON  && */ gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
 				{
 //inshy: fix for UB-1.13 version only					sprintf( zFileName,"SPEECH\\r_%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
+				if ( gSoundProfileValue[ubCharacterNum].EnabledSound == TRUE )
+				{
 					sprintf( zFileName,"SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
 					if ( !FileExists( zFileName ) )
 					{
@@ -2013,15 +2026,24 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 						}
 //</SB>
 					}
+					
+				}
 				}
 				else
 			#endif
 			{	// build name of wav file (characternum + quotenum)
 				sprintf( zFileName,"SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
-				if ( !FileExists( zFileName ) )
+				
+				if ( gSoundProfileValue[ubCharacterNum].EnabledSound == TRUE )
 				{
-					sprintf( zFileName,"SPEECH\\%03d_%03d.wav",ubCharacterNum,usQuoteNum );
+					if ( !FileExists( zFileName ) )
+					{
+						sprintf( zFileName,"SPEECH\\%03d_%03d.wav",ubCharacterNum,usQuoteNum );
+					}
+				
 				}
+				
+				
 			}
 		}
 		else
