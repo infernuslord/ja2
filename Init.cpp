@@ -818,6 +818,25 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
 	THROWIFFALSE(ReadInSoundProfile(gSoundProfileValue,fileName), SOUNDPROFILE);
 
+	//legion by jazz 
+	strcpy(fileName, directoryName);
+	strcat(fileName, RANDOMSTATS);
+	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+	THROWIFFALSE(ReadInRandomStats(fileName), RANDOMSTATS);
+	
+	/*
+	strcpy(fileName, directoryName);
+	strcat(fileName, RANDOMSTATS);
+	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+	THROWIFFALSE(WriteRandomStats(fileName), RANDOMSTATS);
+	*/
+
+	//quote array by Jazz
+	strcpy(fileName, directoryName);
+	strcat(fileName, QUOTEARRAYFILENAME);
+	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+	THROWIFFALSE(ReadInQarray(QuoteExp,fileName),QUOTEARRAYFILENAME);
+	
 	LoadIMPPortraitsTEMP();
 
 	// load Lua for Strategic Mines initialization

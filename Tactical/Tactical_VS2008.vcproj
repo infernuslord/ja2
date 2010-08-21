@@ -1120,6 +1120,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\XML_Qarray.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\XML_RandomStats.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\XML_RPCFacesSmall.cpp"
 				>
 			</File>

@@ -64,15 +64,15 @@ extern	UINT8	gbPlayerNum;
 
 #ifdef STAT_CHANGE_DEBUG
 STR16 wDebugStatStrings[]={
-	L"",
-	L"Life (Max)",
+  L"",
+  L"Life (Max)",
   L"Agility",
   L"Dexterity",
   L"Wisdom",
   L"Medical",
   L"Explosives",
   L"Mechanical",
-	L"Marksmanship",
+  L"Marksmanship",
   L"Experience Level",
   L"Strength",
   L"Leadership",
@@ -1332,73 +1332,73 @@ UINT8 CurrentPlayerProgressPercentage(void)
 	
 	//Get the furthest sector the player owns
 	bFurthestSectorPlayerOwns = GetTheFurthestSectorPlayerOwns();
-	
+	//JA25 UB
 	switch( bFurthestSectorPlayerOwns )
 	{
 		//initial sector
-		case JA25_H7:
+		case SEC_H7:
 			ubCurrentProgress = 44;
 			break;
 
-		case JA25_H8:
+		case SEC_H8:
 			ubCurrentProgress = 45;
 			break;
 
 		//guard post
-		case JA25_H9:
+		case SEC_H9:
 			ubCurrentProgress = 55;
 			break;
 
 		//field
-		case JA25_H10:
+		case SEC_H10:
 			ubCurrentProgress = 58;
 			break;
 
 		//field
-		case JA25_I9:
+		case SEC_I9:
 			ubCurrentProgress = 60;
 			break;
 
 		//first part of town
-		case JA25_I10:
+		case SEC_I10:
 			ubCurrentProgress = 63;
 			break;
 
 		//second part of town
-		case JA25_I11:
+		case SEC_I11:
 			ubCurrentProgress = 65;
 			break;
 
 		//field
-		case JA25_I12:
+		case SEC_I12:
 			ubCurrentProgress = 68;
 			break;
 
 		//Abondoned mine
-		case JA25_I13:
+		case SEC_I13:
 			ubCurrentProgress = 70;
 			break;
 
 		// cave under abondoned mine
-		case JA25_I13_1:
+/*	case SEC_I13_1:
 			ubCurrentProgress = 72;
 			break;
-
+*/
 		//field
-		case JA25_J11:
+		case SEC_J11:
 			ubCurrentProgress = 70;
 			break;
 
 		//field
-		case JA25_J12:
+		case SEC_J12:
 			ubCurrentProgress = 70;
 			break;
 
 		//power gen plant
-		case JA25_J13:
+		case SEC_J13:
 			ubCurrentProgress = 75;
 			break;
-
+/*
 			//power gen plant, sub level
 		case JA25_J13_1:
 			ubCurrentProgress = 75;
@@ -1438,7 +1438,7 @@ UINT8 CurrentPlayerProgressPercentage(void)
 		case JA25_L15_3:
 			ubCurrentProgress = 100;
 			break;
-
+*/
 		default:
 
 			// OK, use percentage complete from map...

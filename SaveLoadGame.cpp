@@ -3028,6 +3028,9 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 
 	//Empty the dialogue Queue cause someone could still have a quote in waiting
 	EmptyDialogueQueue( );
+	
+	//Reset Jerry Quotes  JA25UB
+	HandleJerryMiloQuotes( TRUE );
 
 	//If there is someone talking, stop them
 	StopAnyCurrentlyTalkingSpeech( );

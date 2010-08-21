@@ -94,7 +94,7 @@ SoundProfileEndElementHandle(void *userData, const XML_Char *name)
 
 			if(pData->curSoundProfile.uiIndex < pData->maxArraySize)
 			{
-				pData->curArray[pData->curSoundProfile.uiIndex] = pData->curSoundProfile; //write the small faces into the table
+				pData->curArray[pData->curSoundProfile.uiIndex] = pData->curSoundProfile; 
 			}
 		}
 		else if(strcmp(name, "uiIndex") == 0)

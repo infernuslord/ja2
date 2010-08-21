@@ -7209,7 +7209,8 @@ void MilitiaDisbandYesNoBoxCallback( UINT8 bExitValue )
 
 void SetUpValidCampaignSectors( void )
 {
-	INT32			iRow, iCol;
+/*
+INT32			iRow, iCol;
 	
 	for( iRow=1; iRow<=16; iRow++ )
 	{
@@ -7220,6 +7221,85 @@ void SetUpValidCampaignSectors( void )
 //			SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fCampaignSector = FALSE;
 		}
 	}
+*/
+	
+#ifdef JA2UB_PRESS_PREVIEW	
+
+	INT32			iRow, iCol;
+	
+	for( iRow=1; iRow<=16; iRow++ )
+	{
+		for( iCol=1; iCol<=16; iCol++ )
+		{
+			SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fValidSector = FALSE;	
+			SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fCampaignSector = FALSE;
+		}
+	}
+
+#endif
+
+
+	SectorInfo[ ( SECTOR( 7 , 8 ) ) ].fValidSector = TRUE;		//H7
+	SectorInfo[ ( SECTOR( 7 , 8 ) ) ].fCampaignSector = TRUE;
+
+	SectorInfo[ ( SECTOR( 8 , 8 ) ) ].fValidSector = TRUE;		//H8
+	SectorInfo[ ( SECTOR( 8 , 8 ) ) ].fCampaignSector = TRUE;	
+
+	SectorInfo[ ( SECTOR( 9 , 8 ) ) ].fValidSector = TRUE;		//H9
+	SectorInfo[ ( SECTOR( 9 , 8 ) ) ].fCampaignSector = TRUE;		//H9
+
+	SectorInfo[ ( SECTOR( 10 , 8 ) ) ].fValidSector = TRUE;		//H10
+	SectorInfo[ ( SECTOR( 10 , 8 ) ) ].fCampaignSector = TRUE;		
+
+#ifndef JA2UB_PRESS_PREVIEW
+
+	SectorInfo[ ( SECTOR( 11, 8 ) ) ].fValidSector = TRUE;		//H11
+	SectorInfo[ ( SECTOR( 11, 8 ) ) ].fCampaignSector = TRUE;		
+
+#endif
+
+	SectorInfo[ ( SECTOR( 9 , 9 ) ) ].fValidSector = TRUE;		//I9
+	SectorInfo[ ( SECTOR( 9 , 9 ) ) ].fCampaignSector = TRUE;		
+
+	SectorInfo[ ( SECTOR( 10 , 9 ) ) ].fValidSector = TRUE;		//I10
+	SectorInfo[ ( SECTOR( 10 , 9 ) ) ].fCampaignSector = TRUE;		
+
+#ifndef JA2UB_PRESS_PREVIEW
+
+	SectorInfo[ ( SECTOR( 11 , 9 ) ) ].fValidSector = TRUE;		//I11
+	SectorInfo[ ( SECTOR( 11 , 9 ) ) ].fCampaignSector = TRUE;	
+
+	SectorInfo[ ( SECTOR( 12 , 9 ) ) ].fValidSector = TRUE;		//I12
+	SectorInfo[ ( SECTOR( 12 , 9 ) ) ].fCampaignSector = TRUE;		
+
+	SectorInfo[ ( SECTOR( 13 , 9 ) ) ].fValidSector = TRUE;		//I13
+	SectorInfo[ ( SECTOR( 13 , 9 ) ) ].fCampaignSector = TRUE;		
+
+	SectorInfo[ ( SECTOR( 11 , 10 ) ) ].fValidSector = TRUE;		//J11
+	SectorInfo[ ( SECTOR( 11 , 10 ) ) ].fCampaignSector = TRUE;		
+
+	SectorInfo[ ( SECTOR( 12 , 10 ) ) ].fValidSector = TRUE;		//J12
+	SectorInfo[ ( SECTOR( 12 , 10 ) ) ].fCampaignSector = TRUE;		
+
+	SectorInfo[ ( SECTOR( 13 , 10 ) ) ].fValidSector = TRUE;		//J13
+	SectorInfo[ ( SECTOR( 13 , 10 ) ) ].fCampaignSector = TRUE;		
+
+	SectorInfo[ ( SECTOR( 14 , 10 ) ) ].fValidSector = TRUE;		//J14
+	SectorInfo[ ( SECTOR( 14 , 10 ) ) ].fCampaignSector = TRUE;		
+
+	SectorInfo[ ( SECTOR( 14 , 11 ) ) ].fValidSector = TRUE;		//K14
+	SectorInfo[ ( SECTOR( 14 , 11 ) ) ].fCampaignSector = TRUE;		
+
+	SectorInfo[ ( SECTOR( 15 , 11 ) ) ].fValidSector = TRUE;		//K15
+	SectorInfo[ ( SECTOR( 15 , 11 ) ) ].fCampaignSector = TRUE;		
+
+	SectorInfo[ ( SECTOR( 16 , 11 ) ) ].fValidSector = TRUE;		//K16
+	SectorInfo[ ( SECTOR( 16 , 11 ) ) ].fCampaignSector = TRUE;		
+
+	SectorInfo[ ( SECTOR( 15 , 12 ) ) ].fValidSector = TRUE;		//L15
+	SectorInfo[ ( SECTOR( 15 , 12 ) ) ].fCampaignSector = TRUE;		
+
+#endif
 
 
 }

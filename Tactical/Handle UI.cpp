@@ -5787,7 +5787,7 @@ BOOLEAN HandleTalkInit(	)
 
 				case 1:
 
-					if ( QuoteExp_PassingDislike[ pTSoldier->ubProfile ] )
+					if ( QuoteExp[ pTSoldier->ubProfile ].QuoteExpPassingDislike )
 					{
 						ubQuoteNum = QUOTE_PASSING_DISLIKE;
 					}

@@ -55,6 +55,28 @@ extern SLOTY_LEGION_VALUES gLegionSloty[200];
 
 typedef struct
 {
+	UINT16 uiIndex;
+	BOOLEAN Enabled;
+	INT8 BaseAttribute;
+	INT8 ExpLevel;
+	BOOLEAN RandomLife;
+	BOOLEAN RandomAgility;
+	BOOLEAN RandomLeadership;
+	BOOLEAN RandomDexterity;
+	BOOLEAN RandomWisdom;
+	BOOLEAN RandomMarksmanship;
+	BOOLEAN RandomMedical;
+	BOOLEAN RandomMechanical;
+	BOOLEAN RandomExplosive;
+	BOOLEAN RandomScientific;
+
+} RANDOM_STATS_VALUES;
+
+extern RANDOM_STATS_VALUES gRandomStatsValue[NUM_PROFILES];
+
+
+typedef struct
+{
 	UINT16		uiIndex; // add
 	BOOLEAN EnabledSound;
 
@@ -88,10 +110,14 @@ typedef struct
 	BOOLEAN InitTownLoyalty_UB;
 	BOOLEAN AUTO_RESOLVE_UB;
 	BOOLEAN ADD_RANDOM_ENEMY_TO_SECTOR_UB;
+	BOOLEAN StrategicMovementCostsXML;
+	BOOLEAN CampaignSector;
        
 } GAME_LEGION_OPTIONS;
 
 extern GAME_LEGION_OPTIONS gGameLegionOptions; 
 extern Legion2Dane	gLegion2Dane; //legion
 extern void RandomAddEnemy( UINT8 SectorX, UINT8 SectorY, UINT8 Level );
+
+extern void RandomStats ();
 #endif

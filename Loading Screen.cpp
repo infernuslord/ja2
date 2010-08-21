@@ -709,7 +709,76 @@ void DisplayLoadScreenWithID( UINT8 ubLoadScreenID )
 			strcat(szFullImagePath, szImageFormat);
 		}
 
-		strcpy(vs_desc.ImageFile,szFullImagePath);
+		
+		if ( !FileExists(szFullImagePath) )
+		{
+					switch (ubLoadScreenID)
+					{
+						case DAY:
+						
+								// Small image: 640x480
+								strcpy(vs_desc.ImageFile,"Loadscreens\\LS_DayWild.sti");
+
+								// Actual image, depending on the resolution
+								if (iResolution == 1)
+								{
+									strcpy(vs_desc.ImageFile,"Loadscreens\\LS_DayWild_800x600.sti");
+								}
+								else if (iResolution == 2)
+								{
+									strcpy(vs_desc.ImageFile,"Loadscreens\\LS_DayWild_1024x768.sti");
+								}
+								
+							break;
+						case DAY_ALT:
+								// Small image: 640x480
+								strcpy(vs_desc.ImageFile,"Loadscreens\\LS_DayWild.sti");
+
+								// Actual image, depending on the resolution
+								if (iResolution == 1)
+								{
+									strcpy(vs_desc.ImageFile,"Loadscreens\\LS_DayWild_800x600.sti");
+								}
+								else if (iResolution == 2)
+								{
+									strcpy(vs_desc.ImageFile,"Loadscreens\\LS_DayWild_1024x768.sti");
+								}
+							break;
+						case NIGHT:
+								// Small image: 640x480
+								strcpy(vs_desc.ImageFile,"Loadscreens\\LS_NightWild.sti");
+
+								// Actual image, depending on the resolution
+								if (iResolution == 1)
+								{
+									strcpy(vs_desc.ImageFile,"Loadscreens\\LS_NightWild_800x600.sti");
+								}
+								else if (iResolution == 2)
+								{
+									strcpy(vs_desc.ImageFile,"Loadscreens\\LS_NightWild_1024x768.sti");
+								}
+							break;
+						case NIGHT_ALT:
+								// Small image: 640x480
+								strcpy(vs_desc.ImageFile,"Loadscreens\\LS_NightWild.sti");
+
+								// Actual image, depending on the resolution
+								if (iResolution == 1)
+								{
+									strcpy(vs_desc.ImageFile,"Loadscreens\\LS_NightWild_800x600.sti");
+								}
+								else if (iResolution == 2)
+								{
+									strcpy(vs_desc.ImageFile,"Loadscreens\\LS_NightWild_1024x768.sti");
+								}
+							break;
+								
+					}
+		}
+		else
+		{
+			strcpy(vs_desc.ImageFile,szFullImagePath);
+		}
 	}
 	else
 	{

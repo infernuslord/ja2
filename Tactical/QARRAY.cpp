@@ -5,6 +5,9 @@
 	#include "qarray.h"
 #endif
 
+QARRAY_VALUES QuoteExp[NUM_PROFILES];
+
+
 BOOLEAN QuoteExp_HeadShotOnly[NUM_PROFILES] =
 {
 // this is for quote 33 (0=generic grossout, 1=headshot specific)
@@ -1255,5 +1258,3 @@ BOOLEAN QuoteExp_WitnessQueenBugDeath[NUM_PROFILES] =
 0, //169
 
 };
-
-

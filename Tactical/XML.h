@@ -8,6 +8,7 @@
 #include "Interface.h"
 #include "XML_SenderNameList.h"
 #include "legion cfg.h"
+#include "qarray.h"
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -177,6 +178,7 @@ typedef PARSE_STAGE;
 //Sender Name List
 #define SENDERNAMELISTFILENAME					"SenderNameList.xml"
 
+#define QUOTEARRAYFILENAME					"QuoteArray.xml"
 
 #define IMPPORTRAITS					"IMPPortraits.xml"
 
@@ -186,6 +188,8 @@ typedef PARSE_STAGE;
 #define MERCOPINIONSFILENAME25					"MercOpinions25.xml"
 
 #define SOUNDPROFILE					"SoundsProfiles.xml"
+
+#define RANDOMSTATS					"RandomStats.xml"
 
 extern BOOLEAN ReadInItemStats(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteItemStats();
@@ -380,4 +384,11 @@ extern void LoadIMPPortraitsTEMP();
 
 extern BOOLEAN ReadInSoundProfile(SOUND_PROFILE_VALUES *pSoundProfile, STR fileName);
 extern BOOLEAN WriteSoundProfile(SOUND_PROFILE_VALUES *pSoundProfile, STR fileName);
+
+extern BOOLEAN WriteRandomStats( STR fileName);
+extern BOOLEAN ReadInRandomStats(STR fileName);
+
+extern BOOLEAN WriteQarray(QARRAY_VALUES *pQarray, STR fileName);
+extern BOOLEAN ReadInQarray(QARRAY_VALUES *pQarray, STR fileName);
+
 #endif

@@ -2854,12 +2854,12 @@ void SayQuote58FromNearbyMercInSector( INT32 sGridNo, INT8 bDistance, UINT16 usQ
 			SoldierTo3DLocationLineOfSightTest( pTeamSoldier, sGridNo, 0, 0, TRUE ) )
 		{
 			// ATE: This is to check gedner for this quote...
-			if ( QuoteExp_GenderCode[ pTeamSoldier->ubProfile ] == 0 && bSex == FEMALE )
+			if ( QuoteExp[ pTeamSoldier->ubProfile ].QuoteExpGenderCode == 0 && bSex == FEMALE )
 			{
 				continue;
 			}
 
-			if ( QuoteExp_GenderCode[ pTeamSoldier->ubProfile ] == 1 && bSex == MALE )
+			if ( QuoteExp[ pTeamSoldier->ubProfile ].QuoteExpGenderCode == 1 && bSex == MALE )
 			{
 				continue;
 			}

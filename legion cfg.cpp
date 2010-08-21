@@ -106,6 +106,7 @@ UINT32	ProfileNum_Legion[200];
 SLOTY_LEGION_VALUES gLegionSloty[200];
 
 SOUND_PROFILE_VALUES gSoundProfileValue[NUM_PROFILES];
+RANDOM_STATS_VALUES gRandomStatsValue[NUM_PROFILES];
 
 #define				GAME_LEGION_OPTIONS_FILE	"UB_Options.ini"
 #define				LAPTOP_OPTIONS_FILE	"Ja2_laptop.ini"
@@ -119,11 +120,76 @@ void LoadGameLegionOptions();
 
 void RandomAddEnemy( UINT8 SectorX, UINT8 SectorY, UINT8 Level );
 
-
 BOOLEAN sUSTAW[500]; //legion2
 BOOLEAN sNPCSPEECH[171]; //legion2
 BOOLEAN sSPEECH[171]; //legion2
 
+void RandomStats ()
+{
+UINT32 cnt;
+INT8 bBaseAttribute = 0;
+MERCPROFILESTRUCT * pProfile;
+
+	for ( cnt = 0; cnt < NUM_PROFILES; cnt++ )
+	{
+		if ( gRandomStatsValue[cnt].Enabled == TRUE )
+			{
+				//if ( gRandomStatsValue[cnt].uiIndex == cnt )
+				//	{
+						bBaseAttribute = gRandomStatsValue[cnt].BaseAttribute + ( 4 * gRandomStatsValue[cnt].ExpLevel );
+						pProfile = &(gMercProfiles[cnt]);
+					
+						pProfile->bExpLevel = gRandomStatsValue[cnt].ExpLevel;
+
+						if ( gRandomStatsValue[cnt].RandomLife == TRUE )
+							{
+								pProfile->bLifeMax = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+								pProfile->bLife = pProfile->bLifeMax;
+							}	
+							
+						if ( gRandomStatsValue[cnt].RandomAgility == TRUE )
+							{
+								pProfile->bAgility = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}							
+							
+						if ( gRandomStatsValue[cnt].RandomLeadership == TRUE )
+							{
+								pProfile->bLeadership = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}							
+														
+						if ( gRandomStatsValue[cnt].RandomDexterity == TRUE )
+							{
+								pProfile->bDexterity = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}	
+							
+						if ( gRandomStatsValue[cnt].RandomWisdom == TRUE )
+							{
+								pProfile->bWisdom = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}	
+							
+						if ( gRandomStatsValue[cnt].RandomMarksmanship == TRUE )
+							{
+								pProfile->bMarksmanship = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}	
+							
+						if ( gRandomStatsValue[cnt].RandomMedical == TRUE )
+							{
+								pProfile->bMedical = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}
+							
+						if ( gRandomStatsValue[cnt].RandomMechanical == TRUE )
+							{
+								pProfile->bMechanical = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}	
+
+						if ( gRandomStatsValue[cnt].RandomExplosive == TRUE )
+							{
+								pProfile->bExplosive = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}								
+				//	}	
+			}
+	}
+}
 
 void RandomAddEnemy( UINT8 SectorX, UINT8 SectorY, UINT8 Level )
 {
@@ -143,33 +209,31 @@ UINT8 ubNumElites = 0;
 			{
 			case DIF_LEVEL_EASY:
 				ubNumAdmins = Random( 0 );
-				ubNumTroops = 16 + Random( 5 );
+				ubNumTroops = 10 + Random( 5 );
 				ubNumElites = Random( 4 );			
 				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
 				break;
 			case DIF_LEVEL_MEDIUM:
 				ubNumAdmins = Random( 0 );
-				ubNumTroops = 20 + Random( 8 );
+				ubNumTroops = 15 + Random( 8 );
 				ubNumElites = 1 + Random( 2 );		
 				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
 				break;
 			case DIF_LEVEL_HARD:
 				ubNumAdmins = Random( 0 );
-				ubNumTroops = 23 + Random( 7);
+				ubNumTroops = 20 + Random( 7 );
 				ubNumElites = 2 + Random( 2 );	
 				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
 				break;
 			case DIF_LEVEL_INSANE:
 				ubNumAdmins = Random( 0 );
-				ubNumTroops = 15 + Random( 3 );
-				ubNumElites = 8 + Random( 3 );		
+				ubNumTroops = 20 + Random( 3 );
+				ubNumElites = 6 + Random( 3 );		
 				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
 				break;
 			}
 		}
-		
 	}
-	
 	}
 	else
 	{
@@ -179,13 +243,13 @@ UINT8 ubNumElites = 0;
 			{
 			case DIF_LEVEL_EASY:
 				ubNumAdmins = Random( 0 );
-				ubNumTroops = 16 + Random( 5 );
+				ubNumTroops = 10 + Random( 5 );
 				ubNumElites = Random( 4 );			
 				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
 				break;
 			case DIF_LEVEL_MEDIUM:
 				ubNumAdmins = Random( 0 );
-				ubNumTroops = 20 + Random( 8 );
+				ubNumTroops = 15 + Random( 8 );
 				ubNumElites = 1 + Random( 2 );		
 				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
 				break;
@@ -197,8 +261,8 @@ UINT8 ubNumElites = 0;
 				break;
 			case DIF_LEVEL_INSANE:
 				ubNumAdmins = Random( 0 );
-				ubNumTroops = 15 + Random( 3 );
-				ubNumElites = 8 + Random( 3 );		
+				ubNumTroops = 20 + Random( 3 );
+				ubNumElites = 6 + Random( 3 );		
 				SetNumberJa25EnemiesInSector( SectorX, SectorY, Level, ubNumAdmins, ubNumTroops, ubNumElites );
 				break;
 			}
@@ -416,7 +480,7 @@ void LoadGameLegionOptions()
 	
 	gGameLegionOptions.SF_UB = iniReader.ReadBoolean("UB","SF", FALSE);
 	
-	gGameLegionOptions.EnemyXML = iniReader.ReadBoolean("UB","EnemyXML", TRUE);
+	gGameLegionOptions.EnemyXML = iniReader.ReadBoolean("UB","USE_ENEMY_XML", TRUE);
 	
 	gGameLegionOptions.EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE_UB = iniReader.ReadBoolean("UB","EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE", TRUE);
 	gGameLegionOptions.HandleAddingEnemiesToTunnelMaps_UB = iniReader.ReadBoolean("UB","HANDLE_ADDING_ENEMIES_TO_TUNNEL_MAPS", TRUE);
@@ -424,6 +488,11 @@ void LoadGameLegionOptions()
 	gGameLegionOptions.AUTO_RESOLVE_UB = iniReader.ReadBoolean("UB","AUTO_RESOLVE", FALSE);
 	
 	gGameLegionOptions.ADD_RANDOM_ENEMY_TO_SECTOR_UB = iniReader.ReadBoolean("UB","ADD_RANDOM_ENEMY_TO_SECTOR", FALSE);
+	
+	gGameLegionOptions.StrategicMovementCostsXML = iniReader.ReadBoolean("UB","STRATEGIC_MOVEMENT_COSTS_XML", FALSE);
+	
+	gGameLegionOptions.CampaignSector = iniReader.ReadBoolean("UB","MAKE_STRATEGIC_MOVEMENT_COSTS", FALSE);
+	
 	
 //	gGameLegionOptions.BobbyRayInventory_UB = iniReader.ReadBoolean("UB","INIT_BOBBYRAY_INVENTORY", FALSE);
 //	gGameLegionOptions.InitTownLoyalty_UB = iniReader.ReadBoolean("UB","INIT_TOWN_LOYALTY", FALSE);

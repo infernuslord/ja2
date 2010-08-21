@@ -1318,7 +1318,7 @@ void MercLooksForCorpses( SOLDIERTYPE *pSoldier )
 		return;
 	}
 
-	if ( QuoteExp_HeadShotOnly[ pSoldier->ubProfile ] == 1 )
+	if ( QuoteExp[ pSoldier->ubProfile ].QuoteExpHeadShotOnly == 1 )
 	{
 		return;
 	}
@@ -1921,7 +1921,7 @@ void LookForAndMayCommentOnSeeingCorpse( SOLDIERTYPE *pSoldier, INT32 sGridNo, U
 	SOLDIERTYPE		*pTeamSoldier;
 
 
-	if ( QuoteExp_HeadShotOnly[ pSoldier->ubProfile ] == 1 )
+	if ( QuoteExp[ pSoldier->ubProfile ].QuoteExpHeadShotOnly == 1 )
 	{
 	return;
 	}

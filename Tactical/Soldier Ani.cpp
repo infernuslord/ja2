@@ -2919,7 +2919,7 @@ BOOLEAN ShouldMercSayHappyWithGunQuote( SOLDIERTYPE *pSoldier )
 {
 	// How do we do this....
 
-	if ( QuoteExp_GotGunOrUsedGun[ pSoldier->ubProfile ] == QUOTE_SATISFACTION_WITH_GUN_AFTER_KILL )
+	if ( QuoteExp[ pSoldier->ubProfile ].QuoteExpGotGunOrUsedGun == QUOTE_SATISFACTION_WITH_GUN_AFTER_KILL )
 	{
 		// For one, only once a day...
 		if ( pSoldier->usQuoteSaidFlags & SOLDIER_QUOTE_SAID_LIKESGUN )

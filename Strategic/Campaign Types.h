@@ -379,6 +379,14 @@ enum
 	TUNNEL,
 	SHELTER,
 	ABANDONED_MINE,
+	
+//Ja25: New
+	FINAL_COMPLEX,
+	GUARD_POST_TYPE,
+	CRASH_SITE_TYPE,
+	POWER_PLANT_TYPE,
+	MOUNTAINS_TYPE,
+	UNKNOWN_TYPE,
 
 	NUM_TRAVTERRAIN_TYPES
 };
@@ -456,7 +464,9 @@ typedef struct SECTORINFO
 	UINT32	uiNumberOfWorldItemsInTempFileThatCanBeSeenByPlayer;
 
 	BOOLEAN	fValidSector; //ja25 UB
-
+	BOOLEAN	fCustomSector;
+	BOOLEAN	fCampaignSector;
+	
 	INT8	bPadding[ 41 ];
 
 }SECTORINFO;
@@ -486,6 +496,10 @@ typedef struct UNDERGROUND_SECTORINFO
 	UINT8	ubElitesInBattle, ubTroopsInBattle, ubAdminsInBattle, ubCreaturesInBattle;
 
 	UINT32	uiNumberOfWorldItemsInTempFileThatCanBeSeenByPlayer;
+	
+	BOOLEAN	fCustomSector;
+	BOOLEAN	fCampaignSector;
+	
 	INT8	bPadding[36];
 	//no padding left!
 }UNDERGROUND_SECTORINFO;
