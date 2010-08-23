@@ -38,9 +38,12 @@
 #include "mercs.h"
 #include "gamesettings.h"
 #include "connect.h"
-#include "legion cfg.h"
 #include <vfs/Core/vfs.h>
 #include <vfs/Core/vfs_profile.h>
+
+#ifdef JA2UB
+#include "legion cfg.h"
+#endif
 
 #define	MAINMENU_TEXT_FILE						"LoadScreens\\MainMenu.edt"
 #define MAINMENU_RECORD_SIZE					80 * 2
@@ -407,7 +410,11 @@ void InitDependingGameStyleOptions()
 	LoadGameAPBPConstants();
 	// Load ja2_options.ini
 	LoadGameExternalOptions();
+
+#ifdef JA2UB
 	LoadGameLegionOptions(); // JA25 UB
+#endif
+
 	InitSightRange(); //lal
 
 	ReStartingGame();

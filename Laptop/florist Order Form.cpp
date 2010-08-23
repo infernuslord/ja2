@@ -652,7 +652,10 @@ void BtnFlowerOrderSendButtonCallback(GUI_BUTTON *btn,INT32 reason)
 
 			if ( gubCurrentlySelectedFlowerLocation == 7 )
 			{
-/*	                        // sent to meduna!
+#ifdef JA2UB
+// no UB
+#else
+				// sent to meduna!
 				if ( gfFLoristCheckBox0Down )
 				{
 					HandleFlowersMeanwhileScene( 0 );
@@ -661,7 +664,7 @@ void BtnFlowerOrderSendButtonCallback(GUI_BUTTON *btn,INT32 reason)
 				{
 					HandleFlowersMeanwhileScene( 1 );
 				}
-   */
+#endif
 			}
 
 			//increment the order number

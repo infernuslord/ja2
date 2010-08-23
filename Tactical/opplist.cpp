@@ -52,7 +52,10 @@
 	#include "Explosion Control.h"//dnl ch40 200909
 #endif
 
+#ifdef JA2UB
 #include "Ja25_Tactical.h"
+#endif
+
 //rain
 //#define VIS_DIST_DECREASE_PER_RAIN_INTENSITY 20
 //end rain
@@ -103,9 +106,10 @@ BOOLEAN		gfPlayerTeamSawCreatures = FALSE;
 BOOLEAN	gfPlayerTeamSawJoey			= FALSE;
 BOOLEAN	gfMikeShouldSayHi				= FALSE;
 
+#ifdef JA2UB
 //JA25 UB
 BOOLEAN   gfMorrisShouldSayHi				 = FALSE;
-
+#endif
 
 UINT8			gubBestToMakeSighting[BEST_SIGHTING_ARRAY_SIZE];
 UINT8			gubBestToMakeSightingSize = 0;
@@ -2100,22 +2104,28 @@ void ManSeesMan(SOLDIERTYPE *pSoldier, SOLDIERTYPE *pOpponent, INT32 sOppGridNo,
 						switch( pSoldier->ubProfile )
 						{
 						case CARMEN:
-							//if (pOpponent->ubProfile == SLAY ) // 64
-							//{
+#ifdef JA2UB
+// no UB 
+#else
+							if (pOpponent->ubProfile == SLAY ) // 64
+							{
 								// Carmen goes to war (against Slay)
-								//if ( pSoldier->aiData.bNeutral )
-								//{
+								if ( pSoldier->aiData.bNeutral )
+								{
 									//SetSoldierNonNeutral( pSoldier );
-								//	pSoldier->aiData.bAttitude = ATTACKSLAYONLY;
-								//	TriggerNPCRecord( pSoldier->ubProfile, 28 );
-								//}
+									pSoldier->aiData.bAttitude = ATTACKSLAYONLY;
+									TriggerNPCRecord( pSoldier->ubProfile, 28 );
+								}
 								/*
 								if ( ! gTacticalStatus.uiFlags & INCOMBAT )
 								{
 								EnterCombatMode( pSoldier->bTeam );
 								}
 								*/
-							//}
+
+							}
+#endif								
+
 							
 							break;
 						case ELDIN:
@@ -2171,9 +2181,10 @@ void ManSeesMan(SOLDIERTYPE *pSoldier, SOLDIERTYPE *pOpponent, INT32 sOppGridNo,
 							}
 							break;
 							//case QUEEN:
-/*
-Ja25
-No Queen,Joe, or elliot
+#ifdef JA2UB
+//Ja25
+//No Queen,Joe, or elliot
+#else
 						case JOE:
 						case ELLIOT:
 							if ( ! ( gMercProfiles[ pSoldier->ubProfile ].ubMiscFlags2 & PROFILE_MISC_FLAG2_SAID_FIRSTSEEN_QUOTE ) )
@@ -2185,7 +2196,7 @@ No Queen,Joe, or elliot
 								}
 							}
 							break;
-      */
+#endif
 						default:
 							break;
 						}
@@ -2281,7 +2292,7 @@ No Queen,Joe, or elliot
 		}
 		else if ( pSoldier->bTeam == gbPlayerNum )
 		{
-		
+#ifdef JA2UB		
 		  if( (pOpponent->ubProfile == 75 ) && 
 					( GetNumSoldierIdAndProfileIdOfTheNewMercsOnPlayerTeam( NULL, NULL ) != 0 ) && 
 					!( pSoldier->usQuoteSaidExtFlags & SOLDIER_QUOTE_SAID_EXT_MORRIS ) && 
@@ -2289,8 +2300,7 @@ No Queen,Joe, or elliot
 		  {
 				gfMorrisShouldSayHi = TRUE;
 		  }
-		  
-		  /*
+#else		  
 			if ( (pOpponent->ubProfile == MIKE) && ( pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__AIM_MERC ) && !(pSoldier->usQuoteSaidExtFlags & SOLDIER_QUOTE_SAID_EXT_MIKE) )
 			{
 				if (gfMikeShouldSayHi == FALSE)
@@ -2300,7 +2310,7 @@ No Queen,Joe, or elliot
 				TacticalCharacterDialogue( pSoldier, QUOTE_AIM_SEEN_MIKE );
 				pSoldier->usQuoteSaidExtFlags |= SOLDIER_QUOTE_SAID_EXT_MIKE;
 			}
-			*/
+#endif
 			else if ( pOpponent->ubProfile == JOEY && gfPlayerTeamSawJoey == FALSE )
 			{
 				TacticalCharacterDialogue( pSoldier, QUOTE_SPOTTED_JOEY );
@@ -3152,13 +3162,14 @@ void SaySeenQuote( SOLDIERTYPE *pSoldier, BOOLEAN fSeenCreature, BOOLEAN fVirgin
 	UINT8				ubNumEnemies = 0;
 	UINT8				ubNumAllies = 0;
 	UINT32			cnt;
- /*
-Ja25 No meanwhiles
+#ifdef JA2UB
+//Ja25 No meanwhiles
+#else
 	if ( AreInMeanwhile( ) )
 	{
 		return;
 	}
-     */
+#endif
 	// Check out for our under large fire quote
 	if ( !(pSoldier->usQuoteSaidFlags & SOLDIER_QUOTE_SAID_IN_SHIT ) )
 	{
@@ -6364,10 +6375,11 @@ void TellPlayerAboutNoise( SOLDIERTYPE *pSoldier, UINT8 ubNoiseMaker, INT32 sGri
 	// if the quote was faint, say something
 	if (ubVolumeIndex == 0)
 	{
-/*
-Ja25 No meanwhiles
+#ifdef JA2UB
+//Ja25 No meanwhiles
+#else
 		if ( !AreInMeanwhile( ) && !( gTacticalStatus.uiFlags & ENGAGED_IN_CONV) && pSoldier->ubTurnsUntilCanSayHeardNoise == 0)
-*/
+#endif
 		{
 			TacticalCharacterDialogue( pSoldier, QUOTE_HEARD_SOMETHING );
 			if ( gTacticalStatus.uiFlags & INCOMBAT )
@@ -7352,7 +7364,9 @@ BOOLEAN SoldierHasLimitedVision(SOLDIERTYPE * pSoldier)
 		return FALSE;
 }
 
+#ifdef JA2UB
 INT32 MaxDistanceVisible( void )
 {
 	return( STRAIGHT * 2 );
 }
+#endif

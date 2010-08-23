@@ -32,8 +32,11 @@ enum NPCIDs
 	COUGAR,
 	NUMB,
 	BUBBA,
-
+#ifdef JA2UB
 	MIGUEL = 58,  	//Ja25:		Was 57
+#else
+	MIGUEL = 57,
+#endif
 	CARLOS,
 	IRA,
 	DIMITRI,
@@ -42,7 +45,11 @@ enum NPCIDs
 	ROBOT,
 	HAMOUS,
 	SLAY,
+#ifdef JA2UB
 //	RPC65,
+#else
+	RPC65,
+#endif
 	DYNAMO,
 	SHANK,
 	IGGY,
@@ -153,15 +160,19 @@ enum NPCIDs
 	PROF_ICECREAM,
 	PROF_HELICOPTER,
 	NPC164,
+#ifdef JA2UB
 	NPC165,
 	NPC166,
 	NPC167,
 	NPC168,
-	//GASTON,
-	//STOGIE,
-	//TEX,
-	//BIGGENS,
 	NPC169,
+#else
+	GASTON,
+	STOGIE,
+	TEX,
+	BIGGENS,
+	NPC169,
+#endif
 } ;
 
 BOOLEAN LoadMercProfiles(void);

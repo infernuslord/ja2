@@ -205,11 +205,12 @@ extern UINT32 guiLaptopBACKGROUND;
 #define	DEAD_MERC_COLOR_GREEN						55
 #define	DEAD_MERC_COLOR_BLUE						55
 
+#ifdef JA2UB
 //ja25 UB
 void			ShouldImpReminderEmailBeSentWhenLaptopBackOnline();
 
 extern BOOLEAN gfProcessCustomMaps;
-
+#endif
 
 #endif
 

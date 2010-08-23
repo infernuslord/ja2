@@ -208,8 +208,9 @@ void HandleEnricoEmail(void)
 	UINT8 ubCurrentProgress = CurrentPlayerProgressPercentage();
 	UINT8 ubHighestProgress = HighestPlayerProgressPercentage();
 
+#ifdef JA2UB
 //JA25 UB	
-/*
+#else
 	// if creatures have attacked a mine (doesn't care if they're still there or not at the moment)
 	if (HasAnyMineBeenAttackedByMonsters() && !(gStrategicStatus.usEnricoEmailFlags & ENRICO_EMAIL_SENT_CREATURES))
 	{
@@ -345,7 +346,7 @@ void HandleEnricoEmail(void)
 			}
 		}
 	}
-*/
+#endif
 	// reset # of new sectors visited 'today'
 	// grant some leeway for the next day, could have started moving
 	// at night...

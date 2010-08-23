@@ -1816,10 +1816,12 @@ void CheckIfEntireTownHasBeenLiberated( INT8 bTownId, INT16 sSectorX, INT16 sSec
 
 			// set fact is has been lib'ed and set history event
 			AddHistoryToPlayersLog( HISTORY_LIBERATED_TOWN, bTownId, GetWorldTotalMin(), sSectorX, sSectorY );
-/*
-Ja25: No meanhwiles
+
+#ifdef JA2UB
+//Ja25: No meanhwiles
+#else
 			HandleMeanWhileEventPostingForTownLiberation( bTownId );
-*/
+#endif
 		}
 
 		// even taking over non-trainable "towns" like Orta/Tixa for the first time should count as "player activity"
@@ -1849,14 +1851,15 @@ void CheckIfEntireTownHasBeenLost( INT8 bTownId, INT16 sSectorX, INT16 sSectorY 
 	if ( MilitiaTrainingAllowedInSector( sSectorX, sSectorY, 0 ) && IsTownUnderCompleteControlByEnemy(bTownId) )
 	{
 
-
-/*
-Ja25 No meanwhile		// the whole town is under enemy control, check if we libed this town before
+#ifdef JA2UB
+//Ja25 No meanwhile
+#else
+		// the whole town is under enemy control, check if we libed this town before
 		if ( gTownLoyalty[ bTownId ].fLiberatedAlready )
 		{
 			HandleMeanWhileEventPostingForTownLoss( bTownId );
 		}
-*/
+#endif
 	}
 }
 
@@ -1896,12 +1899,14 @@ void HandleLoyaltyChangeForNPCAction( UINT8 ubNPCProfileId )
 			// NOTE: This affects Chitzena,too, a second time, so first value is discounted for it
 			IncrementTownLoyaltyEverywhere( LOYALTY_BONUS_YANNI_WHEN_CHALICE_RETURNED_GLOBAL );
 			break;
-                 /*
+#ifdef JA2UB
+// ja25 UB
+#else      
 		case AUNTIE:
 			// Bloodcats killed
 			IncrementTownLoyalty( ALMA, LOYALTY_BONUS_AUNTIE_WHEN_BLOODCATS_KILLED );
 			break;
-                    */
+#endif
 		case MATT:
 			// Brother Dynamo freed
 			IncrementTownLoyalty( ALMA, LOYALTY_BONUS_MATT_WHEN_DYNAMO_FREED );

@@ -74,11 +74,13 @@ CHAR16 gszActionItemDesc[ NUM_ACTIONITEMS ][ 30 ] =
 	L"Museum alarm",
 	L"Bloodcat alarm",
 	L"Big teargas",
+#ifdef JA2UB
 	L"BIGGENS BOMBS",
 	L"ABIGGENS WARNING",
 	L"SEE FORTIFIED DOOR",
 	L"OPEN FORTIFED DOOR",
 	L"SEE POWER GEN FAN",
+#endif
 };
 
 const STR16 GetActionItemName( OBJECTTYPE *pItem )
@@ -112,11 +114,13 @@ const STR16 GetActionItemName( OBJECTTYPE *pItem )
 			case ACTION_ITEM_TOGGLE_PRESSURE_ITEMS:		return gszActionItemDesc[ ACTIONITEM_TOGGLE_PRESSURE_ITEMS ];
 			case ACTION_ITEM_MUSEUM_ALARM:						return gszActionItemDesc[ ACTIONITEM_MUSEUM_ALARM ];
 			case ACTION_ITEM_BLOODCAT_ALARM:					return gszActionItemDesc[ ACTIONITEM_BLOODCAT_ALARM ];
+#ifdef JA2UB
 			case ACTION_ITEM_BIGGENS_BOMBS:						return gszActionItemDesc[ ACTIONITEM_BIGGENS_BOMBS ];
 			case ACTION_ITEM_BIGGENS_WARNING:					return gszActionItemDesc[ ACTIONITEM_BIGGENS_WARNING ];
 			case ACTION_ITEM_SEE_FORTIFIED_DOOR:			return gszActionItemDesc[ ACTIONITEM_SEE_FORTIFIED_DOOR ];
 			case ACTION_ITEM_OPEN_FORTIFED_DOOR:			return gszActionItemDesc[ ACTIONITEM_OPEN_FORTIFED_DOOR ];
 			case ACTION_ITEM_SEE_POWER_GEN_FAN:				return gszActionItemDesc[ ACTIONITEM_SEE_POWER_GEN_FAN ];
+#endif
 			default:																	return NULL;
 		}
 	}
@@ -1537,7 +1541,8 @@ void ChangeActionItem( OBJECTTYPE *pItem, INT8 bActionItemIndex )
 			break;
 		case ACTIONITEM_BIG_TEAR_GAS:
 			(*pItem)[0]->data.misc.usBombItem = BIG_TEAR_GAS;
-			break;	
+			break;
+#ifdef JA2UB
 		case ACTIONITEM_BIGGENS_BOMBS:
 			(*pItem)[0]->data.misc.usBombItem = NOTHING;
 			(*pItem)[0]->data.misc.bActionValue = ACTION_ITEM_BIGGENS_BOMBS;
@@ -1558,7 +1563,7 @@ void ChangeActionItem( OBJECTTYPE *pItem, INT8 bActionItemIndex )
 			(*pItem)[0]->data.misc.usBombItem = NOTHING;
 			(*pItem)[0]->data.misc.bActionValue = ACTION_ITEM_SEE_POWER_GEN_FAN;
 			break;
-
+#endif
 	}
 }
 

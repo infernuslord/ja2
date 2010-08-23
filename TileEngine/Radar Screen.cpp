@@ -364,14 +364,15 @@ void RenderRadarScreen( )
 		RenderSquadList( );
 		return;
 	}
-/*
-JA25 No meanwhiles
+#ifdef JA2UB
+//JA25 No meanwhiles
+#else
 	if( AreInMeanwhile( ) == TRUE )
 	{
 		// in a meanwhile, don't render any map
 		fImageLoaded = FALSE;
 	}
-*/
+#endif
 	if ( fInterfacePanelDirty == DIRTYLEVEL2 && fImageLoaded )
 	{
 		// Set to default

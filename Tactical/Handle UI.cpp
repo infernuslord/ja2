@@ -5637,8 +5637,11 @@ BOOLEAN IsValidTalkableNPC( UINT8 ubSoldierID, BOOLEAN fGive , BOOLEAN fAllowMer
 			return( FALSE	);
 		}
 	}
-
+#ifdef JA2UB
 	if ( pSoldier->ubProfile != NO_PROFILE && pSoldier->ubProfile >= FIRST_RPC /* &&  pSoldier->ubProfile < GASTON*/ && !RPC_RECRUITED( pSoldier ) && !AM_AN_EPC( pSoldier ) )
+#else
+	if ( pSoldier->ubProfile != NO_PROFILE && pSoldier->ubProfile >= FIRST_RPC && pSoldier->ubProfile < GASTON && !RPC_RECRUITED( pSoldier ) && !AM_AN_EPC( pSoldier ) )
+#endif
 	{
 		fValidGuy = TRUE;
 	}
@@ -5807,12 +5810,14 @@ BOOLEAN HandleTalkInit(	)
 					ubQuoteNum = QUOTE_NEGATIVE_COMPANY;
 					break;
 				}
-/* ja25 UB
+#ifdef JA2UB
+// ja25 UB
+#else
 				if ( pTSoldier->ubProfile == IRA )
 				{
 					ubQuoteNum = QUOTE_PASSING_DISLIKE;
 				}
-*/
+#endif
 				TacticalCharacterDialogue( pTSoldier, ubQuoteNum );
 
 				return( FALSE );

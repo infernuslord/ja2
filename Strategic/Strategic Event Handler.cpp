@@ -683,7 +683,11 @@ void HandleNPCSystemEvent( UINT32 uiEvent )
 					{
 						// KP knows money is gone, hasn't told player, if this event is called then the 2
 						// days are up... send email
-					//	AddEmail( KING_PIN_LETTER, KING_PIN_LETTER_LENGTH, KING_PIN, GetWorldTotalMin(), -1 );
+#ifdef JA2UB
+// no UB
+#else
+						AddEmail( KING_PIN_LETTER, KING_PIN_LETTER_LENGTH, KING_PIN, GetWorldTotalMin(), -1 );
+#endif
 						StartQuest( QUEST_KINGPIN_MONEY, 5, MAP_ROW_D );
 						// add event to send terrorists two days from now
 						AddFutureDayStrategicEvent( EVENT_SET_BY_NPC_SYSTEM, Random( 120 ), FACT_KINGPIN_KNOWS_MONEY_GONE, 2 );
@@ -780,7 +784,11 @@ void HandleNPCSystemEvent( UINT32 uiEvent )
 				break;
 
 			case NPC_ACTION_SEND_ENRICO_MIGUEL_EMAIL:
-			//	AddEmail( ENRICO_MIGUEL, ENRICO_MIGUEL_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1 );
+#ifdef JA2UB
+// no UB
+#else
+				AddEmail( ENRICO_MIGUEL, ENRICO_MIGUEL_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1 );
+#endif
 				break;
 
 			case NPC_ACTION_TIMER_FOR_VEHICLE:
@@ -803,7 +811,11 @@ void HandleEarlyMorningEvents( void )
 	UINT32					uiAmount;
 
 	// loop through all *NPCs* and reset "default response used recently" flags
+#ifdef JA2UB
 	for (cnt = FIRST_RPC; cnt < NUM_PROFILES; cnt++)  //GASTON
+#else
+	for (cnt = FIRST_RPC; cnt < GASTON; cnt++)
+#endif
 	{
 		gMercProfiles[cnt].bFriendlyOrDirectDefaultResponseUsedRecently = FALSE;
 		gMercProfiles[cnt].bRecruitDefaultResponseUsedRecently = FALSE;

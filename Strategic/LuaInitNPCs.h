@@ -4,7 +4,10 @@
 #include "Types.h"
 
 extern BOOLEAN LetLuaGameInit(UINT8 Init);
+
+#ifdef JA2UB
 extern BOOLEAN LuaInitStrategicLayer(UINT8 Init);
 extern BOOLEAN LetLuaMakeBadSectorListFromMapsOnHardDrive(UINT8 Init);
+#endif
 
 #endif

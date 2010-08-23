@@ -3200,11 +3200,12 @@ void TrashWorld( void )
 
 	//Remove the schedules
 	DestroyAllSchedules();
-/*
-Ja25 no meanwhiles
+#ifdef JA2UB
+//Ja25 no meanwhiles
+#else
 	// on trash world sheck if we have to set up the first meanwhile
 	HandleFirstMeanWhileSetUpWithTrashWorld( );
-*/
+#endif
 	// Create world randomly from tiles
 	for ( cnt = 0; cnt < WORLD_MAX; cnt++ )
 	{

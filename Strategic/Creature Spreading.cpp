@@ -297,15 +297,17 @@ void InitCreatureQuest()
 	#else
 		fPlayMeanwhile = TRUE;
 	#endif
-/*
-Ja25 No meanwhiles && no creatures
+
+#ifdef JA2UB
+//Ja25 No meanwhiles && no creatures
+#else
 	if( fPlayMeanwhile && !gfCreatureMeanwhileScenePlayed )
 	{
 		//Start the meanwhile scene for the queen ordering the release of the creatures.
 		HandleCreatureRelease();
 		gfCreatureMeanwhileScenePlayed = TRUE;
 	}
-*/
+#endif
 	giHabitatedDistance = 0;
 	switch( gGameOptions.ubDifficultyLevel )
 	{
@@ -1520,10 +1522,12 @@ BOOLEAN LoadCreatureDirectives( HWFILE hFile, UINT32 uiSavedGameVersion )
 		if( gfClearCreatureQuest && giLairID != -1 )
 		{
 			giLairID = 0;
-			/*
+#ifdef JA2UB
+// no UB
+#else
 			gfCreatureMeanwhileScenePlayed = FALSE;
 			uiMeanWhileFlags &= ~(0x00000800);
-			*/
+#endif
 		}
 		gfClearCreatureQuest = FALSE;
 	#endif

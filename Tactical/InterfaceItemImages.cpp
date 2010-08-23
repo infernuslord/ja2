@@ -16,13 +16,17 @@ UINT32					guiGUNSM;
 UINT32					guiP1ITEMS;
 UINT32					guiP2ITEMS;
 UINT32					guiP3ITEMS;
+#ifdef JA2UB
 UINT32					guiP4ITEMS; //UB Items
+#endif
 // new item image handles
 MDItemVideoObjects		g_oGUNSM;
 MDItemVideoObjects		g_oP1ITEMS;
 MDItemVideoObjects		g_oP2ITEMS;
 MDItemVideoObjects		g_oP3ITEMS;
+#ifdef JA2UB
 MDItemVideoObjects		g_oP4ITEMS; //UB Items
+#endif
 
 /******************************************************************************/
 
@@ -156,7 +160,7 @@ bool RegisterItemImages()
 	{
 		return false;
 	}
-	
+#ifdef JA2UB	
 	// LOAD INTERFACE UB ITEM PICTURES
 	if(!g_bUsePngItemImages)
 	{
@@ -169,7 +173,7 @@ bool RegisterItemImages()
 	{
 		return false;
 	}
-
+#endif
 	return true;
 }
 

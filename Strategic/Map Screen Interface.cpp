@@ -5762,10 +5762,12 @@ BOOLEAN HandleTimeCompressWithTeamJackedInAndGearedToGo( void )
 	FadeInGameScreen( );
 
 	SetUpShutDownMapScreenHelpTextScreenMask( );
-
-	// Add e-mail message //no ja25 UB
-//	AddEmail(ENRICO_CONGRATS,ENRICO_CONGRATS_LENGTH,MAIL_ENRICO, GetWorldTotalMin(), -1);
-
+#ifdef JA2UB
+//no ja25 UB
+#else
+	// Add e-mail message 
+	AddEmail(ENRICO_CONGRATS,ENRICO_CONGRATS_LENGTH,MAIL_ENRICO, GetWorldTotalMin(), -1);
+#endif
 
 	return( TRUE );
 }
@@ -5876,18 +5878,19 @@ BOOLEAN NotifyPlayerWhenEnemyTakesControlOfImportantSector( INT16 sSectorX, INT1
 
 	if( fContested && bTownId )
 	{
-	
-		/*
+#ifdef JA2UB
+	// no UB
+#else	
 		if( bTownId == SAN_MONA )
 		{ //San Mona isn't important.
 			return( TRUE );
 		}
-		
-		*/
+#endif			
 		swprintf( sStringB, pMapErrorString[ 25 ], sString );
-		
-		HandleDisplayingOfPlayerLostDialogue( );
 
+#ifdef JA2UB		
+		HandleDisplayingOfPlayerLostDialogue( );
+#endif
 		// put up the message informing the player of the event
 		DoScreenIndependantMessageBox( sStringB, MSG_BOX_FLAG_OK, MapScreenDefaultOkBoxCallback );
 		return( TRUE );

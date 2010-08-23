@@ -457,12 +457,7 @@ void MercDailyUpdate()
 					if ( pProfile->ubMiscFlags3 & PROFILE_MISC_FLAG3_PLAYER_LEFT_MSG_FOR_MERC_AT_AIM )
 					{
 						iOffset = AIM_REPLY_BARRY;
-
-						//remove the Flag, so if the merc goes on another assignment, the player can leave an email.
-						//pProfile->ubMiscFlags3 &= ~PROFILE_MISC_FLAG3_PLAYER_LEFT_MSG_FOR_MERC_AT_AIM;
-
-						// TO DO: send E-mail to player telling him the merc has returned from an assignment
-						//AddEmail( ( UINT8 )( iOffset + ( cnt * AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, ( UINT8 )( 6 + cnt ), GetWorldTotalMin(), -1 );
+#ifdef JA2UB
 
 						//if the Laptop is NOT broken
 						if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTINPROGRESS )
@@ -473,9 +468,14 @@ void MercDailyUpdate()
 							// TO DO: send E-mail to player telling him the merc has returned from an assignment
 							AddEmail( ( UINT8 )( iOffset + ( cnt * AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, ( UINT8 )( 6 + cnt ), GetWorldTotalMin(),-1 );
 						}
+#else
+						//remove the Flag, so if the merc goes on another assignment, the player can leave an email.
+						pProfile->ubMiscFlags3 &= ~PROFILE_MISC_FLAG3_PLAYER_LEFT_MSG_FOR_MERC_AT_AIM;
 
-
-						}
+						// TO DO: send E-mail to player telling him the merc has returned from an assignment
+						AddEmail( ( UINT8 )( iOffset + ( cnt * AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, ( UINT8 )( 6 + cnt ), GetWorldTotalMin(), -1 );
+#endif
+					}
 				}
 			}
 		}
@@ -524,8 +524,11 @@ void MercDailyUpdate()
 
 	// build quit list
 	//BuildMercQuitList( pQuitList );
-	//HandleSlayDailyEvent( );
-
+#ifdef JA2UB
+//no UB
+#else
+	HandleSlayDailyEvent( );
+#endif
 	// rebuild list for mapscreen
 	ReBuildCharactersList( );
 	// HEADROCK HAM B1: Run a function to redefine Roaming Militia Restrictions.
@@ -1020,8 +1023,11 @@ void UpdateBuddyAndHatedCounters( void )
 											pProfile->bHated[2] = pProfile->bLearnToHate;
 											pProfile->bMercOpinion[ubOtherProfileID] = HATED_OPINION;
 											}
-
+#ifdef JA2UB
 											if (pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__MERC || (pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__NPC &&  ( /* pSoldier->ubProfile == DEVIN || */ pSoldier->ubProfile == SLAY || pSoldier->ubProfile == IGGY || pSoldier->ubProfile == CONRAD ) ) )
+#else
+											if (pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__MERC || (pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__NPC && (pSoldier->ubProfile == DEVIN || pSoldier->ubProfile == SLAY || pSoldier->ubProfile == IGGY || pSoldier->ubProfile == CONRAD ) ) )
+#endif
 											{
 												// Leave now! ( handle equipment too )....
 												TacticalCharacterDialogue( pSoldier, QUOTE_MERC_QUIT_LEARN_TO_HATE );
@@ -1247,7 +1253,7 @@ void HourlyCamouflageUpdate( void )
 		}
 	}
 }
-
+#ifdef JA2UB
 void HandleAddingAnyAimAwayEmailsWhenLaptopGoesOnline()
 {
 	UINT32 cnt;
@@ -1280,3 +1286,4 @@ void HandleAddingAnyAimAwayEmailsWhenLaptopGoesOnline()
 		}
 	}
 }
+#endif

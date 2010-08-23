@@ -931,14 +931,15 @@ BOOLEAN SaveCurrentSectorsInformationToTempItemFile( )
 		gfWasInMeanwhile = FALSE;
 		return TRUE;
 	}
-/*
-Ja25v No meanwhiles
+#ifdef JA2UB
+//Ja25v No meanwhiles
+#else
 	else if( AreInMeanwhile() )
 	{
 		gfInMeanwhile = FALSE;
 		fShouldBeInMeanwhile = TRUE;
 	}
-    */
+#endif
 	//If we havent been to tactical yet
 	if( ( gWorldSectorX == 0 ) && ( gWorldSectorY == 0 ) )
 	{
@@ -1029,13 +1030,14 @@ Ja25v No meanwhiles
 	//Save the time the player was last in the sector
 	SetLastTimePlayerWasInSector();
 
-/*
-Ja25 no meanwhile
+#ifdef JA2UB
+//Ja25 no meanwhile
+#else
 	if( fShouldBeInMeanwhile )
 	{
 		gfInMeanwhile = TRUE;
 	}
-    */
+#endif
 	return( TRUE );
 }
 
@@ -1190,8 +1192,9 @@ BOOLEAN LoadCurrentSectorsInformationFromTempItemsFile()
 	//
 	// Load in the sectors ITems
 	//
-/*
-Ja25v no meanwhiles
+#ifdef JA2UB
+//Ja25v no meanwhiles
+#else
 	if( AreInMeanwhile() )
 	{ //There will never be a temp file for the meanwhile scene, so return TRUE.  However,
 		//set a flag to not save it either!
@@ -1212,7 +1215,7 @@ Ja25v no meanwhiles
 		}
 		return TRUE;
 	}
-    */
+#endif
 	//if we are in an above ground sector
 
 	//If there is a file, load in the Items array
@@ -2304,7 +2307,11 @@ BOOLEAN InitTempNpcQuoteInfoForNPCFromTempFile()
 
 
 	//loop through all the npc accounts and write the temp array to disk
+#ifdef JA2UB
 	for( usCnt1=0; usCnt1< ( NUM_PROFILES-FIRST_RPC ); usCnt1++)    //  GASTON
+#else
+	for( usCnt1=0; usCnt1< ( GASTON-FIRST_RPC ); usCnt1++)
+#endif
 	{
 
 		memset( TempNpcQuote, 0, uiSizeOfTempArray );

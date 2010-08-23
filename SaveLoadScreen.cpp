@@ -41,11 +41,14 @@
 
 #include "Campaign Init.h"
 #include "connect.h"
+
+#ifdef JA2UB
 #include "Strategic Movement.h"
 
 //#include "Strategic Movement Costs.h"
 
 #include "LuaInitNPCs.h"
+#endif
 
 BOOLEAN gfSchedulesHosed = FALSE;
 extern UINT32 guiBrokenSaveGameVersion;
@@ -280,7 +283,9 @@ void			MoveSelectionUpOrDown( BOOLEAN fUp );
 void			SaveGameToSlotNum();
 void			StartFadeOutForSaveLoadScreen();
 
+#ifdef JA2UB
 extern void MakeBadSectorListFromMapsOnHardDrive( BOOLEAN fDisplayMessages ); // ja25 UB
+#endif
 
 //ppp
 
@@ -2288,7 +2293,7 @@ void DoneFadeOutForSaveLoadScreen( void )
 	//			EnterTacticalScreen( );
 				FadeInGameScreen( );
 			}
-			
+#ifdef JA2UB			
 			//JA25 UB
 			// ATE: Validate any new maps...
 			// OK, if we're a camapign, check for new maps
@@ -2298,6 +2303,7 @@ void DoneFadeOutForSaveLoadScreen( void )
 			LetLuaMakeBadSectorListFromMapsOnHardDrive( 0 );
 
 			//}
+#endif
 			
 		#ifdef JA2BETAVERSION
 		}

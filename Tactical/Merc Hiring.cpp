@@ -61,6 +61,7 @@
 #endif
 #include "connect.h"
 
+#ifdef JA2UB
 #include "Soldier Control.h"
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
@@ -68,6 +69,7 @@
 #include "MapScreen Quotes.h"
 #include "opplist.h"
 #include "Ja25Update.h"
+#endif
 
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -94,6 +96,8 @@ INT16 gsMercArriveSectorX = gGameExternalOptions.ubDefaultArrivalSectorX;
 INT16 gsMercArriveSectorY = gGameExternalOptions.ubDefaultArrivalSectorY;
 
 void CheckForValidArrivalSector( );
+
+#ifdef JA2UB
 void AddItemToMerc( UINT8 ubNewMerc, INT16 sItemType );
 
 #define	NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH		7
@@ -123,7 +127,7 @@ INT16	gsInitialHeliRandomTimes[ NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH ] =
 
 INT16		GetInitialHeliGridNo( );
 UINT16	GetInitialHeliRandomTime();
-
+#endif
 INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 {
 	SOLDIERTYPE	*pSoldier;
@@ -175,34 +179,7 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 		return( MERC_HIRE_FAILED );
 	}
 
-/*
-Ja25: No enrico, therefore, no email
-	if( DidGameJustStart() )
-	{
-		// OK, CHECK FOR FIRST GUY, GIVE HIM SPECIAL ITEM!
-		if ( iNewIndex == 0 )
-		{
-			// OK, give this item to our merc!
-			// make an objecttype
-			CreateItem(LETTER, 100, &gTempObject);
-			// Give it
-			fReturn = AutoPlaceObject( MercPtrs[iNewIndex], &gTempObject, FALSE );
-			// CHRISL: This condition should resolve the issue of the letter not being issued to the first merc
-			if(!fReturn && (UsingNewInventorySystem() == true))
-			{
-				(MercPtrs[iNewIndex]->inv[NUM_INV_SLOTS-1]) = gTempObject;
-				fReturn=TRUE;
-			}
-			Assert( fReturn );
-		}
-
-		// Set insertion for first time in chopper
-
-		// ATE: Insert for demo , not using the heli sequence....
-		pHireMerc->ubInsertionCode				= INSERTION_CODE_CHOPPER;
-		#endif
-	}
-*/
+#ifdef JA2UB
 	//JA25 UB
 	//MErc mercs come with an umbrella
 	if( ( ubCurrentSoldier >= 40 && ubCurrentSoldier <= 50 ) || ubCurrentSoldier == 58 /*GASTON*/ || ubCurrentSoldier == 59 /*STOGIE*/ )
@@ -229,7 +206,32 @@ Ja25: No enrico, therefore, no email
 			AddItemToMerc( iNewIndex, 4506 ); //SAM_GARVER_COMBAT_KNIFE
 		}
 	}
+#else //ja25: No enrico, therefore, no email
+	if( DidGameJustStart() )
+	{
+		// OK, CHECK FOR FIRST GUY, GIVE HIM SPECIAL ITEM!
+		if ( iNewIndex == 0 )
+		{
+			// OK, give this item to our merc!
+			// make an objecttype
+			CreateItem(LETTER, 100, &gTempObject);
+			// Give it
+			fReturn = AutoPlaceObject( MercPtrs[iNewIndex], &gTempObject, FALSE );
+			// CHRISL: This condition should resolve the issue of the letter not being issued to the first merc
+			if(!fReturn && (UsingNewInventorySystem() == true))
+			{
+				(MercPtrs[iNewIndex]->inv[NUM_INV_SLOTS-1]) = gTempObject;
+				fReturn=TRUE;
+			}
+			Assert( fReturn );
+		}
 
+		// Set insertion for first time in chopper
+
+		// ATE: Insert for demo , not using the heli sequence....
+		pHireMerc->ubInsertionCode				= INSERTION_CODE_CHOPPER;
+	}
+#endif
 
 	//record how long the merc will be gone for
 	pMerc->bMercStatus = (UINT8)pHireMerc->iTotalContractLength;
@@ -271,13 +273,15 @@ Ja25: No enrico, therefore, no email
 	{
 	if( DidGameJustStart() )
 	{
+#ifdef JA2UB
 		//ja25ub
 		//set a flag so we know we are doing the heli crash
 		gfFirstTimeInGameHeliCrash = TRUE; //AA FALSE ??
 
 		// Set time of initial merc arrival in minutes
-
+#endif
 		pHireMerc->uiTimeTillMercArrives = ( gGameExternalOptions.iGameStartingTime + gGameExternalOptions.iFirstArrivalDelay ) / NUM_SEC_IN_MIN;
+#ifdef JA2UB
 		// Set the gridno for the soldier
 		pSoldier->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
 		pSoldier->usStrategicInsertionData = GetInitialHeliGridNo( );
@@ -295,10 +299,10 @@ Ja25: No enrico, therefore, no email
 		pSoldier->fIgnoreGetupFromCollapseCheck = TRUE;
 
 		RESETTIMECOUNTER( pSoldier->GetupFromJA25StartCounter, GetInitialHeliRandomTime() );
-
+#else
 		// Set insertion for first time in chopper
-		//pHireMerc->ubInsertionCode				= INSERTION_CODE_CHOPPER;
-
+		pHireMerc->ubInsertionCode				= INSERTION_CODE_CHOPPER;
+#endif
 		//set when the merc's contract is finished
 		pSoldier->iEndofContractTime = GetMidnightOfFutureDayInMinutes( pSoldier->iTotalContractLength ) + ( GetHourWhenContractDone( pSoldier ) * 60 );
 	}
@@ -367,7 +371,11 @@ Ja25: No enrico, therefore, no email
 		pSoldier->usMedicalDeposit = gMercProfiles[ pSoldier->ubProfile ].sMedicalDepositAmount;
 	}
 	//if the merc is from M.E.R.C.
+#ifdef JA2UB
 	else if( ( ubCurrentSoldier >= BIFF && ubCurrentSoldier <= BUBBA ) || ( ubCurrentSoldier == 58 || ubCurrentSoldier == 59 ) ) // gaston stogie
+#else
+	else if( ( ubCurrentSoldier >= BIFF && ubCurrentSoldier <= BUBBA ) || ubCurrentSoldier >= GASTON )
+#endif
 	{
 		pSoldier->ubWhatKindOfMercAmI = MERC_TYPE__MERC;
 		//pSoldier->iTotalContractCharge = -1;
@@ -391,10 +399,10 @@ Ja25: No enrico, therefore, no email
 		pSoldier->ubWhatKindOfMercAmI = MERC_TYPE__NPC;
 		//pSoldier->iTotalContractCharge = -1;
 	}
-
+#ifdef JA2UB
 	//Ja25:  Need to set start time for all mercs
 	pSoldier->iStartContractTime = GetWorldDay( );
-
+#endif
 	//remove the merc from the Personnel screens departed list ( if they have never been hired before, its ok to call it )
 	RemoveNewlyHiredMercFromPersonnelDepartedList( pSoldier->ubProfile );
 
@@ -496,9 +504,11 @@ void MercArrivesCallback(	UINT8	ubSoldierID )
 			TacticalCharacterDialogueWithSpecialEvent( pSoldier, 0, DIALOGUE_SPECIAL_EVENT_MINESECTOREVENT, 2, 0 );
 			
 //ja25ub
+#ifdef JA2UB
 			//if its the first time in, dont say anything
 			if( !gfFirstTimeInGameHeliCrash )
-				TacticalCharacterDialogue( pSoldier, QUOTE_MERC_REACHED_DESTINATION );
+#endif
+			TacticalCharacterDialogue( pSoldier, QUOTE_MERC_REACHED_DESTINATION );
 
 			TacticalCharacterDialogueWithSpecialEvent( pSoldier, 0, DIALOGUE_SPECIAL_EVENT_MINESECTOREVENT, 3, 0 );
 			TacticalCharacterDialogueWithSpecialEventEx( pSoldier, 0, DIALOGUE_SPECIAL_EVENT_UNSET_ARRIVES_FLAG, 0, 0, 0 );
@@ -609,14 +619,14 @@ void HandleMercArrivesQuotes( SOLDIERTYPE *pSoldier )
 {
 	INT8										cnt, bHated, bLastTeamID;
 	SOLDIERTYPE							*pTeamSoldier;
-
+#ifdef JA2UB
 	//if we are at the begining of the game going through the initial heli scequence
 	if( pSoldier->fWaitingToGetupFromJA25Start )
 	{
 		//we can "leave" this function cause we dont want to do anything with buddy system
 		return;
 	}
-	
+#endif	
 	// If we are approaching with helicopter, don't say any ( yet )
 	if ( pSoldier->ubStrategicInsertionCode != INSERTION_CODE_CHOPPER )
 	{
@@ -826,7 +836,7 @@ void CheckForValidArrivalSector( )
 
 	}
 }
-
+#ifdef JA2UB
 INT16	GetInitialHeliGridNo( )
 {
 	UINT8	ubCnt;
@@ -999,3 +1009,4 @@ void AddItemToMerc( UINT8 ubNewMerc, INT16 sItemType )
 	
 
 }
+#endif

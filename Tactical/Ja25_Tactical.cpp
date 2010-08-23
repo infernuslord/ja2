@@ -54,6 +54,8 @@
 	#include "debug control.h"
 #endif
 
+#ifdef JA2UB
+
 #include "Ja25 Strategic Ai.h"
 #include "MapScreen Quotes.h"
 #include "Ja25_Tactical.h"
@@ -1789,3 +1791,4 @@ void HandleOpenControlPanelToRevealSwitchInMorrisArea()
 		}
 	}
 }
+#endif

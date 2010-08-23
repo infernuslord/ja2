@@ -32,8 +32,10 @@ BOOLEAN			gfApplyChangesToTempFile = FALSE;
 //	3200 bytes * 8 bits = 25600 map elements
 UINT8				*gpRevealedMap;
 
+#ifdef JA2UB
 //Ja25
 void AddRemoveExitGridToUnloadedMapTempFile( UINT16 usGridNo, INT16 sSectorX, INT16 sSectorY, UINT8 ubSectorZ );
+#endif
 
 void RemoveSavedStructFromMap( INT32 uiMapIndex, UINT16 usIndex );
 void AddObjectFromMapTempFileToMap( INT32 uiMapIndex, UINT16 usIndex );
@@ -289,7 +291,7 @@ BOOLEAN LoadAllMapChangesFromMapTempFileAndApplyThem( )
 					uiNumberOfElementsSavedBackToFile++;
 				}
 				break;
-				
+#ifdef JA2UB				
 			case SLM_REMOVE_EXIT_GRID:
 				//Remove the exit grid
 				RemoveExitGridFromWorld( pMap->usGridNo );
@@ -297,7 +299,7 @@ BOOLEAN LoadAllMapChangesFromMapTempFileAndApplyThem( )
 				// Save this struct back to the temp file
 				SaveModifiedMapStructToMapTempFile( pMap, gWorldSectorX, gWorldSectorY, gbWorldSectorZ );
 				break;
-
+#endif
 			default:
 				AssertMsg( 0, "ERROR!	Map Type not in switch when loading map changes from temp file");
 				break;
@@ -1213,6 +1215,7 @@ BOOLEAN ChangeStatusOfOpenableStructInUnloadedSector( UINT16 usSectorX, UINT16 u
 	return( TRUE );
 }
 
+#ifdef JA2UB
 //JA25
 void AddRemoveExitGridToUnloadedMapTempFile( UINT16 usGridNo, INT16 sSectorX, INT16 sSectorY, UINT8 ubSectorZ )
 {
@@ -1235,3 +1238,4 @@ void AddRemoveExitGridToUnloadedMapTempFile( UINT16 usGridNo, INT16 sSectorX, IN
 
 	SaveModifiedMapStructToMapTempFile( &Map, sSectorX, sSectorY, ubSectorZ );
 }
+#endif

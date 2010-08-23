@@ -56,8 +56,10 @@
 	#include "strategic.h"
 #endif
 
-
+#ifdef JA2UB
 #include "Ja25_Tactical.h"
+#endif
+
 #include "legion cfg.h"
 
 #include "connect.h"
@@ -236,8 +238,9 @@ BOOLEAN LoadMercProfiles(void)
 //	FILE *fptr;
 	HWFILE fptr;
 	STR8 pFileName = "BINARYDATA\\Prof.dat";
+#ifdef JA2UB
 	STR8 pFileName_UB = "BINARYDATA\\JA25PROF.DAT";
-
+#endif
 	STR8 pFileName1_Normal = "BINARYDATA\\Prof_Novice_NormalGuns.dat";
 	STR8 pFileName2_Normal = "BINARYDATA\\Prof_Experienced_NormalGuns.dat";
 	STR8 pFileName3_Normal = "BINARYDATA\\Prof_Expert_NormalGuns.dat";
@@ -287,15 +290,15 @@ BOOLEAN LoadMercProfiles(void)
 	else
 	{
 
-
+#ifdef JA2UB
 		fptr = FileOpen(pFileName_UB, FILE_ACCESS_READ, FALSE );   //ub
 		if( !fptr )
 		{
 			fptr = FileOpen(pFileName, FILE_ACCESS_READ, FALSE );   //ja
 		}
-
-	//	fptr = FileOpen(pFileName, FILE_ACCESS_READ, FALSE );
-
+#else
+		fptr = FileOpen(pFileName, FILE_ACCESS_READ, FALSE );
+#endif
 
 	}
 
@@ -646,7 +649,9 @@ void MakeRemainingTerroristsTougher( void )
 	{
 		if ( gMercProfiles[ gubTerrorists[ ubLoop ] ].bMercStatus != MERC_IS_DEAD && gMercProfiles[ gubTerrorists[ ubLoop ] ].sSectorX != 0 && gMercProfiles[ gubTerrorists[ ubLoop ] ].sSectorY != 0 )
 		{
-			/*
+#ifdef JA2UB
+//no Ub
+#else
 			if ( gubTerrorists[ ubLoop ] == SLAY )
 			{
 				if ( FindSoldierByProfileID( SLAY, TRUE ) != NULL )
@@ -655,7 +660,7 @@ void MakeRemainingTerroristsTougher( void )
 					continue;
 				}
 			}
-			*/
+#endif
 			ubRemainingTerrorists++;
 		}
 	}
@@ -720,7 +725,9 @@ void MakeRemainingTerroristsTougher( void )
 		if ( gMercProfiles[ gubTerrorists[ ubLoop ] ].bMercStatus != MERC_IS_DEAD && gMercProfiles[ gubTerrorists[ ubLoop ] ].sSectorX != 0 && gMercProfiles[ gubTerrorists[ ubLoop ] ].sSectorY != 0 )
 		{
 		
-			/*
+#ifdef JA2UB
+// no UB
+#else
 			if ( gubTerrorists[ ubLoop ] == SLAY )
 			{
 				if ( FindSoldierByProfileID( SLAY, TRUE ) != NULL )
@@ -729,7 +736,7 @@ void MakeRemainingTerroristsTougher( void )
 					continue;
 				}
 			}
-			*/
+#endif
 			if ( usOldItem != NOTHING )
 			{
 				RemoveObjectFromSoldierProfile( gubTerrorists[ ubLoop ], usOldItem );
@@ -875,7 +882,7 @@ void StartSomeMercsOnAssignment(void)
 		}
 
 		pProfile = &(gMercProfiles[ uiCnt ]);
-		
+#ifdef JA2UB		
 		//Make sure stigie and Gaston are available at the start of the game
 		if( uiCnt == 59 || uiCnt == 58 )
 		{
@@ -895,7 +902,9 @@ void StartSomeMercsOnAssignment(void)
 
 		// calc chance to start on assignment
 		uiChance = 3 * pProfile->bExpLevel; //5 Ja25 UB
-
+#else
+		uiChance = 5 * pProfile->bExpLevel;
+#endif
 		// tais: added ini option to disable mercs being on assignment at the start
 		if (Random(100) < uiChance && gGameExternalOptions.fMercsOnAssignmentAtStart)
 		{
@@ -1260,13 +1269,15 @@ BOOLEAN RecruitRPC( UINT8 ubCharNum )
 			SwapObjs( pNewSoldier, bSlot, HANDPOS, TRUE );
 		}
 	}
-/* Ja25 UB
+#ifdef JA2UB
+// no Ja25 UB
+#else
 	if ( ubCharNum == IRA )
 	{
 		// trigger 0th PCscript line
 		TriggerNPCRecord( IRA, 0 );
 	}
-*/
+#endif
 	// Set whatkind of merc am i
 	pNewSoldier->ubWhatKindOfMercAmI = MERC_TYPE__NPC;
 
@@ -1284,10 +1295,10 @@ BOOLEAN RecruitRPC( UINT8 ubCharNum )
 
 	//remove the merc from the Personnel screens departed list ( if they have never been hired before, its ok to call it )
 	RemoveNewlyHiredMercFromPersonnelDepartedList( pSoldier->ubProfile );
-	
+#ifdef JA2UB	
 	//If this is a special NPC, play a quote from the team mates
 	HandlePlayingQuoteWhenHiringNpc( pNewSoldier->ubProfile );
-
+#endif
 	return( TRUE );
 }
 
@@ -1491,14 +1502,22 @@ void UpdateSoldierPointerDataIntoProfile( BOOLEAN fPlayerMercs )
 				// If we are above player mercs
 				if ( fPlayerMercs )
 				{
+#ifdef JA2UB
 					if ( pSoldier->ubProfile < FIRST_RPC ) //|| pSoldier->ubProfile >= GASTON )
+#else
+					if ( pSoldier->ubProfile < FIRST_RPC || pSoldier->ubProfile >= GASTON )
+#endif
 					{
 						fDoCopy = TRUE;
 					}
 				}
 				else
 				{
+#ifdef JA2UB
 					if ( pSoldier->ubProfile >= FIRST_RPC ) //&& pSoldier->ubProfile < GASTON )
+#else
+					if ( pSoldier->ubProfile >= FIRST_RPC && pSoldier->ubProfile < GASTON )
+#endif
 					{
 						fDoCopy = TRUE;
 					}
@@ -1730,8 +1749,12 @@ BOOLEAN IsProfileIdAnAimOrMERCMerc( UINT8 ubProfileID )
 
 	if( ubProfileID < BIFF ||
 			( ubProfileID >= BIFF && ubProfileID <= BUBBA ) ||
+#ifdef JA2UB
 			ubProfileID == 58 ||  // GASTON
 			ubProfileID == 59 )  //STOGIE
+#else
+			ubProfileID >= GASTON )
+#endif
 	{
 		return( TRUE );
 	}

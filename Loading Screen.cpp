@@ -709,7 +709,7 @@ void DisplayLoadScreenWithID( UINT8 ubLoadScreenID )
 			strcat(szFullImagePath, szImageFormat);
 		}
 
-		
+#ifdef JA2UB		
 		if ( !FileExists(szFullImagePath) )
 		{
 					switch (ubLoadScreenID)
@@ -779,6 +779,9 @@ void DisplayLoadScreenWithID( UINT8 ubLoadScreenID )
 		{
 			strcpy(vs_desc.ImageFile,szFullImagePath);
 		}
+#else
+	strcpy(vs_desc.ImageFile,szFullImagePath);
+#endif
 	}
 	else
 	{

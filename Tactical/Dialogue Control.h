@@ -153,8 +153,10 @@ enum DialogQuoteIDs
 	QUOTE_PERSONALITY_BIAS_WITH_MERC_2,
 	QUOTE_MERC_LEAVING_ALSUCO_SOON,
 	QUOTE_MERC_GONE_UP_IN_PRICE,
+#ifdef JA2UB
 	QUOTE_ENTER_SECTOR_WITH_FAN_1,
 	QUOTE_ENTER_SECTOR_WITH_FAN_2,
+#endif
 
 
 
@@ -187,10 +189,12 @@ enum DialogQuoteIDs
 #define			DIALOGUE_SPECIAL_EVENT_ENABLE_AI									0x00000800
 #define			DIALOGUE_SPECIAL_EVENT_USE_ALTERNATE_FILES				0x00001000
 
-
-//#define			DIALOGUE_SPECIAL_EVENT_CONTINUE_TRAINING_MILITIA  0x00002000    //ja25 ub off
-
+#ifdef JA2UB
 #define			DIALOGUE_SPECIAL_EVENT_JERRY_MILO								  0x00002000
+#else
+#define			DIALOGUE_SPECIAL_EVENT_CONTINUE_TRAINING_MILITIA	0x00002000
+#endif
+
 #define			DIALOGUE_SPECIAL_EVENT_CONTRACT_ENDING						0x00004000
 #define			DIALOGUE_SPECIAL_EVENT_MULTIPURPOSE								0x00008000
 #define			DIALOGUE_SPECIAL_EVENT_SLEEP											0x00010000
@@ -210,14 +214,18 @@ enum DialogQuoteIDs
 #define			DIALOGUE_SPECIAL_EVENT_CONTRACT_NOGO_TO_RENEW			0x40000000
 #define			DIALOGUE_SPECIAL_EVENT_CONTRACT_ENDING_NO_ASK_EQUIP	0x80000000
 
-#define			MULTIPURPOSE_SPECIAL_EVENT_DONE_KILLING_DEIDRANNA			0x10000000
+#ifdef JA2UB
 #define			MULTIPURPOSE_SPECIAL_EVENT_TEAM_MEMBERS_DONE_TALKING	0x20000000
+#else
+#define			MULTIPURPOSE_SPECIAL_EVENT_DONE_KILLING_DEIDRANNA			0x10000000
+#endif
 
-
+#ifdef JA2UB
 enum{
      JERRY_MELO_FACE = 6,
      NUMBER_OF_EXTERNAL_NPC_FACES,
 };
+#endif
 
 enum{
 	SKYRIDER_EXTERNAL_FACE =0,
@@ -237,9 +245,14 @@ enum{
 	UPDATE_BOX_REASON_SHOW_BOX,
 };
 
+#ifdef JA2UB
 extern UINT32 uiExternalStaticNPCFacesUB[ ];
-extern std::vector<UINT32> uiExternalStaticNPCFaces;
 extern UINT32 uiExternalFaceProfileIdsUB[ ];
+#endif
+
+//extern UINT32 uiExternalStaticNPCFaces[ ];
+extern std::vector<UINT32> uiExternalStaticNPCFaces;
+//extern UINT32 uiExternalFaceProfileIds[ ];
 
 // Functions for handling dialogue Q
 BOOLEAN InitalizeDialogueControl();
@@ -359,6 +372,8 @@ void UnPauseDialogueQueue( void );
 
 void SetExternMapscreenSpeechPanelXY( INT16 sXPos, INT16 sYPos );
 
+#ifdef JA2UB
 void RemoveJerryMiloBrokenLaptopOverlay();
+#endif
 
 #endif

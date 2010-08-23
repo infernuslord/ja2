@@ -7,8 +7,13 @@
 #include "faces.h"
 #include "Interface.h"
 #include "XML_SenderNameList.h"
+
+
 #include "legion cfg.h"
+
+
 #include "qarray.h"
+
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -70,7 +75,10 @@ typedef PARSE_STAGE;
 #define LOADBEARINGEQUIPMENTFILENAME			"LoadBearingEquipment.xml"
 #define LBEPOCKETFILENAME						"Pockets.xml"
 #define MERCSTARTINGGEARFILENAME				"MercStartingGear.xml"
+
+#ifdef JA2UB
 #define MERCSTARTINGGEAR25FILENAME				"MercStartingGear25.xml"  //ja25 ub
+#endif
 
 #define TONYINVENTORYFILENAME					"NPCInventory\\TonyInventory.xml"
 #define DEVININVENTORYFILENAME					"NPCInventory\\DevinInventory.xml"
@@ -92,8 +100,10 @@ typedef PARSE_STAGE;
 #define PERKOINVENTORYFILENAME					"NPCInventory\\PerkoInventory.xml"
 #define FREDOINVENTORYFILENAME					"NPCInventory\\FredoInventory.xml"
 
+#ifdef JA2UB
 #define BETTYINVENTORYFILENAME					"NPCInventory\\BettyInventory.xml"
 #define RAULINVENTORYFILENAME					"NPCInventory\\RaulInventory.xml"
+#endif
 
 #define BOBBYRAYSTRINGSFILENAME					"BobbyRayStrings.xml"
 #define AMMOCALIBERSTRINGSFILENAME				"AmmoCaliberStrings.xml"
@@ -182,14 +192,17 @@ typedef PARSE_STAGE;
 
 #define IMPPORTRAITS					"IMPPortraits.xml"
 
+#ifdef JA2UB
 // UB
 #define MERCPROFILESFILENAME25					"MercProfiles25.xml"
 // UB
 #define MERCOPINIONSFILENAME25					"MercOpinions25.xml"
+#endif
 
-#define SOUNDPROFILE					"SoundsProfiles.xml"
+#define SOUNDPROFILE				"SoundsProfiles.xml"
 
 #define RANDOMSTATS					"RandomStats.xml"
+
 
 extern BOOLEAN ReadInItemStats(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteItemStats();

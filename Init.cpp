@@ -67,7 +67,10 @@
 
 #include "Interface.h"
 #include "Strategic Town Loyalty.h"
+
+
 #include "legion cfg.h"
+
 
 #include "Civ Quotes.h"
 #include "Sector Summary.h"
@@ -358,6 +361,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	}
 #endif
 
+#ifdef JA2UB
 	//JA25 UB
 	strcpy(fileName, directoryName);
 	strcat(fileName, MERCSTARTINGGEAR25FILENAME);
@@ -367,11 +371,16 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	}
 	else
 	{
+#endif
+
 	// CHRISL:
 	strcpy(fileName, directoryName);
 	strcat(fileName, MERCSTARTINGGEARFILENAME);
 	THROWIFFALSE(ReadInMercStartingGearStats(fileName),MERCSTARTINGGEARFILENAME);
+
+#ifdef JA2UB
 	}
+#endif
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, WEAPONSFILENAME);
@@ -418,11 +427,33 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, TONYINVENTORYFILENAME);
 	THROWIFFALSE(ReadInInventoryStats(gTonyInventory,fileName),TONYINVENTORYFILENAME);
-/* ja25 ub Biggins
+
+#ifdef JA2UB
+//ja25 ub Biggins
+
+	strcpy(fileName, directoryName);
+	strcat(fileName, BETTYINVENTORYFILENAME);
+	THROWIFFALSE(ReadInInventoryStats(gBettyInventory,fileName),BETTYINVENTORYFILENAME);
+
+	//UB
+	strcpy(fileName, directoryName);
+	strcat(fileName, RAULINVENTORYFILENAME);
+	if ( FileExists(fileName) )
+	{
+	THROWIFFALSE(ReadInInventoryStats(gPerkoInventory,fileName),RAULINVENTORYFILENAME);
+	}
+
+#else
 	strcpy(fileName, directoryName);
 	strcat(fileName, DEVININVENTORYFILENAME);
 	THROWIFFALSE(ReadInInventoryStats(gDevinInventory,fileName),DEVININVENTORYFILENAME);
-*/
+
+	strcpy(fileName, directoryName);
+	strcat(fileName, PERKOINVENTORYFILENAME);
+	THROWIFFALSE(ReadInInventoryStats(gPerkoInventory,fileName),PERKOINVENTORYFILENAME);
+
+#endif
+
 	strcpy(fileName, directoryName);
 	strcat(fileName, FRANZINVENTORYFILENAME);
 	THROWIFFALSE(ReadInInventoryStats(gFranzInventory,fileName),FRANZINVENTORYFILENAME);
@@ -492,18 +523,6 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	THROWIFFALSE(ReadInInventoryStats(gFredoInventory,fileName),FREDOINVENTORYFILENAME);
 	
 	strcpy(fileName, directoryName);
-	strcat(fileName, BETTYINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gBettyInventory,fileName),BETTYINVENTORYFILENAME);
-
-	//UB
-	strcpy(fileName, directoryName);
-	strcat(fileName, RAULINVENTORYFILENAME);
-	if ( FileExists(fileName) )
-	{
-	THROWIFFALSE(ReadInInventoryStats(gPerkoInventory,fileName),RAULINVENTORYFILENAME);
-	}
-	
-	strcpy(fileName, directoryName);
 	strcat(fileName, CITYTABLEFILENAME);
 	THROWIFFALSE(ReadInMapStructure(fileName, FALSE),CITYTABLEFILENAME);
 
@@ -531,20 +550,22 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcat(fileName, SAMSITESFILENAME);
 	THROWIFFALSE(ReadInSAMInfo(fileName),SAMSITESFILENAME);
 
+#ifdef JA2UB
 	if ( gGameLegionOptions.EnemyXML == TRUE ) 
 	{
+#endif
 	// Lesh: army externalization
 	strcpy(fileName, directoryName);
 	strcat(fileName, GARRISONFILENAME);
 	THROWIFFALSE(ReadInGarrisonInfo(fileName),GARRISONFILENAME);
-	}
-	
-	if ( gGameLegionOptions.EnemyXML == TRUE ) 
-	{
+
 	strcpy(fileName, directoryName);
 	strcat(fileName, PATROLFILENAME);
 	THROWIFFALSE(ReadInPatrolInfo(fileName),PATROLFILENAME);
+#ifdef JA2UB
 	}
+#endif
+
 	strcpy(fileName, directoryName);
 	strcat(fileName, COMPOSITIONFILENAME);
 	THROWIFFALSE(ReadInArmyCompositionInfo(fileName),COMPOSITIONFILENAME);
@@ -651,7 +672,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		THROWIFFALSE(ReadInMercOpinions(fileName), MERCOPINIONSFILENAME);
 		
 		
-		
+#ifdef JA2UB		
 		// UB25
 		strcpy(fileName, directoryName);
 		strcat(fileName, MERCPROFILESFILENAME25); 
@@ -680,7 +701,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
 		THROWIFFALSE(ReadInMercOpinions(fileName), MERCOPINIONSFILENAME25);
 		}
-		
+#endif		
 	}
 
 	// HEADROCK HAM 3.6: Read in customized Bloodcat Placements
@@ -805,6 +826,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		}
 #endif
 
+
 /*
 	strcpy(fileName, directoryName);
 	strcat(fileName, SOUNDPROFILE);
@@ -836,6 +858,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcat(fileName, QUOTEARRAYFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
 	THROWIFFALSE(ReadInQarray(QuoteExp,fileName),QUOTEARRAYFILENAME);
+
 	
 	LoadIMPPortraitsTEMP();
 

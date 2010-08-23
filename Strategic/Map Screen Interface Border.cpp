@@ -25,9 +25,9 @@
 	#include "Assignments.h"
 #endif
 
-
+#ifdef JA2UB
 #include "legion cfg.h"
-
+#endif
 
 //#define MAP_BORDER_CORNER_X 584
 //#define MAP_BORDER_CORNER_Y 279
@@ -409,7 +409,7 @@ BOOLEAN CreateButtonsForMapBorder( void )
 //	SetButtonCursor(guiMapBorderLandRaiseButtons[ 1 ], MSYS_NO_CURSOR );
 
 
-
+#ifdef JA2UB
     //EnableButton
       
 	if (gGameLegionOptions.ZAIKONA1 == TRUE)  
@@ -465,7 +465,7 @@ BOOLEAN CreateButtonsForMapBorder( void )
 	   {
 	   DisableButton( giMapBorderButtons[ MAP_BORDER_ITEM_BTN ]); 
 	   }  
-
+#endif
 
 	InitializeMapBorderButtonStates( );
 

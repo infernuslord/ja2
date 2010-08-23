@@ -403,9 +403,13 @@ void ProcessPlayerInputActivationString( void )
 	{
 		freeMercSlot = FALSE;
 	}
-
+#ifdef JA2UB
 	//Madd multiple imps if( ( ( wcscmp(pPlayerActivationString, L"GP97SL") == 0 ) || ( wcscmp(pPlayerActivationString, L"gp97sl") == 0 ) )&&( LaptopSaveInfo.fIMPCompletedFlag == FALSE ) &&( LaptopSaveInfo.gfNewGameLaptop < 2 ) )
 	if( ( ( wcscmp(pPlayerActivationString, L"GP97SL") == 0 ) || ( wcscmp(pPlayerActivationString, L"gp97sl") == 0 ) ) &&( LaptopSaveInfo.gfNewGameLaptop < 2 ) )
+#else
+	//Madd multiple imps if( ( ( wcscmp(pPlayerActivationString, L"XEP624") == 0 ) || ( wcscmp(pPlayerActivationString, L"xep624") == 0 ) )&&( LaptopSaveInfo.fIMPCompletedFlag == FALSE ) &&( LaptopSaveInfo.gfNewGameLaptop < 2 ) )
+	if( ( ( wcscmp(pPlayerActivationString, L"XEP624") == 0 ) || ( wcscmp(pPlayerActivationString, L"xep624") == 0 ) ) &&( LaptopSaveInfo.gfNewGameLaptop < 2 ) )
+#endif
 	{
 		// WANNE: Check total number of hired mercs
 		if( freeMercSlot == FALSE )
@@ -480,7 +484,11 @@ void ProcessPlayerInputActivationString( void )
 	}
 	else
 	{
+#ifdef JA2UB
 		if( ( ( wcscmp(pPlayerActivationString, L"GP97SL") != 0 ) && ( wcscmp(pPlayerActivationString, L"gp97sl") != 0 ) ) )
+#else
+		if( ( ( wcscmp(pPlayerActivationString, L"XEP624") != 0 ) && ( wcscmp(pPlayerActivationString, L"xep624") != 0 ) ) )
+#endif
 		{
 			DoLapTopMessageBox( MSG_BOX_IMP_STYLE, pImpPopUpStrings[ 0 ], LAPTOP_SCREEN, MSG_BOX_FLAG_OK, NULL);
 		}

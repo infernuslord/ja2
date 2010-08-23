@@ -12,7 +12,9 @@ UINT32	IntroScreenInit( void );
 enum
 {
 	INTRO_BEGINING,			//set when viewing the intro at the begining of the game
+#ifdef JA2UB
 	INTRO_HELI_CRASH,
+#endif
 	INTRO_ENDING,				//set when viewing the end game video.
 
 	INTRO_SPLASH,

@@ -125,8 +125,10 @@
 #include "Mercs.h"
 #include "INIReader.h"
 
+#ifdef JA2UB
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
+#endif
 
 #include <vfs/Core/vfs.h>
 //rain
@@ -414,13 +416,14 @@ typedef struct
 
 	// HEADROCK HAM 3.6: Removed 16 fillers (16 bytes) to accomodate the above new variables.
 	//JA25 UB
+#ifdef JA2UB
 	INT8	fMorrisShouldSayHi;
-
 	BOOLEAN		fFirstTimeInGameHeliCrash;
+#endif
 	BOOLEAN Pokaznazwe[500]; //legion by Jazz
 
 
-	//UINT8		ubFiller[534];		//This structure should be 1024 bytes
+	UINT8		ubFiller[534];		//This structure should be 1024 bytes
 	
 
 } GENERAL_SAVE_INFO;
@@ -2883,7 +2886,7 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 		goto FAILED_TO_SAVE;
 	}
 	
-	
+#ifdef JA2UB	
 	//save Ja25 info
 	if( !SaveJa25SaveInfoToSaveGame( hFile ) )
 	{
@@ -2897,7 +2900,7 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"Ja25 Tactical info");
 		goto FAILED_TO_SAVE;
 	}
-
+#endif
 
 	//Close the saved game file
 	FileClose( hFile );
@@ -3028,9 +3031,11 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 
 	//Empty the dialogue Queue cause someone could still have a quote in waiting
 	EmptyDialogueQueue( );
-	
+
+#ifdef JA2UB	
 	//Reset Jerry Quotes  JA25UB
 	HandleJerryMiloQuotes( TRUE );
+#endif
 
 	//If there is someone talking, stop them
 	StopAnyCurrentlyTalkingSpeech( );
@@ -3215,9 +3220,10 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 		gfUseAlternateMap = TRUE;
 	}
 
-	
+#ifdef JA2UB	
 	//Re-init the heli gridnos and time..
 	InitializeHeliGridnoAndTime( TRUE );
+#endif
 
 	for (int x = 0; x < 256; ++x) {
 		gEnemyPreservedTempFileVersion[x] = guiCurrentSaveGameVersion;
@@ -4246,7 +4252,8 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Final Checks..." );
 	RenderProgressBar( 0, 100 );
 	uiRelStartPerc = uiRelEndPerc;
-	
+
+#ifdef JA2UB	
 	
 		if ( !LoadJa25SaveInfoFromSavedGame( hFile ) )
 		{
@@ -4270,8 +4277,7 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Ja25 Tactical info" );
 	RenderProgressBar( 0, 100 );
 	uiRelStartPerc = uiRelEndPerc;
-
-
+#endif
 
 	//
 	//Close the saved game file
@@ -6279,10 +6285,12 @@ BOOLEAN SaveGeneralInfo( HWFILE hFile )
 
 	// HEADROCK HAM 3.6: Save new global variable for militia upkeep
 	sGeneralInfo.uiTotalUpkeepForMilitia = guiTotalUpkeepForMilitia;
+
+#ifdef JA2UB
 	//ja25 UB
 	sGeneralInfo.fMorrisShouldSayHi					= gfMorrisShouldSayHi;
 	sGeneralInfo.fFirstTimeInGameHeliCrash			= gfFirstTimeInGameHeliCrash;
-
+#endif
 
 	for (int i=0;i<501;i++)
 	{
@@ -6572,11 +6580,12 @@ BOOLEAN LoadGeneralInfo( HWFILE hFile )
 
 	// HEADROCK HAM 3.6: Load new global variable for militia upkeep
 	guiTotalUpkeepForMilitia = sGeneralInfo.uiTotalUpkeepForMilitia;
-	
+
+#ifdef JA2UB	
 	//JA25 UB
 	gfMorrisShouldSayHi							= sGeneralInfo.fMorrisShouldSayHi;
 	gfFirstTimeInGameHeliCrash			= sGeneralInfo.fFirstTimeInGameHeliCrash;
-
+#endif
 
 	for (int i=0;i<501;i++)
 	{

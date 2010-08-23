@@ -37,7 +37,9 @@
 
 #include "Lua Interpreter.h"
 
+#ifdef JA2UB
 #include "legion cfg.h"
+#endif
 
 // rain
 #include "Rain.h"
@@ -120,7 +122,11 @@ BOOLEAN InitializeGame(void)
 	// Moved this up because some settings are used during other inits
 	LoadGameAPBPConstants();
 	LoadGameExternalOptions();
+
+#ifdef JA2UB
 	LoadGameLegionOptions(); // JA25 UB
+#endif
+
 	InitSightRange(); //lal
 
 	// Initlaize mouse subsystems

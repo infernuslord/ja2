@@ -106,22 +106,23 @@
 	#include "cursors.h"
 #endif
 
+#ifdef JA2UB
 #include "SaveLoadGame.h"
 #include "email.h"
-#include "Strategic AI.h"
-#include "connect.h" //hayden added alot ""'s to get around client spawing random/different placed AI
-#include "SaveLoadGame.h"
-#include "Strategic Mines.h"
-#include "Strategic Mines LUA.h"
-
 #include "Ja25 Strategic Ai.h"
 #include "Merc Hiring.h"
 #include "Ja25_Tactical.h"
 #include "Timer Control.h"
 #include "Soldier Control.h"
 #include "Ja25Update.h"
-
 #include "Map Screen Interface Bottom.h"
+#include "Strategic AI.h"
+#endif
+
+#include "connect.h" //hayden added alot ""'s to get around client spawing random/different placed AI
+#include "SaveLoadGame.h"
+#include "Strategic Mines.h"
+#include "Strategic Mines LUA.h"
 
 #include <vfs/Core/vfs.h>
 #include <vfs/Tools/vfs_log.h>
@@ -323,7 +324,9 @@ void DoneFadeOutExitGridSector( void );
 INT32 PickGridNoNearestEdge( SOLDIERTYPE *pSoldier, UINT8 ubTacticalDirection );
 INT32 PickGridNoToWalkIn( SOLDIERTYPE *pSoldier, UINT8 ubInsertionDirection, UINT32 *puiNumAttempts );
 
+
 //JA25UB
+#ifdef JA2UB
 void HandleQuestCodeOnSectorExit( INT16 sOldSectorX, INT16 sOldSectorY, INT8 bOldSectorZ );
 void HandlePotentialMoraleHitForSkimmingSectors( GROUP *pGroup );
 void HandlePlayerTeamQuotesWhenEnteringSector( INT16 sSectorX, INT16 sSectorY, INT16 sSectorZ );
@@ -342,6 +345,7 @@ void HandleFirstPartOfTunnelFanSound();
 void HandlePowerGenFanSoundModification();
 BOOLEAN MoveEnemyFromGridNoToRoofGridNo( INT16 sSourceGridNo, INT16 sDestGridNo );
 void		HandleMovingEnemiesOntoRoofs();
+#endif
 
 void HandleQuestCodeOnSectorExit( INT16 sOldSectorX, INT16 sOldSectorY, INT8 bOldSectorZ );
 void HandlePotentialMoraleHitForSkimmingSectors( GROUP *pGroup );
@@ -1310,12 +1314,12 @@ void BeginLoadScreen( void )
 
 	SetCurrentCursorFromDatabase( VIDEO_NO_CURSOR );
 
-/*
-Ja25: No meanwhiles
-	if( guiCurrentScreen == MAP_SCREEN && !(gTacticalStatus.uiFlags & LOADING_SAVED_GAME) && !AreInMeanwhile() )
-*/
-
+#ifdef JA2UB
 	if( guiCurrentScreen == MAP_SCREEN && !(gTacticalStatus.uiFlags & LOADING_SAVED_GAME) )
+#else
+//Ja25: No meanwhiles
+	if( guiCurrentScreen == MAP_SCREEN && !(gTacticalStatus.uiFlags & LOADING_SAVED_GAME) && !AreInMeanwhile() )
+#endif
 	{
 		DstRect.iLeft = 0;
 		DstRect.iTop = 0;
@@ -1360,13 +1364,15 @@ Ja25: No meanwhiles
 	ColorFillVideoSurfaceArea( FRAME_BUFFER, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Get16BPPColor( FROMRGB( 0, 0, 0 ) ) );
 	InvalidateScreen( );
 	RefreshScreen( NULL );
-	
+
+#ifdef JA2UB	
 	//if we are going to the intro screen, return before putting up a loadscreen
 	if( gbExitingMapScreenToWhere == MAP_EXIT_TO_INTRO_SCREEN )
 	{
 		SetPendingNewScreen( INTRO_SCREEN );
 		return;
 	}
+#endif
 
 	//If we are loading a saved game, use the Loading screen we saved into the SavedGameHeader file
 	// ( which gets reloaded into gubLastLoadingScreenID )
@@ -1721,8 +1727,10 @@ void GetMapFileName(INT16 sMapX,INT16 sMapY, INT8 bSectorZ, STR8 bString, BOOLEA
 			strcat( bExtensionString, "_a" );
 		}
 	}
-	/*
-	Ja25: No meanwhiles
+
+#ifdef JA2UB
+/* Ja25: No meanwhiles */
+#else
 	// If we are in a meanwhile...
 	if ( AreInMeanwhile( ) && sMapX == 3 && sMapY == 16 && !bSectorZ )//GetMeanwhileID() != INTERROGATION )
 	{
@@ -1731,7 +1739,7 @@ void GetMapFileName(INT16 sMapX,INT16 sMapY, INT8 bSectorZ, STR8 bString, BOOLEA
 			strcat( bExtensionString, "_m" );
 		}
 	}
-*/
+#endif
 
 	// This is the string to return, but...
 	sprintf( bString, "%s%s%s.DAT", pVertStrings[sMapY], pHortStrings[sMapX], bExtensionString );
@@ -1838,8 +1846,11 @@ void HandleRPCDescriptionOfSector( INT16 sSectorX, INT16 sSectorY, INT16 sSector
 	}
 
   // Handle guide description ( will be needed if a SAM one )
-//	HandleRPCDescription( );
-
+#ifdef JA2UB
+//UB
+#else
+	HandleRPCDescription( );
+#endif
 }
 
 
@@ -1973,14 +1984,15 @@ BOOLEAN	SetCurrentWorldSector( INT16 sMapX, INT16 sMapY, INT8 bMapZ )
 		if( !(gTacticalStatus.uiFlags & LOADING_SAVED_GAME ) )
 		{
 			StopAnyCurrentlyTalkingSpeech( );
-			
-/*
-Ja25 no creatures
+
+#ifdef JA2UB
+/*  Ja25 no creatures  */
+#else			
 			if( gWorldSectorX == 9 && gWorldSectorY == 10 && gbWorldSectorZ == 2 )
 			{
 				InitCreatureQuest(); //Ignored if already active.
 			}
-*/
+#endif
 		}
 
 		//Stop playing any music -- will fade out.
@@ -2039,10 +2051,10 @@ Ja25 no creatures
 
 			// Check for helicopter being on the ground in this sector...
 			HandleHelicopterOnGroundSkyriderProfile( );
-			
+#ifdef JA2UB			
 		//Check to see if we should add Manuel to this sector, if so add him
 		ShouldNpcBeAddedToSector( gWorldSectorX, gWorldSectorY, bMapZ );
-		
+#endif		
 		}
 
 		//Load and enter the new sector
@@ -2097,11 +2109,11 @@ Ja25 no creatures
 
 			// ATE: Set Flag for being visited...
 			SetSectorFlag( sMapX, sMapY, bMapZ, SF_HAS_ENTERED_TACTICAL );
-			
+#ifdef JA2UB			
 			//ja2ub
 			// If any emails should be sent from this sector
 			HandleEmailBeingSentWhenEnteringSector( sMapX, sMapY, bMapZ, FALSE );
-
+#endif
 
 			// ATE; Reset some flags for creature sayings....
 			gTacticalStatus.fSaidCreatureFlavourQuote = FALSE;
@@ -2114,11 +2126,10 @@ Ja25 no creatures
 			gTacticalStatus.fGoodToAllowCrows					= FALSE;
 			gTacticalStatus.fHasEnteredCombatModeSinceEntering = FALSE;
 			gTacticalStatus.fDontAddNewCrows          = FALSE;
-			
-			
+#ifdef JA2UB			
 		//Call this function, if Jerry doesnt need to be added, it will return
 		UpdateJerryMiloInInitialSector();
-
+#endif
 			// Adjust delay for tense quote
 			gTacticalStatus.sCreatureTenseQuoteDelay = (INT16)( 10 + Random( 20 ) );
 
@@ -2189,8 +2200,11 @@ void PrepareLoadedSector()
 	BOOLEAN fEnemyPresenceInThisSector = FALSE;
 	BOOLEAN fAddCivs = TRUE;
 	INT8 bMineIndex = -1;
-
-//Ja25 No meanwhiles	if( AreInMeanwhile( ) == FALSE )
+#ifdef JA2UB
+//Ja25 No meanwhiles
+#else
+	if( AreInMeanwhile( ) == FALSE )
+#endif
 	{
 		if( gbWorldSectorZ == 0 )
 		{
@@ -2214,7 +2228,12 @@ void PrepareLoadedSector()
 	//if we are loading a 'pristine' map ( ie, not loading a saved game )
 	if( !(gTacticalStatus.uiFlags & LOADING_SAVED_GAME ))
 	{
-//Ja25 No meanwhiles		if ( !AreReloadingFromMeanwhile( ) )
+
+#ifdef JA2UB
+//Ja25 No meanwhiles
+#else
+		if ( !AreReloadingFromMeanwhile( ) )
+#endif
 		{
 			SetPendingNewScreen(GAME_SCREEN);
 
@@ -2335,8 +2354,11 @@ void PrepareLoadedSector()
 		{
 			AddProfilesNotUsingProfileInsertionData();
 		}
-
-//Ja25 No meanwhiles		if( !AreInMeanwhile() || GetMeanwhileID() == INTERROGATION )
+#ifdef JA2UB
+//Ja25 No meanwhiles
+#else
+		if( !AreInMeanwhile() || GetMeanwhileID() == INTERROGATION )
+#endif
 		{
 			if (is_networked)
 			{
@@ -2567,9 +2589,9 @@ void HandleQuestCodeOnSectorEntry( INT16 sNewSectorX, INT16 sNewSectorY, INT8 bN
 
 void HandleQuestCodeOnSectorExit( INT16 sOldSectorX, INT16 sOldSectorY, INT8 bOldSectorZ )
 {
-
+#ifdef JA2UB
 SOLDIERTYPE *pSoldier=NULL;
-
+#endif
 
 	if ( sOldSectorX == KINGPIN_MONEY_SECTOR_X && sOldSectorY == KINGPIN_MONEY_SECTOR_Y && bOldSectorZ == KINGPIN_MONEY_SECTOR_Z )
 	{
@@ -2582,7 +2604,7 @@ SOLDIERTYPE *pSoldier=NULL;
 		gMercProfiles[ CONRAD ].sSectorX = 0;
 		gMercProfiles[ CONRAD ].sSectorY = 0;
 	}
-	
+#ifdef JA2UB	
 	//JA25 UB
 	if( sOldSectorX == 7 && sOldSectorY == MAP_ROW_H && bOldSectorZ == 0 )
 	{
@@ -2632,7 +2654,7 @@ SOLDIERTYPE *pSoldier=NULL;
 			gMercProfiles[ 60 ].sSectorY = 0;
 		}
 	}
-
+#endif
 	if ( sOldSectorX == HOSPITAL_SECTOR_X && sOldSectorY == HOSPITAL_SECTOR_Y && bOldSectorZ == HOSPITAL_SECTOR_Z )
 	{
 		CheckForMissingHospitalSupplies();
@@ -2679,7 +2701,11 @@ BOOLEAN EnterSector( INT16 sSectorX, INT16 sSectorY , INT8 bSectorZ )
 	// This has tobe done before loadworld, as it will remmove old gridnos if present
 	RemoveMercsInSector( );
 
-//Ja25 No meanwhiles	if( AreInMeanwhile() == FALSE )
+#ifdef JA2UB
+//Ja25 No meanwhiles
+#else
+	if( AreInMeanwhile() == FALSE )
+#endif
 	{
 		SetSectorFlag( sSectorX, sSectorY, bSectorZ, SF_ALREADY_VISITED );
 	}
@@ -4420,11 +4446,12 @@ void SetupNewStrategicGame( )
 		}
 	}
 	
-	
+#ifdef JA2UB	
 	//Ja25
 	// Make the initial sector free of enemies
 	StrategicMap[ CALCULATE_STRATEGIC_INDEX( JA2_5_START_SECTOR_X, JA2_5_START_SECTOR_Y ) ].fEnemyControlled = FALSE;
 
+#endif
 
 	//Initialize the game time
 	InitNewGameClock();
@@ -4447,26 +4474,24 @@ void SetupNewStrategicGame( )
 	
 	//Daily Update of the M.E.R.C. site.
 	AddEveryDayStrategicEvent( EVENT_DAILY_UPDATE_OF_MERC_SITE, 0, 0 );
-	
-/*
-Ja25:  No insurance for mercs
+
+#ifdef JA2UB
+//Ja25:  No insurance for mercs
+//JA25: There is no mines
+//Ja25 no town opinions
+#else	
 	//Daily update of insured mercs
 	AddEveryDayStrategicEvent( EVENT_HANDLE_INSURED_MERCS, INSURANCE_UPDATE_TIME,	0 );
-*/	
-/*
-JA25: There is no mines
+	//Daily update of mercs
+	AddEveryDayStrategicEvent( EVENT_MERC_DAILY_UPDATE, 0, 0 );
 	// Daily mine production processing events
 	AddEveryDayStrategicEvent( EVENT_SETUP_MINE_INCOME, 0, 0 );
-*/
-
-/*
-Ja25 no town opinions
 	// Daily merc reputation processing events
 	AddEveryDayStrategicEvent( EVENT_SETUP_TOWN_OPINION, 0, 0 );
-*/
-
 	// Daily checks for E-mail from Enrico
-	//ja25ub AddEveryDayStrategicEvent( EVENT_ENRICO_MAIL, ENRICO_MAIL_TIME , 0 );
+	AddEveryDayStrategicEvent( EVENT_ENRICO_MAIL, ENRICO_MAIL_TIME , 0 );
+#endif
+
 
 //	if ( gGameOptions.fAirStrikes )
 //	{
@@ -5556,7 +5581,9 @@ void GetLoadedSectorString( STR16 pString )
 	}
 }
 
-/*
+#ifdef JA2UB
+// no UB
+#else
 void HandleSlayDailyEvent( void )
 {
 	SOLDIERTYPE *pSoldier = NULL;
@@ -5585,8 +5612,7 @@ void HandleSlayDailyEvent( void )
 		TacticalCharacterDialogueWithSpecialEvent( pSoldier, 0, DIALOGUE_SPECIAL_EVENT_CONTRACT_ENDING_NO_ASK_EQUIP, 0, 0 );
 	}
 }
-
-*/
+#endif
 
 BOOLEAN IsSectorDesert( INT16 sSectorX, INT16 sSectorY )
 {
@@ -6011,7 +6037,7 @@ BOOLEAN EscapeDirectionIsValid( INT8 * pbDirection )
 	}
 	return( *pbDirection != -1 );
 }
-
+#ifdef JA2UB
 
 
 //------------ub
@@ -6904,3 +6930,4 @@ BOOLEAN MoveEnemyFromGridNoToRoofGridNo( INT16 sSourceGridNo, INT16 sDestGridNo 
 
 	return( FALSE );
 }
+#endif

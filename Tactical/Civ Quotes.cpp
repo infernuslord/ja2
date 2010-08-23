@@ -246,7 +246,9 @@ void ShutDownQuoteBox( BOOLEAN fForce )
 	gCivQuoteData.iDialogueBox = -1;
 
 		gCivQuoteData.bActive = FALSE;
-/*
+#ifdef JA2UB
+// no UB
+#else
 		// do we need to do anything at the end of the civ quote?
 		if ( gCivQuoteData.pCiv && gCivQuoteData.pCiv->aiData.bAction == AI_ACTION_OFFER_SURRENDER )
 		{
@@ -261,7 +263,7 @@ void ShutDownQuoteBox( BOOLEAN fForce )
 				ActionDone( gCivQuoteData.pCiv );
 			}
 		}
-*/
+#endif
 	}
 }
 
@@ -498,7 +500,11 @@ UINT16 DetermineCivQuoteEntry( SOLDIERTYPE *pCiv, UINT16 *pubCivHintToUse, BOOLE
 	
 	for( iCounter2 = NON_CIV_GROUP; iCounter2 < NUM_CIV_GROUPS; iCounter2++ )
 		{	
+#ifdef JA2UB
 			if (pCiv->ubCivilianGroup > UNNAMED_CIV_GROUP_19 && pCiv->ubCivilianGroup == iCounter2)
+#else
+			if (pCiv->ubCivilianGroup > QUEENS_CIV_GROUP && pCiv->ubCivilianGroup == iCounter2)
+#endif
 			{
 				if ( pCiv->aiData.bNeutral )
 					{
@@ -511,7 +517,7 @@ UINT16 DetermineCivQuoteEntry( SOLDIERTYPE *pCiv, UINT16 *pubCivHintToUse, BOOLE
 			}	
 		}
 		
-		
+#ifdef JA2UB		
 	if( ubCivType != CIV_TYPE_ENEMY )
 	{
 		//if the civ is not an enemy
@@ -570,9 +576,8 @@ UINT16 DetermineCivQuoteEntry( SOLDIERTYPE *pCiv, UINT16 *pubCivHintToUse, BOOLE
 	}
 
 	return( 255 );
-	
-		
-/*	
+#else	
+			
 	if ( ubCivType == CIV_TYPE_ENEMY )
 	{
 		// Determine what type of quote to say...
@@ -850,7 +855,7 @@ UINT16 DetermineCivQuoteEntry( SOLDIERTYPE *pCiv, UINT16 *pubCivHintToUse, BOOLE
 	{
 		return( CIV_QUOTE_KIDS_ALL_PURPOSE );
 	}
-*/
+#endif
 }
 
 
@@ -909,12 +914,13 @@ void StartCivQuote( SOLDIERTYPE *pCiv )
 	}
 	else 
 		RandomVal = 15;
-		
+
+#ifdef JA2UB		
 	if( ubCivQuoteID == 255 )
 	{
 		return;
 	}
-	
+#endif	
 	
 	// Determine entry id
 	// ATE: Try and get entry from soldier pointer....

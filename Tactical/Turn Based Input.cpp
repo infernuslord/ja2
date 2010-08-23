@@ -1524,8 +1524,9 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 			HandleShortCutExitState( );
 			//*puiNewEvent = I_EXIT;
 		}
-  /*
-Ja25 No meanwhiles
+#ifdef JA2UB
+//Ja25 No meanwhiles
+#else
 		if ((InputEvent.usEvent == KEY_UP )&& ( InputEvent.usParam == ESC) )
 		{
 			if ( AreInMeanwhile() && gCurrentMeanwhileDef.ubMeanwhileID != INTERROGATION )
@@ -1534,7 +1535,7 @@ Ja25 No meanwhiles
 				EndMeanwhile();
 			}
 		}
-        */
+#endif
 
 		/// Allow to load everywhere
 		if ((InputEvent.usEvent == KEY_DOWN )&& ( InputEvent.usParam == 'l') )

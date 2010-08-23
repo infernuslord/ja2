@@ -3,6 +3,8 @@
 
 #include "Language Defines.h"
 
+//JA2/Unfinished Business
+#define JA2UB
 
 // Map Editor version - you should use the MapEditor configuration instead of messing with these defines (ChrisL)
 //#define JA2BETAVERSION

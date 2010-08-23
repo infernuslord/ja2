@@ -28,7 +28,9 @@
 #include "connect.h"
 #include "saveloadscreen.h"
 
+#ifdef JA2UB
 #include "Legion cfg.h"
+#endif
 
 ////////////////////////////////////////////
 //
@@ -451,10 +453,10 @@ BOOLEAN		EnterGIOScreen()
 	//
 	//Check box to toggle Game settings ( realistic, sci fi )
 	//
-	
+#ifdef JA2UB	
 	if ( gGameLegionOptions.SF_UB == TRUE ) 
 	{
-
+#endif
 	usPosY = GIO_GAME_SETTINGS_Y - GIO_OFFSET_TO_TOGGLE_BOX_Y;
 	for( cnt=0; cnt<NUM_GAME_STYLES; cnt++)
 	{
@@ -465,6 +467,7 @@ BOOLEAN		EnterGIOScreen()
 
 		usPosY += GIO_GAP_BN_SETTINGS;
 	}
+#ifdef JA2UB
 	}
 	else
 	{
@@ -484,17 +487,19 @@ BOOLEAN		EnterGIOScreen()
 	
 	if ( gGameLegionOptions.SF_UB == TRUE )
 	{
+#endif
 	if( gGameOptions.ubGameStyle == STYLE_SCIFI )
 		ButtonList[ guiGameStyleToggles[ GIO_SCI_FI ] ]->uiFlags |= BUTTON_CLICKED_ON;
 	else // if(gGameOptions.ubGameStyle == STYLE_REALISTIC)
 		ButtonList[ guiGameStyleToggles[ GIO_REALISTIC ] ]->uiFlags |= BUTTON_CLICKED_ON;
+#ifdef JA2UB
 	}
 	else
 	{
 		gGameOptions.ubGameStyle = GIO_REALISTIC;
 		ButtonList[ guiGameStyleToggles[ GIO_REALISTIC ] ]->uiFlags |= BUTTON_CLICKED_ON;
 	}
-		
+#endif		
 		
 		
 		
@@ -824,11 +829,15 @@ BOOLEAN		RenderGIOScreen()
 	DisplayWrappedString( (UINT16)(GIO_GAME_SETTINGS_X+GIO_OFFSET_TO_TEXT), usPosY, GIO_GAME_SETTINGS_WIDTH, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ GIO_REALISTIC_TEXT ], FONT_MCOLOR_BLACK, FALSE, LEFT_JUSTIFIED );
 
 	usPosY += GIO_GAP_BN_SETTINGS;
+#ifdef JA2UB
 	if ( gGameLegionOptions.SF_UB == TRUE )
 	{
+#endif
 	//DrawTextToScreen( gzGIOScreenText[ GIO_SCI_FI_TEXT ], (UINT16)(GIO_GAME_SETTINGS_X+GIO_OFFSET_TO_TEXT), usPosY, GIO_MAIN_TITLE_WIDTH, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, FONT_MCOLOR_BLACK, FALSE, LEFT_JUSTIFIED );	
 	DisplayWrappedString( (UINT16)(GIO_GAME_SETTINGS_X+GIO_OFFSET_TO_TEXT), usPosY, GIO_GAME_SETTINGS_WIDTH, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ GIO_SCI_FI_TEXT ],	FONT_MCOLOR_BLACK, FALSE, LEFT_JUSTIFIED );
+#ifdef JA2UB
 	}
+#endif
 	//usPosY += GIO_GAP_BN_SETTINGS;
 	//DrawTextToScreen( gzGIOScreenText[ GIO_SCI_FI_TEXT ], (UINT16)(GIO_GAME_SETTINGS_X+GIO_OFFSET_TO_TEXT), usPosY, GIO_MAIN_TITLE_WIDTH, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, FONT_MCOLOR_BLACK, FALSE, LEFT_JUSTIFIED );	
 	//DisplayWrappedString( (UINT16)(GIO_GAME_SETTINGS_X+GIO_OFFSET_TO_TEXT), usPosY, GIO_GAME_SETTINGS_WIDTH, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ GIO_PLATINUM_TEXT ],	FONT_MCOLOR_BLACK, FALSE, LEFT_JUSTIFIED );
@@ -1564,8 +1573,10 @@ void DoneFadeOutForExitGameInitOptionScreen( void )
 
 	ExitGIOScreen();
 
+#ifdef JA2UB
 	gFadeInDoneCallback = DoneFadeInForExitGameInitOptionScreen;
 	FadeInNextFrame( );
+#endif
 	SetCurrentCursorFromDatabase( VIDEO_NO_CURSOR );
 }
 

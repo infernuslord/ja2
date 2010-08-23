@@ -81,6 +81,7 @@
 	#include "Overhead.h"
 #endif
 
+#ifdef JA2UB
 #include "Explosion Control.h"
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
@@ -90,6 +91,7 @@
 #include "LOS.h"
 #include "Soldier Control.h"
 #include "Ja25Update.h"
+#endif
 
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -177,6 +179,7 @@ extern void EndGameMessageBoxCallBack( UINT8 ubExitValue );
 extern INT32 FindNearestOpenableNonDoor( INT32 sStartGridNo );
 extern void RecalculateOppCntsDueToBecomingNeutral( SOLDIERTYPE * pSoldier );
 
+#ifdef JA2UB
 //JA25 UB
 void PerformJerryMiloAction301();
 void PerformJerryMiloAction302();
@@ -197,6 +200,7 @@ void HandleTexMakingHimselfAlreadyBeIntroduced();
 void DisplayJerryBreakingLaptopTransmitterPopup();
 void HaveNpcOpenUpDealerScreen( UINT8 ubProfileID );
 void HandleTexBecomingCamoed();
+#endif
 
 UINT8	ubTalkMenuApproachIDs[] =
 {
@@ -243,8 +247,10 @@ INT32 giHospitalTempBalance; // stores amount of money for current doctoring
 INT32 giHospitalRefund; // stores amount of money given to hospital for doctoring that wasn't used
 INT8	gbHospitalPriceModifier; // stores discount being offered
 
+#ifdef JA2UB
 //ja25 ub
 BOOLEAN	gfDisplayMsgBoxSayingCantAffordNPC=FALSE;
+#endif
 
 enum
 {
@@ -4036,13 +4042,22 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 				{
 					// This is not the end, 'cause momma creature is still alive
 					TriggerNPCRecordImmediately( 136, 8 );
-				//	EndQueenDeathEndgame( );
+#ifdef JA2UB
+//no Ub
+#else
+					EndQueenDeathEndgame( );
+#endif
+
 				}
 				else
 				{
 					// Continue with endgame cimematic..
 					DeleteTalkingMenu( );
-				//	EndQueenDeathEndgameBeginEndCimenatic( );
+#ifdef JA2UB
+//no Ub
+#else
+					EndQueenDeathEndgameBeginEndCimenatic( );
+#endif
 				}
 				break;
 
@@ -4050,7 +4065,11 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 
 				// Just end queen killed dequence.......
 				DeleteTalkingMenu( );
-				//EndQueenDeathEndgame( );
+#ifdef JA2UB
+// no UB
+#else
+				EndQueenDeathEndgame( );
+#endif
 				break;
 
 			case NPC_ACTION_MAKE_ESTONI_A_FUEL_SITE:
@@ -4300,6 +4319,7 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 					TriggerNPCRecord( WALTER, 15 );
 				}
 				break;
+#ifdef JA2UB
 			//JA25 UB	
 			case NPC_ACTION_TRIGGER_JERRY_CONVERSATION_WITH_PGC_1:
 				PerformJerryMiloAction301();
@@ -4336,7 +4356,7 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 			case NPC_ACTION_HAVE_DEALER_OPEN_BUY_SELL_SCREEN:
 				HaveNpcOpenUpDealerScreen( ubTargetNPC );
 				break;
-
+#endif
 			default:
 				ScreenMsg( FONT_MCOLOR_RED, MSG_TESTVERSION, L"No code support for NPC action %d", usActionCode );
 				break;
@@ -4583,6 +4603,8 @@ void DialogueMessageBoxCallBack( UINT8 ubExitValue )
 			break;
 		case NPC_ACTION_ASK_ABOUT_PAYING_RPC:
 		case NPC_ACTION_ASK_ABOUT_PAYING_RPC_WITH_DAILY_SALARY:
+
+#ifdef JA2UB
 			if ( ubExitValue == MSG_BOX_RETURN_YES )
 			{
 				//if the player cannot afford to hire the npc
@@ -4609,7 +4631,8 @@ void DialogueMessageBoxCallBack( UINT8 ubExitValue )
 			{
 				TriggerNPCRecord( ubProfile, 0 );
 			}
-			/*
+#else
+			
 			if ( ubExitValue == MSG_BOX_RETURN_YES )
 			{
 				TriggerNPCRecord( ubProfile, 1 );
@@ -4618,7 +4641,7 @@ void DialogueMessageBoxCallBack( UINT8 ubExitValue )
 			{
 				TriggerNPCRecord( ubProfile, 0 );
 			}
-			*/
+#endif
 			break;
 		case NPC_ACTION_REDUCE_CONRAD_SALARY_CONDITIONS:
 			if ( ubExitValue == MSG_BOX_RETURN_YES )
@@ -5043,7 +5066,7 @@ void CarmenLeavesSectorCallback( void )
 
 }
 
-
+#ifdef JA2UB
 //JA25 UB
 
 
@@ -5587,3 +5610,4 @@ void HaveNpcOpenUpDealerScreen( UINT8 ubProfileID )
 	//Enter the shopkeeper interface
 	EnterShopKeeperInterfaceScreen( gTalkPanel.ubCharNum );
 }
+#endif

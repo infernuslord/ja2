@@ -8,12 +8,11 @@
 #define MAX_MESSAGES_PAGE 18 // max number of messages per page
 
 //---ja25 ub
-
+#ifdef JA2UB
 //JA25:  New emails
 // email # 1
 #define EMAIL_STARTGAME												0
 #define EMAIL_STARTGAME_LENGTH								8
-
 // email # 2
 #define EMAIL_PILOTMISSING										(EMAIL_STARTGAME + EMAIL_STARTGAME_LENGTH)		
 #define EMAIL_PILOTMISSING_LENGTH							2
@@ -131,11 +130,7 @@
 
 #define IMP_EMAIL_PROFILE_RESULTS								( EMAIL_AIM_PROMOTION_2 + EMAIL_AIM_PROMOTION_2_LENGTH )
 #define IMP_EMAIL_PROFILE_RESULTS_LENGTH				1
-
-
-//---ja2
-
-/*
+#else
 #define IMP_EMAIL_INTRO					0
 #define IMP_EMAIL_INTRO_LENGTH	10
 #define ENRICO_CONGRATS					(IMP_EMAIL_INTRO + IMP_EMAIL_INTRO_LENGTH)					
@@ -261,7 +256,7 @@
 
 #define	BOBBY_R_MEDUNA_SHIPMENT				( AIM_MEDICAL_DEPOSIT_NO_REFUND + AIM_MEDICAL_DEPOSIT_NO_REFUND_LENGTH )
 #define	BOBBY_R_MEDUNA_SHIPMENT_LENGTH				4
-*/
+#endif
 // WANNE: New 1.13 MERC merc mail text for level up that Speck sends
 //#define	MERC_UP_LEVEL_GASTON			(BOBBY_R_MEDUNA_SHIPMENT + BOBBY_R_MEDUNA_SHIPMENT_LENGTH)
 //#define MERC_UP_LEVEL_GASTON_LENGTH		2
@@ -391,7 +386,9 @@ enum {
 	KING_PIN,
 	JOHN_KULBA,
 	AIM_SITE,
+#ifdef JA2UB
 	MAIL_MIGUEL,
+#endif
 };
 
 // the length of the subject in char

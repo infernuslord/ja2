@@ -37,6 +37,7 @@
 	#include "Tactical Save.h"
 #endif
 
+#ifdef JA2UB
 #include "Explosion Control.h"
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
@@ -45,6 +46,7 @@
 #include "interface Dialogue.h"
 #include "mercs.h"
 #include "legion cfg.h"
+#endif
 
 #include "email.h"
 
@@ -1287,12 +1289,15 @@ void HandleUnhiredMercDeaths( INT32 iProfileID )
 		gStrategicStatus.ubUnhiredMercDeaths++;
 
 		//send an email as long as the merc is from aim
+#ifdef JA2UB
 		//ja25 ub
-		//if( iProfileID < BIFF )
-		//{
-		//	//send an email to the player telling the player that a merc died
-		//	AddEmailWithSpecialData(MERC_DIED_ON_OTHER_ASSIGNMENT, MERC_DIED_ON_OTHER_ASSIGNMENT_LENGTH, AIM_SITE, GetWorldTotalMin(), 0, iProfileID );
-		//}
+#else
+		if( iProfileID < BIFF )
+		{
+			//send an email to the player telling the player that a merc died
+			AddEmailWithSpecialData(MERC_DIED_ON_OTHER_ASSIGNMENT, MERC_DIED_ON_OTHER_ASSIGNMENT_LENGTH, AIM_SITE, GetWorldTotalMin(), 0, iProfileID );
+		}
+#endif
 	}
 }
 
@@ -1307,9 +1312,10 @@ void HandleUnhiredMercDeaths( INT32 iProfileID )
 // returns a number between 0-100, this is an estimate of how far a player has progressed through the game
 UINT8 CurrentPlayerProgressPercentage(void)
 {
-
+#ifdef JA2UB
 	INT8	bFurthestSectorPlayerOwns=-1; //JA25 UB
 	UINT8 ubCurrentProgress;
+#endif
 	
 	UINT32 uiCurrentIncome;
 	UINT32 uiPossibleIncome;
@@ -1329,7 +1335,7 @@ UINT8 CurrentPlayerProgressPercentage(void)
 	UINT16 usMaxControlProgress;
 	UINT16 usMaxVisitProgress;
 	
-	
+#ifdef JA2UB	
 	//Get the furthest sector the player owns
 	bFurthestSectorPlayerOwns = GetTheFurthestSectorPlayerOwns();
 	//JA25 UB
@@ -1449,9 +1455,7 @@ UINT8 CurrentPlayerProgressPercentage(void)
 	}
 
 	return(ubCurrentProgress);
-
-
-/*
+#else
 	if( gfEditMode )
 		return 0;
 
@@ -1594,7 +1598,7 @@ UINT8 CurrentPlayerProgressPercentage(void)
 
 	return((UINT8)usCurrentProgress);
 	
-	*/
+#endif
 }
 
 UINT8 HighestPlayerProgressPercentage(void)
@@ -1619,11 +1623,14 @@ void HourlyProgressUpdate(void)
 		// CJC:  note when progress goes above certain values for the first time
 
 		// at 35% start the Madlab quest
-/*		if ( ubCurrentProgress >= gGameExternalOptions.ubGameProgressStartMadlabQuest && gStrategicStatus.ubHighestProgress < gGameExternalOptions.ubGameProgressStartMadlabQuest )
+#ifdef JA2UB
+// no UB
+#else
+		if ( ubCurrentProgress >= gGameExternalOptions.ubGameProgressStartMadlabQuest && gStrategicStatus.ubHighestProgress < gGameExternalOptions.ubGameProgressStartMadlabQuest )
 		{
 			HandleScientistAWOLMeanwhileScene();
 		}
-*/
+#endif
 		// at 50% make Mike available to the strategic AI
 		if ( ubCurrentProgress >= gGameExternalOptions.ubGameProgressMikeAvailable && gStrategicStatus.ubHighestProgress < gGameExternalOptions.ubGameProgressMikeAvailable )
 		{
@@ -1913,8 +1920,9 @@ UINT16 TotalVisitableSurfaceSectors( void )
 
 void MERCMercWentUpALevelSendEmail( UINT8 ubMercMercIdValue )
 {
+#ifdef JA2UB
 //JA25 UB
-	/*
+#else
 	UINT8 ubEmailOffset = 0;
 	int iMsgLength = 0;
 
@@ -1955,5 +1963,5 @@ void MERCMercWentUpALevelSendEmail( UINT8 ubMercMercIdValue )
 
 	AddEmail( ubEmailOffset, iMsgLength, SPECK_FROM_MERC, GetWorldTotalMin(), -1);
 
-	*/
+	#endif
 }

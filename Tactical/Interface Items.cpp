@@ -1658,7 +1658,11 @@ BOOLEAN	CompatibleItemForApplyingOnMerc( OBJECTTYPE *pTestObject )
 	// ATE: Would be nice to have flag here to check for these types....
 	if ( Item[usItem].camouflagekit || usItem == ADRENALINE_BOOSTER || usItem == REGEN_BOOSTER ||
 			 usItem == SYRINGE_3		 || usItem == SYRINGE_4 || usItem == SYRINGE_5 ||
+#ifdef JA2UB
 			 Item[usItem].alcohol  || Item[usItem].canteen || usItem == JAR_ELIXIR || usItem == 4504 ) // JA25 UB  CHE_GUEVARA_CANTEEN
+#else
+			 Item[usItem].alcohol  || Item[usItem].canteen || usItem == JAR_ELIXIR )
+#endif
 	{
 		return( TRUE );
 	}
@@ -5865,7 +5869,11 @@ BOOLEAN HandleItemPointerClick( INT32 usMapPos )
 					EndItemPointer( );
 
 					// If we are giving it to somebody not on our team....
+#ifdef JA2UB
 					if ( MercPtrs[ ubSoldierID ]->ubProfile < FIRST_RPC /* || MercPtrs[ubSoldierID]->ubProfile >= GASTON */ || RPC_RECRUITED( MercPtrs[ ubSoldierID ] ) )
+#else
+					if ( MercPtrs[ ubSoldierID ]->ubProfile < FIRST_RPC || MercPtrs[ubSoldierID]->ubProfile >= GASTON || RPC_RECRUITED( MercPtrs[ ubSoldierID ] ) )
+#endif
 					{
 
 					}
@@ -6864,11 +6872,13 @@ UINT32 GetInterfaceGraphicForItem( INVTYPE *pItem )
 		TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oP2ITEMS.getVObjectForItem(pItem->ubGraphicNum) : guiP2ITEMS,
 			L"Failed to retrieve P2 item image" );
 	}
+#ifdef JA2UB
 	else if ( pItem->ubGraphicType == 9 ) // Items UB
 	{
 		TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oP4ITEMS.getVObjectForItem(pItem->ubGraphicNum) : guiP4ITEMS,
 			L"Failed to retrieve P4 item image" );
 	}
+#endif
 	else
 	{
 		TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oP3ITEMS.getVObjectForItem(pItem->ubGraphicNum) : guiP3ITEMS,
@@ -6958,6 +6968,7 @@ BOOLEAN LoadTileGraphicForItem( INVTYPE *pItem, UINT32 *puiVo )
 			sprintf( zName, "p2item%d", ubGraphic );
 		}
 	}
+#ifdef JA2UB
 	else if ( pItem->ubGraphicType == 9 ) // UB Items
 	{
 		if ( ubGraphic < 10 )
@@ -6969,6 +6980,7 @@ BOOLEAN LoadTileGraphicForItem( INVTYPE *pItem, UINT32 *puiVo )
 			sprintf( zName, "GUN_UB%d", ubGraphic );
 		}
 	}
+#endif
 	else
 	{
 		if ( ubGraphic < 10 )

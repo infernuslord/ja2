@@ -23,8 +23,10 @@
 	#include "Exit Grids.h"
 #endif
 
+#ifdef JA2UB
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
+#endif
 
 #include "GameSettings.h"	// ary-05/05/2009 : add forced turn mode
 #include "text.h"			//	: add forced turn mode
@@ -1099,8 +1101,9 @@ BOOLEAN InternalAddSoldierToSector( UINT8 ubID, BOOLEAN fCalculateDirection, BOO
 
 	if ( pSoldier->bActive	)
 	{
-/*
-Ja25 No meanwhiles in exp
+#ifdef JA2UB
+//Ja25 No meanwhiles in exp
+#else
 		// ATE: Make sure life of elliot is OK if from a meanwhile
 		if ( AreInMeanwhile() && pSoldier->ubProfile == ELLIOT )
 		{
@@ -1109,7 +1112,7 @@ Ja25 No meanwhiles in exp
 				pSoldier->stats.bLife = 25;
 			}
 		}
-     */
+#endif
 		// ADD SOLDIER TO SLOT!
 		if (pSoldier->flags.uiStatusFlags & SOLDIER_OFF_MAP)
 		{
@@ -1573,7 +1576,7 @@ void AddSoldierToSectorGridNo( SOLDIERTYPE *pSoldier, INT32 sGridNo, UINT8 ubDir
 				// default to standing on arrival
 				if ( pSoldier->usAnimState != HELIDROP )
 				{
-				
+#ifdef JA2UB				
 					// DAVE!!!!
 					if ( gfFirstTimeInGameHeliCrash )
 					{
@@ -1594,7 +1597,7 @@ void AddSoldierToSectorGridNo( SOLDIERTYPE *pSoldier, INT32 sGridNo, UINT8 ubDir
 					{
 						pSoldier->EVENT_InitNewSoldierAnim( STANDING, 1, TRUE );
 					}
-					/*
+#else
 					if ( fUseAnimation )
 					{
 						pSoldier->EVENT_InitNewSoldierAnim( usAnimState, usAnimCode, TRUE );
@@ -1603,7 +1606,7 @@ void AddSoldierToSectorGridNo( SOLDIERTYPE *pSoldier, INT32 sGridNo, UINT8 ubDir
 					{
 						pSoldier->EVENT_InitNewSoldierAnim( STANDING, 1, TRUE );
 					}
-					*/
+#endif
 				}
 
 				// ATE: if we are below OK life, make them lie down!

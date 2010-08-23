@@ -44,6 +44,7 @@
 	#include "screenids.h"
 #endif
 
+#ifdef JA2UB
 #include "email.h"
 #include "Game Clock.h"
 #include "Ja25_Tactical.h"
@@ -57,6 +58,7 @@ void InFinalSectorAfterFadeIn( void );
 void FadeOutToLaptopOnEndGame( void );
 
 BOOLEAN			gfPlayersLaptopWasntWorkingAtEndOfGame;
+#endif
 
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -150,8 +152,9 @@ void ChangeO3SectorStatue( BOOLEAN fFromExplosion )
 	RecompileLocalMovementCostsFromRadius( 13830, 5 );
 
 }
-/*
-Ja25 no queen
+#ifdef JA2UB
+//Ja25 no queen
+#else
 void DeidrannaTimerCallback( void )
 {
 	HandleDeidrannaDeath( gpKillerSoldier, gsGridNo, gbLevel );
@@ -382,9 +385,7 @@ void EndQueenDeathEndgame( )
 	gTacticalStatus.uiFlags &= (~IN_DEIDRANNA_ENDGAME);
 }
 
-*/
 
-/*
 void DoneFadeOutEndCinematic( void )
 {
 	// DAVE PUT SMAKER STUFF HERE!!!!!!!!!!!!
@@ -401,26 +402,32 @@ void DoneFadeOutEndCinematic( void )
 
 	SetIntroType( INTRO_ENDING );
 }
-*/
+#endif
 // OK, end death UI - fade to smaker....
 void HandleDoneLastEndGameQuote( )
 {
-//Ja25 No queen	EndQueenDeathEndgame( );
-
+#ifdef JA2UB
+//Ja25 No queen	
+#else
+EndQueenDeathEndgame( );
+#endif
 	gFadeOutDoneCallback = DoneFadeOutEndCinematic;
 
-	FadeOutGameScreen( );	
+	FadeOutGameScreen( );
 }
-
 
 
 
 void QueenBitchTimerCallback( void )
 {
-//	HandleQueenBitchDeath( gpKillerSoldier, gsGridNo, gbLevel );
+#ifdef JA2UB
+//no Ub
+#else
+	HandleQueenBitchDeath( gpKillerSoldier, gsGridNo, gbLevel );
+#endif
 }
 
-
+#ifdef JA2UB
 void EndGameEveryoneSayTheirGoodByQuotes( void )
 {
 	INT32 cnt;
@@ -619,9 +626,8 @@ void FadeOutToLaptopOnEndGame( void )
 	//Add the end Game Emails
 	HandleAddingTheEndGameEmails();
 }
+#else  //Ja25 no queen
 
-/*
-Ja25 no queen
 void BeginHandleQueenBitchDeath( SOLDIERTYPE *pKillerSoldier, INT32 sGridNo, INT8 bLevel )
 {
 	SOLDIERTYPE *pTeamSoldier;
@@ -719,7 +725,9 @@ void HandleQueenBitchDeath( SOLDIERTYPE *pKillerSoldier, INT32 sGridNo, INT8 bLe
 	giNPCReferenceCount = 0;
 	}
 }
-*/
+#endif
+
+#ifdef JA2UB
 //JA25UB
 void DoneFadeOutEndCinematic( void )
 {
@@ -759,3 +767,4 @@ void DoneFadeOutEndCinematic( void )
 	InternalLeaveTacticalScreen( INTRO_SCREEN );
 	SetIntroType( INTRO_ENDING );
 }
+#endif

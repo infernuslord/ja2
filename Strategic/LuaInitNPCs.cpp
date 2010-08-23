@@ -41,9 +41,11 @@
 #include "LOS.h"
 #include "Music Control.h"
 
+#ifdef JA2UB
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
 #include "Ja25Update.h"
+#endif
 
 #include "Queen Command.h"
 
@@ -99,7 +101,7 @@ static int lh_getIntegerFromTable(lua_State *L, const char * fieldname);
 static std::string lh_getStringFromTable(lua_State *L, const char * fieldname);;
 static bool locationStringToCoordinates_AltSector(std::string loc, UINT8* x, UINT8* y);
 static bool locationStringToCoordinates(std::string loc, UINT8* x, UINT8* y, UINT8* z);
-
+#ifdef JA2UB
 static int l_Ja25SaveStructJohnKulbaIsInGame(lua_State *L);
 static int l_Ja25SaveCheckStructJohnKulbaIsInGame(lua_State *L);
 
@@ -119,7 +121,7 @@ static int l_AddEnemyToUnderGroundSector(lua_State *L);
 static int l_FindUnderGroundSectorVisited(lua_State *L);
 
 UNDERGROUND_SECTORINFO* NewUndergroundNode( UINT8 ubSectorX, UINT8 ubSectorY, UINT8 ubSectorZ );
-
+#endif
 
 using namespace std;
 
@@ -167,7 +169,8 @@ void IniFunction(lua_State *L)
 	//Fact and Quest
 	lua_register(L, "SetFactTrue", l_SetFactTrue);
 	lua_register(L, "SetFactFalse", l_SetFactFalse);
-	
+
+#ifdef JA2UB	
 	//john
 	lua_register(L, "Ja25JohnKulbaIsInGame", l_Ja25SaveStructJohnKulbaIsInGame);
 	lua_register(L, "Ja25CheckJohnKulbaIsInGame", l_Ja25SaveCheckStructJohnKulbaIsInGame);
@@ -186,9 +189,10 @@ void IniFunction(lua_State *L)
 	lua_register(L, "FindUnderGroundSector", l_FindUnderGroundSector);
 	lua_register(L, "AddEnemyToUnderGroundSector", l_AddEnemyToUnderGroundSector);
 	lua_register(L, "FindUnderGroundSectorVisited", l_FindUnderGroundSectorVisited);
-	
+#endif	
 }
 
+#ifdef JA2UB
 BOOLEAN LetLuaMakeBadSectorListFromMapsOnHardDrive(UINT8 Init)
 {
 	char * filename = "scripts\\MakeMapsOnHardDrive.lua";
@@ -233,6 +237,7 @@ BOOLEAN LetLuaMakeBadSectorListFromMapsOnHardDrive(UINT8 Init)
 	return true;
 
 }
+#endif
 
 BOOLEAN LetLuaGameInit(UINT8 Init)
 {
@@ -285,6 +290,7 @@ BOOLEAN LetLuaGameInit(UINT8 Init)
 
 }
 
+#ifdef JA2UB
 BOOLEAN LuaInitStrategicLayer(UINT8 Init)
 {
 	char * filename = "scripts\\InitStrategicLayer.lua";
@@ -576,7 +582,7 @@ UINT8 n = lua_gettop(L);
 	gJa25SaveStruct.fJohnKulbaIsInGame = FactFalse;
 	return 0;
 }
-
+#endif
 // set fact = false
 static int l_SetFactFalse(lua_State *L)
 {
@@ -649,6 +655,7 @@ UINT CREATURE_ILOSC = 0;
 		
 	return 0;
 }
+
 
 //AddEmail
 static int l_AddEmail (lua_State *L)

@@ -117,7 +117,10 @@ typedef struct
 
 extern GAME_LEGION_OPTIONS gGameLegionOptions; 
 extern Legion2Dane	gLegion2Dane; //legion
+
+#ifdef JA2UB
 extern void RandomAddEnemy( UINT8 SectorX, UINT8 SectorY, UINT8 Level );
+#endif
 
 extern void RandomStats ();
 #endif

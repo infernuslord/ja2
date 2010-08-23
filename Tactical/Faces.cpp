@@ -282,7 +282,9 @@ INT32	InternalInitFace( UINT8 usMercProfileID, UINT8 ubSoldierID, UINT32 uiInitF
 		{
 			sprintf( VObjectDesc.ImageFile, "FACES\\b%02de.sti", iFaceFileID );
 		}
-	} //Tex
+	}
+//Tex
+#ifdef JA2UB
 	else if ( usMercProfileID == 64 )
 	{
 		if( gMercProfiles[ 64 ].bSkillTrait2 == CAMOUFLAGED )
@@ -290,6 +292,15 @@ INT32	InternalInitFace( UINT8 usMercProfileID, UINT8 ubSoldierID, UINT32 uiInitF
 			sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
 		}
 		}
+#else
+	else if ( usMercProfileID == TEX )
+	{
+		if( gMercProfiles[ TEX ].bSkillTrait2 == CAMOUFLAGED )
+		{
+			sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
+		}
+		}
+#endif
 
 	}
 	else
@@ -556,7 +567,7 @@ void GetFaceRelativeCoordinates( FACETYPE *pFace, UINT16 *pusEyesX, UINT16 *pusE
 	usMouthY			=	gMercProfiles[ usMercProfileID ].usMouthY;
 	usMouthX			= gMercProfiles[ usMercProfileID ].usMouthX;
 	
-	
+#ifdef JA2UB	
   if( usMercProfileID == 64 && gMercProfiles[ 64 ].bSkillTrait2 == CAMOUFLAGED )
   {
 		usEyesX				= 13;
@@ -564,6 +575,7 @@ void GetFaceRelativeCoordinates( FACETYPE *pFace, UINT16 *pusEyesX, UINT16 *pusE
 		usMouthX			= 13;
 		usMouthY			=	55;
   }
+#endif
 
 	// Use some other values for x,y, base on if we are a RPC!
 	if ( !( pFace->uiFlags & FACE_BIGFACE ) ||( pFace->uiFlags & FACE_FORCE_SMALL ))
@@ -2647,13 +2659,14 @@ BOOLEAN SetFaceTalking( INT32 iFaceIndex, CHAR8 *zSoundFile, STR16 zTextString,
 	pFace->fAnimatingTalking = TRUE;
 	pFace->fFinishTalking = FALSE;
 
-/*
-Ja25: No Meanwhiles
+#ifdef JA2UB
+//Ja25: No Meanwhiles
+#else
 	if ( !AreInMeanwhile( ) )
 	{
 	TurnOnSectorLocator( pFace->ubCharacterNum );
 	}
-*/
+#endif
 	// Play sample
 	if( gGameSettings.fOptions[ TOPTION_SPEECH ] )
 		pFace->uiSoundID = PlayJA2GapSample( zSoundFile, RATE_11025, HIGHVOLUME, 1, MIDDLEPAN, &(pFace->GapList ) );

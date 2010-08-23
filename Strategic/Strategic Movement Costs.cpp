@@ -12,6 +12,8 @@
 	#include "Tactical Save.h"
 #endif
 #include "Map Screen Interface Map.h"
+
+#ifdef JA2UB
 #include "Ja25Update.h"
 #include "message.h"
 #include "strategicmap.h"
@@ -19,14 +21,17 @@
 #include "Strategic Movement.h"
 #include "Summary Info.h"
 #include "legion cfg.h"
+#endif
 
 extern BOOLEAN sBadSectorsList[ WORLD_MAP_X ][ WORLD_MAP_X ];
 
+#ifdef JA2UB
 extern void UpdateCustomMapMovementCosts(); // ja25 UB
 extern void MakeBadSectorListFromMapsOnHardDrive( BOOLEAN fDisplayMessages ); // ja25 UB
 extern void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMessageIfNotExist ); //ja25 UB
 extern UNDERGROUND_SECTORINFO* NewUndergroundNode( UINT8 ubSectorX, UINT8 ubSectorY, UINT8 ubSectorZ );
 extern BOOLEAN SectorIsImpassableUB( INT16 sSector );
+#endif
 
 typedef enum
 {
@@ -3394,7 +3399,7 @@ void InitStrategicRowP()
 	pSector->ubTraversability[ THROUGH_STRATEGIC_MOVE ] = EDGEOFWORLD;
 }
 */
-
+#ifdef JA2UB
 void InitStrategicRowA()
 {
 	SECTORINFO *pSector;
@@ -5539,18 +5544,21 @@ void InitStrategicRowP()
 	pSector->ubTraversability[ WEST_STRATEGIC_MOVE ]		= EDGEOFWORLD;
 	pSector->ubTraversability[ THROUGH_STRATEGIC_MOVE ] = EDGEOFWORLD;
 }
-
+#endif
 
 BOOLEAN InitStrategicMovementCosts()
 {
 	char fileName[MAX_PATH];
+#ifdef JA2UB
 if ( gGameLegionOptions.StrategicMovementCostsXML == TRUE )
 	{
+#endif
 	// need to be here
 	strcpy(fileName, TABLEDATA_DIRECTORY);
 	strcat(fileName, MOVEMENTCOSTFILENAME);
 	if(!ReadInStrategicMovementCosts(fileName))
 		return FALSE;
+#ifdef JA2UB
 	}
 	else
 	{
@@ -5571,7 +5579,7 @@ if ( gGameLegionOptions.StrategicMovementCostsXML == TRUE )
 	InitStrategicRowO();
 	InitStrategicRowP();
 	}
-	
+#endif	
 	//WriteInStrategicMovementCosts("TABLEDATA\\~MovementCosts.xml");
 
 
@@ -5625,16 +5633,18 @@ if ( gGameLegionOptions.StrategicMovementCostsXML == TRUE )
 	}
 	#endif
 	
-	
+	#ifdef JA2UB
 	if ( gGameLegionOptions.CampaignSector == TRUE )
 		UpdateCustomMapMovementCosts(); //Ja25 UB
-	
-	
 	//MakeBadSectorListFromMapsOnHardDrive( TRUE ); //ja25 UB
+	#endif
+	
+
 
 	return( TRUE );
 }
 
+#ifdef JA2UB
 void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMessageIfNotExist ) //ja25 UB
 {
 	CHAR8			zMapName[200];
@@ -6185,3 +6195,4 @@ void UpdateCustomMapMovementCosts()
 		}
 	}
 }
+#endif

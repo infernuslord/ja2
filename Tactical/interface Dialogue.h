@@ -351,7 +351,7 @@ enum
 	NPC_ACTION_TRIGGER_MADLAB_32,
 	NPC_ACTION_TRIGGER_BREWSTER_BY_WARDEN_PROXIMITY, // 298
 	
-	
+#ifdef JA2UB	
 	//JA25
 	NPC_ACTION_TRIGGER_JERRY_CONVERSATION_WITH_PGC_1 = 301,
 	NPC_ACTION_TRIGGER_JERRY_CONVERSATION_WITH_PGC_2,
@@ -364,7 +364,7 @@ enum
 	NPC_ACTION_MARK_TEX_AS_ALREADY_INTRODUCED_HIMSELF=308,
 	NPC_ACTION_MAKE_TEX_CAMOED=309,
 	NPC_ACTION_HAVE_DEALER_OPEN_BUY_SELL_SCREEN=310,
-	
+#endif	
 	// WDS - New AI
 	NPC_ACTION_SEND_WEIGHTED_ASSAULT_TO_LOCATION,  // 1st optional parm is "direness: rating
 	NPC_ACTION_SEND_SPECIFIC_ASSAULT_TO_LOCATION,  // 1st option parm is # of soldiers to send, 2nd is composition
@@ -385,7 +385,7 @@ extern UINT32 CalcPatientMedicalCost( SOLDIERTYPE * pSoldier );
 extern UINT32 CalcMedicalCost( UINT8 ubId );
 
 extern BOOLEAN	gfInTalkPanel;
-
+#ifdef JA2UB
 //JA25 ub
 void DelayedSayingOfMercQuote( UINT32 uiParam );
 void DelayedMercQuote( UINT16 usProfileID, UINT32 uiQuoteNum, UINT32 uiTimeTillQuoteSaid );
@@ -397,5 +397,5 @@ void HaveBiggensDetonatingExplosivesByTheMine();
 BOOLEAN IsMineEntranceInSectorI13AtThisGridNo( INT16 sGridNo );
 
 void ReplaceMineEntranceGraphicWithCollapsedEntrance();
-
+#endif
 #endif

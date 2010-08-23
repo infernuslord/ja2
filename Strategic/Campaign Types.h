@@ -91,8 +91,9 @@ enum //strategic values for each sector
 #define SF_SKYRIDER_NOTICED_ENEMIES_HERE			0x00000400
 #define SF_HAVE_USED_GUIDE_QUOTE					0x00000800
 
+#ifdef JA2UB
 #define	SF_HAVE_SAID_PLAYER_QUOTE_NEW_SECTOR		0x00001000
-
+#endif
 
 #define SF_SMOKE_EFFECTS_TEMP_FILE_EXISTS			0x00100000		//Temp File starts with sm_
 #define SF_LIGHTING_EFFECTS_TEMP_FILE_EXISTS		0x00200000		//Temp File starts with l_
@@ -379,7 +380,8 @@ enum
 	TUNNEL,
 	SHELTER,
 	ABANDONED_MINE,
-	
+
+#ifdef JA2UB	
 //Ja25: New
 	FINAL_COMPLEX,
 	GUARD_POST_TYPE,
@@ -387,6 +389,7 @@ enum
 	POWER_PLANT_TYPE,
 	MOUNTAINS_TYPE,
 	UNKNOWN_TYPE,
+#endif
 
 	NUM_TRAVTERRAIN_TYPES
 };
@@ -462,10 +465,11 @@ typedef struct SECTORINFO
 	UINT8	bFiller3;
 
 	UINT32	uiNumberOfWorldItemsInTempFileThatCanBeSeenByPlayer;
-
+#ifdef JA2UB
 	BOOLEAN	fValidSector; //ja25 UB
 	BOOLEAN	fCustomSector;
 	BOOLEAN	fCampaignSector;
+#endif
 	
 	INT8	bPadding[ 41 ];
 
@@ -496,9 +500,11 @@ typedef struct UNDERGROUND_SECTORINFO
 	UINT8	ubElitesInBattle, ubTroopsInBattle, ubAdminsInBattle, ubCreaturesInBattle;
 
 	UINT32	uiNumberOfWorldItemsInTempFileThatCanBeSeenByPlayer;
-	
+
+#ifdef JA2UB	
 	BOOLEAN	fCustomSector;
 	BOOLEAN	fCampaignSector;
+#endif
 	
 	INT8	bPadding[36];
 	//no padding left!

@@ -35,10 +35,13 @@
 
 #include "BobbyRMailOrder.h"
 #include "connect.h"
+
+#ifdef JA2UB
 #include "email.h"
 #include "Strategic Merc Handler.h"
 #include "laptop.h"
 #include "Ja25 Strategic Ai.h"
+#endif
 
 #define TESTQUESTS
 
@@ -646,12 +649,13 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 
 	switch( usFact )
 	{
-/*
-Ja25 No dimitri
+#ifdef JA2UB
+//Ja25 No dimitri
+#else
 		case FACT_DIMITRI_DEAD:
 			gubFact[ usFact ] = (gMercProfiles[ DIMITRI ].bMercStatus == MERC_IS_DEAD );
 			break;
-*/
+#endif
 		case FACT_CURRENT_SECTOR_IS_SAFE:
 			gubFact[FACT_CURRENT_SECTOR_IS_SAFE] = !( ( (gTacticalStatus.fEnemyInSector && NPCHeardShot( ubProfileID ) ) || gTacticalStatus.uiFlags & INCOMBAT ) );
 			break;
@@ -694,7 +698,9 @@ Ja25 No dimitri
 		case FACT_NPC_WOUNDED_BY_PLAYER:
 			gubFact[FACT_NPC_WOUNDED_BY_PLAYER] = CheckNPCWounded( ubProfileID, TRUE );
 			break;
-		/*
+#ifdef JA2UB
+// no ja25 UB
+#else
 		case FACT_IRA_NOT_PRESENT:
 			gubFact[FACT_IRA_NOT_PRESENT] = !CheckNPCWithin( ubProfileID, IRA, 10 );
 			break;
@@ -711,7 +717,7 @@ Ja25 No dimitri
 				gubFact[FACT_IRA_UNHIRED_AND_ALIVE] = FALSE;
 			}
 			break;
-		*/
+#endif
 		case FACT_NPC_BLEEDING:
 			gubFact[FACT_NPC_BLEEDING] = CheckNPCBleeding( ubProfileID );
 			break;
@@ -725,8 +731,9 @@ Ja25 No dimitri
 				gubFact[FACT_NPC_BLEEDING_BUT_OKAY] = FALSE;
 			}
 			break;
-/*
-Ja25: NO Carmen
+#ifdef JA2UB
+//Ja25: NO Carmen
+#else
 		case FACT_PLAYER_HAS_HEAD_AND_CARMEN_IN_SAN_MONA:
 			gubFact[usFact] = (CheckNPCSector( CARMEN, 5, MAP_ROW_C, 0 ) && CheckPlayerHasHead() );
 			break;
@@ -738,7 +745,7 @@ Ja25: NO Carmen
 		case FACT_PLAYER_HAS_HEAD_AND_CARMEN_IN_DRASSEN:
 			gubFact[usFact] = (CheckNPCSector( CARMEN, 13, MAP_ROW_C, 0 ) && CheckPlayerHasHead() );
 			break;
- */
+#endif
 		case FACT_NPC_OWED_MONEY:
 			gubFact[FACT_NPC_OWED_MONEY] = (gMercProfiles[ubProfileID].iBalance < 0);
 			break;
@@ -862,11 +869,13 @@ Ja25: NO Carmen
 		case FACT_SHANK_NOT_IN_SECTOR:
 			gubFact[usFact] = ( FindSoldierByProfileID( SHANK, FALSE ) == NULL );
 			break;
-/* Ja25 No queen
+#ifdef JA2UB
+//Ja25 No queen
+#else
 		case FACT_QUEEN_DEAD:
 			gubFact[usFact] = (gMercProfiles[ QUEEN ].bMercStatus == MERC_IS_DEAD);
 			break;
-*/
+#endif
 		case FACT_MINE_EMPTY:
 			gubFact[usFact] = IsHisMineEmpty( ubProfileID );
 			break;
@@ -1005,15 +1014,27 @@ Ja25: NO Carmen
 			break;
 
 		case FACT_PLAYER_OWNS_2_TOWNS_INCLUDING_OMERTA:
-		//	gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() == 3 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
+#ifdef JA2UB
+//UB
+#else
+			gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() == 3 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
+#endif
 			break;
 
 		case FACT_PLAYER_OWNS_3_TOWNS_INCLUDING_OMERTA:
-		//	gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() == 5 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
+#ifdef JA2UB
+//UB
+#else
+			gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() == 5 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
+#endif
 			break;
 
 		case FACT_PLAYER_OWNS_4_TOWNS_INCLUDING_OMERTA:
-		//	gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() >= 6 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
+#ifdef JA2UB
+//UB
+#else
+			gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() >= 6 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
+#endif
 			break;
 
 		case FACT_PLAYER_FOUGHT_THREE_TIMES_TODAY:
@@ -1116,11 +1137,13 @@ Ja25: NO Carmen
 		case FACT_WALDO_ALIVE:
 			gubFact[usFact] = gMercProfiles[ WALDO ].bMercStatus != MERC_IS_DEAD;
 			break;
-             /*  ja2UB
+#ifdef JA2UB
+//UB
+#else        
 		case FACT_PERKO_ALIVE:
 			gubFact[usFact] = gMercProfiles[ PERKO ].bMercStatus != MERC_IS_DEAD;
 			break;
-              */
+#endif
 		case FACT_TONY_ALIVE:
 			gubFact[usFact] = gMercProfiles[ TONY ].bMercStatus != MERC_IS_DEAD;
 			break;
@@ -1302,7 +1325,7 @@ void InternalEndQuest( UINT8 ubQuest, INT16 sSectorX, INT16 sSectorY, BOOLEAN fU
 		gMercProfiles[ MADAME ].bNPCData2 = 0;
 	}
 	
-	
+#ifdef JA2UB	
 	//if the quest is the FIX LAPTOP quest
 	if( ubQuest == QUEST_FIX_LAPTOP )
 	{
@@ -1352,7 +1375,7 @@ void InternalEndQuest( UINT8 ubQuest, INT16 sSectorX, INT16 sSectorY, BOOLEAN fU
 		//Force which ever of these emails that needed to be sent, to be sent
 		HandleEmailBeingSentWhenEnteringSector( 0, 0, 0, TRUE );
 	}
-
+#endif
 };
 
 void InitQuestEngine()
@@ -1388,7 +1411,7 @@ void CheckForQuests( UINT32 uiDay )
 	ScreenMsg( MSG_FONT_RED, MSG_DEBUG, L"Checking For Quests, Day %d", uiDay );
 #endif
 
-
+#ifdef JA2UB
  // -------------------------------------------------------------------------------
 	// QUEST 23 : Detroy missles
 	// -------------------------------------------------------------------------------
@@ -1401,14 +1424,13 @@ void CheckForQuests( UINT32 uiDay )
 		ScreenMsg( MSG_FONT_RED, MSG_DEBUG, L"Started DESTORY MISSLES quest");
 #endif
 	}
-
+//Ja25: No deliver letter quest, dont start it
+#else
 	// -------------------------------------------------------------------------------
 	// QUEST 0 : DELIVER LETTER
 	// -------------------------------------------------------------------------------
 	// The game always starts with DELIVER LETTER quest, so turn it on if it hasn't
 	// already started
-/*
-Ja25: No deliver letter quest, dont start it
 	if (gubQuest[QUEST_DELIVER_LETTER] == QUESTNOTSTARTED)
 	{
 		StartQuest( QUEST_DELIVER_LETTER, -1, -1 );
@@ -1418,7 +1440,7 @@ Ja25: No deliver letter quest, dont start it
 		ScreenMsg( MSG_FONT_RED, MSG_DEBUG, L"Started DELIVER LETTER quest");
 #endif
 	}
-       */
+#endif
 	// This quest gets turned OFF through conversation with Miguel - when user hands
 	// Miguel the letter
 }

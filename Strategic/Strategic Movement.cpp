@@ -51,13 +51,17 @@
 
 #include "MilitiaSquads.h"
 #include "Vehicles.h"
+
+#ifdef JA2UB
 #include "Ja25Update.h"
 //#include "Map Screen Interface Map.h"
+#endif
 
 #include "connect.h"
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
+
 
 extern UINT32		guiLastTacticalRealTime;
 
@@ -1700,7 +1704,11 @@ void GroupArrivedAtSector( UINT8 ubGroupID, BOOLEAN fCheckForBattle, BOOLEAN fNe
 	if( fExceptionQueue || fCheckForBattle && gTacticalStatus.fEnemyInSector &&
 			FindMovementGroupInSector( (UINT8)gWorldSectorX, (UINT8)gWorldSectorY, TRUE ) &&
 		(pGroup->ubNextX != gWorldSectorX || pGroup->ubNextY != gWorldSectorY || gbWorldSectorZ > 0 ) ||
-//Ja25: NO meanwhiles			AreInMeanwhile() ||
+		#ifdef JA2UB
+			//Ja25: NO meanwhiles		
+		#else
+			AreInMeanwhile() ||
+		#endif
 			//KM : Aug 11, 1999 -- Patch fix:	Added additional checks to prevent a 2nd battle in the case
 			//	 where the player is involved in a potential battle with bloodcats/civilians
 			fCheckForBattle && HostileCiviliansPresent() ||
@@ -1710,16 +1718,17 @@ void GroupArrivedAtSector( UINT8 ubGroupID, BOOLEAN fCheckForBattle, BOOLEAN fNe
 		//QUEUE BATTLE!
 		//Delay arrival by a random value ranging from 3-5 minutes, so it doesn't get the player
 		//too suspicious after it happens to him a few times, which, by the way, is a rare occurrence.
-
-/*
-Ja25: No meanwhiles
+#ifdef JA2UB
+/*Ja25: No meanwhiles*/
+#else
 		if( AreInMeanwhile() )
 		{
 			pGroup->uiArrivalTime ++; //tack on only 1 minute if we are in a meanwhile scene.	This effectively
 									//prevents any battle from occurring while inside a meanwhile scene.
 		}
+
 		else
-*/
+#endif
 		{
 			pGroup->uiArrivalTime += Random(3) + 3;
 		}
@@ -5043,13 +5052,13 @@ BOOLEAN HandlePlayerGroupEnteringSectorToCheckForNPCsOfNote( GROUP *pGroup )
 
 	// get the strategic sector value
 	sStrategicSector = sSectorX + MAP_WORLD_X * sSectorY;
-	
+#ifdef JA2UB	
 	// ATE: if this is a custom map, return Ja25 UB
 	if ( SectorInfo[ SECTOR( sSectorY, sSectorX ) ].fCustomSector )
 	{
 		return( FALSE );
 	}
-
+#endif
 	// skip towns/pseudo-towns (anything that shows up on the map as being special)
 	if( StrategicMap[ sStrategicSector ].bNameId != BLANK_SECTOR )
 	{
@@ -5099,8 +5108,11 @@ BOOLEAN WildernessSectorWithAllProfiledNPCsNotSpokenWith( INT16 sSectorX, INT16 
 	MERCPROFILESTRUCT *		pProfile;
 	BOOLEAN fFoundSomebody = FALSE;
 
-
+#ifdef JA2UB
 	for ( ubProfile = FIRST_RPC; ubProfile < NUM_PROFILES; ubProfile++ ) // GASTON
+#else
+	for ( ubProfile = FIRST_RPC; ubProfile < GASTON; ubProfile++ )
+#endif
 	{
 		pProfile = &gMercProfiles[ ubProfile ];
 

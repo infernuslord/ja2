@@ -147,7 +147,11 @@ NPCQuoteInfo * LoadQuoteFile( UINT8 ubNPC )
 		// use a copy of Herve's data file instead!
 		sprintf( zFileName, "NPCData\\%03d.npc", HERVE );
 	}
+#ifdef JA2UB
 	else if ( ubNPC < FIRST_RPC || /*ubNPC >= GASTON || */ (ubNPC < FIRST_NPC && gMercProfiles[ ubNPC ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED ) )
+#else
+	else if ( ubNPC < FIRST_RPC || ubNPC >= GASTON || (ubNPC < FIRST_NPC && gMercProfiles[ ubNPC ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED ) )
+#endif
 	{
 		sprintf( zFileName, "NPCData\\000.npc", ubNPC );
 	}
@@ -155,8 +159,11 @@ NPCQuoteInfo * LoadQuoteFile( UINT8 ubNPC )
 	{
 		sprintf( zFileName, "NPCData\\%03d.npc", ubNPC );
 	}
-/*
-Ja25:  No meanwhiles
+#ifdef JA2UB
+//Ja25:  No meanwhiles
+#else
+
+
 	// ATE: Put some stuff i here to use a different NPC file if we are in a meanwhile.....
 	if ( AreInMeanwhile( ) )
 	{
@@ -173,7 +180,7 @@ Ja25:  No meanwhiles
 		}
 
 	}
-  */
+#endif
 	CHECKN( FileExists( zFileName ) );
 
 	hFile = FileOpen( zFileName, FILE_ACCESS_READ, FALSE );
@@ -424,12 +431,14 @@ BOOLEAN RefreshNPCScriptRecord( UINT8 ubNPC, UINT8 ubRecord )
 		{
 			RefreshNPCScriptRecord( ubLoop, ubRecord );
 		}
-		/*
+#ifdef JA2UB
+//no UB
+#else
 		for ( ubLoop = GASTON; ubLoop < NUM_PROFILES; ubLoop++ ) // need more finesse here
 		{
 			RefreshNPCScriptRecord( ubLoop, ubRecord );
 		}
-		*/
+#endif
 		for ( ubLoop = FIRST_RPC; ubLoop < FIRST_NPC; ubLoop++ )
 		{
 			if ( gMercProfiles[ ubNPC ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED && gpBackupNPCQuoteInfoArray[ ubNPC ] != NULL )
@@ -653,7 +662,11 @@ BOOLEAN ReloadAllQuoteFiles( void )
 {
 	UINT8		ubProfile, ubLoop;
 
+#ifdef JA2UB
 	for ( ubProfile = FIRST_RPC; ubProfile < NUM_PROFILES; /*GASTON;*/ ubProfile++ )
+#else
+	for ( ubProfile = FIRST_RPC; ubProfile < GASTON; ubProfile++ )
+#endif
 	{
 		// zap backup if any
 		if ( gpBackupNPCQuoteInfoArray[ ubProfile ] != NULL )
@@ -1683,8 +1696,11 @@ void ResetOncePerConvoRecordsForAllNPCsInLoadedSector( void )
 	{
 		return;
 	}
-
+#ifdef JA2UB
 	for ( ubLoop = FIRST_RPC; ubLoop < NUM_PROFILES; /*GASTON; */ ubLoop++ )
+#else
+	for ( ubLoop = FIRST_RPC; ubLoop < GASTON; ubLoop++ )
+#endif
 	{
 		if ( gMercProfiles[ ubLoop ].sSectorX == gWorldSectorX &&
 				 gMercProfiles[ ubLoop ].sSectorY == gWorldSectorY &&
@@ -3115,9 +3131,11 @@ BOOLEAN LoadNPCInfoFromSavedGameFile( HWFILE hFile, UINT32 uiSaveGameVersion )
 	if ( uiSaveGameVersion < 92 )
 	{
 		RefreshNPCScriptRecord( MATT, 14 );
-		/*
+#ifdef JA2UB
+//no Ub
+#else
 		RefreshNPCScriptRecord( AUNTIE, 8 );
-		*/
+#endif
 	}
 	if ( uiSaveGameVersion < 93 )
 	{
@@ -3608,7 +3626,7 @@ INT8 ConsiderCivilianQuotes( INT16 sSectorX, INT16 sSectorY, INT16 sSectorZ, BOO
 	return( -1 );
 }
 
-
+#ifdef JA2UB
 //UB
 
 BOOLEAN HasNpcSaidQuoteBefore( UINT8 ubNPC, UINT8 ubRecord )
@@ -3618,3 +3636,4 @@ BOOLEAN HasNpcSaidQuoteBefore( UINT8 ubNPC, UINT8 ubRecord )
 	else
 		return( FALSE );
 }
+#endif

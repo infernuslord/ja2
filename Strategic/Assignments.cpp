@@ -71,7 +71,7 @@ class SOLDIERTYPE;
 // HEADROCK HAM 3.5: Include Facility data
 #include "Facilities.h"
 
-
+#ifdef JA2UB
 #include "Explosion Control.h"
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
@@ -80,6 +80,7 @@ class SOLDIERTYPE;
 #include "interface Dialogue.h"
 #include "mercs.h"
 #include "legion cfg.h"
+#endif
 
 // various reason an assignment can be aborted before completion
 enum{
@@ -511,8 +512,10 @@ BOOLEAN RepairObject( SOLDIERTYPE * pSoldier, SOLDIERTYPE * pOwner, OBJECTTYPE *
 void RepairItemsOnOthers( SOLDIERTYPE *pSoldier, UINT8 *pubRepairPtsLeft );
 BOOLEAN UnjamGunsOnSoldier( SOLDIERTYPE *pOwnerSoldier, SOLDIERTYPE *pRepairSoldier, UINT8 *pubRepairPtsLeft );
 
+#ifdef JA2UB
 void HaveMercSayWhyHeWontLeave( SOLDIERTYPE *pSoldier ); //Ja25 UB
 BOOLEAN CanMercBeAllowedToLeaveTeam( SOLDIERTYPE *pSoldier ); //JA25 UB
+#endif
 
 /* No point in allowing SAM site repair any more.	Jan/13/99.	ARM
 BOOLEAN IsTheSAMSiteInSectorRepairable( INT16 sSectorX, INT16 sSectorY, INT16 sSectorZ );
@@ -7463,7 +7466,8 @@ void BeginRemoveMercFromContract( SOLDIERTYPE *pSoldier )
 	// This function will setup the quote, then start dialogue beginning the actual leave sequence
 	if( ( pSoldier->stats.bLife > 0 ) && ( pSoldier->bAssignment != ASSIGNMENT_POW ) )
 	{
-	
+
+#ifdef JA2UB	
 		//Ja25 UB
 		//if the merc cant leave
 		if( !CanMercBeAllowedToLeaveTeam( pSoldier ) )
@@ -7471,6 +7475,7 @@ void BeginRemoveMercFromContract( SOLDIERTYPE *pSoldier )
 			HaveMercSayWhyHeWontLeave( pSoldier );
 			return;
 		}
+#endif
 		
 		if( ( pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__MERC ) || ( pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__NPC ) )
 		{
@@ -15350,7 +15355,7 @@ void HandleShadingOfLinesForFacilityAssignmentMenu( void )
 	return;
 }
 
-
+#ifdef JA2UB
 //Ja25 UB
 
 BOOLEAN CanMercBeAllowedToLeaveTeam( SOLDIERTYPE *pSoldier )
@@ -15382,3 +15387,4 @@ void HaveMercSayWhyHeWontLeave( SOLDIERTYPE *pSoldier )
 		TacticalCharacterDialogue( pSoldier, QUOTE_REFUSING_ORDER );
 	}
 }
+#endif

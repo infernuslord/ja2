@@ -53,6 +53,7 @@
 #include "Reinforcement.h"
 #include "MilitiaSquads.h"
 
+#ifdef JA2UB
 #include "Explosion Control.h"
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
@@ -60,6 +61,7 @@
 #include "email.h"
 #include "interface Dialogue.h"
 #include "Arms Dealer Init.h"
+#endif
 
 #include <vector>
 
@@ -84,7 +86,9 @@ extern BOOLEAN gfOverrideSector;
 
 INT32 gsInterrogationGridNo[3] = { 7756, 7757, 7758 };
 
+#ifdef JA2UB
 void HandleBloodCatDeaths( SECTORINFO *pSector );
+#endif
 
 extern void Ensure_RepairedGarrisonGroup( GARRISON_GROUP **ppGarrison, INT32 *pGarraySize );
 
@@ -892,7 +896,7 @@ void ProcessQueenCmdImplicationsOfDeath( SOLDIERTYPE *pSoldier )
 
 	switch( pSoldier->ubProfile )
 	{
-	
+#ifdef JA2UB	
 		case 75://MORRIS:
 
 			if( !pSoldier->bSectorZ )
@@ -922,7 +926,7 @@ void ProcessQueenCmdImplicationsOfDeath( SOLDIERTYPE *pSoldier )
 				}
 			}
 			break;
-			
+#endif			
 		case MIKE:
 		case IGGY:
 			if( pSoldier->ubProfile == IGGY && !gubFact[ FACT_IGGY_AVAILABLE_TO_ARMY ] )
@@ -1194,10 +1198,11 @@ void ProcessQueenCmdImplicationsOfDeath( SOLDIERTYPE *pSoldier )
 						{
 							pSector->bBloodCats--;
 						}
-						
+#ifdef JA2UB						
 							//JA25 UB
 							//handle anything important when bloodcats die
 							HandleBloodCatDeaths( pSector );
+#endif
 					}
 
 					break;
@@ -1906,7 +1911,10 @@ void BeginCaptureSquence( )
 
 void EndCaptureSequence( )
 {
-     /*
+#ifdef JA2UB
+// no UB
+#else
+     
 	// Set flag...
 	if( !( gStrategicStatus.uiFlags & STRATEGIC_PLAYER_CAPTURED_FOR_RESCUE ) || !(gStrategicStatus.uiFlags & STRATEGIC_PLAYER_CAPTURED_FOR_ESCAPE) )
 	{
@@ -1948,7 +1956,7 @@ void EndCaptureSequence( )
 			gStrategicStatus.uiFlags |= STRATEGIC_PLAYER_CAPTURED_FOR_ESCAPE;
 		}
 	}
-     */
+#endif
 }
 
 void EnemyCapturesPlayerSoldier( SOLDIERTYPE *pSoldier )
@@ -2299,6 +2307,7 @@ BOOLEAN CheckPendingEnemies()
 	return FALSE;
 }
 
+#ifdef JA2UB
 void HandleBloodCatDeaths( SECTORINFO *pSector )
 {
 	//if the current sector is the first part of the town
@@ -2335,4 +2344,4 @@ void HandleBloodCatDeaths( SECTORINFO *pSector )
 		}
 	}
 }
-
+#endif

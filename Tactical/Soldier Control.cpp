@@ -98,8 +98,10 @@
 #include "Debug Control.h"
 #endif
 
+#ifdef JA2UB
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
+#endif
 
 #include "fresh_header.h"
 
@@ -5033,14 +5035,15 @@ void SOLDIERTYPE::EVENT_SoldierGotHit( UINT16 usWeaponIndex, INT16 sDamage, INT1
 		// is actually how much breath we'll take away
 		sBreathLoss = sDamage * 100;
 		sDamage = sDamage / PUNCH_REAL_DAMAGE_PORTION;
- /*
-Ja25: No meanwhiles
+#ifdef JA2UB
+//Ja25: No meanwhiles
+#else
 		if ( AreInMeanwhile() && gCurrentMeanwhileDef.ubMeanwhileID == INTERROGATION )
 		{
 			sBreathLoss = 0;
 			sDamage /= 2;
 		}
-*/
+#endif
 		ubReason = TAKE_DAMAGE_HANDTOHAND;
 	}
 	// marke added one 'or' for explosive ammo. variation of: AmmoTypes[this->inv[this->ubAttackingHand ][0]->data.gun.ubGunAmmoType].explosionSize > 1
@@ -8205,14 +8208,15 @@ void SOLDIERTYPE::BeginSoldierGetup( void )
 	{
 		return;
 	}
- /*
-Ja25: No meanwhiles
+#ifdef JA2UB
+//Ja25: No meanwhiles
+#else
 	// ATE: Don't getup if we are in a meanwhile
 	if ( AreInMeanwhile( ) )
 	{
 		return;
 	}
-    */
+#endif
 	if ( this->bCollapsed )
 	{
 		if ( this->stats.bLife >= OKLIFE && this->bBreath >= OKBREATH && (this->bSleepDrugCounter == 0) )
@@ -8451,14 +8455,15 @@ UINT8 SOLDIERTYPE::SoldierTakeDamage( INT8 bHeight, INT16 sLifeDeduct, INT16 sBr
 		// Turn off
 		this->flags.uiStatusFlags &= ( ~SOLDIER_NPC_SHOOTING );
 	}
- /*
-Ja25: No meanwhiles
+#ifdef JA2UB
+//Ja25: No meanwhiles
+#else
 	// CJC: make sure Elliot doesn't bleed to death!
 	if ( ubReason == TAKE_DAMAGE_BLOODLOSS && AreInMeanwhile() )
 	{
 		return( 0 );
 	}
-    */
+#endif
 
 	// Calculate bandage
 	bBandage = this->stats.bLifeMax - this->stats.bLife - this->bBleeding;
@@ -8807,8 +8812,11 @@ Ja25: No meanwhiles
 			}
 		}
 	}
-
+#ifdef JA2UB
 	if ((ubAttacker != NOBODY) && (Menptr[ubAttacker].bTeam == OUR_TEAM) && (this->ubProfile != NO_PROFILE) && (this->ubProfile >= FIRST_RPC ))
+#else
+	if ((ubAttacker != NOBODY) && (Menptr[ubAttacker].bTeam == OUR_TEAM) && (this->ubProfile != NO_PROFILE) && (this->ubProfile >= FIRST_RPC && this->ubProfile < GASTON ))
+#endif
 	{
 		gMercProfiles[this->ubProfile].ubMiscFlags |= PROFILE_MISC_FLAG_WOUNDEDBYPLAYER;
 		if (this->ubProfile == 114)
@@ -8830,7 +8838,7 @@ Ja25: No meanwhiles
 		DecayIndividualOpplist( this );
 	}
 	
-	
+#ifdef JA2UB	
 	//if the attacker is MORRIS, AND he didnt kill the person
 	if( Menptr[ ubAttacker ].ubProfile == 75 )	//MORRIS			
 	{
@@ -8861,7 +8869,7 @@ Ja25: No meanwhiles
 			gJa25SaveStruct.ubPlayerMorrisHurt = NO_PROFILE;
 		}
 	}
-
+#endif
 
 	return( ubCombinedLoss );
 }
@@ -10658,8 +10666,11 @@ void SOLDIERTYPE::EVENT_SoldierBeginPunchAttack( INT32 sGridNo, UINT8 ubDirectio
 	}
 
 //Ja25 No meanwhiles
-//	if ( fMartialArtist && !AreInMeanwhile( ) && !Item[usItem].crowbar )
+#ifdef JA2UB
 	if ( fMartialArtist && !Item[usItem].crowbar )
+#else
+	if ( fMartialArtist && !AreInMeanwhile( ) && !Item[usItem].crowbar )
+#endif
 	{
 		// Are we in attack mode yet?
 		if ( this->usAnimState != NINJA_BREATH && gAnimControl[ this->usAnimState ].ubHeight == ANIM_STAND && gAnimControl[ pTSoldier->usAnimState ].ubHeight != ANIM_PRONE )
@@ -10830,7 +10841,11 @@ void SOLDIERTYPE::EVENT_SoldierBeginFirstAid( INT32 sGridNo, UINT8 ubDirection )
 		// OK, check if we should play quote...
 		if ( pTSoldier->bTeam != gbPlayerNum )
 		{
+#ifdef JA2UB
 			if ( pTSoldier->ubProfile != NO_PROFILE && pTSoldier->ubProfile >= FIRST_RPC /*&& pTSoldier->ubProfile < GASTON */ && !RPC_RECRUITED( pTSoldier ) )
+#else
+			if ( pTSoldier->ubProfile != NO_PROFILE && pTSoldier->ubProfile >= FIRST_RPC && pTSoldier->ubProfile < GASTON && !RPC_RECRUITED( pTSoldier ) )
+#endif
 			{
 				fRefused = PCDoesFirstAidOnNPC( pTSoldier->ubProfile );
 			}

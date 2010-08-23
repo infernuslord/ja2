@@ -49,6 +49,7 @@
 
 #include "connect.h"
 
+#ifdef JA2UB
 #include "Explosion Control.h"
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
@@ -57,6 +58,8 @@
 #include "interface Dialogue.h"
 #include "mercs.h"
 #include "legion cfg.h"
+#endif
+
 
 #ifdef JA2BETAVERSION
 extern BOOLEAN gfMercsNeverQuit;
@@ -217,7 +220,11 @@ BOOLEAN ExecuteStrategicEvent( STRATEGICEVENT *pEvent )
 	case EVENT_DAY3_ADD_EMAIL_FROM_SPECK:
 			if(!bMercDayOne)
 			{
-//				AddEmail(MERC_INTRO, MERC_INTRO_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin( ), -1 );
+			#ifdef JA2UB
+			//No JA25 UB
+			#else
+				AddEmail(MERC_INTRO, MERC_INTRO_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin( ), -1 );
+			#endif		
 			}
 			break;
 		case EVENT_DAY2_ADD_EMAIL_FROM_IMP:
@@ -352,8 +359,10 @@ BOOLEAN ExecuteStrategicEvent( STRATEGICEVENT *pEvent )
 		//case EVENT_BEGIN_AIR_RAID:
 		//	BeginAirRaid( );
 		//	break;
-/*
-Ja25 No meanwhiles
+
+#ifdef JA2UB
+// Ja25 No meanwhiles
+#else
 		case EVENT_MEANWHILE:
 			if( !DelayEventIfBattleInProgress( pEvent ) )
 			{
@@ -361,7 +370,7 @@ Ja25 No meanwhiles
 				InterruptTime();
 			}
 			break;
-*/
+#endif
 		case EVENT_BEGIN_CREATURE_QUEST:
 			break;
 		case EVENT_CREATURE_SPREAD:
@@ -418,7 +427,11 @@ Ja25 No meanwhiles
 			}
 			break;
 		case EVENT_MERC_SITE_BACK_ONLINE:
-		//	GetMercSiteBackOnline();
+			#ifdef JA2UB
+			// no JA25 UB
+			#else
+			GetMercSiteBackOnline();
+			#endif
 			break;
 		case EVENT_INVESTIGATE_SECTOR:
 			InvestigateSector( (UINT8)pEvent->uiParam );
@@ -455,7 +468,7 @@ Ja25 No meanwhiles
 		case EVENT_POSTAL_SERVICE_SHIPMENT:
 			gPostalService.DeliverShipment(pEvent->uiParam);
 			break;
-			
+#ifdef JA2UB			
 		//Ja25 UB	
 		case EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE:
 			if ( gGameLegionOptions.EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE_UB == TRUE )
@@ -479,6 +492,7 @@ Ja25 No meanwhiles
 		case EVENT_SEND_ENRICO_UNDERSTANDING_EMAIL:
 			HandleEnricosUnderstandingEmail();
 			break;
+#endif
 
 #ifdef CRIPPLED_VERSION
 		case EVENT_CRIPPLED_VERSION_END_GAME_CHECK:

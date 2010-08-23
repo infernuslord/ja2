@@ -48,8 +48,10 @@
 	#include "NPC.h"
 #endif
 
+#ifdef JA2UB
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
+#endif
 
 // HEADROCK HAM 3.2: Gamesettings.h for external modifications to team turns.
 #include "GameSettings.h"
@@ -447,7 +449,8 @@ void EndTurnEvents( void )
 
 	// decay AI warning values from corpses
 	DecayRottingCorpseAIWarnings();
-	
+
+#ifdef JA2UB	
 	//Ja25 UB
 	
 	//increment the number of tactical turns that have gone by in turn based mode
@@ -455,6 +458,7 @@ void EndTurnEvents( void )
 
 	//if the fan should start up
 	HandleStartingFanBackUp();
+#endif
 }
 
 //rain
@@ -683,13 +687,14 @@ void DisplayHiddenTurnbased( SOLDIERTYPE * pActingSoldier )
 	// This code should put the game in turn-based and give control to the AI-controlled soldier
 	// whose pointer has been passed in as an argument (we were in non-combat and the AI is doing
 	// something visible, i.e. making an attack)
-/*
-Ja25 No meanwhiles
+#ifdef JA2UB
+//Ja25 No meanwhiles
+#else
 	if ( AreInMeanwhile( ) )
 	{
 		return;
 	}
-*/
+#endif
 	if (gTacticalStatus.uiFlags & REALTIME || gTacticalStatus.uiFlags & INCOMBAT)
 	{
 		// pointless call here; do nothing

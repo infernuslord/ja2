@@ -51,8 +51,10 @@
 #include "message.h"
 #include "fresh_header.h"
 
+#ifdef JA2UB
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
+#endif
 
 // THESE 3 DIFFICULTY FACTORS MUST ALWAYS ADD UP TO 100% EXACTLY!!!
 #define DIFF_FACTOR_PLAYER_PROGRESS			50
@@ -3040,7 +3042,7 @@ void CopyProfileItems( SOLDIERTYPE *pSoldier, SOLDIERCREATE_STRUCT *pCreateStruc
 						// to provide one which doesn't work and would confuse everything.
 						switch( pCreateStruct->ubProfile )
 						{
-						
+#ifdef JA2UB						
 							case 75: //MORRIS:
 								if ( pProfile->inv[ cnt ] >= KEY_1 && pProfile->inv[ cnt ] <= KEY_32)
 								{
@@ -3052,6 +3054,7 @@ void CopyProfileItems( SOLDIERTYPE *pSoldier, SOLDIERCREATE_STRUCT *pCreateStruc
 								//	memset( &(pSoldier->inv[cnt]), 0, sizeof( OBJECTTYPE ) );
 								//}
 								break;
+#endif
 
 							// WANNE: Changed KEY_32 to KEY_8 because we only have 8 keys defined in Items.xml
 							case BREWSTER:
@@ -3160,7 +3163,7 @@ UINT8 GetLocationModifier( UINT8 ubSoldierClass )
 	// where is all this taking place?
 	fSuccess = GetCurrentBattleSectorXYZ( &sSectorX, &sSectorY, &sSectorZ );
 	Assert( fSuccess );
-
+#ifdef JA2UB
 	//Ja25 UB
 	//switch on the sector, to determine modifer
 	//the modifier is based between 0 and 40.  40 being the "hardest"
@@ -3284,7 +3287,7 @@ UINT8 GetLocationModifier( UINT8 ubSoldierClass )
 		}
 		break;
 	}
-/*	
+#else	
 	// ignore sSectorZ - treat any underground enemies as if they were on the surface!
 	bTownId = GetTownIdForSector( sSectorX, sSectorY );
 
@@ -3314,7 +3317,7 @@ UINT8 GetLocationModifier( UINT8 ubSoldierClass )
 
 	// adjust for distance from Queen's palace (P3) (0 to +30)
 	ubLocationModifier = ( ( MAX_PALACE_DISTANCE - ubPalaceDistance ) * DIFF_FACTOR_PALACE_DISTANCE ) / MAX_PALACE_DISTANCE;
-*/
+#endif
 	return( ubLocationModifier );
 }
 

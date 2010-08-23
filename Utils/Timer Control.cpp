@@ -169,7 +169,9 @@ void CALLBACK TimeProc( UINT uID,	UINT uMsg, DWORD dwUser, DWORD dw1,	DWORD dw2	
 					UPDATETIMECOUNTER( gPSOLDIER->timeCounters.FadeCounter );
 					UPDATETIMECOUNTER( gPSOLDIER->timeCounters.NextTileCounter );
 					UPDATETIMECOUNTER( gPSOLDIER->timeCounters.PanelAnimateCounter );
+#ifdef JA2UB
 					UPDATETIMECOUNTER( gPSOLDIER->GetupFromJA25StartCounter );
+#endif
 				}
 			}
 		}

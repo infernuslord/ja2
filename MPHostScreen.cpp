@@ -1608,7 +1608,12 @@ void DoneFadeOutForExitMPHScreen( void )
 	}
 	else
 #endif
-	//	SetIntroType( INTRO_BEGINING );
+
+#ifdef JA2UB
+	//SetIntroType( INTRO_BEGINING );
+#else
+	SetIntroType( INTRO_BEGINING );
+#endif
 
 	ExitMPHScreen(); // cleanup please, if we called a fadeout then we didnt do it above
 

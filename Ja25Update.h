@@ -2,6 +2,9 @@
 #define JA25UPDATE__C_
 
 #include "Types.h"
+
+#ifdef JA2UB
+
 //Used in the editor to compensate for the 2_<map name>
 #define	JA25_EXP_MAP_NAME_PREFIX						L""
 #define	JA25_EXP_MAP_NAME_SIZE_OFFSET				0
@@ -24,4 +27,6 @@ UINT32	HandleDifficultyModifierForImportedGames();
 
 BOOLEAN DoesJa25ImportSaveExistAndSeemValid();
 */
+#endif
+
 #endif

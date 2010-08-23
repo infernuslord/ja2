@@ -27,11 +27,13 @@
 	#include <string>
 #endif
 
+#ifdef JA2UB
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
 
 #define		EMAIL_EDT_FILE_JA25			"BINARYDATA\\Email25.edt"
 #define		EMAIL_EDT_FILE_JA2		"BINARYDATA\\Email.edt"
+#endif
 
 using namespace std;
 
@@ -679,8 +681,7 @@ void AddEmailWithSpecialData(INT32 iMessageOffset, INT32 iMessageLength, UINT8 u
 
 
 	// starts at iSubjectOffset amd goes iSubjectLength, reading in string
-	
-	
+#ifdef JA2UB	
 	if (FileExists(EMAIL_EDT_FILE_JA25))
 	{
 	LoadEncryptedDataFromFile(EMAIL_EDT_FILE_JA25, pSubject, 640*(iMessageOffset), 640);
@@ -689,8 +690,9 @@ void AddEmailWithSpecialData(INT32 iMessageOffset, INT32 iMessageLength, UINT8 u
 	{
 	LoadEncryptedDataFromFile(EMAIL_EDT_FILE_JA2, pSubject, 640*(iMessageOffset), 640);
 	}
-	
-	
+#else
+	LoadEncryptedDataFromFile("BINARYDATA\\Email.edt", pSubject, 640*(iMessageOffset), 640);
+#endif	
 
 	//Make a fake email that will contain the codes ( ie the merc ID )
 	FakeEmail.iFirstData = iFirstData;
@@ -720,7 +722,7 @@ void AddEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 
 	//MessagePtr pMessage;
 	//CHAR16 pMessageString[320];
 	
-	
+#ifdef JA2UB	
 	if (FileExists(EMAIL_EDT_FILE_JA25))
 	{
 	LoadEncryptedDataFromFile(EMAIL_EDT_FILE_JA25, pSubject, 640*(iMessageOffset), 640);
@@ -729,10 +731,10 @@ void AddEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 
 	{
 	LoadEncryptedDataFromFile(EMAIL_EDT_FILE_JA2, pSubject, 640*(iMessageOffset), 640);
 	}
-
+#else
 	// WANNE: Short work in both ways
-//	LoadEncryptedDataFromFile("BINARYDATA\\Email.edt", pSubject, 640*(iMessageOffset), 640);
-
+	LoadEncryptedDataFromFile("BINARYDATA\\Email.edt", pSubject, 640*(iMessageOffset), 640);
+#endif
 	// add message to list
 	AddEmailMessage(iMessageOffset,iMessageLength, pSubject, iDate, ubSender, FALSE, 0, 0, iCurrentIMPPosition );
 
@@ -754,9 +756,7 @@ void AddPreReadEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender,
 	//MessagePtr pMessage;
 	//CHAR16 pMessageString[320];
 
-
-	
-	
+#ifdef JA2UB	
 	if (FileExists(EMAIL_EDT_FILE_JA25))
 	{
 	LoadEncryptedDataFromFile(EMAIL_EDT_FILE_JA25, pSubject, 640*(iMessageOffset), 640);
@@ -765,10 +765,10 @@ void AddPreReadEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender,
 	{
 	LoadEncryptedDataFromFile(EMAIL_EDT_FILE_JA2, pSubject, 640*(iMessageOffset), 640);
 	}
-	
+#else	
 	// starts at iSubjectOffset amd goes iSubjectLength, reading in string
-//	LoadEncryptedDataFromFile("BINARYDATA\\Email.edt", pSubject, 640*(iMessageOffset), 640);
-
+	LoadEncryptedDataFromFile("BINARYDATA\\Email.edt", pSubject, 640*(iMessageOffset), 640);
+#endif
 	// add message to list
 	AddEmailMessage(iMessageOffset,iMessageLength, pSubject, iDate, ubSender, TRUE, 0, 0, -1 );
 
@@ -3135,9 +3135,10 @@ void HandleAnySpecialEmailMessageEvents(INT32 iMessageId )
 {
 
 	// handles any special message events
-
+#ifdef JA2UB
 	switch( iMessageId )
 	{
+
 		case EMAIL_MAKECONTACT:
 			if( !( gJa25SaveStruct.ubEmailFromSectorFlag & SECTOR_EMAIL__ANOTHER_SECTOR ) )
 			{
@@ -3152,9 +3153,9 @@ void HandleAnySpecialEmailMessageEvents(INT32 iMessageId )
 		 SetBookMark(IMP_BOOKMARK);
 		break;
 	}
-
+#else
 	// handles any special message events
-/*
+
 	switch( iMessageId )
 	{
 
@@ -3165,7 +3166,7 @@ void HandleAnySpecialEmailMessageEvents(INT32 iMessageId )
 		SetBookMark(IMP_BOOKMARK);
 		break;
 	}
-*/	
+#endif	
 }
 
 void ReDisplayBoxes( void )
@@ -3208,7 +3209,7 @@ BOOLEAN HandleMailSpecialMessages( UINT16 usMessageId, INT32 *iResults, EmailPtr
 		fSpecialCase = TRUE;
 
 		break;
-
+#ifdef JA2UB
 		case AIM_REFUND:
 			ModifyInsuranceEmails( usMessageId, iResults, pMail, AIM_REFUND_LENGTH );
 			break;
@@ -3216,7 +3217,7 @@ BOOLEAN HandleMailSpecialMessages( UINT16 usMessageId, INT32 *iResults, EmailPtr
 			ModifyInsuranceEmails( usMessageId, iResults, pMail, MERC_REFUND_LENGTH );
 			break;
 
-/*
+#else
 		case( MERC_INTRO ):
 			SetBookMark( MERC_BOOKMARK );
 			fReDrawScreenFlag = TRUE;
@@ -3259,9 +3260,9 @@ BOOLEAN HandleMailSpecialMessages( UINT16 usMessageId, INT32 *iResults, EmailPtr
 				for (int i = 0; i < BOBBYR_SHIPMENT_ARRIVED_LENGTH; i++)
 				{
 					wstrMail.clear();
-//					LoadEncryptedDataFromFile("BINARYDATA\\Email.edt", szMail, MAIL_STRING_SIZE *usMessageId, MAIL_STRING_SIZE);
+					LoadEncryptedDataFromFile("BINARYDATA\\Email.edt", szMail, MAIL_STRING_SIZE *usMessageId, MAIL_STRING_SIZE);
 
-			if (FileExists(EMAIL_EDT_FILE_JA25))
+/*			if (FileExists(EMAIL_EDT_FILE_JA25))
 			{
 			LoadEncryptedDataFromFile(EMAIL_EDT_FILE_JA25, szMail, MAIL_STRING_SIZE *usMessageId, MAIL_STRING_SIZE);
 			}
@@ -3269,6 +3270,7 @@ BOOLEAN HandleMailSpecialMessages( UINT16 usMessageId, INT32 *iResults, EmailPtr
 			{
 			LoadEncryptedDataFromFile(EMAIL_EDT_FILE_JA2, szMail, MAIL_STRING_SIZE *usMessageId, MAIL_STRING_SIZE);
 			}
+*/
 					wstrMail = szMail;
 
 					index = wstrMail.find(L"$DESTINATIONNAME$");
@@ -3288,7 +3290,7 @@ BOOLEAN HandleMailSpecialMessages( UINT16 usMessageId, INT32 *iResults, EmailPtr
 			giPrevMessageId = giMessageId;
 			break;
 
-*/
+#endif
 	}
 
 	return fSpecialCase;
@@ -4892,8 +4894,7 @@ void PreProcessEmail( EmailPtr pMail )
 	while(pMail->usLength > iCounter)
 		{
 		// read one record from email file
-//		LoadEncryptedDataFromFile( "BINARYDATA\\Email.edt", pString, MAIL_STRING_SIZE * ( iOffSet + iCounter ), MAIL_STRING_SIZE );
-
+#ifdef JA2UB
 			if (FileExists(EMAIL_EDT_FILE_JA25))
 			{
 			LoadEncryptedDataFromFile( EMAIL_EDT_FILE_JA25, pString, MAIL_STRING_SIZE * ( iOffSet + iCounter ), MAIL_STRING_SIZE );
@@ -4902,7 +4903,9 @@ void PreProcessEmail( EmailPtr pMail )
 			{
 			LoadEncryptedDataFromFile( EMAIL_EDT_FILE_JA2, pString, MAIL_STRING_SIZE * ( iOffSet + iCounter ), MAIL_STRING_SIZE );
 			}
-
+#else
+		LoadEncryptedDataFromFile( "BINARYDATA\\Email.edt", pString, MAIL_STRING_SIZE * ( iOffSet + iCounter ), MAIL_STRING_SIZE );
+#endif
 			// WANNE: We have a new 1.13 MERC merc (Text, Gaston, Stogie or Biggens)
 			if (iNew113MERCMerc != 0)
 			{
@@ -5166,7 +5169,7 @@ void ModifyInsuranceEmails( UINT16 usMessageId, INT32 *iResults, EmailPtr pMail,
 		for( ubCnt=0; ubCnt<ubNumberOfRecords; ubCnt++)
 		{
 			// read one record from email file
-//			LoadEncryptedDataFromFile( "BINARYDATA\\Email.edt", pString, MAIL_STRING_SIZE * usMessageId, MAIL_STRING_SIZE );
+#ifdef JA2UB
 			if (FileExists(EMAIL_EDT_FILE_JA25))
 			{
 			LoadEncryptedDataFromFile( EMAIL_EDT_FILE_JA25, pString, MAIL_STRING_SIZE * usMessageId, MAIL_STRING_SIZE );
@@ -5175,7 +5178,9 @@ void ModifyInsuranceEmails( UINT16 usMessageId, INT32 *iResults, EmailPtr pMail,
 			{
 			LoadEncryptedDataFromFile( EMAIL_EDT_FILE_JA2, pString, MAIL_STRING_SIZE * usMessageId, MAIL_STRING_SIZE );
 			}
-
+#else
+			LoadEncryptedDataFromFile( "BINARYDATA\\Email.edt", pString, MAIL_STRING_SIZE * usMessageId, MAIL_STRING_SIZE );
+#endif
 			//Replace the $MERCNAME$ and $AMOUNT$ with the mercs name and the amountm if the string contains the keywords.
 			ReplaceMercNameAndAmountWithProperData( pString, pMail );
 
@@ -5376,7 +5381,9 @@ void AddAllEmails()
 {
 	UINT32 uiCnt;
 	UINT32 uiOffset;
-/*
+#ifdef JA2UB
+//no UB
+#else
 	AddEmail(IMP_EMAIL_INTRO,IMP_EMAIL_INTRO_LENGTH,CHAR_PROFILE_SITE,	GetWorldTotalMin(), -1 );
 	AddEmail(ENRICO_CONGRATS,ENRICO_CONGRATS_LENGTH,MAIL_ENRICO, GetWorldTotalMin(), -1 );
 	AddEmail(IMP_EMAIL_AGAIN,IMP_EMAIL_AGAIN_LENGTH,1, GetWorldTotalMin( ), -1 );
@@ -5442,7 +5449,7 @@ void AddAllEmails()
 	AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND, AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), 20, 0 );
 
 	AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_NO_REFUND, AIM_MEDICAL_DEPOSIT_NO_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), 20, 0 );
-*/
+#endif
 	
 }
 #endif

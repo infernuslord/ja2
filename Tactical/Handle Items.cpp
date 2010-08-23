@@ -63,8 +63,10 @@
 	#include "Map Screen Interface Map Inventory.h"
 #endif
 
+#ifdef JA2UB
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
+#endif
 
 #define					NUM_ITEMS_LISTED			8
 #define					NUM_ITEM_FLASH_SLOTS	50
@@ -1740,9 +1742,9 @@ void SoldierGetItemFromWorld( SOLDIERTYPE *pSoldier, INT32 iItemIndex, INT32 sGr
 	BOOLEAN					fShouldSayCoolQuote = FALSE;
 	BOOLEAN					fDidSayCoolQuote = FALSE;
 	BOOLEAN		 fSaidBoobyTrapQuote = FALSE;
-
+#ifdef JA2UB
 	UINT16					usItem=0;
-
+#endif
 	// OK. CHECK IF WE ARE DOING ALL IN THIS POOL....
 	if ( iItemIndex == ITEM_PICKUP_ACTION_ALL || iItemIndex == ITEM_PICKUP_SELECTION )
 	{
@@ -1934,7 +1936,7 @@ void SoldierGetItemFromWorld( SOLDIERTYPE *pSoldier, INT32 iItemIndex, INT32 sGr
 			}
 		}
 	}
-	
+#ifdef JA2UB	
 	//JA25 ub
 	//if the item is valid
 	if( usItem != 0 )
@@ -1942,7 +1944,7 @@ void SoldierGetItemFromWorld( SOLDIERTYPE *pSoldier, INT32 iItemIndex, INT32 sGr
 		//handle the picking up of a new ja25 gun
 		HandleNewGunComment( pSoldier, usItem, TRUE );
 	}
-
+#endif
 	// Aknowledge....
 	if( pSoldier->bTeam == OUR_TEAM && !fDidSayCoolQuote && !fSaidBoobyTrapQuote )
 	{
@@ -4076,7 +4078,11 @@ void SoldierGiveItemFromAnimation( SOLDIERTYPE *pSoldier )
 
 		// Switch on target...
 		// Are we a player dude.. ( target? )
+#ifdef JA2UB
 		if ( ubProfile < FIRST_RPC || RPC_RECRUITED( pTSoldier ) ) //|| ubProfile >=  GASTON )
+#else
+		if ( ubProfile < FIRST_RPC || RPC_RECRUITED( pTSoldier ) || ubProfile >= GASTON )
+#endif
 		{
 			fToTargetPlayer = TRUE;
 		}

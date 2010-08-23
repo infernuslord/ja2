@@ -55,11 +55,11 @@ void		HandleMercArrivesQuotes( SOLDIERTYPE *pSoldier );
 void		UpdateAnyInTransitMercsWithGlobalArrivalSector( );
 
 
-void UpdateJerryMiloInInitialSector();
-
 UINT32	GetMercArrivalTimeOfDay( );
 
+#ifdef JA2UB
+void UpdateJerryMiloInInitialSector();
 void InitializeHeliGridnoAndTime( BOOLEAN fLoading );
 void InitJerryMiloInfo();
-
+#endif
 #endif

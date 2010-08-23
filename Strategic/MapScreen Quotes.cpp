@@ -57,6 +57,8 @@
 
 #include "connect.h"
 
+	#ifdef JA2UB
+
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
 
@@ -455,3 +457,5 @@ BOOLEAN HasJerryAlreadySaidTheMapScreenIntroSequence()
 		return( FALSE );
 	}
 }
+
+#endif

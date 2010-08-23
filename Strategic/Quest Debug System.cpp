@@ -3301,7 +3301,11 @@ void AddNPCsInSectorToArray()
 		if ( ( pSoldier != NULL ) && pSoldier->bActive )
 		{
 			//if soldier is a NPC, add him to the local NPC array
+#ifdef JA2UB
 			if( ( pSoldier->ubProfile >= FIRST_RPC ) )//&& ( pSoldier->ubProfile < GASTON ) )
+#else
+			if( ( pSoldier->ubProfile >= FIRST_RPC ) && ( pSoldier->ubProfile < GASTON ) )
+#endif
 			{
 				gubCurrentNpcInSector[ i ] = pSoldier->ubProfile;
 				i++;
@@ -3698,7 +3702,11 @@ void RefreshAllNPCInventory()
 		if( Menptr[ usCnt ].bActive == 1 )
 		{
 			//is the merc a rpc or npc
+#ifdef JA2UB
 			if( Menptr[ usCnt ].ubProfile >= FIRST_RPC ) //&& Menptr[ usCnt ].ubProfile < GASTON )
+#else
+			if( Menptr[ usCnt ].ubProfile >= FIRST_RPC && Menptr[ usCnt ].ubProfile < GASTON )
+#endif
 			{
 				//refresh the mercs inventory
 				for ( usItemCnt = 0; usItemCnt< Menptr[ usCnt ].inv.size(); usItemCnt++ )
@@ -3981,8 +3989,11 @@ UINT8	WhichPanelShouldTalkingMercUse( )
 	{
 		return( QDS_NO_PANEL );
 	}
-
+#ifdef JA2UB
 	if( gTalkingMercSoldier->ubProfile < FIRST_RPC )  //|| gTalkingMercSoldier->ubProfile >= GASTON )
+#else
+	if( gTalkingMercSoldier->ubProfile < FIRST_RPC || gTalkingMercSoldier->ubProfile >= GASTON )
+#endif
 	{
 		return( QDS_REGULAR_PANEL );
 	}

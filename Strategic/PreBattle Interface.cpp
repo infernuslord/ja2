@@ -46,7 +46,9 @@
 	#include "Cheats.h"
 #endif
 
+#ifdef JA2UB
 #include "legion cfg.h"
+#endif
 
 extern void InitializeTacticalStatusAtBattleStart();
 extern BOOLEAN gfDelayAutoResolveStart;
@@ -763,10 +765,11 @@ void InitPreBattleInterface( GROUP *pBattleGroup, BOOLEAN fPersistantPBI )
 	EnableDisAbleMapScreenOptionsButton( FALSE );
 
 	SetMusicMode( MUSIC_TACTICAL_ENEMYPRESENT );
-	
+
+#ifdef JA2UB	
 	if ( gGameLegionOptions.AUTO_RESOLVE_UB == FALSE )
 		DisableButton( iPBButton[0] );
-
+#endif
 	DoTransitionFromMapscreenToPreBattleInterface();
 }
 

@@ -86,7 +86,9 @@
 //	#include "XMLWriter.h"
 #endif
 
+#ifdef JA2UB
 #include "Ja25 Strategic Ai.h"
+#endif
 
 #include "legion cfg.h" //legion2
 #include "Campaign Types.h"
@@ -118,7 +120,9 @@ extern void Ustaw_parametry ();
 
 void LoadGameLegionOptions();
 
+#ifdef JA2UB
 void RandomAddEnemy( UINT8 SectorX, UINT8 SectorY, UINT8 Level );
+#endif
 
 BOOLEAN sUSTAW[500]; //legion2
 BOOLEAN sNPCSPEECH[171]; //legion2
@@ -190,6 +194,8 @@ MERCPROFILESTRUCT * pProfile;
 			}
 	}
 }
+
+#ifdef JA2UB
 
 void RandomAddEnemy( UINT8 SectorX, UINT8 SectorY, UINT8 Level )
 {
@@ -269,6 +275,8 @@ UINT8 ubNumElites = 0;
 		}
 	}
 }
+
+#endif
 
 //----LEGION 2---------
 BOOLEAN HandleSlotA( SOLDIERTYPE *pSoldier, UINT32 uiHandPos, UINT16 usReplaceItem, UINT8 Profil_Legion, UINT32 Przedmiot, UINT8 Tekst_EDT )

@@ -34,12 +34,12 @@
 
 #include <vfs/Core/vfs.h>
 
-
+#ifdef JA2UB
 #include "strategicmap.h"
 #include "Map Screen Interface Map.h"
 #include "Map Screen Interface.h"
 #include "End Game.h"
-
+#endif
 
 extern STR16	gzIntroScreen[];
 extern HVSURFACE ghFrameBuffer;
@@ -85,9 +85,11 @@ enum
 
 	SMKINTRO_SPLASH_SCREEN,
 	SMKINTRO_SPLASH_TALONSOFT,
-	
+
+#ifdef JA2UB	
 	SMKINTRO_HELI_CRASH_SCENE_1,
 //	SMKINTRO_HELI_CRASH_SCENE_2,
+#endif
 
 	//there are no more videos shown for the endgame
 	SMKINTRO_LAST_END_GAME,
@@ -113,12 +115,14 @@ CHAR		*gpzSmackerFileNames[] =
 
 	"INTRO\\SplashScreen.smk",
 	"INTRO\\TalonSoftid_endhold.smk",
-	
+
+#ifdef JA2UB	
 	//Ja25: New vidoes
 	"INTRO\\Intro.smk",
 //	"INTRO\\Fade.bik",
 
 	"INTRO\\MissileEnding.smk"
+#endif
 
 };
 
@@ -373,6 +377,7 @@ void PrepareToExitIntroScreen()
 		//go to the init screen
 		guiIntroExitScreen = INIT_SCREEN;
 	}
+#ifdef JA2UB
 	else if( gbIntroScreenMode == INTRO_HELI_CRASH )
 	{
 		//go to the init screen
@@ -382,6 +387,7 @@ void PrepareToExitIntroScreen()
 		guiIntroExitScreen = GAME_SCREEN;
 		SetCurrentWorldSector( sSelMapX, sSelMapY, ( UINT8 )iCurrentMapSectorZ );
 	}
+#endif
 	else if( gbIntroScreenMode == INTRO_SPLASH )
 	{
 		//display a logo when exiting
@@ -390,6 +396,7 @@ void PrepareToExitIntroScreen()
 		gfDoneWithSplashScreen = TRUE;
 		guiIntroExitScreen = INIT_SCREEN;
 	}
+#ifdef JA2UB
 	else if( gbIntroScreenMode == INTRO_ENDING )
 	{
 		guiIntroExitScreen = GAME_SCREEN;
@@ -400,6 +407,7 @@ void PrepareToExitIntroScreen()
 		//Dont leave tactical
 		gfEnteringMapScreen = FALSE;
 	}
+#endif
 	else
 	{
 		//We want to reinitialize the game
@@ -446,7 +454,7 @@ INT32 GetNextIntroVideo( UINT32 uiCurrentVideo )
 			}
 		}
 		break;
-		
+#ifdef JA2UB		
 		case INTRO_HELI_CRASH:
 			switch( uiCurrentVideo )
 			{
@@ -455,6 +463,7 @@ INT32 GetNextIntroVideo( UINT32 uiCurrentVideo )
 					break;
 			}
 			break;
+#endif
 
 		//end game
 		case INTRO_ENDING:
@@ -534,10 +543,12 @@ void SetIntroType( INT8 bIntroType )
 	{
 		gbIntroScreenMode = INTRO_BEGINING;
 	}
+#ifdef JA2UB
 	else if( bIntroType == INTRO_HELI_CRASH )
 	{
 		gbIntroScreenMode = INTRO_HELI_CRASH;
 	}
+#endif
 	else if( bIntroType == INTRO_ENDING )
 	{
 		gbIntroScreenMode = INTRO_ENDING;

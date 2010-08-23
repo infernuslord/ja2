@@ -98,6 +98,8 @@
 #include "Debug Control.h"
 #endif
 
+#ifdef JA2UB
+
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
 
@@ -121,6 +123,8 @@ typedef struct
 
 #define	NUM_MERCS_TO_USE_IN_PERCENT_STAT_INCREASE			6
 
-#define	MAX_STAT_INCREASE															30
+#define	MAX_STAT_INCREASE	
+
+#endif														30
 
 //******************************************************************************

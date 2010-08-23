@@ -67,12 +67,15 @@ enum Quests
 	QUEST_FREE_CHILDREN,	// 20
 	QUEST_LEATHER_SHOP_DREAM,
 
-////	QUEST_KILL_DEIDRANNA = 25
-
+#ifdef JA2UB
 	QUEST_DESTROY_MISSLES = 23,
 	QUEST_FIX_LAPTOP,
 	QUEST_GET_RID_BLOODCATS_AT_BETTYS,
 	QUEST_FIND_ANTIQUE_MUSKET_FOR_RAUL,
+#else
+	QUEST_KILL_DEIDRANNA = 25
+
+#endif
 } ;
 /*
 // The first quest is mandatory. Player must find Miguel and deliver letter to him. The tough
@@ -522,7 +525,7 @@ enum Facts
 	FACT_CONRAD_SHOULD_GO =																		367,
 	FACT_PLAYER_KILLED_BOXERS =																368,
 	
-	
+#ifdef JA2UB	
 	//Ja25 UB
 	FACT_IMPORTED_SAVE_AND_MARY_WAS_DEAD	=										400,
 	FACT_JOHN_KULBA_OFFERED_TO_BE_RECRUITED,//								401,
@@ -549,7 +552,7 @@ enum Facts
 	FACT_FAN_STOPPPED,//																			422
 	FACT_BIGGENS_ON_TEAM_AND_FAN_STOPPED,//										423
 	FACT_PLAYER_KNOWS_ABOUT_FAN_STOPPING,//										424
-
+#endif
 } ;
 //**	END FACTS *************************
 

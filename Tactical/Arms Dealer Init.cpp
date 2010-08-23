@@ -19,12 +19,14 @@
 	#include "GameSettings.h"
 #endif
 
+#ifdef JA2UB
 #include "Explosion Control.h"
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
 #include "MapScreen Quotes.h"
 #include "email.h"
 #include "interface Dialogue.h"
+#endif
 
 #include <list>
 
@@ -49,16 +51,21 @@ const ARMS_DEALER_INFO	DefaultarmsDealerInfo[ NUM_ARMS_DEALERS ] =
 									//Price			Price							Of											Cash
 									//Modifier	Modifier					Dealer
 
-/* Tony	*/		{ 0.75f,	1.25f,	TONY,		ARMS_DEALER_BUYS_SELLS, 15000,	ARMS_DEALER_SOME_USED_ITEMS | ARMS_DEALER_GIVES_CHANGE, 15000, 15000, 0, 1, 10, 1, 10, 2, 3, false, false },
+/* Tony	*/			{ 0.75f,	1.25f,	TONY,		ARMS_DEALER_BUYS_SELLS, 15000,	ARMS_DEALER_SOME_USED_ITEMS | ARMS_DEALER_GIVES_CHANGE, 15000, 15000, 0, 1, 10, 1, 10, 2, 3, false, false },
 /* Franz Hinkle */	{ 1.0f,		1.5f,	FRANZ,		ARMS_DEALER_BUYS_SELLS,	5000,	ARMS_DEALER_SOME_USED_ITEMS | ARMS_DEALER_GIVES_CHANGE, 5000,  5000,  0, 1, 10, 0, 100, 1, 2, false, true },
 /* Keith Hemps */	{ 0.75f,	1.0f,	KEITH,		ARMS_DEALER_BUYS_SELLS,	1500,	ARMS_DEALER_ONLY_USED_ITEMS | ARMS_DEALER_GIVES_CHANGE, 1500,  1500,  0, 1, 10, 0, 100, 1, 2, false, true },
 /* Jake Cameron */	{ 0.8f,		1.1f,	JAKE,		ARMS_DEALER_BUYS_SELLS,	2500,	ARMS_DEALER_ONLY_USED_ITEMS | ARMS_DEALER_GIVES_CHANGE, 2500,  2500,  0, 1, 10, 0, 100, 1, 2, false, true },
 /* Gabby Mulnick*/	{ 1.0f,		1.0f,	GABBY,		ARMS_DEALER_BUYS_SELLS,	3000,	ARMS_DEALER_GIVES_CHANGE							,	3000,  3000,  0, 1, 10, 0, 100, 1, 2, false, true },
 
+#ifdef JA2UB
 /* Devin Connell*/	//ja25 ub Biggins//{ 0.75f,	1.25f,	DEVIN,		ARMS_DEALER_SELLS_ONLY,	5000,	ARMS_DEALER_GIVES_CHANGE							,	5000,  5000,  0, 3, 10, 0, 10, 2, 3, false, false },
+#else
+/* Devin Connell*/	{ 0.75f,	1.25f,	DEVIN,		ARMS_DEALER_SELLS_ONLY,	5000,	ARMS_DEALER_GIVES_CHANGE							,	5000,  5000,  0, 3, 10, 0, 10, 2, 3, false, false },
+#endif
+
 /* Howard Filmore*/	{ 1.0f,		1.0f,	HOWARD,		ARMS_DEALER_SELLS_ONLY,	3000,	ARMS_DEALER_GIVES_CHANGE							,	3000,  3000,  0, 1, 10, 0, 100, 1, 2, false, true },
 /* Sam Rozen */		{ 1.0f,		1.0f,	SAM,		ARMS_DEALER_SELLS_ONLY,	3000,	ARMS_DEALER_GIVES_CHANGE							,	3000,  3000,  0, 1, 10, 0, 100, 1, 2, false, true },
-/* Frank */		{ 1.0f,		1.0f,	FRANK,		ARMS_DEALER_SELLS_ONLY,	500,	ARMS_DEALER_ACCEPTS_GIFTS							,	500,   500,   0, 1, 10, 0, 100, 1, 2, false, true },
+/* Frank */			{ 1.0f,		1.0f,	FRANK,		ARMS_DEALER_SELLS_ONLY,	500,	ARMS_DEALER_ACCEPTS_GIFTS							,	500,   500,   0, 1, 10, 0, 100, 1, 2, false, true },
 
 /* Bar Bro 1 */		{ 1.0f,		1.0f,	HERVE,		ARMS_DEALER_SELLS_ONLY,	250,	ARMS_DEALER_ACCEPTS_GIFTS							,	250,   250,   0, 1, 10, 0, 100, 1, 2, false, true },
 /* Bar Bro 2 */		{ 1.0f,		1.0f,	PETER,		ARMS_DEALER_SELLS_ONLY,	250,	ARMS_DEALER_ACCEPTS_GIFTS							,	250,   250,   0, 1, 10, 0, 100, 1, 2, false, true },
@@ -69,16 +76,20 @@ const ARMS_DEALER_INFO	DefaultarmsDealerInfo[ NUM_ARMS_DEALERS ] =
 
 										//Repair	Repair
 										//Speed		Cost
-/* Arnie Brunzwell*/    { 0.1f,		0.8f,	ARNIE,		ARMS_DEALER_REPAIRS,	1500,	ARMS_DEALER_HAS_NO_INVENTORY | ARMS_DEALER_GIVES_CHANGE,	1500, 1500, 0, 1, 10, 1, 10, 1, 2, false, true },
-/* Fredo */		{ 0.6f,		0.6f,	FREDO,		ARMS_DEALER_REPAIRS,	1000,	ARMS_DEALER_HAS_NO_INVENTORY | ARMS_DEALER_GIVES_CHANGE,	1000, 1000, 0, 1, 10, 1, 10, 1, 2, false, true },
-/* Perko */ //{ 1.0f,		0.4f,	PERKO,		ARMS_DEALER_REPAIRS,	1000,	ARMS_DEALER_HAS_NO_INVENTORY | ARMS_DEALER_GIVES_CHANGE,	1000, 1000, 0, 1, 10, 1, 10, 1, 2, false, true },
-
+/* Arnie Brunzwell*/{ 0.1f,		0.8f,	ARNIE,		ARMS_DEALER_REPAIRS,	1500,	ARMS_DEALER_HAS_NO_INVENTORY | ARMS_DEALER_GIVES_CHANGE,	1500, 1500, 0, 1, 10, 1, 10, 1, 2, false, true },
+/* Fredo */			{ 0.6f,		0.6f,	FREDO,		ARMS_DEALER_REPAIRS,	1000,	ARMS_DEALER_HAS_NO_INVENTORY | ARMS_DEALER_GIVES_CHANGE,	1000, 1000, 0, 1, 10, 1, 10, 1, 2, false, true },
+#ifdef JA2UB
 /* Raul  */		{ 0.80f,	1.8f,	PERKO,		ARMS_DEALER_BUYS_SELLS, 20000,	ARMS_DEALER_SOME_USED_ITEMS | ARMS_DEALER_GIVES_CHANGE , 1000, 1000, 0, 1, 10, 1, 10, 1, 2, false, true },
+#else
+/* Perko */			{ 1.0f,		0.4f,	PERKO,		ARMS_DEALER_REPAIRS,	1000,	ARMS_DEALER_HAS_NO_INVENTORY | ARMS_DEALER_GIVES_CHANGE,	1000, 1000, 0, 1, 10, 1, 10, 1, 2, false, true },
+#endif
 
-/* Elgin */		{ 1.0f,		1.0f,	DRUGGIST,	ARMS_DEALER_SELLS_ONLY,	500,	ARMS_DEALER_ACCEPTS_GIFTS							,	500,   500,   0, 1, 10, 1, 10, 1, 2, false, true },
-/* Manny */		{ 1.0f,		1.0f,	MANNY,		ARMS_DEALER_SELLS_ONLY,	500,	ARMS_DEALER_ACCEPTS_GIFTS							,	500,   500,   0, 1, 10, 1, 10, 1, 2, false, true },
+/* Elgin */			{ 1.0f,		1.0f,	DRUGGIST,	ARMS_DEALER_SELLS_ONLY,	500,	ARMS_DEALER_ACCEPTS_GIFTS							,	500,   500,   0, 1, 10, 1, 10, 1, 2, false, true },
+/* Manny */			{ 1.0f,		1.0f,	MANNY,		ARMS_DEALER_SELLS_ONLY,	500,	ARMS_DEALER_ACCEPTS_GIFTS							,	500,   500,   0, 1, 10, 1, 10, 1, 2, false, true },
 
+#ifdef JA2UB
 /* Betty  */		{ 0.75f,	1.25f,	73,		ARMS_DEALER_BUYS_SELLS, 10000,	ARMS_DEALER_SOME_USED_ITEMS | ARMS_DEALER_GIVES_CHANGE , 1000, 1000, 0, 1, 10, 1, 10, 1, 2, false, true },
+#endif
 
 };
 std::vector<ARMS_DEALER_INFO>	armsDealerInfo (NUM_ARMS_DEALERS);
@@ -103,8 +114,9 @@ BOOLEAN AdjustCertainDealersInventory();
 void		LimitArmsDealersInventory( UINT8 ubArmsDealer, UINT32 uDealerItemType, UINT8 ubMaxNumberOfItemType );
 void		GuaranteeAtLeastOneItemOfType( UINT8 ubArmsDealer, UINT32 uiDealerItemType );
 void		GuaranteeAtLeastXItemsOfIndex( UINT8 ubArmsDealer, UINT16 usItemIndex, UINT8 ubHowMany );
+#ifdef JA2UB
 void		GuaranteeAtMostNumOfItemsForItem( UINT8 ubArmsDealer, INT16 sItemIndex, UINT8 ubAtMostNumItems );
-
+#endif
 
 void		ArmsDealerGetsFreshStock( UINT8 ubArmsDealer, UINT16 usItemIndex, UINT8 ubNumItems );
 BOOLEAN ItemContainsLiquid( UINT16 usItemIndex );
@@ -112,11 +124,12 @@ UINT8		DetermineDealerItemCondition( UINT8 ubArmsDealer, UINT16 usItemIndex );
 
 BOOLEAN DoesItemAppearInDealerInventoryList( UINT8 ubArmsDealer, UINT16 usItemIndex, BOOLEAN fPurchaseFromPlayer );
 
-
+#ifdef JA2UB
 UINT8	GetFirstValidSpecialItemFromDealer( UINT8 ubArmsDealer, INT16 sItemIndex );
 
 void AddTexsVideosToBettysInventory();
 BOOLEAN CanThisItemBeSoldToSimulatedCustomer( UINT8 ubArmsDealerID, UINT16 usItemIndex );
+#endif
 
 void GuaranteeMinimumAlcohol( UINT8 ubArmsDealer );
 
@@ -303,8 +316,11 @@ void DailyUpdateOfArmsDealersInventory()
 	SimulateArmsDealerCustomer();
 
 	//if there are some items that are out of stock, order some more
+#ifdef JA2UB
 	DailyCheckOnItemQuantities( FALSE );
-
+#else
+	DailyCheckOnItemQuantities();
+#endif
 	//make sure certain items are in stock and certain limits are respected
 	AdjustCertainDealersInventory( );
 }
@@ -343,13 +359,13 @@ void SimulateArmsDealerCustomer()
 		{
 			if ( Item[usItemIndex].usItemClass	== 0 )
 				break;
-			
+#ifdef JA2UB			
 			//JA25 UB//			
 			if( !CanThisItemBeSoldToSimulatedCustomer( ubArmsDealer, usItemIndex ) )
 			{
 				continue;
 			}
-			
+#endif			
 			//if there are some of these in stock
 			if( numPerfectItems[usItemIndex] > 0)
 			{
@@ -390,8 +406,11 @@ void SimulateArmsDealerCustomer()
 	}
 }
 
-
+#ifdef JA2UB
 void DailyCheckOnItemQuantities( BOOLEAN fInstallyHaveItemsAppear )
+#else
+void DailyCheckOnItemQuantities()
+#endif
 {
 	UINT8		ubArmsDealer;
 	UINT16	usItemIndex;
@@ -432,14 +451,14 @@ void DailyCheckOnItemQuantities( BOOLEAN fInstallyHaveItemsAppear )
 					{
 						iter->ubQtyOnOrder = 0;
 						iter->uiOrderArrivalTime = 0;
-						
+#ifdef JA2UB						
 						//JA25 UB if the dealer is RAUL
 						if( ubArmsDealer == ARMS_DEALER_PERKO )
 						{
 							//set the fact the raul refreshed his inventory
 							SetFactTrue( FACT_RAULS_INVENTORY_CHANGED_SINCE_LAST_VISIT );
 						}
-						
+#endif						
 						
 					}
 				}
@@ -467,14 +486,14 @@ void DailyCheckOnItemQuantities( BOOLEAN fInstallyHaveItemsAppear )
 						{
 							// figure out how many items to reorder (items are reordered an entire batch at a time)
 							ubNumItems = HowManyItemsToReorder( ubMaxSupply, numTotalItems[ usItemIndex ] );
-							
+#ifdef JA2UB							
 							//if the dealer is betty, and we are to ADD the stuff instantly
 							if( ubArmsDealer == ARMS_DEALER_BETTY && fInstallyHaveItemsAppear &&
 									( usItemIndex == MEDICKIT || usItemIndex == FIRSTAIDKIT ) )
 							{
 								ubNumItems = ubMaxSupply + ubMaxSupply/2;
 							}
-
+#endif
 							// if this is the first day the player is eligible to have access to this thing
 							if ( gArmsDealerStatus[ubArmsDealer].fPreviouslyEligible[ usItemIndex ] == false )
 							{
@@ -484,7 +503,7 @@ void DailyCheckOnItemQuantities( BOOLEAN fInstallyHaveItemsAppear )
 							}
 							else
 							{
-							
+#ifdef JA2UB							
 								if( fInstallyHaveItemsAppear )
 								{
 									ubReorderDays = 0;
@@ -494,7 +513,7 @@ void DailyCheckOnItemQuantities( BOOLEAN fInstallyHaveItemsAppear )
 									ubReorderDays = ( UINT8) ( armsDealerInfo[ ubArmsDealer ].daysDelayMin + Random( armsDealerInfo[ ubArmsDealer ].daysDelayMax - armsDealerInfo[ ubArmsDealer ].daysDelayMin ) );
 								}
 								
-								
+#endif								
 								//Determine when the inventory should arrive
 								uiArrivalDay = GetWorldDay() + ubReorderDays;	// consider changing this to minutes
 								// post new order
@@ -606,7 +625,7 @@ BOOLEAN AdjustCertainDealersInventory( )
 	{
 		GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_FRANZ, VIDEO_CAMERA, 1 );
 	}
-	
+#ifdef JA2UB	
 	//------------UB---------------------
 	
 	
@@ -641,7 +660,7 @@ BOOLEAN AdjustCertainDealersInventory( )
 
 	//Guarntee 1 laptop transmitter to be at betty's
 	GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, PORNOS, 1 );
-
+#endif
 	return( TRUE );
 }
 
@@ -1704,9 +1723,9 @@ void RemoveRandomItemFromArmsDealerInventory( UINT8 ubArmsDealer, UINT16 usItemI
 BOOLEAN AddDeadArmsDealerItemsToWorld( UINT8 ubMercID )
 {
 	INT8	bArmsDealer;
-	
+#ifdef JA2UB	
 	BOOLEAN	fBoobyTrapItemsWhenDropping=FALSE;
-	
+#endif	
 	//Get Dealer ID from from merc Id
 	bArmsDealer = GetArmsDealerIDFromMercID( ubMercID );
 	if( bArmsDealer == -1 )
@@ -1730,14 +1749,14 @@ BOOLEAN AddDeadArmsDealerItemsToWorld( UINT8 ubMercID )
 		Assert(0);
 		return( FALSE );
 	}
-	
+#ifdef JA2UB	
 	//Ja25 UB
 	//if Raul blew him,self up, dont drop any items
 	if( pSoldier->ubProfile == PERKO && IsJa25GeneralFlagSet( JA_GF__RAUL_BLOW_HIMSELF_UP ) )
 	{
 		return( TRUE );
 	}
-
+#endif
 	//loop through all the items in the dealer's inventory, and drop them all where the dealer was set up.
 	for (DealerItemList::iterator iter = gArmsDealersInventory[bArmsDealer].begin();
 		iter != gArmsDealersInventory[bArmsDealer].end(); ++iter) {
@@ -2368,7 +2387,7 @@ UINT32 CalculateMinutesClosedBetween( UINT8 ubArmsDealer, UINT32 uiStartTime, UI
 
 	return ( uiMinutesClosed );
 }
-
+#ifdef JA2UB
 //JA25 ub
 
 
@@ -2463,3 +2482,4 @@ void GuaranteeAtMostNumOfItemsForItem( UINT8 ubArmsDealer, INT16 sItemIndex, UIN
 	
 	*/
 }
+#endif

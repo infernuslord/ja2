@@ -60,15 +60,15 @@
 #include "Auto Resolve.h"
 
 #include "connect.h"
+#ifdef JA2UB
 #include "Intro.h"
-
-#include "legion cfg.h"
-
 #include "MapScreen Quotes.h"
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
 #include "Animation Control.h"
+#endif
 
+#include "legion cfg.h"
 
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -136,7 +136,7 @@ std::vector<UINT32> uiExternalStaticNPCFaces;
 //	157,
 //	158,
 //};
-
+#ifdef JA2UB
 UINT32 uiExternalStaticNPCFacesUB[ NUMBER_OF_EXTERNAL_NPC_FACES ];
 UINT32 uiExternalFaceProfileIdsUB[ NUMBER_OF_EXTERNAL_NPC_FACES ]=
 {
@@ -153,7 +153,7 @@ UINT32 uiExternalFaceProfileIdsUB[ NUMBER_OF_EXTERNAL_NPC_FACES ]=
 BOOLEAN AreAllTheMercsFinishedSayingThereInitialHeliCrashQuotes();
 void		InitJerriesSpeechCallBack();
 void		HandlePlayerClosingMorrisNoteDisplayedOnScreen();
-
+#endif
 
 UINT8	gubMercValidPrecedentQuoteID[ NUMBER_VALID_MERC_PRECEDENT_QUOTES ] =
 					{ 80, 81, 82, 83, 86, 87, 88, 95, 97, 99, 100, 101, 102 };
@@ -243,10 +243,11 @@ void HandleTacticalSpeechUI( UINT8 ubCharacterNum, INT32 iFaceIndex );
 void DisplayTextForExternalNPC(	UINT8 ubCharacterNum, STR16 zQuoteStr );
 void CreateTalkingUI( INT8 bUIHandlerID, INT32 iFaceIndex, UINT8 ubCharacterNum, SOLDIERTYPE *pSoldier, STR16 zQuoteStr );
 
-
+#ifdef JA2UB
 BOOLEAN AreAllTheMercsFinishedSayingThereInitialHeliCrashQuotes();
 void		InitJerriesSpeechCallBack();
 void		HandlePlayerClosingMorrisNoteDisplayedOnScreen();
+#endif
 
 void HandleExternNPCSpeechFace( INT32 iIndex );
 
@@ -340,10 +341,18 @@ void InitalizeStaticExternalNPCFaces( void )
 	//
 	// Code for loading miners' faces has been moved to LuaMines::InitMinerFaces ...
 	//
+#ifdef JA2UB
 	for( iCounter = 0; iCounter < NUMBER_OF_EXTERNAL_NPC_FACES; iCounter++ )
 	{
 		uiExternalStaticNPCFacesUB[ iCounter ] = ( UINT32 )InitFace( ( UINT8 )( uiExternalFaceProfileIdsUB[ iCounter ] ), NOBODY, FACE_FORCE_SMALL );
 	}
+#endif
+
+	//for( iCounter = 0; iCounter < NUMBER_OF_EXTERNAL_NPC_FACES; iCounter++ )
+	//{
+	//	uiExternalStaticNPCFaces[ iCounter ] = ( UINT32 )InitFace( ( UINT8 )( uiExternalFaceProfileIds[ iCounter ] ), NOBODY, FACE_FORCE_SMALL );
+	//}
+
 	// ... put Skyrider's face at index 0
 	uiExternalStaticNPCFaces.push_back(( UINT32 )InitFace( ( UINT8 )( SKYRIDER ), NOBODY, FACE_FORCE_SMALL ));
 
@@ -362,10 +371,18 @@ void ShutdownStaticExternalNPCFaces( void )
 	fExternFacesLoaded = FALSE;
 
 	// remove all external npc faces
+	//for( iCounter = 0; iCounter < NUMBER_OF_EXTERNAL_NPC_FACES; iCounter++ )
+	//{
+	//	DeleteFace( uiExternalStaticNPCFaces[ iCounter ] );
+	//}
+
+#ifdef JA2UB
 	for( iCounter = 0; iCounter < NUMBER_OF_EXTERNAL_NPC_FACES; iCounter++ )
 	{
 		DeleteFace( uiExternalStaticNPCFacesUB[ iCounter ] );
 	}
+#endif
+
 	for (std::vector<UINT32>::iterator face = uiExternalStaticNPCFaces.begin();
 		face != uiExternalStaticNPCFaces.end(); ++face)
 	{
@@ -455,8 +472,9 @@ void StopAnyCurrentlyTalkingSpeech( )
 	{
 		InternalShutupaYoFace( gpCurrentTalkingFace->iID, TRUE );
 	}
-	
+#ifdef JA2UB	
 	RemoveJerryMiloBrokenLaptopOverlay();
+#endif
 }
 
 
@@ -697,7 +715,7 @@ void HandleDialogue( )
 
 	}
 	
-	
+#ifdef JA2UB	
 	if ( iQSize == 0 )
 	{
 		if( gfMorrisShouldSayHi )
@@ -757,9 +775,8 @@ void HandleDialogue( )
 
 		return;
 	}
-	
-	//Ja25: no mike
-/*
+#else		//Ja25: no mike
+
 	if ( iQSize == 0 )
 	{
 
@@ -789,7 +806,7 @@ void HandleDialogue( )
 
 		return;
 	}
-*/
+#endif
 	// ATE: Remove any civ quotes....
 	// ShutDownQuoteBoxIfActive( TRUE );
 
@@ -902,7 +919,7 @@ void HandleDialogue( )
 		// Setup face pointer
 		gpCurrentTalkingFace = &gFacesData[ QItem->iFaceIndex ];
 		gubCurrentTalkingID	= QItem->ubCharacterNum;
-		
+#ifdef JA2UB		
 		//Ja25: test
 		if( QItem->ubCharacterNum == 75 ) //MORRIS
 		{
@@ -910,7 +927,7 @@ void HandleDialogue( )
 			{
 			}
 		}
-
+#endif
 		ExecuteCharacterDialogue( QItem->ubCharacterNum, QItem->usQuoteNum, QItem->iFaceIndex, QItem->bUIHandlerID, QItem->fFromSoldier );
 
 	}
@@ -1226,21 +1243,7 @@ void HandleDialogue( )
 		{
 			SetUpdateBoxFlag( TRUE );
 		}
-/*
-Ja25: removed the flag, no militia
-		else if( QItem->uiSpecialEventFlag & DIALOGUE_SPECIAL_EVENT_CONTINUE_TRAINING_MILITIA )
-		{
-			// grab soldier ptr from profile ID
-			pSoldier = FindSoldierByProfileID( ( UINT8 )( QItem->uiSpecialEventData ), FALSE );
-
-			// if soldier valid...
-			if( pSoldier != NULL )
-			{
-				HandleInterfaceMessageForContinuingTrainingMilitia( pSoldier );
-			}
-		}
-	*/
-		//JA25 UB
+#ifdef JA2UB
 		else if( QItem->uiSpecialEventFlag & DIALOGUE_SPECIAL_EVENT_JERRY_MILO )
 		{
 			//switch on the quote that is being spoken
@@ -1265,6 +1268,19 @@ Ja25: removed the flag, no militia
 					break;
 			}
 		}
+#else //Ja25: removed the flag, no militia
+		else if( QItem->uiSpecialEventFlag & DIALOGUE_SPECIAL_EVENT_CONTINUE_TRAINING_MILITIA )
+		{
+			// grab soldier ptr from profile ID
+			pSoldier = FindSoldierByProfileID( ( UINT8 )( QItem->uiSpecialEventData ), FALSE );
+
+			// if soldier valid...
+			if( pSoldier != NULL )
+			{
+				HandleInterfaceMessageForContinuingTrainingMilitia( pSoldier );
+			}
+		}
+#endif
 		else if( QItem->uiSpecialEventFlag & DIALOGUE_SPECIAL_EVENT_ENTER_MAPSCREEN )
 		{
 			if( !(guiTacticalInterfaceFlags & INTERFACE_MAPSCREEN ) )
@@ -1299,18 +1315,7 @@ Ja25: removed the flag, no militia
 		}
 		else if( QItem->uiSpecialEventFlag & DIALOGUE_SPECIAL_EVENT_MULTIPURPOSE )
 		{
-/*
-Ja25 No queen
-			if ( QItem->uiSpecialEventData & MULTIPURPOSE_SPECIAL_EVENT_DONE_KILLING_DEIDRANNA )
-			{
-				HandleDoneLastKilledQueenQuote( );
-			}
-			else if ( QItem->uiSpecialEventData & MULTIPURPOSE_SPECIAL_EVENT_TEAM_MEMBERS_DONE_TALKING )
-			{
-				HandleDoneLastEndGameQuote( );
-			}
-		}
-	*/
+#ifdef JA2UB
 			//JA25 UB
 			if ( QItem->uiSpecialEventData & MULTIPURPOSE_SPECIAL_EVENT_TEAM_MEMBERS_DONE_TALKING )
 			{
@@ -1351,6 +1356,17 @@ Ja25 No queen
 				}
 			}
 		}
+#else //Ja25 No queen
+			if ( QItem->uiSpecialEventData & MULTIPURPOSE_SPECIAL_EVENT_DONE_KILLING_DEIDRANNA )
+			{
+				HandleDoneLastKilledQueenQuote( );
+			}
+			else if ( QItem->uiSpecialEventData & MULTIPURPOSE_SPECIAL_EVENT_TEAM_MEMBERS_DONE_TALKING )
+			{
+				HandleDoneLastEndGameQuote( );
+			}
+		}
+#endif
 		else if( QItem->uiSpecialEventFlag & DIALOGUE_SPECIAL_EVENT_SLEEP )
 		{
 			// no soldier, leave now
@@ -1491,13 +1507,14 @@ BOOLEAN TacticalCharacterDialogue( SOLDIERTYPE *pSoldier, UINT16 usQuoteNum )
 		return( FALSE );
 	}
 
-/*
-Ja25 no meanwhiles
+#ifdef JA2UB
+//Ja25 no meanwhiles
+#else
 	if ( AreInMeanwhile( ) )
 	{
 		return( FALSE );
 	}
-*/
+#endif
 	if (pSoldier->stats.bLife < CONSCIOUSNESS )
 	return( FALSE );
 
@@ -1961,7 +1978,11 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 			sprintf( zFileName,"NPCDATA\\%03d.EDT", ubCharacterNum );
 		}
 	}
+#ifdef JA2UB
 	else if ( ubCharacterNum >= FIRST_RPC && /* ubCharacterNum <  GASTON  && */
+#else
+	else if ( ubCharacterNum >= FIRST_RPC && ubCharacterNum < GASTON &&
+#endif
 			( !( gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
 			|| ProfileCurrentlyTalkingInDialoguePanel( ubCharacterNum )
 			|| (gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_FORCENPCQUOTE) )
@@ -2005,16 +2026,28 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 		if ( fWavFile )
 		{
 			#ifdef RUSSIAN
+#ifdef JA2UB
 				if( ubCharacterNum >= FIRST_RPC && /* ubCharacterNum < GASTON  && */ gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
+#else
+				if( ubCharacterNum >= FIRST_RPC && ubCharacterNum < GASTON && gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
+#endif
 				{
 //inshy: fix for UB-1.13 version only					sprintf( zFileName,"SPEECH\\r_%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
 				if ( gSoundProfileValue[ubCharacterNum].EnabledSound == TRUE )
 				{
+#ifdef JA2UB
 					sprintf( zFileName,"SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
+#else
+					sprintf( zFileName,"SPEECH\\r_%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
+#endif
 					if ( !FileExists( zFileName ) )
 					{
 //inshy: fix for UB-1.13 version only						sprintf( zFileName,"SPEECH\\r_%03d_%03d.wav",ubCharacterNum,usQuoteNum );
+#ifdef JA2UB
 						sprintf( zFileName,"SPEECH\\%03d_%03d.wav",ubCharacterNum,usQuoteNum );
+#else
+						sprintf( zFileName,"SPEECH\\r_%03d_%03d.wav",ubCharacterNum,usQuoteNum );
+#endif
 //<SB> Also check for Russian Gold sound files (identical to international ones)
 						if(! FileExists( zFileName ) )
 						{
@@ -2038,7 +2071,11 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 				{
 					if ( !FileExists( zFileName ) )
 					{
-						sprintf( zFileName,"SPEECH\\%03d_%03d.wav",ubCharacterNum,usQuoteNum );
+#ifdef JA2UB
+					sprintf( zFileName,"SPEECH\\%03d_%03d.wav",ubCharacterNum,usQuoteNum );
+#else
+					sprintf( zFileName,"SPEECH\\%03d_%03d.wav",ubCharacterNum,usQuoteNum );
+#endif
 					}
 				
 				}
@@ -2689,8 +2726,9 @@ void SayQuoteFromAnyBodyInSector( UINT16 usQuoteNum )
 			if ( gTacticalStatus.bNumFoughtInBattle[ ENEMY_TEAM ] == 0 )
 			{
 			
-/*
-Ja25 No Ira, Miguel etc.
+#ifdef JA2UB
+//Ja25 No Ira, Miguel etc.
+#else
 				// quotes referring to Deidranna's men so we skip quote if there were no army guys fought
 				if ( (usQuoteNum == QUOTE_SECTOR_SAFE) && (pTeamSoldier->ubProfile == IRA || pTeamSoldier->ubProfile == MIGUEL || pTeamSoldier->ubProfile == SHANK ) )
 				{
@@ -2701,7 +2739,7 @@ Ja25 No Ira, Miguel etc.
 				{
 					continue;
 				}
-*/
+#endif
 			}
 
 			ubMercsInSector[ ubNumMercs ] = (UINT8)cnt;
@@ -2901,7 +2939,7 @@ void TextOverlayClickCallback( MOUSE_REGION * pRegion, INT32 iReason )
 				ShutDownLastQuoteTacticalTextBox( );
 			}
 		}
-		
+#ifdef JA2UB		
 		//JA25 UB
 		//if we are in the heli crash sequence
 		else if( gJa25SaveStruct.fJerryBreakingLaptopOccuring )
@@ -2915,6 +2953,7 @@ void TextOverlayClickCallback( MOUSE_REGION * pRegion, INT32 iReason )
 		{
 			HandlePlayerClosingMorrisNoteDisplayedOnScreen();
 		}
+#endif
 	}
 	else if (iReason & MSYS_CALLBACK_REASON_LOST_MOUSE )
 	{
@@ -3178,7 +3217,7 @@ void SetExternMapscreenSpeechPanelXY( INT16 sXPos, INT16 sYPos )
 }
 
 
-
+#ifdef JA2UB
 //JA25 UB
 BOOLEAN AreAllTheMercsFinishedSayingThereInitialHeliCrashQuotes()
 {
@@ -3268,3 +3307,4 @@ void HandlePlayerClosingMorrisNoteDisplayedOnScreen()
 		DelayedMercQuote( gJa25SaveStruct.bNewMercProfileIDForSayingMorrisNote, DQ__MORRIS_NOTE_DISPLAY_NOTE_1, GetWorldTotalSeconds() + 1 );
 	}
 }
+#endif

@@ -322,8 +322,6 @@ UINT32 guiBULLSEYE;
 #define HELI_SHADOW_ICON_WIDTH	19
 #define HELI_SHADOW_ICON_HEIGHT	11
 
-// list of map sectors that player isn't allowed to even highlight
-BOOLEAN sBadSectorsList[ WORLD_MAP_X ][ WORLD_MAP_X ];
 
 // the militia box buttons and images
 INT32 giMapMilitiaButtonImage[ 5 ];
@@ -384,6 +382,10 @@ UINT32 guiMapBorderEtaPopUp;
 
 // heli pop up
 UINT32 guiMapBorderHeliSectors;
+
+// list of map sectors that player isn't allowed to even highlight
+BOOLEAN sBadSectorsList[ WORLD_MAP_X ][ WORLD_MAP_X ];
+
 
 INT16 sBaseSectorList[ MAX_TOWNS - 1 ];/*={
 	// NOTE: These co-ordinates must match the top left corner of the 3x3 town tiles cutouts in Interface/MilitiaMaps.sti!
@@ -562,8 +564,9 @@ void AnimateRoute( PathStPtr pPath );
 extern void EndConfirmMapMoveMode( void );
 extern BOOLEAN CanDrawSectorCursor( void );
 
+#ifdef JA2UB
 void SetUpValidCampaignSectors( void );
-
+#endif
 
 
 void DrawMapIndexBigMap( BOOLEAN fSelectedCursorIsYellow )
@@ -7207,6 +7210,7 @@ void MilitiaDisbandYesNoBoxCallback( UINT8 bExitValue )
 	return;
 }
 
+#ifdef JA2UB
 void SetUpValidCampaignSectors( void )
 {
 /*
@@ -7303,3 +7307,4 @@ INT32			iRow, iCol;
 
 
 }
+#endif

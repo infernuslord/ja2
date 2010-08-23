@@ -180,14 +180,15 @@ BOOLEAN SetThisSectorAsPlayerControlled( INT16 sMapX, INT16 sMapY, INT8 bMapZ, B
 	INT8 bTownId = 0;
 	UINT8 ubSectorID;
 
-
-/*
-Ja25: No meanwhiles
+#ifdef JA2UB
+//Ja25: No meanwhiles
+#else
 	if( AreInMeanwhile( ) )
 	{
 		return FALSE;
 	}
-*/
+#endif
+
 
 	if( bMapZ == 0 )
 	{
@@ -225,7 +226,11 @@ Ja25: No meanwhiles
 			//If the player has been to Bobbyr when it was down, and we havent already sent email, send him an email
 			if( LaptopSaveInfo.ubHaveBeenToBobbyRaysAtLeastOnceWhileUnderConstruction == BOBBYR_BEEN_TO_SITE_ONCE &&	LaptopSaveInfo.ubHaveBeenToBobbyRaysAtLeastOnceWhileUnderConstruction != BOBBYR_ALREADY_SENT_EMAIL )
 			{
-			//	AddEmail( BOBBYR_NOW_OPEN, BOBBYR_NOW_OPEN_LENGTH, BOBBY_R, GetWorldTotalMin(), -1);
+#ifdef JA2UB
+// no UB
+#else
+				AddEmail( BOBBYR_NOW_OPEN, BOBBYR_NOW_OPEN_LENGTH, BOBBY_R, GetWorldTotalMin(), -1);
+#endif
 				LaptopSaveInfo.ubHaveBeenToBobbyRaysAtLeastOnceWhileUnderConstruction = BOBBYR_ALREADY_SENT_EMAIL;
 			}
 		}
@@ -262,10 +267,11 @@ Ja25: No meanwhiles
 					{
 						HandleMoraleEvent( NULL, MORALE_TOWN_LIBERATED, sMapX, sMapY, bMapZ );
 
-                                            /*
-                                              Ja25:	no loyalty
-                                        	HandleGlobalLoyaltyEvent( GLOBAL_LOYALTY_GAIN_TOWN_SECTOR, sMapX, sMapY, bMapZ );
-                                            */
+#ifdef JA2UB
+//Ja25:	no loyalty
+#else
+						HandleGlobalLoyaltyEvent( GLOBAL_LOYALTY_GAIN_TOWN_SECTOR, sMapX, sMapY, bMapZ );
+#endif
 						// liberation by definition requires that the place was enemy controlled in the first place
 						CheckIfEntireTownHasBeenLiberated( bTownId, sMapX, sMapY );
 					}
@@ -278,11 +284,12 @@ Ja25: No meanwhiles
 				if ( GetTotalLeftInMine( GetMineIndexForSector( sMapX, sMapY ) ) > 0)
 				{
 					HandleMoraleEvent( NULL, MORALE_MINE_LIBERATED, sMapX, sMapY, bMapZ );
-                                       /*
-                                       Ja25:	no loyalty
-                                	HandleGlobalLoyaltyEvent( GLOBAL_LOYALTY_GAIN_MINE, sMapX, sMapY, bMapZ );
-                                     */
-                        	}
+#ifdef JA2UB
+// Ja25:	no loyalty
+#else
+					HandleGlobalLoyaltyEvent( GLOBAL_LOYALTY_GAIN_MINE, sMapX, sMapY, bMapZ );
+#endif
+				}
 			}
 
 			// if it's a SAM site sector
@@ -291,16 +298,19 @@ Ja25: No meanwhiles
 				if ( 1 /*!GetSectorFlagStatus( sMapX, sMapY, bMapZ, SF_SECTOR_HAS_BEEN_LIBERATED_ONCE ) */)
 				{
 					// SAM site liberated for first time, schedule meanwhile
-					/*
-JA25 No meanwhiles
+#ifdef JA2UB
+//JA25 No meanwhiles
+#else
 					HandleMeanWhileEventPostingForSAMLiberation( GetSAMIdFromSector( sMapX, sMapY, bMapZ ) );
-                        */
-                        	}
+#endif
+				}
 
 				HandleMoraleEvent( NULL, MORALE_SAM_SITE_LIBERATED, sMapX, sMapY, bMapZ );
-                        /* Ja25:	no loyalty
-                        	HandleGlobalLoyaltyEvent( GLOBAL_LOYALTY_GAIN_SAM, sMapX, sMapY, bMapZ );
-                         */
+#ifdef JA2UB
+// Ja25:	no loyalty
+#else
+				HandleGlobalLoyaltyEvent( GLOBAL_LOYALTY_GAIN_SAM, sMapX, sMapY, bMapZ );
+#endif
 				// if Skyrider has been delivered to chopper, and already mentioned Drassen SAM site, but not used this quote yet
 				if ( IsHelicopterPilotAvailable() && ( guiHelicopterSkyriderTalkState >= 1 ) && ( !gfSkyriderSaidCongratsOnTakingSAM ) )
 				{
@@ -331,30 +341,35 @@ JA25 No meanwhiles
 //			SetSectorFlag( sMapX, sMapY, bMapZ, SF_SECTOR_HAS_BEEN_LIBERATED_ONCE );
 			if ( bMapZ == 0 && ( ( sMapY == MAP_ROW_M && (sMapX >= 2 && sMapX <= 6) ) || sMapY == MAP_ROW_N && sMapX == 6) )
 			{
-			/*
-Ja25 No meanwhiles
+
+#ifdef JA2UB
+//Ja25 No meanwhiles
+#else
 				HandleOutskirtsOfMedunaMeanwhileScene();
-				*/
+#endif
+
 			}
 		}
-                /*
-Ja25 No strategic ai
+#ifdef JA2UB
+//Ja25 No strategic ai
+#else
 		if( fContested )
 		{
 			StrategicHandleQueenLosingControlOfSector( (UINT8)sMapX, (UINT8)sMapY, (UINT8)bMapZ );
 		}
-		*/
+#endif
 	}
 	else
 	{
-         /*
-Ja25 No strategic ai
+#ifdef JA2UB
+//Ja25 No strategic ai
+#else
 
-        	if( sMapX == 3 && sMapY == 16 && bMapZ == 1 )
+		if( sMapX == 3 && sMapY == 16 && bMapZ == 1 )
 		{ //Basement sector (P3_b1)
 			gfUseAlternateQueenPosition = TRUE;
 		}
-		*/
+#endif
 	}
 
 	// also set fact the player knows they own it

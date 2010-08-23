@@ -13,8 +13,12 @@ enum
 	ARMS_DEALER_KEITH,
 	ARMS_DEALER_JAKE,
 	ARMS_DEALER_GABBY,
+	#ifdef JA2UB
+	//ja25 ub Biggins
+	#else
+	ARMS_DEALER_DEVIN, 
+	#endif
 
-//	ARMS_DEALER_DEVIN, ja25 ub Biggins
 	ARMS_DEALER_HOWARD,
 	ARMS_DEALER_SAM,
 	ARMS_DEALER_FRANK,
@@ -37,7 +41,9 @@ enum
 	ARMS_DEALER_MANNY,
 	
 	//Betty UB
+	#ifdef JA2UB
 	ARMS_DEALER_BETTY,
+	#endif
 
 	NUM_ARMS_DEALERS,
 };

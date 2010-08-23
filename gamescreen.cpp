@@ -89,8 +89,12 @@
 #endif
 
 #include "connect.h"
+
+#ifdef JA2UB
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
+#endif
+
 #define		ARE_IN_FADE_IN( )		( gfFadeIn || gfFadeInitialized )
 
 
@@ -131,8 +135,10 @@ extern				BOOLEAN		gfFirstHeliRun;
 extern				BOOLEAN		gfRenderFullThisFrame;
 //extern				BOOLEAN		gfFirstTimeInGameHeliCrash;
 
+#ifdef JA2UB
 extern				void HandleCannotAffordNpcMsgBox();
 extern				BOOLEAN	gfDisplayMsgBoxSayingCantAffordNPC;
+#endif
 
 // The InitializeGame function is responsible for setting up all data and Gaming Engine
 // tasks which will run the game
@@ -332,15 +338,16 @@ void EnterTacticalScreen( )
 	//gfGameScreenLocateToSoldier = TRUE;
 
 	DebugMsg(TOPIC_JA2,DBG_LEVEL_3,String("EnterTacticalScreen: check meanwhile"));
-	
-/*
-Ja25 No meanwhiles
+
+#ifdef JA2UB	
+/* Ja25 No meanwhiles */
+#else
 	// Locate if in meanwhile...
 	if ( AreInMeanwhile( ) )
 	{
 		LocateToMeanwhileCharacter( );
 	}
-*/
+#endif
 
 	if ( gTacticalStatus.uiFlags & IN_DEIDRANNA_ENDGAME )
 	{
@@ -463,9 +470,12 @@ UINT32	MainGameScreenHandle(void)
 			return( GAME_SCREEN );
 		#endif
 	}
+
+#ifdef JA2UB
 	//jA25 UB
 	//Handle the strategic AI
 	JA25_HandleUpdateOfStrategicAi();
+#endif
 
 #if 0
 	{
@@ -610,13 +620,15 @@ UINT32	MainGameScreenHandle(void)
 	{
 		gfGameScreenLocateToSoldier = FALSE;
 
-		
+#ifdef JA2UB		
 		//if it is the first time in the game, and we are doing the heli crash code, locate to a different spot
 		if( gfFirstTimeInGameHeliCrash )
 			InternalLocateGridNo( 15427, TRUE );
 		else
 			InternalLocateGridNo( gMapInformation.sNorthGridNo, TRUE );
-			
+#else
+			InternalLocateGridNo( gMapInformation.sNorthGridNo, TRUE );
+#endif			
 		// Start heli Run...
 		StartHelicopterRun( gMapInformation.sNorthGridNo );
 
@@ -635,12 +647,14 @@ UINT32	MainGameScreenHandle(void)
 		return( GAME_SCREEN );
 	}
 
+#ifdef JA2UB
 	if ( !ARE_IN_FADE_IN( ) )
 	{
 	//	HandleAirRaid( );
 		
 		HandlePowerGenAlarm();
 	}
+#endif
 
 	if ( gfGameScreenLocateToSoldier )
 	{
@@ -689,11 +703,13 @@ UINT32	MainGameScreenHandle(void)
 		}
 	}
 
+#ifdef JA2UB
 	//if we are to display a mesg box about cant afford biggens
 	if( gfDisplayMsgBoxSayingCantAffordNPC )
 	{
 		HandleCannotAffordNpcMsgBox();
 	}
+#endif
 
 	#ifdef JA2BETAVERSION
 		if( gfDoDialogOnceGameScreenFadesIn )
@@ -705,10 +721,13 @@ UINT32	MainGameScreenHandle(void)
 	HandleHeliDrop( );
 
 	if ( !ARE_IN_FADE_IN( ) )
-  {
-	  HandleAutoBandagePending( );
-		HandleThePlayerBeNotifiedOfSomeoneElseInSector();
-	}
+  	{
+	HandleAutoBandagePending( );
+     
+	  #ifdef JA2UB
+      HandleThePlayerBeNotifiedOfSomeoneElseInSector();
+	  #endif
+     }
 
 
 	// ATE: CHRIS_C LOOK HERE FOR GETTING AI CONSTANTLY GOING
@@ -917,10 +936,14 @@ UINT32	MainGameScreenHandle(void)
 	// Display Framerate
 	DisplayFrameRate( );
 	
-	//UB
-        /*
+	
+//UB       
+#ifdef JA2UB
+ /* JA2UB */
+#else
 	CheckForMeanwhileOKStart( );
-        */
+#endif
+     
 	ScrollString( );
 
 	ExecuteBaseDirtyRectQueue( );
@@ -1173,9 +1196,9 @@ void InitHelicopterEntranceByMercs( void )
 		// Madd - nevermind initial air strike.	It just seems silly, since Deidranna doesn't know the mercs are there.
 		//if ( gGameOptions.fAirStrikes )
 		//	ScheduleAirRaid( &AirRaidDef );
-		
+#ifdef JA2UB		
 		HandleInitialEventsInHeliCrash(); //JA25 UB
-
+#endif
 		gfTacticalDoHeliRun = TRUE;
 		gfFirstHeliRun			= TRUE;
 

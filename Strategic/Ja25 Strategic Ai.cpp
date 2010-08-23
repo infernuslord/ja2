@@ -106,6 +106,8 @@
 	#include "cursors.h"
 #endif
 
+#ifdef JA2UB
+
 #include "Ja25Update.h"
 #include "Ja25 Strategic Ai.h"
 #include "MapScreen Quotes.h"
@@ -2873,3 +2875,5 @@ void AddJA25AIDataToSector( JA25_SECTOR_AI *pSectorAIInfo )
 	giNumJA25Sectors++;
 */
 }
+
+#endif

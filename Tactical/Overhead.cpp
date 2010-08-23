@@ -116,9 +116,12 @@
 #endif
 #include "test_space.h"
 #include "connect.h"
+
+#ifdef JA2UB
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
 #include "Soldier Control.h"
+#endif
 
 // OJW - 20090419
 UINT8	giMAXIMUM_NUMBER_OF_PLAYER_MERCS = CODE_MAXIMUM_NUMBER_OF_PLAYER_MERCS;
@@ -194,13 +197,14 @@ extern UINT16 PickSoldierReadyAnimation( SOLDIERTYPE *pSoldier, BOOLEAN fEndRead
 
 extern void PlayStealthySoldierFootstepSound( SOLDIERTYPE *pSoldier );
 
+#ifdef JA2UB
 BOOLEAN CanMsgBoxForPlayerToBeNotifiedOfSomeoneElseInSector();
 
 extern void PlayStealthySoldierFootstepSound( SOLDIERTYPE *pSoldier );
+//extern	BOOLEAN		gfFirstTimeInGameHeliCrash; //JA25 UB
+#endif
 
 extern BOOLEAN gfSurrendered;
-
-//extern	BOOLEAN		gfFirstTimeInGameHeliCrash; //JA25 UB
 
 // GLOBALS
 #define		 START_DEMO_SCENE				3
@@ -1092,7 +1096,7 @@ BOOLEAN ExecuteOverhead( )
 						*/
 					}
 				}
-				
+#ifdef JA2UB				
 				//Ja25 UB
 				// ATE: JA25 additon - poll for getting up from start of game...
 				if( pSoldier->fWaitingToGetupFromJA25Start )
@@ -1131,7 +1135,7 @@ BOOLEAN ExecuteOverhead( )
 					}
 				}				
 				
-
+#endif
 				// Checkout fading
 				if ( pSoldier->flags.fBeginFade )
 				{
@@ -3402,9 +3406,9 @@ void HandlePlayerTeamMemberDeath( SOLDIERTYPE *pSoldier )
 		// handle stuff for Carmen if Slay is killed
 		switch( pSoldier->ubProfile )
 		{
-/*
-Ja25
-No carmen
+#ifdef JA2UB
+//Ja25 No carmen
+#else
 		case SLAY:
 			pTeamSoldier = FindSoldierByProfileID( CARMEN, FALSE );			
 			if (pTeamSoldier && pTeamSoldier->aiData.bAttitude == ATTACKSLAYONLY && !TileIsOutOfBounds(ClosestPC( pTeamSoldier, NULL )) )
@@ -3413,7 +3417,7 @@ No carmen
 				TriggerNPCRecord( CARMEN, 29 );
 			}
 			break;
-*/
+#endif
 		case ROBOT:
 			if (CheckFact( FACT_FIRST_ROBOT_DESTROYED, 0 ) == FALSE )
 			{
@@ -3498,7 +3502,7 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 
 		switch( pSoldierOld->ubProfile )
 		{
-
+#ifdef JA2UB
 			case 75: //MORRIS
 				{
 					INT8 bSoldierID;
@@ -3515,8 +3519,7 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 				}
 				break;
 
-/*
-Ja25: none of these characters are in the exp.
+#else //Ja25: none of these characters are in the exp.
 		case BRENDA:
 			SetFactTrue( FACT_BRENDA_DEAD );
 			{
@@ -3572,12 +3575,12 @@ Ja25: none of these characters are in the exp.
 		case ELDIN:
 			// the security guard...	Results in an extra loyalty penalty for Balime (in addition to civilian murder)
 
-			// Delayed loyalty effects elimininated.	Sep.12/98.	ARM
+			/* Delayed loyalty effects elimininated.	Sep.12/98.	ARM
 			// create the event value, for town BALIME
-			//uiLoyaltyValue = BuildLoyaltyEventValue( BALIME, LOYALTY_PENALTY_ELDIN_KILLED, FALSE );
+			uiLoyaltyValue = BuildLoyaltyEventValue( BALIME, LOYALTY_PENALTY_ELDIN_KILLED, FALSE );
 			// post the event, 30 minute delay
-			//AddStrategicEvent( EVENT_TOWN_LOYALTY_UPDATE, GetWorldTotalMin() + 30, uiLoyaltyValue );
-			
+			AddStrategicEvent( EVENT_TOWN_LOYALTY_UPDATE, GetWorldTotalMin() + 30, uiLoyaltyValue );
+			*/
 			DecrementTownLoyalty( BALIME, LOYALTY_PENALTY_ELDIN_KILLED );
 			break;
 		case JOEY:
@@ -3588,22 +3591,22 @@ Ja25: none of these characters are in the exp.
 				// Martha has a heart attack and croaks
 				TriggerNPCRecord( MARTHA, 17 );
 
-				// Delayed loyalty effects elimininated.	Sep.12/98.	ARM
+				/* Delayed loyalty effects elimininated.	Sep.12/98.	ARM
 				// create the event value, for town CAMBRIA
-				//uiLoyaltyValue = BuildLoyaltyEventValue( CAMBRIA, LOYALTY_PENALTY_MARTHA_HEART_ATTACK, FALSE );
+				uiLoyaltyValue = BuildLoyaltyEventValue( CAMBRIA, LOYALTY_PENALTY_MARTHA_HEART_ATTACK, FALSE );
 				// post the event, 30 minute delay
-				//AddStrategicEvent( EVENT_TOWN_LOYALTY_UPDATE, GetWorldTotalMin() + 30, uiLoyaltyValue );
-				
+				AddStrategicEvent( EVENT_TOWN_LOYALTY_UPDATE, GetWorldTotalMin() + 30, uiLoyaltyValue );
+				*/
 				DecrementTownLoyalty( CAMBRIA, LOYALTY_PENALTY_MARTHA_HEART_ATTACK );
 			}
 			else	// Martha doesn't see it.	She lives, but Joey is found a day or so later anyways
 			{
-				
+				/*
 				// create the event value, for town CAMBRIA
-				//uiLoyaltyValue = BuildLoyaltyEventValue( CAMBRIA, LOYALTY_PENALTY_JOEY_KILLED, FALSE );
+				uiLoyaltyValue = BuildLoyaltyEventValue( CAMBRIA, LOYALTY_PENALTY_JOEY_KILLED, FALSE );
 				// post the event, 30 minute delay
-				//AddStrategicEvent( EVENT_TOWN_LOYALTY_UPDATE, GetWorldTotalMin() + ( ( 12 + Random(13)) * 60 ), uiLoyaltyValue );
-				
+				AddStrategicEvent( EVENT_TOWN_LOYALTY_UPDATE, GetWorldTotalMin() + ( ( 12 + Random(13)) * 60 ), uiLoyaltyValue );
+				*/
 				DecrementTownLoyalty( CAMBRIA, LOYALTY_PENALTY_JOEY_KILLED );
 			}
 			break;
@@ -3640,10 +3643,11 @@ Ja25: none of these characters are in the exp.
 				HandleNPCDoAction( DOREEN, NPC_ACTION_FREE_KIDS, 0 );
 			}
 			break;
-	*/
+	#endif
 		}
-/* Ja25
-no queen
+#ifdef JA2UB
+// Ja25no queen
+#else
 		// Are we looking at the queen?
 		if ( pSoldierOld->ubProfile == QUEEN )
 		{
@@ -3652,9 +3656,9 @@ no queen
 				pKiller = MercPtrs[ pSoldierOld->ubAttackerID ];
 			}
 
-		//	BeginHandleDeidrannaDeath( pKiller, pSoldierOld->sGridNo, pSoldierOld->pathing.bLevel );
+			BeginHandleDeidrannaDeath( pKiller, pSoldierOld->sGridNo, pSoldierOld->pathing.bLevel );
 		}
-*/
+#endif
 		// crows/cows are on the civilian team, but none of the following applies to them
 		if ( ( pSoldierOld->ubBodyType != CROW ) && ( pSoldierOld->ubBodyType != COW ) )
 		{
@@ -3702,8 +3706,9 @@ no queen
 	else	// enemies and creatures... should any of this stuff not be called if a creature dies?
 	{
 	
-	/*
-no queen, or queen monster
+#ifdef JA2UB
+//no queen, or queen monster
+#else
 		if ( pSoldierOld->ubBodyType == QUEENMONSTER )
 		{
 			SOLDIERTYPE *pKiller = NULL;
@@ -3712,10 +3717,10 @@ no queen, or queen monster
 			{
 				pKiller = MercPtrs[ pSoldierOld->ubAttackerID ];
 
-			//	BeginHandleQueenBitchDeath( pKiller, pSoldierOld->sGridNo, pSoldierOld->pathing.bLevel );
+				BeginHandleQueenBitchDeath( pKiller, pSoldierOld->sGridNo, pSoldierOld->pathing.bLevel );
 			}
 		}
-*/
+#endif
 		if ( pSoldierOld->bTeam == ENEMY_TEAM )
 		{
 			gTacticalStatus.ubArmyGuysKilled++;
@@ -3736,8 +3741,9 @@ no queen, or queen monster
 			// reset the chosen one!
 			gTacticalStatus.ubTheChosenOne = NOBODY;
 		}
-/*
-no queen, or queen monster
+#ifdef JA2UB
+//no queen, or queen monster
+#else
 		if ( pSoldierOld->ubProfile == QUEEN )
 		{
 			HandleMoraleEvent( NULL, MORALE_DEIDRANNA_KILLED, gWorldSectorX, gWorldSectorY, gbWorldSectorZ	);
@@ -3752,7 +3758,7 @@ no queen, or queen monster
 			HandleNPCDoAction( 0, NPC_ACTION_GRANT_EXPERIENCE_5, 0 );
 
 		}
-		*/
+#endif
 	}
 
 
@@ -3794,15 +3800,14 @@ no queen, or queen monster
 	//if the NPC is a dealer, add the dealers items to the ground
 	AddDeadArmsDealerItemsToWorld( pSoldierOld->ubProfile );
 	
-
+#ifdef JA2UB
 	HandleDeathInPowerGenSector( pSoldierOld ); //ja25 ub
 	HandleWhenCertainPercentageOfEnemiesDie();  //ja25 ub
-
-
+#endif
 
 	//The queen AI layer must process the event by subtracting forces, etc.
 	ProcessQueenCmdImplicationsOfDeath( pSoldierOld );
-
+#ifdef JA2UB
 	 //------------------- ja25 ub -------------------------
 	//if the person was Raul, and we are to say the blown up quotes
 	if( pSoldierOld->ubProfile == PERKO /*RAUL */ && IsJa25GeneralFlagSet( JA_GF__RAUL_BLOW_HIMSELF_UP ) )
@@ -3826,7 +3831,7 @@ no queen, or queen monster
 			TacticalCharacterDialogue( &Menptr[SoldierId2], QUOTE_SMALL_TALK );
 		}
 	}
-
+#endif
 	// OK, check for existence of any more badguys!
 	CheckForEndOfBattle( FALSE );
 }
@@ -3938,13 +3943,14 @@ void MakeCivHostile( SOLDIERTYPE *pSoldier, INT8 bNewSide )
 
 	switch( pSoldier->ubProfile )
 	{
-/*
-Ja25 No Ira, miguel, etc
+#ifdef JA2UB
+//Ja25 No Ira, miguel, etc
+#else
 	case IRA:
 	case DIMITRI:
 	case MIGUEL:
 	case CARLOS:
-*/	
+#endif	
 	case MADLAB:
 	case DYNAMO:
 	case SHANK:
@@ -6008,8 +6014,14 @@ void SetEnemyPresence( )
 		// Change music modes..
 
 		// If we are just starting game, don't do this!
-		//Ja25: no meanwhiles		if ( !DidGameJustStart() && !AreInMeanwhile( ) )
+	
+#ifdef JA2UB	
+		//Ja25: no meanwhiles
 		if ( !DidGameJustStart() )
+#else
+		if ( !DidGameJustStart() && !AreInMeanwhile( ) )
+
+#endif
 		{
 			SetMusicMode( MUSIC_TACTICAL_ENEMYPRESENT );
 			DebugMsg(TOPIC_JA2,DBG_LEVEL_3,String("SetEnemyPresence: warnings = false"));
@@ -6522,10 +6534,11 @@ BOOLEAN CheckForEndOfBattle( BOOLEAN fAnEnemyRetreated )
 			SetFactTrue( FACT_FIRST_BATTLE_FOUGHT );
 			SetFactFalse( FACT_FIRST_BATTLE_BEING_FOUGHT );
 			SetTheFirstBattleSector( (INT16) (gWorldSectorX + gWorldSectorY * MAP_WORLD_X) );
-/*
-Ja25  no meanwhile
+#ifdef JA2UB
+//Ja25  no meanwhile
+#else
 			HandleFirstBattleEndingWhileInTown( gWorldSectorX, gWorldSectorY, gbWorldSectorZ, FALSE );
-*/
+#endif
 		}
 
 		if( NumEnemyInSectorExceptCreatures() )
@@ -6756,10 +6769,11 @@ Ja25  no meanwhile
 				SetFactTrue( FACT_FIRST_BATTLE_WON );
 				SetFactFalse( FACT_FIRST_BATTLE_BEING_FOUGHT );
 				SetTheFirstBattleSector( (INT16) (gWorldSectorX + gWorldSectorY * MAP_WORLD_X) );
-/*
-Ja25  no meanwhile
+#ifdef JA2UB
+//Ja25  no meanwhile
+#else
 				HandleFirstBattleEndingWhileInTown( gWorldSectorX, gWorldSectorY, gbWorldSectorZ, FALSE );
-*/
+#endif
 			}
 		}
 
@@ -7867,8 +7881,9 @@ BOOLEAN ProcessImplicationsOfPCAttack( SOLDIERTYPE * pSoldier, SOLDIERTYPE ** pp
 	else
 	{
 	
-/*
-Ja25: No carmen
+#ifdef JA2UB
+//Ja25: No carmen
+#else
 		if (pTarget->ubProfile == CARMEN)// Carmen
 		{
 			// Special stuff for Carmen the bounty hunter
@@ -7878,7 +7893,7 @@ Ja25: No carmen
 				pTarget->aiData.bAttitude = AGGRESSIVE;
 			}
 		}
-*/
+#endif
 		if ( pTarget->ubCivilianGroup && ( (pTarget->bTeam == gbPlayerNum) || pTarget->aiData.bNeutral ) )
 		{
 #ifdef JA2TESTVERSION
@@ -8121,8 +8136,9 @@ SOLDIERTYPE *InternalReduceAttackBusyCount( )
 			return( NULL );
 		}
 	}
-/*
-Ja25 no queen
+#ifdef JA2UB
+//Ja25 no queen
+#else
 	// ATE: IN MEANWHILES, we have 'combat' in realtime....
 	// this is so we DON'T call freeupattacker() which will cancel
 	// the AI guy's meanwhile NPC stuff.
@@ -8131,7 +8147,7 @@ Ja25 no queen
 	{
 		return( NULL );
 	}
-  */
+#endif
 #if 0
 // 0verhaul:	This is moved to the end loop where everybody's state is reset for the next action
 	if (pTarget)
@@ -8272,8 +8288,11 @@ Ja25 no queen
 			// Go into combat!
 
 			// If we are in a meanwhile... don't enter combat here...
+#ifdef JA2UB
 //Ja25 no meanwhiles
-//			if ( !AreInMeanwhile( ) )
+#else
+			if ( !AreInMeanwhile( ) )
+#endif
 			{
 				EnterCombatMode( pSoldier->bTeam );
 			}
@@ -9119,7 +9138,7 @@ INT8 CheckStatusNearbyFriendlies( SOLDIERTYPE *pSoldier )
 }
 
 
-
+#ifdef JA2UB
 void SetMsgBoxForPlayerBeNotifiedOfSomeoneElseInSector()
 {
 	//if the player in the same sector as MANUEL
@@ -9218,3 +9237,4 @@ void HandleDisplayingOfPlayerLostDialogue( void )
 		gJa25SaveStruct.ubDisplayPlayerLostMsgBox	= 1;	
 	}
 }
+#endif

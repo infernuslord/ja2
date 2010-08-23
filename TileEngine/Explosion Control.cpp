@@ -67,18 +67,20 @@
 #include "fov.h"
 #include "Map Information.h"
 #include "Soldier Functions.h"//dnl ch40 200909
-#include "interface Dialogue.h"
 #endif
 
 #include "Soldier Macros.h"
 #include "connect.h"
 #include "debug control.h"
+
+#ifdef JA2UB
 #include "interface Dialogue.h"
 
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
 #include "Dialogue Control.h"
 #include "legion cfg.h"
+#endif
 
 
 //forward declarations of common classes to eliminate includes
@@ -100,7 +102,9 @@ extern	void AddToShouldBecomeHostileOrSayQuoteList( UINT8 ubID );
 extern void RecompileLocalMovementCostsForWall( INT32 sGridNo, UINT8 ubOrientation );
 void FatigueCharacter( SOLDIERTYPE *pSoldier );
 
+#ifdef JA2UB
 void HandleSeeingFortifiedDoor( INT16 sGridNo );//Ja25 UB
+#endif
 
 #define NO_ALT_SOUND -1
 
@@ -213,6 +217,7 @@ void RecountExplosions( void );
 void GenerateExplosionFromExplosionPointer( EXPLOSIONTYPE *pExplosion );
 void HandleBuldingDestruction( INT32 sGridNo, UINT8 ubOwner );
 
+#ifdef JA2UB
 //JA25 UB
 void HavePersonAtGridnoStop( INT16 sGridNo );
 BOOLEAN ShouldThePlayerStopWhenWalkingOnBiggensActionItem( UINT8 ubRecordNum );
@@ -221,10 +226,7 @@ BOOLEAN IsFanGraphicInSectorAtThisGridNo( INT16 sGridNo );
 void HandleExplosionsInTunnelSector( INT16 sGridNo );
 void HandleSwitchToOpenFortifiedDoor( INT16 sGridNo );
 void HandleSeeingPowerGenFan( INT16 sGridNo );
-
-
-
-
+#endif
 
 INT32 GetFreeExplosion( void )
 {
@@ -636,7 +638,7 @@ BOOLEAN ExplosiveDamageStructureAtGridNo( STRUCTURE * pCurrent, STRUCTURE **ppNe
 		ChangeO3SectorStatue( TRUE );
 		return( TRUE );
 	}
-	
+#ifdef JA2UB	
 	//JA25 UB
 	//should we replace the mine entrance graphic
 	if( IsMineEntranceInSectorI13AtThisGridNo( sGridNo ) && ubOwner == NOBODY )
@@ -648,6 +650,7 @@ BOOLEAN ExplosiveDamageStructureAtGridNo( STRUCTURE * pCurrent, STRUCTURE **ppNe
 	//ja25 ub
 	//Handle Explosions in the tunnel sectors
 	HandleExplosionsInTunnelSector( sGridNo );
+#endif
 	
 	// Get xy
 	sX = CenterX( sGridNo );
@@ -680,14 +683,14 @@ BOOLEAN ExplosiveDamageStructureAtGridNo( STRUCTURE * pCurrent, STRUCTURE **ppNe
 		if ( ( bDamageReturnVal = DamageStructure( pCurrent, (UINT8)sWoundAmt, STRUCTURE_DAMAGE_EXPLOSION, sGridNo, sX, sY, NOBODY ) ) != 0 )
 		{
 			fContinue = FALSE;
-			
+#ifdef JA2UB			
 			//Ja25 ub
 			//are we exploding the Fan in the power gen facility
 			if( IsFanGraphicInSectorAtThisGridNo( sGridNo ) )
 			{
 				HandleDestructionOfPowerGenFan();
 			}
-
+#endif
 			pBase = FindBaseStructure( pCurrent );
 
 			sBaseGridNo = pBase->sGridNo;
@@ -3171,6 +3174,7 @@ void PerformItemAction( INT32 sGridNo, OBJECTTYPE * pObj )
 		PlayJA2Sample( KLAXON_ALARM, RATE_11025, SoundVolume( MIDVOLUME, sGridNo ), 5, SoundDir( sGridNo ) );
 		CallEldinTo( sGridNo );
 		break;
+#ifdef JA2UB
 		case ACTION_ITEM_BIGGENS_BOMBS:
 
 			if( ShouldThePlayerStopWhenWalkingOnBiggensActionItem( 17 ) )
@@ -3216,6 +3220,7 @@ void PerformItemAction( INT32 sGridNo, OBJECTTYPE * pObj )
 			}
 			
 			break;
+#endif
 	default:
 		// error message here
 #ifdef JA2BETAVERSION
@@ -4010,7 +4015,7 @@ UINT8 DetermineFlashbangEffect( SOLDIERTYPE *pSoldier, INT8 ubExplosionDir, BOOL
 	return ( FIRE_WEAPON_BLINDED_AND_DEAFENED );
 }
 
-
+#ifdef JA2UB
 
 //-- UB
 
@@ -4279,3 +4284,4 @@ void HandleSeeingPowerGenFan( INT16 sGridNo )
 		SetJa25GeneralFlag( JA_GF__PLAYER_SEEN_FAN_BEFORE );
 	}
 }
+#endif

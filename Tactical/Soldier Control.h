@@ -25,9 +25,10 @@
 #define MAXCIVLASTNAMES		30
 extern UINT16 CivLastNames[MAXCIVLASTNAMES][10];
 
+#ifdef JA2UB
 //ja25ub
 #define	NUM_ASSIST_SLOTS				156				//used for when the player asssists in killing the enemty
- 
+#endif
 
 // ANDREW: these are defines for OKDestanation usage - please move to approprite file
 #define IGNOREPEOPLE	0
@@ -131,15 +132,22 @@ extern UINT16 CivLastNames[MAXCIVLASTNAMES][10];
 #define SOLDIER_QUOTE_SAID_EXT_SEEN_CREATURE_ATTACK		0x0002
 #define SOLDIER_QUOTE_SAID_EXT_USED_BATTLESOUND_HIT		0x0004
 #define SOLDIER_QUOTE_SAID_EXT_CLOSE_CALL							0x0008
-//Ja25: no mike#define SOLDIER_QUOTE_SAID_EXT_MIKE										0x0010
+
+//Ja25: no mike
+#ifdef JA2UB
 #define SOLDIER_QUOTE_SAID_EXT_MORRIS									0x0010 //Ja25 UB
+#else
+#define SOLDIER_QUOTE_SAID_EXT_MIKE										0x0010
+#endif
 
 #define SOLDIER_QUOTE_SAID_DONE_ASSIGNMENT						0x0020
 #define SOLDIER_QUOTE_SAID_BUDDY_1_WITNESSED					0x0040
 #define SOLDIER_QUOTE_SAID_BUDDY_2_WITNESSED					0x0080
 #define SOLDIER_QUOTE_SAID_BUDDY_3_WITNESSED					0x0100
-#define	SOLDIER_QUOTE_SAID_THOUGHT_KILLED_YOU					0x0200
 
+#ifdef JA2UB
+#define	SOLDIER_QUOTE_SAID_THOUGHT_KILLED_YOU					0x0200
+#endif
 
 
 #define	SOLDIER_CONTRACT_RENEW_QUOTE_NOT_USED					0
@@ -1086,12 +1094,15 @@ public:
 	// HEADROCK HAM 3.6: I'm removing this filler to make room for the above variable. I'm very worried though,
 	// I don't know if this is a good idea at all...
 	//INT16	filler;
+
+#ifdef JA2UB
 	//ja25
 	BOOLEAN											fIgnoreGetupFromCollapseCheck;
 	TIMECOUNTER									GetupFromJA25StartCounter;
 	BOOLEAN											fWaitingToGetupFromJA25Start;
 
 	UINT8												ubPercentDamageInflictedByTeam[NUM_ASSIST_SLOTS];			//The percent of damage inflicted by the player team.  Each element corresponds to the Soldier ID.  Each element contains the percent damage inflicted by that merc
+#endif
 
 	char endOfPOD;	// marker for end of POD (plain old data)
 
@@ -2053,13 +2064,13 @@ public:
 	INT8	snowCamo;	
 	INT8	wornSnowCamo;
 	
-	
+#ifdef JA2UB	
 	BOOLEAN											fIgnoreGetupFromCollapseCheck;
 	TIMECOUNTER									GetupFromJA25StartCounter;
 	BOOLEAN											fWaitingToGetupFromJA25Start;
 
 	UINT8												ubPercentDamageInflictedByTeam[NUM_ASSIST_SLOTS];			//The percent of damage inflicted by the player team.  Each element corresponds to the Soldier ID.  Each element contains the percent damage inflicted by that merc
-
+#endif
 	UINT8					bFiller[ 36 ];
 
 	//

@@ -71,11 +71,13 @@
 #include "connect.h"
 #include "XML.h"
 
+#ifdef JA2UB
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
+#include "Arms Dealer Init.h"
+#endif
 
 #include "LuaInitNPCs.h"
-#include "Arms Dealer Init.h"
 
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -422,21 +424,26 @@ void InitStrategicLayer( void )
 	InitSquads();
 	// Init vehicles
 	InitAllVehicles( );
-	
+
+#ifdef JA2UB	
 	//JA25 UB
 	//Reset Jerry Quotes
 	HandleJerryMiloQuotes( TRUE ); //AA
 	
 	//Ja25 UB
 	InitJa25StrategicAi( );
- 
-	// init town loyalty
+#endif
+
+	
+#ifdef JA2UB
 	////if ( gGameLegionOptions.InitTownLoyalty_UB == TRUE )
 	//	InitTownLoyalty(); //Ja25 no loyalty
-
+#else
+		// init town loyalty
+		InitTownLoyalty(); //Ja25 no loyalty
+#endif
 	// init the mine management system
 	InitializeMines();
-	
 	// initialize map screen flags
 	InitMapScreenFlags();
 	// initialize NPCs, select alternate maps, etc
@@ -461,9 +468,9 @@ void InitStrategicLayer( void )
 	// re-set up leave list arrays for dismissed mercs
 	InitLeaveList( );
 	
-	
+	#ifdef JA2UB
 	LuaInitStrategicLayer(0); //JA25 UB InitStrategicLayer.lua 
-
+	#endif
 	// reset time compression mode to X0 (this will also pause it)
 	SetGameTimeCompressionLevel( TIME_COMPRESS_X0 );
 
@@ -484,17 +491,18 @@ void ShutdownStrategicLayer()
 	RemoveAllGroups();
 	TrashUndergroundSectorInfo();
 
-	//DeleteCreatureDirectives(); //Ja25 No creatures
+#ifdef JA2UB
+//Ja25 No creatures
+//Ja25 No strategic ai
+#else
+	DeleteCreatureDirectives(); 
 
-	//KillStrategicAI();//  Ja25 No strategic ai
-	
-	DeleteCreatureDirectives();
 	KillStrategicAI();
 	
-	
+#endif
+	DeleteCreatureDirectives();
+	KillStrategicAI();
 	ClearTacticalMessageQueue();
-	
-
 }
 
 BOOLEAN InitNewGame( BOOLEAN fReset )
@@ -510,11 +518,13 @@ BOOLEAN InitNewGame( BOOLEAN fReset )
 		return( TRUE );
 	}
 
-/*
-Ja25 no meanwhiles
+#ifdef JA2UB
+//Ja25 no meanwhiles
+#else
 	// reset meanwhile flags
 	uiMeanWhileFlags = 0;
-*/
+#endif
+
 
 	// Reset the selected soldier
 	gusSelectedSoldier = NOBODY;
@@ -553,9 +563,12 @@ Ja25 no meanwhiles
 	{
 		//Init all the arms dealers inventory
 		InitAllArmsDealers();
-		
+#ifdef JA2UB		
 		//if ( gGameLegionOptions.BobbyRayInventory_UB == TRUE )
-		//	InitBobbyRayInventory();  //Ja25 UB
+		//InitBobbyRayInventory();  //Ja25 UB
+#else
+		InitBobbyRayInventory();  
+#endif
 	}
 
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"InitNewGame: clearing messages");
@@ -682,7 +695,7 @@ Ja25 no meanwhiles
 		SetPendingNewScreen(LAPTOP_SCREEN);
 		}
 		gubScreenCount = 1;
-		
+#ifdef JA2UB		
 		//ja25 ub
 		//Init the initial hweli crash sequence variable
 		InitializeHeliGridnoAndTime( FALSE );
@@ -695,7 +708,7 @@ Ja25 no meanwhiles
 		//}
 
 		InitJerryMiloInfo(); //JA25 UB
-
+#endif
 		//Set the fact the game is in progress
 		gTacticalStatus.fHasAGameBeenStarted = TRUE;
 
@@ -767,8 +780,6 @@ Ja25 no meanwhiles
 		}
 		
 	}
-	
-//	AddTexsVideosToBettysInventory();
 
 /*
 	if ( gubScreenCount == 2 )

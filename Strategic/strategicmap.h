@@ -142,9 +142,13 @@ UINT8 GetMilitiaCountAtLevelAnywhereInTown( UINT8 ubTownValue, UINT8 ubLevelValu
 
 void PrepareLoadedSector();
 
-// handle for slay...no better place to really put this stuff
-//void HandleSlayDailyEvent( void );
 
+#ifdef JA2UB
+// no JA2 UB
+#else
+// handle for slay...no better place to really put this stuff
+void HandleSlayDailyEvent( void );
+#endif
 
 void HandleQuestCodeOnSectorEntry( INT16 sNewSectorX, INT16 sNewSectorY, INT8 bNewSectorZ );
 
@@ -187,11 +191,13 @@ extern INT8 gbGreenToRegPromotions;
 extern INT8 gbRegToElitePromotions;
 extern INT8 gbMilitiaPromotions;
 
+#ifdef JA2UB
 void 	BeginLoadScreen();
 
 //ja25 UB
 void HandleSectorSpecificModificatioToMap( INT16 sMapX, INT16 sMapY, INT8 bMapZ, BOOLEAN fLoadingSavedGame );
 
 void HandleEmailBeingSentWhenEnteringSector( INT16 sMapX, INT16 sMapY, INT8 bMapZ, BOOLEAN fLaptopJustGotFixed );
+#endif
 
 #endif

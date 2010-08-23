@@ -118,6 +118,8 @@
 #include "connect.h" //hayden
 #include "fresh_header.h"
 #include "InterfaceItemImages.h"
+
+#ifdef JA2UB
 #include "laptop.h"
 
 #include "Strategic Movement.h"
@@ -130,6 +132,7 @@
 #include "MapScreen Quotes.h"
 
 #include "LuaInitNPCs.h"
+#endif
 
 #define MAX_SORT_METHODS					6
 
@@ -161,7 +164,9 @@
 
 #define	MINS_TO_FLASH_CONTRACT_TIME	(4 * 60)
 
+#ifdef JA2UB
 void MakeBadSectorListFromMapsOnHardDrive( BOOLEAN fDisplayMessages ); // ja25 UB
+#endif
 
 // CHRISL: Reclassify all coordinates as int variables and declare their values in an initialization function.
 int TOWN_INFO_X;
@@ -1124,7 +1129,9 @@ extern INT32 GetNumberOfMercsInUpdateList( void );
 extern INT32 SellItem( OBJECTTYPE& object, BOOLEAN useModifier = TRUE );
 void DeleteAllItemsInInventoryPool();
 
+#ifdef JA2UB
 void HandleWhenPlayerHasNoMercsAndNoLaptop();
+#endif
 
 #ifdef JA2TESTVERSION
 void TestDumpStatChanges( void );
@@ -4931,6 +4938,7 @@ UINT32 MapScreenHandle(void)
 		{
 			fFirstTimeInMapScreen = FALSE;
 //			fShowMapScreenHelpText = TRUE;
+#ifdef JA2UB
 			//JA25 UB
 			//Get Jerry Milo to say his opening quote, if he hasnt said it before
 			if( !HasJerryMiloSaidQuoteBefore( MILO_QUOTE__OPENING_GREETING_PART_1 ) )
@@ -4941,6 +4949,7 @@ UINT32 MapScreenHandle(void)
 		{
 			//Get Jerry Milo to say his opening quote
 			JerryMiloDelayedTalk( MILO_QUOTE__ALREADY_HAS_6_MERCS, 500 );
+#endif
 		}
 
 		fShowMapInventoryPool = FALSE;
@@ -5110,7 +5119,7 @@ UINT32 MapScreenHandle(void)
 			return( MAP_SCREEN );
 		}
 	}
-	
+#ifdef JA2UB	
 	//Ja25 UB
 	if ( gfProcessCustomMaps )
 	{
@@ -5119,7 +5128,7 @@ UINT32 MapScreenHandle(void)
 
 		gfProcessCustomMaps = FALSE;
 	}
-
+#endif
 
 	// check to see if we need to rebuild the characterlist for map screen
 	HandleRebuildingOfMapScreenCharacterList( );
@@ -5288,19 +5297,25 @@ UINT32 MapScreenHandle(void)
 	RestoreBackgroundRects( );
 
 	InterruptTimeForMenus( );
-	
+
+#ifdef JA2UB	
 	//JA25 UB
 	//Handle Jerry Milo quotes
 	HandleJerryMiloQuotes( FALSE );
+#endif
 
 	// place down background
 	BlitBackgroundToSaveBuffer( );
 
 	if( fLeavingMapScreen == TRUE )
 	{
+
+#ifdef JA2UB
 		//JA25 UB
 		//specify that we are leaving mapscreen
 		HandleJerryMiloQuotes( TRUE );
+#endif
+
 		return( MAP_SCREEN );
 	}
 
@@ -5603,10 +5618,11 @@ UINT32 MapScreenHandle(void)
 		RenderKeyRingPopup( FALSE );
 	}
 
-	/*
-	CheckForMeanwhileOKStart( );
-	*/
-	
+#ifdef JA2UB
+/* UB */
+#else
+	CheckForMeanwhileOKStart( );	
+#endif	
 	// save background rects
 	// ATE: DO this BEFORE rendering help text....
 	SaveBackgroundRects( );
@@ -5718,14 +5734,15 @@ UINT32 MapScreenHandle(void)
 		// handle exiting from mapscreen due to both exit button clicks and keyboard equivalents
 		HandleExitsFromMapScreen( );
 	}
-	
+
+#ifdef JA2UB	
 	//Ja25 ub
 	//Handle the strategic AI
 	JA25_HandleUpdateOfStrategicAi();
 
 	//Should the msg box come up telling the user that they lost?
 	HandleWhenPlayerHasNoMercsAndNoLaptop(); //AA
-
+#endif
 
 	return( MAP_SCREEN );
 }
@@ -13396,11 +13413,13 @@ void TellPlayerWhyHeCantCompressTime( void )
 		ScreenMsg( FONT_MCOLOR_RED, MSG_BETAVERSION, L"(BETA) If permanent, take screenshot now, send with *previous* save & describe what happened since.");
 #endif
 	}
+#ifdef JA2UB
 	else if( DoesPlayerHaveNoMercsHiredAndJerryHasntSaidQuoteYet() )
 	{
 		JerryMiloTalk( MILO_QUOTE__PLAYER_HAS_NO_MERCS );
         DoMapMessageBox( MSG_BOX_BASIC_STYLE, pMapScreenJustStartedHelpText[ 0 ], MAP_SCREEN, MSG_BOX_FLAG_OK, MapScreenDefaultOkBoxCallback );
 	}
+#endif
 	else if( gfAtLeastOneMercWasHired == FALSE )
 	{
 		// no mercs hired, ever
@@ -13449,12 +13468,14 @@ void TellPlayerWhyHeCantCompressTime( void )
 	{
 		DoMapMessageBox( MSG_BOX_BASIC_STYLE, gzLateLocalizedString[ 55 ], MAP_SCREEN, MSG_BOX_FLAG_OK, MapScreenDefaultOkBoxCallback );
 	}
+#ifdef JA2UB
 	//JA25 UB
 	else if( !WillJerryMiloAllowThePlayerToCompressTimeAtBeginingOfGame() )
 	{
 		//Have jerry say why the player cant compress time
 		HaveJerrySayWhyPlayerCantTimeCompressAtBeginningOfGame();
 	}
+#endif
 	// ARM: THIS TEST SHOULD BE THE LAST ONE, BECAUSE IT ACTUALLY RESULTS IN SOMETHING HAPPENING NOW.
 	// KM:	Except if we are in a creature lair and haven't loaded the sector yet (no battle yet)
 	else if( gTacticalStatus.uiFlags & INCOMBAT || gTacticalStatus.fEnemyInSector )
@@ -14628,13 +14649,15 @@ BOOLEAN HandleCtrlOrShiftInTeamPanel( INT8 bCharNumber, BOOLEAN fFromRightClickA
 
 INT32 GetContractExpiryTime( SOLDIERTYPE *pSoldier )
 {
-/* JA25 UB
+#ifdef JA2UB
+/* JA25 UB  */
+#else
 	if( ( pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__AIM_MERC ) || ( pSoldier->ubProfile == SLAY ) )
 	{
 		return ( pSoldier->iEndofContractTime );
 	}
-	else
-	*/
+	else	
+#endif
 	{
 		// never - really high number
 		return ( 999999 );
@@ -15557,9 +15580,12 @@ void GetMapscreenMercDepartureString( SOLDIERTYPE *pSoldier, CHAR16 sString[], U
 	INT32 iDaysRemaining = 0;
 	INT32 iHoursRemaining = 0;
 
+#ifdef JA2UB
 //Ja25:		Removed the aim merc check because aim mercs are hired for a 1 time fee
-//	if( ( pSoldier->ubWhatKindOfMercAmI != MERC_TYPE__AIM_MERC && pSoldier->ubProfile != SLAY ) || pSoldier->stats.bLife == 0 )
 	if( ( pSoldier->ubProfile != SLAY ) || pSoldier->stats.bLife == 0 )
+#else
+	if( ( pSoldier->ubWhatKindOfMercAmI != MERC_TYPE__AIM_MERC && pSoldier->ubProfile != SLAY ) || pSoldier->stats.bLife == 0 )
+#endif
 	{
 		swprintf( sString, L"%s", gpStrategicString[ STR_PB_NOTAPPLICABLE_ABBREVIATION ] );
 	}
@@ -16072,6 +16098,7 @@ INT32 GetTotalContractExpenses ( void )
 	return (iTotalCost);
 }
 
+#ifdef JA2UB
 void HandleWhenPlayerHasNoMercsAndNoLaptop()
 {
 	const UINT8	ubNumLoopsToDisplay=50;
@@ -16090,3 +16117,4 @@ void HandleWhenPlayerHasNoMercsAndNoLaptop()
 		DoMapMessageBox( MSG_BOX_BASIC_STYLE, zNewTacticalMessages[ TCTL_MSG__PLAYER_LOST_SHOULD_RESTART ], MAP_SCREEN, MSG_BOX_FLAG_OK, NULL );
 	}
 }
+#endif
