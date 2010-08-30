@@ -3353,7 +3353,7 @@ UINT8		ubItemsNotCounted = 0; //ja25 UB
 	if( gbSelectedArmsDealerID == ARMS_DEALER_PERKO )
 	{
 		//if the item is the antique musket
-		if( usItemID == 4498 ) //HAND_CANNON 
+		if( usItemID == HAND_CANNON ) //4498
 		{
 			//if the "Find anitque musket" quest is active
 			if( gubQuest[ QUEST_FIND_ANTIQUE_MUSKET_FOR_RAUL ] == QUESTINPROGRESS )
@@ -3402,8 +3402,8 @@ UINT8		ubItemsNotCounted = 0; //ja25 UB
 	if( gbSelectedArmsDealerID == ARMS_DEALER_BETTY )
 	{
 		//if the item is the antique musket
-	//	if( usItemID == TEX_MOVIE_ATTACK_CLYDESDALES || usItemID == TEX_MOVIE_WILD_EAST || usItemID == TEX_MOVIE_HAVE_HONDA )
-		if( usItemID == 4501 || usItemID == 4502 || usItemID == 4503 )
+		if( usItemID == TEX_MOVIE_ATTACK_CLYDESDALES || usItemID == TEX_MOVIE_WILD_EAST || usItemID == TEX_MOVIE_HAVE_HONDA )
+	//	if( usItemID == 4501 || usItemID == 4502 || usItemID == 4503 )
 		{
 			//Make the item price top be what is listed in the item table ( 20 )
 			uiTotalPrice = Item[ usItemID ].usPrice;
@@ -4200,7 +4200,7 @@ void MoveAllArmsDealersItemsInOfferAreaToPlayersOfferArea( )
 			if( gbSelectedArmsDealerID == ARMS_DEALER_BETTY )
 			{
 				//if the item is the laptop transmitter
-				if( ArmsDealerOfferArea[ uiCnt ].sItemIndex == 4500 ) //LAPTOP_TRANSMITTER
+				if( ArmsDealerOfferArea[ uiCnt ].sItemIndex == LAPTOP_TRANSMITTER ) //4500
 				{
 					//Dont transfer the item
 					fAddItemToPlayer = FALSE;
@@ -4217,9 +4217,9 @@ void MoveAllArmsDealersItemsInOfferAreaToPlayersOfferArea( )
 				}
 
 				//if the item is Tex's videos
-				if( ArmsDealerOfferArea[ uiCnt ].sItemIndex == 4501 ||// TEX_MOVIE_ATTACK_CLYDESDALES ||
-						ArmsDealerOfferArea[ uiCnt ].sItemIndex == 4502 ||//TEX_MOVIE_WILD_EAST	||
-						ArmsDealerOfferArea[ uiCnt ].sItemIndex == 4503 )//TEX_MOVIE_HAVE_HONDA )
+				if( ArmsDealerOfferArea[ uiCnt ].sItemIndex == TEX_MOVIE_ATTACK_CLYDESDALES ||//4501  ||
+						ArmsDealerOfferArea[ uiCnt ].sItemIndex == TEX_MOVIE_WILD_EAST ||//4502 	||
+						ArmsDealerOfferArea[ uiCnt ].sItemIndex == TEX_MOVIE_HAVE_HONDA )//4503  )
 				{
 					SetFactTrue( FACT_PLAYER_BOUGHT_A_TEX_VIDEO_FROM_BETTY );
 				}
@@ -4324,13 +4324,13 @@ void MovePlayerOfferedItemsOfValueToArmsDealersInventory()
 					if( gbSelectedArmsDealerID == ARMS_DEALER_PERKO )
 					{
 						//if the item is the cannon balls
-						if( PlayersOfferArea[ uiCnt ].sItemIndex == 4499 )//CLIP_CANNON_BALL )
+						if( PlayersOfferArea[ uiCnt ].sItemIndex == CLIP_CANNON_BALL )// 4499 )
 						{
 							fAddItemToDealer = FALSE;
 						}
 
 						//if the item is the antique musket
-						if( PlayersOfferArea[ uiCnt ].sItemIndex == 4498 )//HAND_CANNON )
+						if( PlayersOfferArea[ uiCnt ].sItemIndex == HAND_CANNON )// 4498 )
 						{
 							//Only do this if the player knew about the cannon offer
 							if( gubQuest[ QUEST_FIND_ANTIQUE_MUSKET_FOR_RAUL ] == QUESTINPROGRESS )
@@ -4494,7 +4494,7 @@ void BeginSkiItemPointer( UINT8 ubSource, INT16 bSlotNum, BOOLEAN fOfferToDealer
 			if( gbSelectedArmsDealerID == ARMS_DEALER_PERKO )
 			{
 				//if the item is the antique musket
-				if( gMoveingItem.ItemObject.usItem == 4498 ) //HAND_CANNON )
+				if( gMoveingItem.ItemObject.usItem == HAND_CANNON ) //4498  )
 				{
 					if( gubQuest[ QUEST_FIND_ANTIQUE_MUSKET_FOR_RAUL ] == QUESTINPROGRESS )
 					{

@@ -68,6 +68,9 @@
 #include "Interface.h"
 #include "Strategic Town Loyalty.h"
 
+#ifdef JA2UB
+#include "Ja25_Tactical.h"
+#endif
 
 #include "legion cfg.h"
 
@@ -363,6 +366,8 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 
 #ifdef JA2UB
 	//JA25 UB
+	if ( gGameLegionOptions.MercStartingGear25XML == TRUE )
+	{
 	strcpy(fileName, directoryName);
 	strcat(fileName, MERCSTARTINGGEAR25FILENAME);
 	if ( FileExists(fileName) )
@@ -379,6 +384,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	THROWIFFALSE(ReadInMercStartingGearStats(fileName),MERCSTARTINGGEARFILENAME);
 
 #ifdef JA2UB
+	}
 	}
 #endif
 
@@ -862,6 +868,13 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	
 	LoadIMPPortraitsTEMP();
 
+#ifdef JA2UB	
+	if ( OldNew == TRUE )
+		Old_UB_Inventory ();
+	else
+		New_UB_Inventory ();
+#endif
+
 	// load Lua for Strategic Mines initialization
 	g_luaMines.LoadScript();
 
@@ -1010,8 +1023,34 @@ UINT32 InitializeJA2(void)
 	}
 #endif
 
+#ifdef JA2UB
+		// run old UB inventory Data-UB\Addons\Data-Old-UB-Inventory
+		if( !strcmp( gzCommandLine, "-OLDUBINVENTORY" ) )
+		{
+			OldNew = TRUE; 
+		}
+#endif
+
 #ifdef JA2BETAVERSION
 	#ifdef JA2EDITOR
+		#ifdef JA2UB
+			// CHECK COMMANDLINE FOR SPECIAL UTILITY
+		if( !strcmp( gzCommandLine, "-OLDUBINVENTORYEDITORAUTO" ) )
+		{
+			OutputDebugString( "Beginning JA2 using -EDITORAUTO commandline argument...\n" );
+			//For editor purposes, need to know the default map file.
+			sprintf( gubFilename, "none");
+			//also set the sector
+			gWorldSectorX = 0;
+			gWorldSectorY = 0;
+			gfAutoLoadA9 = FALSE;
+			gfIntendOnEnteringEditor = TRUE;
+			gGameOptions.fGunNut = TRUE;
+			gGameOptions.fAirStrikes = FALSE;
+			return( GAME_SCREEN );
+		}
+		#endif
+	
 		// CHECK COMMANDLINE FOR SPECIAL UTILITY
 		if( !strcmp( gzCommandLine, "-EDITORAUTO" ) )
 		{

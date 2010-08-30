@@ -144,6 +144,9 @@
 //
 /////////////////////////////////////////////////////
 
+#ifdef JA2UB
+void ConvertMercKnifeAndUmbrellaToBeWeapons( SOLDIERTYPE *pSoldier );
+#endif
 
 void GetBestPossibleSectorXYZValues( INT16 *psSectorX, INT16 *psSectorY, INT8 *pbSectorZ );
 extern void NextLoopCheckForEnoughFreeHardDriveSpace();
@@ -4860,6 +4863,11 @@ BOOLEAN LoadSoldierStructure( HWFILE hFile )
 				}
 			}
 #endif
+			#ifdef JA2UB
+			//if the soldier has the NON weapon version of the merc knofe or merc umbrella
+			//ConvertMercKnifeAndUmbrellaToBeWeapons( &Menptr[ cnt ] );
+			#endif
+			
 			// JA2Gold: fix next-to-previous attacker value
 			if ( guiCurrentSaveGameVersion < 99 )
 			{
@@ -7239,3 +7247,75 @@ UINT32 CalcJA2EncryptionSet( SAVED_GAME_HEADER * pSaveGameHeader )
 
 	return( uiEncryptionSet );
 }
+
+#ifdef JA2UB
+void ConvertMercKnifeAndUmbrellaToBeWeapons( SOLDIERTYPE *pSoldier )
+{
+	INT32 iCnt;
+
+	for( iCnt=0; iCnt< NUM_INV_SLOTS; iCnt++)
+	{
+	
+		if( pSoldier->inv[ iCnt ].usItem == 4499 )
+		{
+			pSoldier->inv[ iCnt ].usItem = 115;
+		}
+	
+		if( pSoldier->inv[ iCnt ].usItem == 4498 )
+		{
+			pSoldier->inv[ iCnt ].usItem = 63;
+		}
+	
+		if( pSoldier->inv[ iCnt ].usItem == 4501 )
+		{
+			pSoldier->inv[ iCnt ].usItem = 328;
+		}
+		
+		if( pSoldier->inv[ iCnt ].usItem == 4502 )
+		{
+			pSoldier->inv[ iCnt ].usItem = 329;
+		}
+
+		if( pSoldier->inv[ iCnt ].usItem == 4503 )
+		{
+			pSoldier->inv[ iCnt ].usItem = 330;
+		}
+		
+		if( pSoldier->inv[ iCnt ].usItem == 4500 )
+		{
+			pSoldier->inv[ iCnt ].usItem = 331;
+		}
+		
+		if( pSoldier->inv[ iCnt ].usItem == 4504 )
+		{
+			pSoldier->inv[ iCnt ].usItem = 332;
+		}		
+		
+		if( pSoldier->inv[ iCnt ].usItem == 4505 )
+		{
+			pSoldier->inv[ iCnt ].usItem = 333;
+		}
+		
+		if( pSoldier->inv[ iCnt ].usItem == 4506 )
+		{
+			pSoldier->inv[ iCnt ].usItem = 334;
+		}
+		
+		if( pSoldier->inv[ iCnt ].usItem == 4508 )
+		{
+			pSoldier->inv[ iCnt ].usItem = 336;
+		}
+		/*
+		if( pSoldier->inv[ iCnt ].usItem == SAM_GARVER_COMBAT_KNIFE_OLD )
+		{
+			pSoldier->inv[ iCnt ].usItem = SAM_GARVER_COMBAT_KNIFE;
+		}
+		*/
+		if( pSoldier->inv[ iCnt ].usItem == 4507 )
+		{
+			pSoldier->inv[ iCnt ].usItem = 70;
+		}
+		
+	}
+}
+#endif

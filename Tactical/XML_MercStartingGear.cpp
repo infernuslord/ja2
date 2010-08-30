@@ -572,6 +572,7 @@ BOOLEAN WriteMercStartingGearStats()
 {
 	//DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"writemercstartinggearstats");
 	HWFILE		hFile;
+	MERCPROFILESTRUCT * pProfile;
 
 	//Debug code; make sure that what we got from the file is the same as what's there
 	// Open a new file
@@ -650,8 +651,138 @@ BOOLEAN WriteMercStartingGearStats()
 					break;
 				}
 			}
+			
 			FilePrintf(hFile,"</mName>\r\n");
-			FilePrintf(hFile,"\t\t<mHelmet>%d</mHelmet>\r\n",						gMercProfileGear[cnt].inv[HELMETPOS]  );
+			FilePrintf(hFile,"\t\t<mHelmet>%d</mHelmet>\r\n",					gMercProfiles[cnt].inv[HELMETPOS]  );
+			FilePrintf(hFile,"\t\t<mHelmetStatus>%d</mHelmetStatus>\r\n",		gMercProfiles[cnt].bInvStatus[HELMETPOS]   );
+			FilePrintf(hFile,"\t\t<mHelmetDrop>1</mHelmetDrop>\r\n");
+			FilePrintf(hFile,"\t\t<mVest>%d</mVest>\r\n",						gMercProfiles[cnt].inv[VESTPOS]   );
+			FilePrintf(hFile,"\t\t<mVestDrop>1</mVestDrop>\r\n");
+			FilePrintf(hFile,"\t\t<mVestStatus>%d</mVestStatus>\r\n",			gMercProfiles[cnt].bInvStatus[VESTPOS]   );
+			FilePrintf(hFile,"\t\t<mLeg>%d</mLeg>\r\n",							gMercProfiles[cnt].inv[LEGPOS]   );
+			FilePrintf(hFile,"\t\t<mLegDrop>1</mLegDrop>\r\n");	
+			FilePrintf(hFile,"\t\t<mLegStatus>%d</mLegStatus>\r\n",				gMercProfiles[cnt].bInvStatus[LEGPOS]   );
+			FilePrintf(hFile,"\t\t<mWeapon>%d</mWeapon>\r\n",					gMercProfiles[cnt].inv[HANDPOS]   );
+			FilePrintf(hFile,"\t\t<mWeaponDrop>1</mWeaponDrop>\r\n");
+			FilePrintf(hFile,"\t\t<mWeaponStatus>%d</mWeaponStatus>\r\n",		gMercProfiles[cnt].bInvStatus[HANDPOS]   );
+			FilePrintf(hFile,"\t\t<mBig0>%d</mBig0>\r\n",						gMercProfiles[cnt].inv[BIGPOCK1POS]   );
+			FilePrintf(hFile,"\t\t<mBig0Status>%d</mBig0Status>\r\n",			gMercProfiles[cnt].bInvStatus[BIGPOCK1POS]   );
+			FilePrintf(hFile,"\t\t<mBig0Quantity>%d</mBig0Quantity>\r\n",		gMercProfiles[cnt].bInvNumber[BIGPOCK1POS]   );
+			FilePrintf(hFile,"\t\t<mBig0Drop>1</mBig0Drop>\r\n");
+			FilePrintf(hFile,"\t\t<mBig1>%d</mBig1>\r\n",						gMercProfiles[cnt].inv[BIGPOCK2POS]   );
+			FilePrintf(hFile,"\t\t<mBig1Status>%d</mBig1Status>\r\n",			gMercProfiles[cnt].bInvStatus[BIGPOCK2POS]   );
+			FilePrintf(hFile,"\t\t<mBig1Quantity>%d</mBig1Quantity>\r\n",		gMercProfiles[cnt].bInvNumber[BIGPOCK2POS]   );
+			FilePrintf(hFile,"\t\t<mBig1Drop>1</mBig1Drop>\r\n");
+			FilePrintf(hFile,"\t\t<mBig2>%d</mBig2>\r\n",						gMercProfiles[cnt].inv[BIGPOCK3POS]   );
+			FilePrintf(hFile,"\t\t<mBig2Status>%d</mBig2Status>\r\n",			gMercProfiles[cnt].bInvStatus[BIGPOCK3POS]   );
+			FilePrintf(hFile,"\t\t<mBig2Quantity>%d</mBig2Quantity>\r\n",		gMercProfiles[cnt].bInvNumber[BIGPOCK3POS]   );
+			FilePrintf(hFile,"\t\t<mBig2Drop>1</mBig2Drop>\r\n");
+			FilePrintf(hFile,"\t\t<mBig3>%d</mBig3>\r\n",						gMercProfiles[cnt].inv[BIGPOCK4POS]   );
+			FilePrintf(hFile,"\t\t<mBig3Status>%d</mBig3Status>\r\n",			gMercProfiles[cnt].bInvStatus[BIGPOCK4POS]   );
+			FilePrintf(hFile,"\t\t<mBig3Quantity>%d</mBig3Quantity>\r\n",		gMercProfiles[cnt].bInvNumber[BIGPOCK4POS]   );
+			FilePrintf(hFile,"\t\t<mBig3Drop>1</mBig3Drop>\r\n");
+			FilePrintf(hFile,"\t\t<mSmall0>%d</mSmall0>\r\n",					gMercProfiles[cnt].inv[SMALLPOCK1POS]   );
+			FilePrintf(hFile,"\t\t<mSmall0Status>%d</mSmall0Status>\r\n",		gMercProfiles[cnt].bInvStatus[SMALLPOCK1POS]   );
+			FilePrintf(hFile,"\t\t<mSmall0Quantity>%d</mSmall0Quantity>\r\n",	gMercProfiles[cnt].bInvNumber[SMALLPOCK1POS]   );
+			FilePrintf(hFile,"\t\t<mSmall1>%d</mSmall1>\r\n",					gMercProfiles[cnt].inv[SMALLPOCK2POS]   );
+			FilePrintf(hFile,"\t\t<mSmall1Status>%d</mSmall1Status>\r\n",		gMercProfiles[cnt].bInvStatus[SMALLPOCK2POS]   );
+			FilePrintf(hFile,"\t\t<mSmall1Quantity>%d</mSmall1Quantity>\r\n",	gMercProfiles[cnt].bInvNumber[SMALLPOCK2POS]   );
+			FilePrintf(hFile,"\t\t<mSmall2>%d</mSmall2>\r\n",					gMercProfiles[cnt].inv[SMALLPOCK3POS]   );
+			FilePrintf(hFile,"\t\t<mSmall2Status>%d</mSmall2Status>\r\n",		gMercProfiles[cnt].bInvStatus[SMALLPOCK3POS]   );
+			FilePrintf(hFile,"\t\t<mSmall2Quantity>%d</mSmall2Quantity>\r\n",	gMercProfiles[cnt].bInvNumber[SMALLPOCK3POS]   );
+			FilePrintf(hFile,"\t\t<mSmall3>%d</mSmall3>\r\n",					gMercProfiles[cnt].inv[SMALLPOCK4POS]   );
+			FilePrintf(hFile,"\t\t<mSmall3Status>%d</mSmall3Status>\r\n",		gMercProfiles[cnt].bInvStatus[SMALLPOCK4POS]   );
+			FilePrintf(hFile,"\t\t<mSmall3Quantity>%d</mSmall3Quantity>\r\n",	gMercProfiles[cnt].bInvNumber[SMALLPOCK4POS]   );
+			FilePrintf(hFile,"\t\t<mSmall4>%d</mSmall4>\r\n",					gMercProfiles[cnt].inv[SMALLPOCK5POS]   );
+			FilePrintf(hFile,"\t\t<mSmall4Status>%d</mSmall4Status>\r\n",		gMercProfiles[cnt].bInvStatus[SMALLPOCK5POS]   );
+			FilePrintf(hFile,"\t\t<mSmall4Quantity>%d</mSmall4Quantity>\r\n",	gMercProfiles[cnt].bInvNumber[SMALLPOCK5POS]   );
+			FilePrintf(hFile,"\t\t<mSmall5>%d</mSmall5>\r\n",					gMercProfiles[cnt].inv[SMALLPOCK6POS]   );
+			FilePrintf(hFile,"\t\t<mSmall5Status>%d</mSmall5Status>\r\n",		gMercProfiles[cnt].bInvStatus[SMALLPOCK6POS]   );
+			FilePrintf(hFile,"\t\t<mSmall5Quantity>%d</mSmall5Quantity>\r\n",	gMercProfiles[cnt].bInvNumber[SMALLPOCK6POS]   );
+			FilePrintf(hFile,"\t\t<mSmall6>%d</mSmall6>\r\n",					gMercProfiles[cnt].inv[SMALLPOCK7POS]   );
+			FilePrintf(hFile,"\t\t<mSmall6Status>%d</mSmall6Status>\r\n",		gMercProfiles[cnt].bInvStatus[SMALLPOCK7POS]   );
+			FilePrintf(hFile,"\t\t<mSmall6Quantity>%d</mSmall6Quantity>\r\n",	gMercProfiles[cnt].bInvNumber[SMALLPOCK7POS]   );
+			FilePrintf(hFile,"\t\t<mSmall7>%d</mSmall7>\r\n",					gMercProfiles[cnt].inv[SMALLPOCK8POS]   );
+			FilePrintf(hFile,"\t\t<mSmall7Status>%d</mSmall7Status>\r\n",		gMercProfiles[cnt].bInvStatus[SMALLPOCK8POS]   );
+			FilePrintf(hFile,"\t\t<mSmall7Quantity>%d</mSmall7Quantity>\r\n",	gMercProfiles[cnt].bInvNumber[SMALLPOCK8POS]   );
+			FilePrintf(hFile,"\t\t<lVest>0</lVest>\r\n");
+			FilePrintf(hFile,"\t\t<lVestStatus>0</lVestStatus>\r\n");
+			FilePrintf(hFile,"\t\t<lLeftThigh>0</lLeftThigh>\r\n");
+			FilePrintf(hFile,"\t\t<lLeftThighStatus>0</lLeftThighStatus>\r\n");
+			FilePrintf(hFile,"\t\t<lRightThigh>0</lRightThigh>\r\n");
+			FilePrintf(hFile,"\t\t<lRightThighStatus>0</lRightThighStatus>\r\n");
+			FilePrintf(hFile,"\t\t<lCPack>0</lCPack>\r\n");
+			FilePrintf(hFile,"\t\t<lCPackStatus>0</lCPackStatus>\r\n");
+			FilePrintf(hFile,"\t\t<lBPack>0</lBPack>\r\n");
+			FilePrintf(hFile,"\t\t<lBPackStatus>0</lBPackStatus>\r\n");
+			
+		/*	FilePrintf(hFile,"</mName>\r\n");
+			FilePrintf(hFile,"\t\t<mHelmet>%d</mHelmet>\r\n",						gMercProfiles[cnt].inv[HELMETPOS]  );
+			FilePrintf(hFile,"\t\t<mVest>%d</mVest>\r\n",							gMercProfiles[cnt].inv[VESTPOS]   );
+			FilePrintf(hFile,"\t\t<mLeg>%d</mLeg>\r\n",								gMercProfiles[cnt].inv[LEGPOS]   );
+			FilePrintf(hFile,"\t\t<mWeapon>%d</mWeapon>\r\n",						gMercProfiles[cnt].inv[HANDPOS]   );
+			FilePrintf(hFile,"\t\t<mHelmetStatus>%d</mHelmetStatus>\r\n",			gMercProfiles[cnt].bInvStatus[HELMETPOS]   );
+			FilePrintf(hFile,"\t\t<mVestStatus>%d</mVestStatus>\r\n",				gMercProfiles[cnt].bInvStatus[VESTPOS]   );
+			FilePrintf(hFile,"\t\t<mLegStatus>%d</mLegStatus>\r\n",					gMercProfiles[cnt].bInvStatus[LEGPOS]   );
+			FilePrintf(hFile,"\t\t<mWeaponStatus>%d</mWeaponStatus>\r\n",			gMercProfiles[cnt].bInvStatus[HANDPOS]   );
+			FilePrintf(hFile,"\t\t<mHelmetDrop>1</mHelmetDrop>\r\n");			//	gMercProfiles[cnt].iDrop[HELMETPOS]   );
+			FilePrintf(hFile,"\t\t<mVestDrop>1</mVestDrop>\r\n");				//	gMercProfiles[cnt].iDrop[VESTPOS]   );
+			FilePrintf(hFile,"\t\t<mLegDrop>1</mLegDrop>\r\n");					//	gMercProfiles[cnt].iDrop[LEGPOS]   );
+			FilePrintf(hFile,"\t\t<mWeaponDrop>1</mWeaponDrop>\r\n");			//	gMercProfiles[cnt].iDrop[HANDPOS]   );
+			FilePrintf(hFile,"\t\t<mBig0>%d</mBig0>\r\n",							gMercProfiles[cnt].inv[BIGPOCK1POS]   );
+			FilePrintf(hFile,"\t\t<mBig1>%d</mBig1>\r\n",							gMercProfiles[cnt].inv[BIGPOCK2POS]   );
+			FilePrintf(hFile,"\t\t<mBig2>%d</mBig2>\r\n",							gMercProfiles[cnt].inv[BIGPOCK3POS]   );
+			FilePrintf(hFile,"\t\t<mBig3>%d</mBig3>\r\n",							gMercProfiles[cnt].inv[BIGPOCK4POS]   );
+			FilePrintf(hFile,"\t\t<mBig0Quantity>%d</mBig0Quantity>\r\n",			gMercProfiles[cnt].bInvNumber[BIGPOCK1POS]   );
+			FilePrintf(hFile,"\t\t<mBig1Quantity>%d</mBig1Quantity>\r\n",			gMercProfiles[cnt].bInvNumber[BIGPOCK2POS]   );
+			FilePrintf(hFile,"\t\t<mBig2Quantity>%d</mBig2Quantity>\r\n",			gMercProfiles[cnt].bInvNumber[BIGPOCK3POS]   );
+			FilePrintf(hFile,"\t\t<mBig3Quantity>%d</mBig3Quantity>\r\n",			gMercProfiles[cnt].bInvNumber[BIGPOCK4POS]   );
+			FilePrintf(hFile,"\t\t<mBig0Status>%d</mBig0Status>\r\n",				gMercProfiles[cnt].bInvStatus[BIGPOCK1POS]   );
+			FilePrintf(hFile,"\t\t<mBig1Status>%d</mBig1Status>\r\n",				gMercProfiles[cnt].bInvStatus[BIGPOCK2POS]   );
+			FilePrintf(hFile,"\t\t<mBig2Status>%d</mBig2Status>\r\n",				gMercProfiles[cnt].bInvStatus[BIGPOCK3POS]   );
+			FilePrintf(hFile,"\t\t<mBig3Status>%d</mBig3Status>\r\n",				gMercProfiles[cnt].bInvStatus[BIGPOCK4POS]   );
+			FilePrintf(hFile,"\t\t<mBig0Drop>1</mBig0Drop>\r\n");					//gMercProfiles[cnt].iDrop[BIGPOCK1POS]   );
+			FilePrintf(hFile,"\t\t<mBig1Drop>1</mBig1Drop>\r\n");					//gMercProfiles[cnt].iDrop[BIGPOCK2POS]   );
+			FilePrintf(hFile,"\t\t<mBig2Drop>1</mBig2Drop>\r\n");					//gMercProfiles[cnt].iDrop[BIGPOCK3POS]   );
+			FilePrintf(hFile,"\t\t<mBig3Drop>1</mBig3Drop>\r\n");					//gMercProfiles[cnt].iDrop[BIGPOCK4POS]   );
+			FilePrintf(hFile,"\t\t<mSmall0>%d</mSmall0>\r\n",						gMercProfiles[cnt].inv[SMALLPOCK1POS]   );
+			FilePrintf(hFile,"\t\t<mSmall1>%d</mSmall1>\r\n",						gMercProfiles[cnt].inv[SMALLPOCK2POS]   );
+			FilePrintf(hFile,"\t\t<mSmall2>%d</mSmall2>\r\n",						gMercProfiles[cnt].inv[SMALLPOCK3POS]   );
+			FilePrintf(hFile,"\t\t<mSmall3>%d</mSmall3>\r\n",						gMercProfiles[cnt].inv[SMALLPOCK4POS]   );
+			FilePrintf(hFile,"\t\t<mSmall4>%d</mSmall4>\r\n",						gMercProfiles[cnt].inv[SMALLPOCK5POS]   );
+			FilePrintf(hFile,"\t\t<mSmall5>%d</mSmall5>\r\n",						gMercProfiles[cnt].inv[SMALLPOCK6POS]   );
+			FilePrintf(hFile,"\t\t<mSmall6>%d</mSmall6>\r\n",						gMercProfiles[cnt].inv[SMALLPOCK7POS]   );
+			FilePrintf(hFile,"\t\t<mSmall7>%d</mSmall7>\r\n",						gMercProfiles[cnt].inv[SMALLPOCK8POS]   );
+			FilePrintf(hFile,"\t\t<mSmall0Quantity>%d</mSmall0Quantity>\r\n",		gMercProfiles[cnt].bInvNumber[SMALLPOCK1POS]   );
+			FilePrintf(hFile,"\t\t<mSmall1Quantity>%d</mSmall1Quantity>\r\n",		gMercProfiles[cnt].bInvNumber[SMALLPOCK2POS]   );
+			FilePrintf(hFile,"\t\t<mSmall2Quantity>%d</mSmall2Quantity>\r\n",		gMercProfiles[cnt].bInvNumber[SMALLPOCK3POS]   );
+			FilePrintf(hFile,"\t\t<mSmall3Quantity>%d</mSmall3Quantity>\r\n",		gMercProfiles[cnt].bInvNumber[SMALLPOCK4POS]   );
+			FilePrintf(hFile,"\t\t<mSmall4Quantity>%d</mSmall4Quantity>\r\n",		gMercProfiles[cnt].bInvNumber[SMALLPOCK5POS]   );
+			FilePrintf(hFile,"\t\t<mSmall5Quantity>%d</mSmall5Quantity>\r\n",		gMercProfiles[cnt].bInvNumber[SMALLPOCK6POS]   );
+			FilePrintf(hFile,"\t\t<mSmall6Quantity>%d</mSmall6Quantity>\r\n",		gMercProfiles[cnt].bInvNumber[SMALLPOCK7POS]   );
+			FilePrintf(hFile,"\t\t<mSmall7Quantity>%d</mSmall7Quantity>\r\n",		gMercProfiles[cnt].bInvNumber[SMALLPOCK8POS]   );
+			FilePrintf(hFile,"\t\t<mSmall0Status>%d</mSmall0Status>\r\n",			gMercProfiles[cnt].bInvStatus[SMALLPOCK1POS]   );
+			FilePrintf(hFile,"\t\t<mSmall1Status>%d</mSmall1Status>\r\n",			gMercProfiles[cnt].bInvStatus[SMALLPOCK2POS]   );
+			FilePrintf(hFile,"\t\t<mSmall2Status>%d</mSmall2Status>\r\n",			gMercProfiles[cnt].bInvStatus[SMALLPOCK3POS]   );
+			FilePrintf(hFile,"\t\t<mSmall3Status>%d</mSmall3Status>\r\n",			gMercProfiles[cnt].bInvStatus[SMALLPOCK4POS]   );
+			FilePrintf(hFile,"\t\t<mSmall4Status>%d</mSmall4Status>\r\n",			gMercProfiles[cnt].bInvStatus[SMALLPOCK5POS]   );
+			FilePrintf(hFile,"\t\t<mSmall5Status>%d</mSmall5Status>\r\n",			gMercProfiles[cnt].bInvStatus[SMALLPOCK6POS]   );
+			FilePrintf(hFile,"\t\t<mSmall6Status>%d</mSmall6Status>\r\n",			gMercProfiles[cnt].bInvStatus[SMALLPOCK7POS]   );
+			FilePrintf(hFile,"\t\t<mSmall7Status>%d</mSmall7Status>\r\n",			gMercProfiles[cnt].bInvStatus[SMALLPOCK8POS]   );
+			
+			
+			FilePrintf(hFile,"\t\t<lVest>0</lVest>\r\n");							//gMercProfiles[cnt].lbe[0]   );
+			FilePrintf(hFile,"\t\t<lLeftThigh>0</lLeftThigh>\r\n");					//gMercProfiles[cnt].lbe[1]   );
+			FilePrintf(hFile,"\t\t<lRightThigh>0</lRightThigh>\r\n");				//gMercProfiles[cnt].lbe[2]   );
+			FilePrintf(hFile,"\t\t<lCPack>0</lCPack>\r\n");							//gMercProfiles[cnt].lbe[3]   );
+			FilePrintf(hFile,"\t\t<lBPack>0</lBPack>\r\n");							//gMercProfiles[cnt].lbe[4]   );
+			FilePrintf(hFile,"\t\t<lVestStatus>0</lVestStatus>\r\n");				//gMercProfiles[cnt].lStatus[0]   );
+			FilePrintf(hFile,"\t\t<lLeftThighStatus>0</lLeftThighStatus>\r\n");		//gMercProfiles[cnt].lStatus[1]   );
+			FilePrintf(hFile,"\t\t<lRightThighStatus>0</lRightThighStatus>\r\n");	//gMercProfiles[cnt].lStatus[2]   );
+			FilePrintf(hFile,"\t\t<lCPackStatus>0</lCPackStatus>\r\n");				//gMercProfiles[cnt].lStatus[3]   );
+			FilePrintf(hFile,"\t\t<lBPackStatus>0</lBPackStatus>\r\n");				//gMercProfiles[cnt].lStatus[4]   );
+/*
+/*			FilePrintf(hFile,"\t\t<mHelmet>%d</mHelmet>\r\n",						gMercProfileGear[cnt].inv[HELMETPOS]  );
 			FilePrintf(hFile,"\t\t<mVest>%d</mVest>\r\n",							gMercProfileGear[cnt].inv[VESTPOS]   );
 			FilePrintf(hFile,"\t\t<mLeg>%d</mLeg>\r\n",								gMercProfileGear[cnt].inv[LEGPOS]   );
 			FilePrintf(hFile,"\t\t<mWeapon>%d</mWeapon>\r\n",						gMercProfileGear[cnt].inv[HANDPOS]   );
@@ -713,7 +844,7 @@ BOOLEAN WriteMercStartingGearStats()
 			FilePrintf(hFile,"\t\t<lRightThighStatus>%d</lRightThighStatus>\r\n",	gMercProfileGear[cnt].lStatus[2]   );
 			FilePrintf(hFile,"\t\t<lCPackStatus>%d</lCPackStatus>\r\n",				gMercProfileGear[cnt].lStatus[3]   );
 			FilePrintf(hFile,"\t\t<lBPackStatus>%d</lBPackStatus>\r\n",				gMercProfileGear[cnt].lStatus[4]   );
-
+*/
 			FilePrintf(hFile,"\t</MERCGEAR>\r\n");
 		}
 		FilePrintf(hFile,"</MERCGEARLIST>\r\n");

@@ -93,6 +93,7 @@
 #ifdef JA2UB
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
+#include "legion cfg.h"
 #endif
 
 #define		ARE_IN_FADE_IN( )		( gfFadeIn || gfFadeInitialized )
@@ -623,7 +624,7 @@ UINT32	MainGameScreenHandle(void)
 #ifdef JA2UB		
 		//if it is the first time in the game, and we are doing the heli crash code, locate to a different spot
 		if( gfFirstTimeInGameHeliCrash )
-			InternalLocateGridNo( 15427, TRUE );
+			InternalLocateGridNo( gGameLegionOptions.LOCATEGRIDNO, TRUE ); // 15427
 		else
 			InternalLocateGridNo( gMapInformation.sNorthGridNo, TRUE );
 #else

@@ -19,7 +19,7 @@
 #include "strategicmap.h"
 #include "Map Screen Interface Map.h"
 #include "Strategic Movement.h"
-#include "Summary Info.h"
+//#include "Summary Info.h"
 #include "legion cfg.h"
 #endif
 

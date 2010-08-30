@@ -69,6 +69,7 @@
 #include "MapScreen Quotes.h"
 #include "opplist.h"
 #include "Ja25Update.h"
+#include "legion cfg.h"
 #endif
 
 //forward declarations of common classes to eliminate includes
@@ -102,7 +103,7 @@ void AddItemToMerc( UINT8 ubNewMerc, INT16 sItemType );
 
 #define	NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH		7
 
-INT16	gsInitialHeliGridNo[ NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH ] =
+INT32	gsInitialHeliGridNo[ NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH ] =
 {
 	0,
 	0,
@@ -184,7 +185,7 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 	//MErc mercs come with an umbrella
 	if( ( ubCurrentSoldier >= 40 && ubCurrentSoldier <= 50 ) || ubCurrentSoldier == 58 /*GASTON*/ || ubCurrentSoldier == 59 /*STOGIE*/ )
 	{
-		AddItemToMerc( iNewIndex, 4507 ); //MERC_UMBRELLA
+		AddItemToMerc( iNewIndex, MERC_UMBRELLA ); //4507
 	}
 
 	//if this is an AIM or MERC merc
@@ -194,16 +195,16 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 		if( ubCurrentSoldier < 40 )
 		{
 			//give the mercs one of the promo items
-			AddItemToMerc( iNewIndex, 4506 ); //SAM_GARVER_COMBAT_KNIFE
+			AddItemToMerc( iNewIndex, SAM_GARVER_COMBAT_KNIFE ); //4506
 		}
 
 		// if its a merc merc
 		else if( ubCurrentSoldier <= 50 || ubCurrentSoldier == 58 /*GASTON*/ || ubCurrentSoldier == 59 /*STOGIE*/ )
 		{
 			//give the mercs one of the promo items
-			AddItemToMerc( iNewIndex, 4504 ); //CHE_GUEVARA_CANTEEN
-			AddItemToMerc( iNewIndex, 4505 ); //MERC_WRISTWATCH
-			AddItemToMerc( iNewIndex, 4506 ); //SAM_GARVER_COMBAT_KNIFE
+			AddItemToMerc( iNewIndex, CHE_GUEVARA_CANTEEN ); //4504
+			AddItemToMerc( iNewIndex, MERC_WRISTWATCH ); //4505
+			AddItemToMerc( iNewIndex, SAM_GARVER_COMBAT_KNIFE ); //4506
 		}
 	}
 #else //ja25: No enrico, therefore, no email
@@ -840,7 +841,7 @@ void CheckForValidArrivalSector( )
 INT16	GetInitialHeliGridNo( )
 {
 	UINT8	ubCnt;
-	INT16	sGridNo;
+	INT32	sGridNo;
 
 	for( ubCnt=0; ubCnt<NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH-1; ubCnt++)
 	{
@@ -891,21 +892,21 @@ void InitializeHeliGridnoAndTime( BOOLEAN fLoading )
 		gfFirstTimeInGameHeliCrash = FALSE;
 	}
 
-	gsInitialHeliGridNo[ 0 ] = 14947;
-	gsInitialHeliGridNo[ 1 ] = 15584;//16067;
-	gsInitialHeliGridNo[ 2 ] = 15754;
-	gsInitialHeliGridNo[ 3 ] = 16232;
-	gsInitialHeliGridNo[ 4 ] = 16067;
-	gsInitialHeliGridNo[ 5 ] = 16230;
-	gsInitialHeliGridNo[ 6 ] = 15272;
+	gsInitialHeliGridNo[ 0 ] = gGameLegionOptions.INITIALHELIGRIDNO[ 0 ];//14947;
+	gsInitialHeliGridNo[ 1 ] = gGameLegionOptions.INITIALHELIGRIDNO[ 1 ];//15584;//16067;
+	gsInitialHeliGridNo[ 2 ] = gGameLegionOptions.INITIALHELIGRIDNO[ 2 ];//15754;
+	gsInitialHeliGridNo[ 3 ] = gGameLegionOptions.INITIALHELIGRIDNO[ 3 ];//16232;
+	gsInitialHeliGridNo[ 4 ] = gGameLegionOptions.INITIALHELIGRIDNO[ 4 ];//16067;
+	gsInitialHeliGridNo[ 5 ] = gGameLegionOptions.INITIALHELIGRIDNO[ 5 ];//16230;
+	gsInitialHeliGridNo[ 6 ] = gGameLegionOptions.INITIALHELIGRIDNO[ 6 ];//15272;
 
-	gsInitialHeliRandomTimes[ 0 ] = 1300;
-	gsInitialHeliRandomTimes[ 1 ] = 2000;
-	gsInitialHeliRandomTimes[ 2 ] = 2750;
-	gsInitialHeliRandomTimes[ 3 ] = 3400;
-	gsInitialHeliRandomTimes[ 4 ] = 4160;
-	gsInitialHeliRandomTimes[ 5 ] = 4700;
-	gsInitialHeliRandomTimes[ 6 ] = 5630;
+	gsInitialHeliRandomTimes[ 0 ] = gGameLegionOptions.INITIALHELIRANDOMTIMES[ 0 ];//1300;
+	gsInitialHeliRandomTimes[ 1 ] = gGameLegionOptions.INITIALHELIRANDOMTIMES[ 1 ];//2000;
+	gsInitialHeliRandomTimes[ 2 ] = gGameLegionOptions.INITIALHELIRANDOMTIMES[ 2 ];//2750;
+	gsInitialHeliRandomTimes[ 3 ] = gGameLegionOptions.INITIALHELIRANDOMTIMES[ 3 ];//3400;
+	gsInitialHeliRandomTimes[ 4 ] = gGameLegionOptions.INITIALHELIRANDOMTIMES[ 4 ];//4160;
+	gsInitialHeliRandomTimes[ 5 ] = gGameLegionOptions.INITIALHELIRANDOMTIMES[ 5 ];//4700;
+	gsInitialHeliRandomTimes[ 6 ] = gGameLegionOptions.INITIALHELIRANDOMTIMES[ 6 ];//5630;
 }
 
 void InitJerryMiloInfo()

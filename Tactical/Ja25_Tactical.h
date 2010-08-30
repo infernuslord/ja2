@@ -107,6 +107,33 @@ void		HandleOpenControlPanelToRevealSwitchInMorrisArea();
 
 void		InitNewGunArray();
 
+extern BOOLEAN OldNew;
+extern UINT32	TEX_MOVIE_ATTACK_CLYDESDALES;
+extern UINT32	TEX_MOVIE_WILD_EAST;
+extern UINT32	TEX_MOVIE_HAVE_HONDA;
+extern UINT32	LAPTOP_TRANSMITTER;
+extern UINT32	CHE_GUEVARA_CANTEEN;
+extern UINT32	MERC_WRISTWATCH;
+extern UINT32	SAM_GARVER_COMBAT_KNIFE;
+extern UINT32	MERC_UMBRELLA_OLD;
+extern UINT32	MORRIS_INSTRUCTION_NOTE;
+extern UINT32	HAND_CANNON;
+extern UINT32	HARTFORD_6_SHOOTER;
+extern UINT32	MERC_UMBRELLA;
+extern UINT32	CLIP_CANNON_BALL;
+//extern UINT32	BARRETT;
+//extern UINT32	CALICO_960;
+//extern UINT32	PSG1;
+//extern UINT32	L85;
+//extern UINT32	TAR21;
+//extern UINT32	VAL_SILENT;
+//extern UINT32	MICRO_UZI;
+//extern UINT32	CALICO_950;
+//extern UINT32	CALICO_900;
+
+extern void Old_UB_Inventory ();
+extern void New_UB_Inventory ();
+
 #endif
 
 #endif

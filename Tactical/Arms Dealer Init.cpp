@@ -641,11 +641,11 @@ BOOLEAN AdjustCertainDealersInventory( )
 	if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTDONE )
 	{
 		//Guarntee 1 laptop transmitter to be at betty's
-		GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, 4500, 1 ); //LAPTOP_TRANSMITTER
+		GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, LAPTOP_TRANSMITTER , 1 ); //4500
 	}
 	else
 	{
-		GuaranteeAtMostNumOfItemsForItem( ARMS_DEALER_BETTY, 4500, 0 ); //LAPTOP_TRANSMITTER
+		GuaranteeAtMostNumOfItemsForItem( ARMS_DEALER_BETTY, LAPTOP_TRANSMITTER, 0 ); //4500
 	}
 
 	if( gubQuest[ QUEST_GET_RID_BLOODCATS_AT_BETTYS ] != QUESTDONE )
@@ -2393,9 +2393,9 @@ UINT32 CalculateMinutesClosedBetween( UINT8 ubArmsDealer, UINT32 uiStartTime, UI
 
 void AddTexsVideosToBettysInventory()
 {
-	GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, 4501, 1 );
-	GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, 4502, 1 );
-	GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, 4503, 1 );
+	GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, TEX_MOVIE_ATTACK_CLYDESDALES, 1 );
+	GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, TEX_MOVIE_WILD_EAST, 1 );
+	GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, TEX_MOVIE_HAVE_HONDA, 1 );
 }
 
 
@@ -2406,10 +2406,10 @@ BOOLEAN CanThisItemBeSoldToSimulatedCustomer( UINT8 ubArmsDealerID, UINT16 usIte
 		case ARMS_DEALER_BETTY:
 			//if the item is..
 
-			if( usItemIndex == 4501 || //TEX_MOVIE_ATTACK_CLYDESDALES ||
-					usItemIndex == 4502 || //TEX_MOVIE_WILD_EAST ||
-					usItemIndex == 4503 || //TEX_MOVIE_HAVE_HONDA ||
-					usItemIndex == 4500 )//LAPTOP_TRANSMITTER )
+			if( usItemIndex == TEX_MOVIE_ATTACK_CLYDESDALES ||  //4501  ||
+					usItemIndex == TEX_MOVIE_WILD_EAST || //4502  ||
+					usItemIndex == TEX_MOVIE_HAVE_HONDA || //4503  ||
+					usItemIndex == LAPTOP_TRANSMITTER )//4500  )
 			{
 				return( FALSE );
 			}

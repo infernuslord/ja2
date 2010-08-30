@@ -98,7 +98,7 @@ typedef struct
 
 
 //Morris items
-UINT32 MORRIS_INSTRUCTION_NOTE = 4508;
+//UINT32 MORRIS_INSTRUCTION_NOTE = 4508;
 
 UINT8 Get3RandomQualifiedMercs( UINT8 *pSoldierId1, UINT8 *pSoldierId2, UINT8 *pSoldierId3 );
 
@@ -148,10 +148,119 @@ void HandleHowPlayerGotThroughFan();
 //
 //*******************************************************************
 
+BOOLEAN OldNew = FALSE;
+UINT32	TEX_MOVIE_ATTACK_CLYDESDALES;
+UINT32	TEX_MOVIE_WILD_EAST;
+UINT32	TEX_MOVIE_HAVE_HONDA;
+UINT32	LAPTOP_TRANSMITTER;
+UINT32	CHE_GUEVARA_CANTEEN;
+UINT32	MERC_WRISTWATCH;
+UINT32	SAM_GARVER_COMBAT_KNIFE;
+UINT32	MERC_UMBRELLA_OLD;
+UINT32	MORRIS_INSTRUCTION_NOTE;
+UINT32	HAND_CANNON;
+UINT32	HARTFORD_6_SHOOTER;
+UINT32	MERC_UMBRELLA;
+
+UINT32	BARRETT_UB;
+UINT32	CALICO_960_UB;
+UINT32	PSG1_UB;
+UINT32	L85_UB;
+UINT32	TAR21_UB;
+UINT32	VAL_SILENT_UB;
+UINT32	MICRO_UZI_UB;
+UINT32	CALICO_950_UB;
+UINT32	CALICO_900_UB;
+
+UINT32	CLIP_CANNON_BALL;
+
+void Old_UB_Inventory ();
+void New_UB_Inventory ();
+
+void Old_UB_Inventory ()
+{
+	BARRETT_UB = 43;
+	CALICO_960_UB = 44;
+	PSG1_UB =45;
+	L85_UB =46;
+	TAR21_UB =47;
+	VAL_SILENT_UB =48;
+	MICRO_UZI_UB = 57;
+	CALICO_950_UB = 66;
+	CALICO_900_UB = 67;
+	
+	CLIP_CANNON_BALL = 115;
+	MERC_UMBRELLA = 70;
+	HAND_CANNON = 63;
+	HARTFORD_6_SHOOTER = 68;
+	TEX_MOVIE_ATTACK_CLYDESDALES = 328;
+	TEX_MOVIE_WILD_EAST = 329;
+	TEX_MOVIE_HAVE_HONDA = 330;
+	LAPTOP_TRANSMITTER = 331;
+	CHE_GUEVARA_CANTEEN = 332;
+	MERC_WRISTWATCH = 333;
+	SAM_GARVER_COMBAT_KNIFE = 334;
+	MERC_UMBRELLA_OLD = 335;
+	MORRIS_INSTRUCTION_NOTE = 336;
+}
+
+void New_UB_Inventory ()
+{
+
+/*	BARRETT = 43;
+	CALICO_960 = 44;
+	PSG1 =45;
+	L85 =46;
+	TAR21 =47;
+	VAL_SILENT =48;
+	MICRO_UZI = 57;
+	CALICO_950 = 66;
+	CALICO_900 = 67;
+*/	
+/*	MERC_UMBRELLA = 4507;
+	HAND_CANNON = 4498;
+	//HARTFORD_6_SHOOTER = 68;
+	CLIP_CANNON_BALL = 4499;
+	TEX_MOVIE_ATTACK_CLYDESDALES = 4501;
+	TEX_MOVIE_WILD_EAST = 4502;
+	TEX_MOVIE_HAVE_HONDA = 4503;
+	LAPTOP_TRANSMITTER = 4500;
+	CHE_GUEVARA_CANTEEN = 4504;
+	MERC_WRISTWATCH = 4505;
+	SAM_GARVER_COMBAT_KNIFE = 4506;
+	//MERC_UMBRELLA_OLD = 4507;
+	MORRIS_INSTRUCTION_NOTE = 4508;
+	*/
+	
+	BARRETT_UB = 43;
+	CALICO_960_UB = 44;
+	PSG1_UB =45;
+	L85_UB =46;
+	TAR21_UB =47;
+	VAL_SILENT_UB =48;
+	MICRO_UZI_UB = 57;
+	CALICO_950_UB = 66;
+	CALICO_900_UB = 67;
+	
+	CLIP_CANNON_BALL = 115;
+	MERC_UMBRELLA = 70;
+	HAND_CANNON = 63;
+	HARTFORD_6_SHOOTER = 68;
+	TEX_MOVIE_ATTACK_CLYDESDALES = 328;
+	TEX_MOVIE_WILD_EAST = 329;
+	TEX_MOVIE_HAVE_HONDA = 330;
+	LAPTOP_TRANSMITTER = 331;
+	CHE_GUEVARA_CANTEEN = 332;
+	MERC_WRISTWATCH = 333;
+	SAM_GARVER_COMBAT_KNIFE = 334;
+	MERC_UMBRELLA_OLD = 335;
+	MORRIS_INSTRUCTION_NOTE = 336;
+}
+
 BOOLEAN	IsSoldierQualifiedMerc( SOLDIERTYPE *pSoldier )
 {
 	if( pSoldier->ubProfile == 	58	||  ///  GASTON
-			pSoldier->ubProfile == 	59	||  // STOGIE
+			pSoldier->ubProfile == 59 ||  // STOGIE
 			pSoldier->ubProfile == 64 ||// TEX 			||
 			pSoldier->ubProfile == 62 || //JOHN_K		||
 			pSoldier->ubProfile == 61 || //BIGGENS	||
@@ -898,7 +1007,11 @@ BOOLEAN HandleNewGunComment( SOLDIERTYPE *pSoldier, INT32 iItemIndex, BOOLEAN fF
 		//if this is morris's note, handle it
 		HandlePickingUpMorrisInstructionNote( pSoldier, iItemIndex );
 	}
-	/*
+	
+	
+if ( OldNew == TRUE )
+{
+
 	//if the quote has already been said
 	if( HasNewGunQuoteBeenPlayedForThisGun( iItemIndex ) )
 	{
@@ -927,24 +1040,26 @@ BOOLEAN HandleNewGunComment( SOLDIERTYPE *pSoldier, INT32 iItemIndex, BOOLEAN fF
 			pSoldier->usQuoteSaidFlags |= SOLDIER_QUOTE_SAID_FOUND_SOMETHING_NICE;
 		}
 	}
-*/
+}
 	//if it is a new merc
 	if( fNewMerc )
 	{
 		//if the item is the hand cannon
-		if( iItemIndex == 4498 )   //  HAND_CANNON
+		if( iItemIndex == HAND_CANNON )   //4498  
 		{
 			//say the new gun quote
 			TacticalCharacterDialogue( pSoldier, QUOTE_PRECEDENT_TO_REPEATING_ONESELF_RENEW );
 		}
-		//else
-		//{
+		else
+		{
 			//say the new gun quote
-		//	TacticalCharacterDialogue( pSoldier, QUOTE_HATE_MERC_1_ON_TEAM_WONT_RENEW );
-		//}
+			if (OldNew == TRUE )
+			TacticalCharacterDialogue( pSoldier, QUOTE_HATE_MERC_1_ON_TEAM_WONT_RENEW );
+		}
 
 		//rememeber we have played the quote
-		//SetNewGunQuoteToBePlayedForThisGun( iItemIndex );
+		if ( OldNew == TRUE )
+			SetNewGunQuoteToBePlayedForThisGun( iItemIndex );
 	}
 	
 	return( TRUE );
@@ -1002,7 +1117,10 @@ BOOLEAN LoadNewGunQuotesArrayToSaveGameFile( HWFILE hFile )
 /*
 	if( guiSaveGameVersion < 1005 )
 	{
-		InitNewGunArray();
+*/
+		if ( OldNew == TRUE )
+			InitNewGunArray();
+/*
 	}
 */
 	return( TRUE );
@@ -1010,39 +1128,44 @@ BOOLEAN LoadNewGunQuotesArrayToSaveGameFile( HWFILE hFile )
 
 void InitNewGunArray()
 {
-/*	INT32 iCnt=0;
 
-	gNewGunQuotes[iCnt++].sItem = BARRETT;
-	gNewGunQuotes[iCnt++].sItem = CALICO_960;
-	gNewGunQuotes[iCnt++].sItem = PSG1;
-	gNewGunQuotes[iCnt++].sItem = L85;
-	gNewGunQuotes[iCnt++].sItem = TAR21;
-	gNewGunQuotes[iCnt++].sItem = VAL_SILENT;
-	gNewGunQuotes[iCnt++].sItem = MICRO_UZI;
+INT32 iCnt=0;
+if ( OldNew == TRUE )
+{
+	gNewGunQuotes[iCnt++].sItem = BARRETT_UB;
+	gNewGunQuotes[iCnt++].sItem = CALICO_960_UB;
+	gNewGunQuotes[iCnt++].sItem = PSG1_UB;
+	gNewGunQuotes[iCnt++].sItem = L85_UB;
+	gNewGunQuotes[iCnt++].sItem = TAR21_UB;
+	gNewGunQuotes[iCnt++].sItem = VAL_SILENT_UB;
+	gNewGunQuotes[iCnt++].sItem = MICRO_UZI_UB;
 	gNewGunQuotes[iCnt++].sItem = HAND_CANNON;
-	gNewGunQuotes[iCnt++].sItem = CALICO_950;
-	gNewGunQuotes[iCnt++].sItem = CALICO_900;
-	*/
+	gNewGunQuotes[iCnt++].sItem = CALICO_950_UB;
+	gNewGunQuotes[iCnt++].sItem = CALICO_900_UB;
+}
+
 }
 
 
 BOOLEAN IsThisGunANewJa25Gun( INT32 iItemIndex )
 {
-/*	//if this gun ISNT a new gun
-	if( !( iItemIndex == BARRETT	||
-			iItemIndex == CALICO_960	|| 
-			iItemIndex == PSG1				|| 
-			iItemIndex == L85					|| 
-			iItemIndex == TAR21				|| 
-			iItemIndex == VAL_SILENT	|| 
-			iItemIndex == MICRO_UZI		|| 
+if ( OldNew == TRUE )
+{
+	//if this gun ISNT a new gun
+	if( !( iItemIndex == BARRETT_UB	||
+			iItemIndex == CALICO_960_UB	|| 
+			iItemIndex == PSG1_UB				|| 
+			iItemIndex == L85_UB					|| 
+			iItemIndex == TAR21_UB				|| 
+			iItemIndex == VAL_SILENT_UB	|| 
+			iItemIndex == MICRO_UZI_UB		|| 
 			iItemIndex == HAND_CANNON ||
-			iItemIndex == CALICO_950	|| 
-			iItemIndex == CALICO_900 ) )
+			iItemIndex == CALICO_950_UB	|| 
+			iItemIndex == CALICO_900_UB ) )
 	{
 		return( FALSE );
 	}
-*/
+}
 	return( TRUE );
 }
 

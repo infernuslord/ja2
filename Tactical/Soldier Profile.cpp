@@ -61,6 +61,7 @@
 #endif
 
 #include "legion cfg.h"
+#include "XML.h"
 
 #include "connect.h"
 #ifdef JA2EDITOR
@@ -485,7 +486,7 @@ BOOLEAN LoadMercProfiles(void)
 	// SET SOME DEFAULT LOCATIONS FOR STARTING NPCS
 
 	FileClose( fptr );
-	
+	WriteMercStartingGearStats();
 	
 		RandomStats (); //random stats by Jazz
 

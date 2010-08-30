@@ -78,6 +78,10 @@
 	#include "InterfaceItemImages.h"
 #endif
 
+#ifdef JA2UB
+#include "Ja25_Tactical.h"
+#endif
+
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -1659,7 +1663,7 @@ BOOLEAN	CompatibleItemForApplyingOnMerc( OBJECTTYPE *pTestObject )
 	if ( Item[usItem].camouflagekit || usItem == ADRENALINE_BOOSTER || usItem == REGEN_BOOSTER ||
 			 usItem == SYRINGE_3		 || usItem == SYRINGE_4 || usItem == SYRINGE_5 ||
 #ifdef JA2UB
-			 Item[usItem].alcohol  || Item[usItem].canteen || usItem == JAR_ELIXIR || usItem == 4504 ) // JA25 UB  CHE_GUEVARA_CANTEEN
+			 Item[usItem].alcohol  || Item[usItem].canteen || usItem == JAR_ELIXIR || usItem == CHE_GUEVARA_CANTEEN ) // JA25 UB 4504
 #else
 			 Item[usItem].alcohol  || Item[usItem].canteen || usItem == JAR_ELIXIR )
 #endif

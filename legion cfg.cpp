@@ -501,6 +501,28 @@ void LoadGameLegionOptions()
 	
 	gGameLegionOptions.CampaignSector = iniReader.ReadBoolean("UB","MAKE_STRATEGIC_MOVEMENT_COSTS", FALSE);
 	
+	gGameLegionOptions.MercStartingGear25XML = TRUE;//iniReader.ReadBoolean("UB","USE_MERC_STARTING_GEAR_XML", FALSE);
+	
+	gGameLegionOptions.MercStartingGear25XML = TRUE;//iniReader.ReadBoolean("UB","USE_MERC_STARTING_GEAR_XML", FALSE);
+	
+	gGameLegionOptions.INITIALHELIGRIDNO[ 0 ]  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","GridNo1", 14947);
+	gGameLegionOptions.INITIALHELIGRIDNO[ 1 ]  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","GridNo2", 15584);
+	gGameLegionOptions.INITIALHELIGRIDNO[ 2 ]  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","GridNo3", 15754);
+	gGameLegionOptions.INITIALHELIGRIDNO[ 3 ]  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","GridNo4", 16232);
+	gGameLegionOptions.INITIALHELIGRIDNO[ 4 ]  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","GridNo5", 16067);
+	gGameLegionOptions.INITIALHELIGRIDNO[ 5 ]  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","GridNo6", 16230);
+	gGameLegionOptions.INITIALHELIGRIDNO[ 6 ]  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","GridNo7", 15272);
+	
+	gGameLegionOptions.INITIALHELIRANDOMTIMES[ 0 ]  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","HeliRandomTimes1",  1300);
+	gGameLegionOptions.INITIALHELIRANDOMTIMES[ 1 ]  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","HeliRandomTimes2",  2000);
+	gGameLegionOptions.INITIALHELIRANDOMTIMES[ 2 ]  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","HeliRandomTimes3",  2750);
+	gGameLegionOptions.INITIALHELIRANDOMTIMES[ 3 ]  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","HeliRandomTimes4",  3400);
+	gGameLegionOptions.INITIALHELIRANDOMTIMES[ 4 ]  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","HeliRandomTimes5",  4160);
+	gGameLegionOptions.INITIALHELIRANDOMTIMES[ 5 ]  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","HeliRandomTimes6",  4700);
+	gGameLegionOptions.INITIALHELIRANDOMTIMES[ 6 ]  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","HeliRandomTimes7",  5630);
+	
+	gGameLegionOptions.LOCATEGRIDNO  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","InternalLocateGridNo",  15427);
+	
 	
 //	gGameLegionOptions.BobbyRayInventory_UB = iniReader.ReadBoolean("UB","INIT_BOBBYRAY_INVENTORY", FALSE);
 //	gGameLegionOptions.InitTownLoyalty_UB = iniReader.ReadBoolean("UB","INIT_TOWN_LOYALTY", FALSE);
