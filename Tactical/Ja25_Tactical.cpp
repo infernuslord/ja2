@@ -148,7 +148,8 @@ void HandleHowPlayerGotThroughFan();
 //
 //*******************************************************************
 
-BOOLEAN OldNew = FALSE;
+BOOLEAN OldNew = TRUE;
+
 UINT32	TEX_MOVIE_ATTACK_CLYDESDALES;
 UINT32	TEX_MOVIE_WILD_EAST;
 UINT32	TEX_MOVIE_HAVE_HONDA;

@@ -1752,8 +1752,13 @@ BOOLEAN	GetSpeckConditionalOpening( BOOLEAN fJustEnteredScreen )
 	if( fJustEnteredScreen )
 	{
 		gfDoneIntroSpeech = FALSE;
+#ifdef JA2UB
+		usQuoteToSay = SPECK_QUOTE_NEW_INTRO_1;
+#else
 		usQuoteToSay = 0;
+#endif
 		return( FALSE );
+
 	}
 
 	//if we are done the intro speech, or arrived from a sub page, get out of the function
@@ -1765,15 +1770,33 @@ BOOLEAN	GetSpeckConditionalOpening( BOOLEAN fJustEnteredScreen )
 	gfDoneIntroSpeech = TRUE;
 
 	//set the opening quote based on if the player has been here before
+
+#ifdef JA2UB
+	if( LaptopSaveInfo.ubPlayerBeenToMercSiteStatus == MERC_SITE_FIRST_VISIT && usQuoteToSay <= SPECK_QUOTE_NEW_INTRO_7 ) //!= 0 )
+#else
 	if( LaptopSaveInfo.ubPlayerBeenToMercSiteStatus == MERC_SITE_FIRST_VISIT && usQuoteToSay <= 8 ) //!= 0 )
+#endif
 	{
 		StartSpeckTalking( usQuoteToSay );
 		usQuoteToSay++;
+#ifdef JA2UB
+		if( usQuoteToSay <= SPECK_QUOTE_NEW_INTRO_7 )
+#else
 		if( usQuoteToSay <= 8 )
+#endif
 			gfDoneIntroSpeech = FALSE;
 	}
 #ifdef JA2UB
-// ja25 ub 	
+	//else if its the first time back since the laptop went down
+	else if( gJa25SaveStruct.fHaveAimandMercOffferItems && !HasImportantSpeckQuoteBeingSaid( SPECK_QUOTE_2ND_INTRO_LAPTOP_WORKING_AGAIN_1 ) )
+	{
+		StartSpeckTalking( SPECK_QUOTE_2ND_INTRO_LAPTOP_WORKING_AGAIN_1 );
+		StartSpeckTalking( SPECK_QUOTE_2ND_INTRO_LAPTOP_WORKING_AGAIN_2 );
+		StartSpeckTalking( SPECK_QUOTE_2ND_INTRO_LAPTOP_WORKING_AGAIN_3 );
+		StartSpeckTalking( SPECK_QUOTE_2ND_INTRO_LAPTOP_WORKING_AGAIN_4 );
+		StartSpeckTalking( SPECK_QUOTE_2ND_INTRO_LAPTOP_WORKING_AGAIN_5 );
+		StartSpeckTalking( SPECK_QUOTE_2ND_INTRO_LAPTOP_WORKING_AGAIN_6 );
+	} 	
 #else
 	//if its the players second visit
 	else if( LaptopSaveInfo.ubPlayerBeenToMercSiteStatus == MERC_SITE_SECOND_VISIT )

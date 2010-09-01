@@ -869,9 +869,9 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	LoadIMPPortraitsTEMP();
 
 #ifdef JA2UB	
-	if ( OldNew == TRUE )
-		Old_UB_Inventory ();
-	else
+	//if ( OldNew == TRUE )
+	//	Old_UB_Inventory ();
+	//else
 		New_UB_Inventory ();
 #endif
 
@@ -1025,10 +1025,10 @@ UINT32 InitializeJA2(void)
 
 #ifdef JA2UB
 		// run old UB inventory Data-UB\Addons\Data-Old-UB-Inventory
-		if( !strcmp( gzCommandLine, "-OLDUBINVENTORY" ) )
-		{
-			OldNew = TRUE; 
-		}
+	//	if( !strcmp( gzCommandLine, "-OLDUBINVENTORY" ) )
+	//	{
+	//		OldNew = TRUE; 
+	//	}
 #endif
 
 #ifdef JA2BETAVERSION
