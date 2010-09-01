@@ -1,4 +1,4 @@
-#pragma setlocale("POLISH")
+Tracona#pragma setlocale("POLISH")
 #ifdef PRECOMPILEDHEADERS
 	#include "Utils All.h"
 #else
@@ -1874,7 +1874,7 @@ STR16 pMapScreenFastHelpTextList[] =
 	L"Próbny tekst",
 	L"Próbny tekst",
 	L"Próbny tekst",
-	L"Niewiele mo¿esz tu zrobiæ, dopóki najemnicy nie przylec¹ do Arulco. Gdy ju¿ zbierzesz swój oddzia³, kliknij przycisk Kompresji Czasu, w prawym dolnym rogu. W ten sposób twoi najemnicy szybciej dotr¹ na miejsce.",
+	L"Niewiele mo¿esz tu zrobiæ, dopóki najemnicy nie przylec¹ do Tracona. Gdy ju¿ zbierzesz swój oddzia³, kliknij przycisk Kompresji Czasu, w prawym dolnym rogu. W ten sposób twoi najemnicy szybciej dotr¹ na miejsce.",
 };
 
 // movement menu text
@@ -2202,7 +2202,7 @@ STR16 pMapErrorString[] =
 //6-10
 	L"musi mieæ eskortê, aby siê przemieszczaæ. Umieœæ go w oddziale z eskort¹.", // merc can't move unescorted .. for a male
 	L"musi mieæ eskortê, aby siê przemieszczaæ. Umieœæ j¹ w oddziale z eskort¹.", // for a female
-	L"Najemnik nie przyby³ jeszcze do Arulco!",
+	L"Najemnik nie przyby³ jeszcze do Tracona!",
 	L"Wygl¹da na to, ¿e trzeba wpierw uregulowaæ sprawy kontraktu.",
 	L"Nie mo¿na przemieœciæ najemnika. Trwa nalot powietrzny.",
 //11-15
@@ -4180,7 +4180,7 @@ STR16 pMilitiaButtonsHelpText[] =
 STR16 pMapScreenJustStartedHelpText[] =
 {
 	L"Zajrzyj do A.I.M. i zatrudnij kilku najemników (*Wskazówka* musisz otworzyæ laptopa)", // to inform the player to hired some mercs to get things going
-	L"Jeœli chcesz ju¿ udaæ siê do Arulco, kliknij przycisk kompresji czasu, w prawym dolnym rogu ekranu.", // to inform the player to hit time compression to get the game underway
+	L"Jeœli chcesz ju¿ udaæ siê do Tracona, kliknij przycisk kompresji czasu, w prawym dolnym rogu ekranu.", // to inform the player to hit time compression to get the game underway
 };
 
 STR16 pAntiHackerString[] = 
@@ -4407,7 +4407,7 @@ STR16 gzLateLocalizedString[] =
 	L"Wszystkim twoim najemnikom za³o¿ono opatrunki.",
 
 	//14
-	L"Arulco",
+	L"Tracona",
 
   L"(dach)",
 
@@ -5075,7 +5075,7 @@ STR16	zNewTacticalMessages[]=
 	L"Nowi rekruci nie mog¹ tam przybyæ.",
 	L"Dopóki twój laprop bêdzie bez nadajnika, nie bêdziesz móg³ zatrudniaæ nowych cz³onków zespo³u.  Mo¿liwe, ¿e to odpowiedni moment ¿eby odczytaæ zapisany stan gry lub zacz¹æ graæ od nowa!",
 	L"%s s³yszy dŸwiêk zgniatanego metalu dochodz¹cy spod cia³a Jerrego.  To niestety zabrzmia³o jak dŸwiêk zgniatanej anteny od twojego laptopa.",  //the %s is the name of a merc.  @@@  Modified
-	L"After scanning the note left behind by Deputy Commander Morris, %s senses an oppurtinity.  The note contains the coordinates for launching missiles against different towns in Arulco.  It also gives the coodinates of the origin - the missile facility.",
+	L"After scanning the note left behind by Deputy Commander Morris, %s senses an oppurtinity.  The note contains the coordinates for launching missiles against different towns in Tracona.  It also gives the coodinates of the origin - the missile facility.",
 	L"Noticing the control panel, %s figures the numbers can be reveresed, so that the missile might destroy this very facility.  %s needs to find an escape route.  The elevator appears to offer the fastest solution...",
 	L"To jest tryb CZ£OWIEK ZE STALI i nie mo¿esz zapisywaæ gry gdy wróg jest w sektorze.",	//	@@@  new text
 	L"(Nie mo¿na zapisywaæ gry podczas walki)", //@@@@ new text

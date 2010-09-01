@@ -1865,7 +1865,7 @@ STR16 pMapScreenFastHelpTextList[] =
 	L"Test Text",
 	L"Test Text",
 	L"Test Text",
-	L"Non potrete fare molto in questa schermata finché non arriverete ad Arulco. Quando avrete definito la vostra squadra, cliccate sul pulsante Compressione di Tempo in basso a destra. Questo diminuirà il tempo necessario alla vostra squadra per raggiungere Arulco.",
+	L"Non potrete fare molto in questa schermata finché non arriverete ad Tracona. Quando avrete definito la vostra squadra, cliccate sul pulsante Compressione di Tempo in basso a destra. Questo diminuirà il tempo necessario alla vostra squadra per raggiungere Tracona.",
 };
 
 // movement menu text
@@ -2192,7 +2192,7 @@ STR16 pMapErrorString[] =
 //6-10
 	L"ha bisogno di una scorta per muoversi. Inseritelo in una squadra che ne è provvista.", // merc can't move unescorted .. for a male
 	L"ha bisogno di una scorta per muoversi. Inseritela in una squadra che ne è provvista.", // for a female
-	L"Il mercenario non è ancora arrivato ad Arulco!",
+	L"Il mercenario non è ancora arrivato ad Tracona!",
 	L"Sembra che ci siano negoziazioni di contratto da stabilire.",
 	L"",
 //11-15
@@ -2281,8 +2281,8 @@ STR16 pMiscMapScreenMouseRegionHelpText[] =
 // male version of where equipment is left
 STR16 pMercHeLeaveString[] =
 {
-	L"Volete che %s lasci il suo equipaggiamento dove si trova ora (%s) o in seguito a Drassen (B13) dopo aver preso il volo da Arulco?",
-	L"Volete che %s lasci il suo equipaggiamento dove si trova ora (%s) o in seguito a Omerta (A9) dopo aver preso il volo da Arulco?",
+	L"Volete che %s lasci il suo equipaggiamento dove si trova ora (%s) o in seguito a Drassen (B13) dopo aver preso il volo da Tracona?",
+	L"Volete che %s lasci il suo equipaggiamento dove si trova ora (%s) o in seguito a Omerta (A9) dopo aver preso il volo da Tracona?",
 	L"sta per partire e spedirà il suo equipaggiamento a Omerta (A9).",
 	L"sta per partire e spedirà il suo equipaggiamento a Drassen (B13).",
 	L"%s sta per partire e spedirà il suo equipaggiamento a %s.",
@@ -2292,8 +2292,8 @@ STR16 pMercHeLeaveString[] =
 // female version
 STR16 pMercSheLeaveString[] =
 {
-	L"Volete che %s lasci il suo equipaggiamento dove si trova ora (%s) o in seguito a Drassen (B13) dopo aver preso il volo da Arulco?",
-	L"Volete che %s lasci il suo equipaggiamento dove si trova ora (%s) o in seguito a Omerta (A9) dopo aver preso il volo da Arulco?",
+	L"Volete che %s lasci il suo equipaggiamento dove si trova ora (%s) o in seguito a Drassen (B13) dopo aver preso il volo da Tracona?",
+	L"Volete che %s lasci il suo equipaggiamento dove si trova ora (%s) o in seguito a Omerta (A9) dopo aver preso il volo da Tracona?",
 	L"sta per partire e spedirà il suo equipaggiamento a Omerta (A9).",
 	L"sta per partire e spedirà il suo equipaggiamento a Drassen (B13).",
 	L"%s sta per partire e spedirà il suo equipaggiamento a %s.",
@@ -4168,7 +4168,7 @@ STR16 pMilitiaButtonsHelpText[] =
 STR16 pMapScreenJustStartedHelpText[] =
 {
 	L"Andate all'A.I.M. e arruolate alcuni mercenari (*Hint* è nel Laptop)", // to inform the player to hired some mercs to get things going
-	L"Quando sarete pronti per partire per Arulco, cliccate sul pulsante nella parte in basso a destra dello schermo.", // to inform the player to hit time compression to get the game underway
+	L"Quando sarete pronti per partire per Tracona, cliccate sul pulsante nella parte in basso a destra dello schermo.", // to inform the player to hit time compression to get the game underway
 };
 
 STR16 pAntiHackerString[] = 
@@ -4401,7 +4401,7 @@ STR16 gzLateLocalizedString[] =
 	L"Tutti i vostri mercenari sono stati bendati.",
 
 	//14
-	L"Arulco",
+	L"Tracona",
 
   L"(tetto)",
 
@@ -5067,7 +5067,7 @@ STR16	zNewTacticalMessages[]=
 	L"Le nuove reclute non possono arrivare qui.",
 	L"Poiché il tuo portatile non ha un trasmettitore, non potrai assoldare nuovi mercenari. Forse questo sarebbe un buon momento per caricare una partita salvata o ricominciare daccapo!",
 	L"%s sente venire da sotto al corpo di Jerry il rumore di metallo che si accartoccia. E' un suono fastidioso, come se l'antenna del tuo portatile venisse schiacciata.",  //the %s is the name of a merc.
-	L"Dopo aver dato un'occhiata al biglietto lasciato dal Vice Comandante Morris, %s vede una possibilità. La nota contiene le coordinate per il lancio di missili contro diverse città ad Arulco. C'è anche la locazione della base di lancio: la fabbrica di missili.",
+	L"Dopo aver dato un'occhiata al biglietto lasciato dal Vice Comandante Morris, %s vede una possibilità. La nota contiene le coordinate per il lancio di missili contro diverse città ad Tracona. C'è anche la locazione della base di lancio: la fabbrica di missili.",
 	L"Guardando il pannello di controllo %s immagina che i numeri possano essere invertiti, cosicché il missile distrugga proprio questa fabbrica. %s deve trovare una via di fuga. L'ascensore sembra offrire la soluzione più rapida...",
 	L"Questa è una partita a livello IRON MAN: non puoi salvare quando ci sono nemici nei dintorni.",
 	L"(Non puoi salvare durante il combattimento.)",

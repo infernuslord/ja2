@@ -1823,7 +1823,7 @@ STR16 pMapScreenFastHelpTextList[] =
 	L"Test-Text",
 	L"Test-Text",
 	L"Test-Text",
-	L"In diesem Bildschirm können Sie nicht viel machen, bevor Sie in Arulco ankommen. Wenn Sie Ihr Team zusammengestellt haben, klicken Sie auf den Zeitraffer-Button unten links. Dadurch vergeht die Zeit schneller, bis Ihr Team in Arulco ankommt.",
+	L"In diesem Bildschirm können Sie nicht viel machen, bevor Sie in Tracona ankommen. Wenn Sie Ihr Team zusammengestellt haben, klicken Sie auf den Zeitraffer-Button unten links. Dadurch vergeht die Zeit schneller, bis Ihr Team in Tracona ankommt.",
 };
 
 // movement menu text
@@ -2125,7 +2125,7 @@ STR16 pMapErrorString[] =
 //6-10
 	L"braucht eine Eskorte. Platzieren Sie ihn in einem Trupp mit Eskorte.", // merc can't move unescorted .. for a male
 	L"braucht eine Eskorte. Platzieren Sie sie in einem Trupp mit Eskorte.", // for a female
-	L"Söldner ist noch nicht in Arulco!",
+	L"Söldner ist noch nicht in Tracona!",
 	L"Erst mal Vertrag aushandeln!",
 	L"Marschbefehl ist nicht möglich. Luftangriffe finden statt.",
 //11-15
@@ -2209,8 +2209,8 @@ STR16 pMiscMapScreenMouseRegionHelpText[] =
 // male version of where equipment is left
 STR16 pMercHeLeaveString[] = 
 {
-	L"Soll %s seine Ausrüstung hier lassen (%s) oder in Drassen (B13), wenn er Arulco verlässt?",
-	L"Soll %s seine Ausrüstung hier lassen (%s) oder in Omerta (A9), wenn er Arulco verlässt?",
+	L"Soll %s seine Ausrüstung hier lassen (%s) oder in Drassen (B13), wenn er Tracona verlässt?",
+	L"Soll %s seine Ausrüstung hier lassen (%s) oder in Omerta (A9), wenn er Tracona verlässt?",
 	L"geht bald und lässt seine Ausrüstung in Omerta (A9).",
 	L"geht bald und lässt seine Ausrüstung in Drassen (B13).",
 	L"%s geht bald und lässt seine Ausrüstung in %s.",
@@ -2219,8 +2219,8 @@ STR16 pMercHeLeaveString[] =
 // female version
 STR16 pMercSheLeaveString[] =
 {
-	L"Soll %s ihre Ausrüstung hier lassen (%s) oder in Drassen (B13), bevor sie Arulco verlässt?",
-	L"Soll %s ihre Ausrüstung hier lassen (%s) oder in Omerta (A9), bevor sie Arulco verlässt?",
+	L"Soll %s ihre Ausrüstung hier lassen (%s) oder in Drassen (B13), bevor sie Tracona verlässt?",
+	L"Soll %s ihre Ausrüstung hier lassen (%s) oder in Omerta (A9), bevor sie Tracona verlässt?",
 	L"geht bald und lässt ihre Ausrüstung in Omerta (A9).",
 	L"geht bald und lässt ihre Ausrüstung in Drassen (B13).",
 	L"%s geht bald und lässt ihre Ausrüstung in %s.",
@@ -3980,7 +3980,7 @@ STR16 pMilitiaButtonsHelpText[] =
 STR16 pMapScreenJustStartedHelpText[] = 
 {
 	L"Zu AIM gehen und Söldner anheuern ( *Tip*: Befindet sich im Laptop )", // to inform the player to hired some mercs to get things going
-	L"Sobald Sie für die Reise nach Arulco bereit sind, klicken Sie auf den Zeitraffer-Button unten rechts auf dem Bildschirm.", // to inform the player to hit time compression to get the game underway
+	L"Sobald Sie für die Reise nach Tracona bereit sind, klicken Sie auf den Zeitraffer-Button unten rechts auf dem Bildschirm.", // to inform the player to hit time compression to get the game underway
 };
 
 STR16 pAntiHackerString[] = 
@@ -4200,7 +4200,7 @@ STR16 gzLateLocalizedString[] =
 	L"Alle Söldner verarztet.",
 
 	//14-16
-	L"Arulco",
+	L"Tracona",
 	L"(Dach)",
 	L"Gesundheit: %d/%d",
 
@@ -4864,7 +4864,7 @@ STR16	zNewTacticalMessages[]=
 	L"Neue Rekruten können dort nicht hinkommen.",
 	L"Da Ihr Laptop keinen Transmitter besitzt, können Sie keine neuen Teammitglieder anheuern. Vielleicht ist dies eine guter Zeitpunkt, ein gespeichertes  Spiel zu laden oder ein neues zu starten!",
 	L"%s hört das Geräusch knirschenden Metalls unter Jerry hervordringen. Es klingt grässlich - die Antenne ihres Laptop-Computers ist  zerstört.",  //the %s is the name of a merc.  @@@  Modified
-	L"Nach Ansehen des Hinweises, den Commander Morris hinterließ, erkennt %s eine einmalige Gelegenheit. Der Hinweis enthält Koordinaten für den Start von Raketen gegen verschiedene Städte in Arulco. Aber er enthält auch die Koordinaten des Startpunktes - der Raketenanlage.",
+	L"Nach Ansehen des Hinweises, den Commander Morris hinterließ, erkennt %s eine einmalige Gelegenheit. Der Hinweis enthält Koordinaten für den Start von Raketen gegen verschiedene Städte in Tracona. Aber er enthält auch die Koordinaten des Startpunktes - der Raketenanlage.",
 	L"Das Kontroll-Board studierend, entdeckt %s, dass die Zahlen umgedreht werden könnten, so dass die Raketen diese Anlage selbst zerstören. %s muss nun einen Fluchtweg finden. Der Aufzug scheint die schnellstmögliche Route zu bieten...",         //!!! The original reads:	L"Noticing the control panel %s, figures the numbers can be reversed..." That sounds odd for me, but I think the comma is placed one word too late... (correct?)
 	L"Dies ist ein IRON MAN-Spiel, und es kann nicht gespeichert werden, wenn sich Gegner in der Nähe befinden.",		
 	L"(Kann während Kampf nicht speichern)", 

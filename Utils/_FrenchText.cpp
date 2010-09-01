@@ -1870,7 +1870,7 @@ STR16 pMapScreenFastHelpTextList[] =
 	L"Test Text",
 	L"Test Text",
 	L"Test Text",
-	L"Cet écran ne vous est d'aucune utilité tant que vous n'êtes pas arrivé à Arulco. Une fois votre équipe constituée, cliquez sur le bouton de compression du temps en bas à droite. Le temps vous paraîtra moins long...",
+	L"Cet écran ne vous est d'aucune utilité tant que vous n'êtes pas arrivé à Tracona. Une fois votre équipe constituée, cliquez sur le bouton de compression du temps en bas à droite. Le temps vous paraîtra moins long...",
 };
 
 // movement menu text
@@ -2288,8 +2288,8 @@ STR16 pMiscMapScreenMouseRegionHelpText[] =
 // male version of where equipment is left
 STR16 pMercHeLeaveString[] =
 {
-	L"%s doit-il abandonner son équipement sur place (%s) ou à Drassen (B13) avant de quitter Arulco ?",
-	L"%s doit-il abandonner son équipement sur place (%s) ou à Omerta (A9) avant de quitter Arulco ?",
+	L"%s doit-il abandonner son équipement sur place (%s) ou à Drassen (B13) avant de quitter Tracona ?",
+	L"%s doit-il abandonner son équipement sur place (%s) ou à Omerta (A9) avant de quitter Tracona ?",
 	L"est sur le point de partir et laissera son équipement à Omerta (A9).",
 	L"est sur le point de partir et laissera son équipement à Drassen (B13).",
 	L"%s est sur le point de partir et laissera son équipement en %s.",
@@ -2299,8 +2299,8 @@ STR16 pMercHeLeaveString[] =
 // female version
 STR16 pMercSheLeaveString[] =
 {
-	L"%s doit-elle abandonner son équipement sur place (%s) ou à Drassen (B13) avant de quitter Arulco ?",
-	L"%s doit-elle abandonner son équipement sur place (%s) ou à Omerta (A9) avant de quitter Arulco ?",
+	L"%s doit-elle abandonner son équipement sur place (%s) ou à Drassen (B13) avant de quitter Tracona ?",
+	L"%s doit-elle abandonner son équipement sur place (%s) ou à Omerta (A9) avant de quitter Tracona ?",
 	L"est sur le point de partir et laissera son équipement à Omerta (A9).",
 	L"est sur le point de partir et laissera son équipement à Drassen (B13).",
 	L"%s est sur le point de partir et laissera son équipement en %s.",
@@ -2313,7 +2313,7 @@ STR16 pMercContractOverStrings[] =
 	L"a rempli son contrat, elle est rentrée chez elle.", 		// merc's contract is over and has departed
 	L"est parti, son contrat ayant été annulé.", 		// merc's contract has been terminated
 	L"est partie, son contrat ayant été annulé.",		// merc's contract has been terminated
-	L"Vous devez trop d'argent à la M.E.R.C., %s quitte Arulco.", // Your M.E.R.C. account is invalid so merc left
+	L"Vous devez trop d'argent à la M.E.R.C., %s quitte Tracona.", // Your M.E.R.C. account is invalid so merc left
 };
 
 // Text used on IMP Web Pages
@@ -2385,7 +2385,7 @@ STR16 pFilesTitle[] =
 
 STR16 pFilesSenderList[] =
 {
-L"Rapport Arulco", 		// the recon report sent to the player. Recon is an abbreviation for reconissance
+L"Rapport Tracona", 		// the recon report sent to the player. Recon is an abbreviation for reconissance
 	L"Intercept #1", 		// first intercept file .. Intercept is the title of the organization sending the file...similar in function to INTERPOL/CIA/KGB..refer to fist record in files.txt for the translated title
 	L"Intercept #2",	   // second intercept file
 	L"Intercept #3",			 // third intercept file
@@ -4367,8 +4367,8 @@ STR16 zGioDifConfirmText[]=
 {
 	L"Vous avez choisi le mode de difficulté NOVICE. Ce mode de jeu est conseillé pour les joueurs qui découvrent Jagged Alliance, qui n'ont pas l'habitude de jouer à des jeux de stratégie ou qui souhaitent que les combats ne durent pas trop longtemps. Ce choix influe sur de nombreux paramètres du jeu. Etes-vous certain de vouloir jouer en mode Novice ?",
 	L"Vous avez choisi le mode de difficulté EXPERIMENTE. Ce mode de jeu est conseillé pour les joueurs qui ont déjà joué à Jagged Alliance ou des jeux de stratégie. Ce choix influe sur de nombreux paramètres du jeu. Etes-vous certain de vouloir jouer en mode Expérimenté ?",
-	L"Vous avez choisi le mode de difficulté EXPERT. Vous aurez été prévenu. Ne venez pas vous plaindre si vos mercenaires quittent Arulco dans un cerceuil. Ce choix influe sur de nombreux paramètres du jeu. Etes-vous certain de vouloir jouer en mode Expert ?",
-	L"Vous avez choisi le mode de difficulté INCROYABLE. ATTENTION: Ne venez pas vous plaindre si vos mercenaires quittent Arulco en petits morceaux... Deidranna va vous tuer. A coup sûr.  Ce choix influe sur de nombreux paramètres du jeu. Etes-vous certain de vouloir jouer en mode INCROYABLE ?",
+	L"Vous avez choisi le mode de difficulté EXPERT. Vous aurez été prévenu. Ne venez pas vous plaindre si vos mercenaires quittent Tracona dans un cerceuil. Ce choix influe sur de nombreux paramètres du jeu. Etes-vous certain de vouloir jouer en mode Expert ?",
+	L"Vous avez choisi le mode de difficulté INCROYABLE. ATTENTION: Ne venez pas vous plaindre si vos mercenaires quittent Tracona en petits morceaux... Deidranna va vous tuer. A coup sûr.  Ce choix influe sur de nombreux paramètres du jeu. Etes-vous certain de vouloir jouer en mode INCROYABLE ?",
 };
 
 STR16 gzLateLocalizedString[] =
@@ -4406,7 +4406,7 @@ STR16 gzLateLocalizedString[] =
 	L"Tous vos mercenaires ont été soignés.",
 
 	//14
-	L"Arulco",
+	L"Tracona",
 
   L"(roof)",
 
@@ -5072,7 +5072,7 @@ STR16	zNewTacticalMessages[]=
 	L"Les nouvelles recrues ne peuvent arriver ici.",
 	L"Comme votre PC n'a pas de transpondeur, vous ne pouvez engager de nouvelles recrues. Revenez à une sauvegarde précédente et réessayez.",
 	L"%s entend le son de métal broyé provenant d'en dessous du corps de Jerry.  On dirait que l'antenne de votre PC ne sers plus à rien.",  //the %s is the name of a merc.  @@@  Modified
-	L"Apres avoir scanné la note laissée par le Deputy Commander Morris, %s sent une oppurtinité. La note contient les coordonnées pour le lancement de missiles sur Arulco. Elle contient aussi l'emplacement de l'usine d'où les missiles proviennent.",
+	L"Apres avoir scanné la note laissée par le Deputy Commander Morris, %s sent une oppurtinité. La note contient les coordonnées pour le lancement de missiles sur Tracona. Elle contient aussi l'emplacement de l'usine d'où les missiles proviennent.",
 	L"En examinant le panneau de contrôle, %s s'aperçoît que less chiffres peuvent être inversés, pour que les missiles détruisent cette même usine.  %s a besoin de trouver un chemin pour s'enfuir.  L'ascenseur semble être la solution la plus rapide...",
 	L"Ceci est un jeu IRON MAN et vous ne pouvez sauvegarder s'il ya des ennemis dans les parages.",	//	@@@  new text
 	L"(ne peut sauvegarder en plein combat)", //@@@@ new text

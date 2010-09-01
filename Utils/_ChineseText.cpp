@@ -1,4 +1,4 @@
-﻿//#pragma setlocale("CHINESE")
+﻿Tracona//#pragma setlocale("CHINESE")
 #ifdef PRECOMPILEDHEADERS
 	#include "Utils All.h"
 #else
@@ -1874,7 +1874,7 @@ STR16 pMapScreenFastHelpTextList[] =
 	L"测试文本",
 	L"测试文本",
 	L"测试文本",
-	L"您尚未开始Arulco之旅，现在在这个屏幕上您无事可做。当您把队员都雇佣好后，请左击右下方的“时间压缩”按钮。这样在您的队伍到达Arulco前，时间就前进了。",
+	L"您尚未开始Tracona之旅，现在在这个屏幕上您无事可做。当您把队员都雇佣好后，请左击右下方的“时间压缩”按钮。这样在您的队伍到达Tracona前，时间就前进了。",
 };
 
 // movement menu text
@@ -2202,7 +2202,7 @@ STR16 pMapErrorString[] =
 //6-10
 	L"需要有人护送才能行军。请把他分进一个小队里。", // merc can't move unescorted .. for a male
 	L"需要有人护送才能行军。请把她分进一个小队里。", // for a female
-	L"佣兵尚未到达Arulco!",
+	L"佣兵尚未到达Tracona!",
 	L"看来得先谈妥合同。",
 	L"无法发出行军命令。目前有空袭。",
 //11-15
@@ -2291,8 +2291,8 @@ STR16 pMiscMapScreenMouseRegionHelpText[] =
 // male version of where equipment is left
 STR16 pMercHeLeaveString[] =
 {
-	L"让%s把装备留在他现在所在的地方(%s)，或者在Drassen (B13)登机飞离Arulco，把装备留在那里?",
-	L"让%s把装备留在他现在所在的地方(%s)，或者在Omerta (A9)登机飞离Arulco，把装备留在那里?",
+	L"让%s把装备留在他现在所在的地方(%s)，或者在Drassen (B13)登机飞离Tracona，把装备留在那里?",
+	L"让%s把装备留在他现在所在的地方(%s)，或者在Omerta (A9)登机飞离Tracona，把装备留在那里?",
 	L"要离开了，他的装备将被留在Omerta (A9)。",
 	L"要离开了，他的装备将被留在Drassen (B13)。",
 	L"%s要离开了，他的装备将被留在%s。",
@@ -2302,8 +2302,8 @@ STR16 pMercHeLeaveString[] =
 // female version
 STR16 pMercSheLeaveString[] =
 {
-	L"让%s把装备留在她现在所在的地方(%s)，或者在Drassen (B13)登机飞离Arulco，把装备留在那里?",
-	L"让%s把装备留在她现在所在的地方(%s)，或者在Omerta (A9)登机飞离Arulco，把装备留在那里?",
+	L"让%s把装备留在她现在所在的地方(%s)，或者在Drassen (B13)登机飞离Tracona，把装备留在那里?",
+	L"让%s把装备留在她现在所在的地方(%s)，或者在Omerta (A9)登机飞离Tracona，把装备留在那里?",
 	L"要离开了，她的装备将被留在Omerta (A9)。",
 	L"要离开了，她的装备将被留在Drassen (B13)。",
 	L"%s要离开了，她的装备将被留在%s。",
@@ -4182,7 +4182,7 @@ STR16 pMilitiaButtonsHelpText[] =
 STR16 pMapScreenJustStartedHelpText[] =
 {
 	L"去AIM雇几个佣兵( *提示* 在笔记本电脑里)",
-	L"当你准备出发前往Arulco，点击屏幕右下方的时间压缩按钮。",
+	L"当你准备出发前往Tracona，点击屏幕右下方的时间压缩按钮。",
 };
 
 STR16 pAntiHackerString[] =
@@ -4410,7 +4410,7 @@ STR16 gzLateLocalizedString[] =
 	L"全部佣兵已被包扎完毕。",	//"All your mercs are bandaged.",
 
 	//14
-	L"Arulco",
+	L"Tracona",
 
 	L"屋顶",
 
@@ -5097,13 +5097,13 @@ STR16	zNewTacticalMessages[]=
 	L"New Recruits cannot arrive there.",
 	L"Since your laptop has no transmitter, you won't be able to hire new team members.  Perhaps this would be a good time to load a saved game or start over!",
 	L"%s hears the sound of crumpling metal coming from underneath Jerry's body.  It sounds disturbingly like your laptop antenna being crushed.",  //the %s is the name of a merc.  @@@  Modified
-	L"After scanning the note left behind by Deputy Commander Morris, %s senses an oppurtinity.  The note contains the coordinates for launching missiles against different towns in Arulco.  It also gives the coodinates of the origin - the missile facility.",
+	L"After scanning the note left behind by Deputy Commander Morris, %s senses an oppurtinity.  The note contains the coordinates for launching missiles against different towns in Tracona.  It also gives the coodinates of the origin - the missile facility.",
 	L"Noticing the control panel, %s figures the numbers can be reveresed, so that the missile might destroy this very facility.  %s needs to find an escape route.  The elevator appears to offer the fastest solution...",
 */
 	L"新雇请的佣兵无法到达那里。",
 	L"由于你的笔记本电脑没有发报机，你无法雇请新的队员。也许你得读取存档或者重新开始游戏！",
 	L"%s听到了Jerry的身体下面传来金属的破碎的声音。听起来令人不安，似乎你的笔记本电脑的天线被压断了。", 
-	L"看完副指挥官Morris留下的备忘录后，%s觉得有机会了。备忘录里有向Arulco各个城镇发射导弹的基地的坐标。它还给出了这个罪恶计划的发源地的坐标 —— 导弹工厂。",
+	L"看完副指挥官Morris留下的备忘录后，%s觉得有机会了。备忘录里有向Tracona各个城镇发射导弹的基地的坐标。它还给出了这个罪恶计划的发源地的坐标 —— 导弹工厂。",
 	L"看到了控制面板后， %s发现它正在倒计时，因此导弹会把这个工厂炸毁。%s得找出个脱逃的路线。使用电梯看起来是最快的办法...",
 /*
 	L"This is an IRON MAN game and you cannot save when enemies are around.",	//	@@@  new text

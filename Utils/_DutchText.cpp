@@ -1868,7 +1868,7 @@ STR16 pMapScreenFastHelpTextList[] =
 	L"Test Tekst",
 	L"Test Tekst",
 	L"Test Tekst",
-	L"Totdat je arriveert in Arulco is er niet veel te doen bij dit scherm. Als je klaar bent met het samenstellen van je team, klik dan op de Tijd-Versnel-knop rechtsonder. Zo verstrijkt de tijd totdat je team in Arulco aankomt.",
+	L"Totdat je arriveert in Tracona is er niet veel te doen bij dit scherm. Als je klaar bent met het samenstellen van je team, klik dan op de Tijd-Versnel-knop rechtsonder. Zo verstrijkt de tijd totdat je team in Tracona aankomt.",
 };
 
 // movement menu text
@@ -2196,7 +2196,7 @@ STR16 pMapErrorString[] =
 //6-10
 	L"heeft een escorte nodig. Plaats hem in een team.", // merc can't move unescorted .. for a male
 	L"heeft een escorte nodig. Plaats haar in een team.", // for a female
-	L"Huurling is nog niet in Arulco aangekomen!",
+	L"Huurling is nog niet in Tracona aangekomen!",
 	L"Het lijkt erop dat er eerst nog contractbesprekingen gehouden moeten worden.",
 	L"Cannot give a movement order. Air raid is going on.",
 //11-15
@@ -2285,8 +2285,8 @@ STR16 pMiscMapScreenMouseRegionHelpText[] =
 // male version of where equipment is left
 STR16 pMercHeLeaveString[] =
 {
-	L"Laat %s zijn uitrusting achterlaten waar hij nu is (%s) of in Drassen (B13) bij het nemen van de vlucht uit Arulco?",
-	L"Laat %s zijn uitrusting achterlaten waar hij nu is (%s) of later in Omerta (A9) bij het nemen van de vlucht uit Arulco?",
+	L"Laat %s zijn uitrusting achterlaten waar hij nu is (%s) of in Drassen (B13) bij het nemen van de vlucht uit Tracona?",
+	L"Laat %s zijn uitrusting achterlaten waar hij nu is (%s) of later in Omerta (A9) bij het nemen van de vlucht uit Tracona?",
 	L"gaat binnenkort weg en laat zijn uitrusting achter in Omerta (A9).",
 	L"gaat binnenkort weg en laat zijn uitrusting achter in Drassen (B13).",
 	L"%s gaat binnenkort weg en laat zijn uitrusting achter in %s.",
@@ -2296,8 +2296,8 @@ STR16 pMercHeLeaveString[] =
 // female version
 STR16 pMercSheLeaveString[] =
 {
-	L"Laat %s haar uitrusting achterlaten waar ze nu is (%s) of in Drassen (B13) bij het nemen van de vlucht uit Arulco?",
-	L"Laat %s haar uitrusting achterlaten waar ze nu is (%s) of later in Omerta (A9) bij het nemen van de vlucht uit Arulco?",
+	L"Laat %s haar uitrusting achterlaten waar ze nu is (%s) of in Drassen (B13) bij het nemen van de vlucht uit Tracona?",
+	L"Laat %s haar uitrusting achterlaten waar ze nu is (%s) of later in Omerta (A9) bij het nemen van de vlucht uit Tracona?",
 	L"gaat binnenkort weg en laat haar uitrusting achter in Omerta (A9).",
 	L"gaat binnenkort weg en laat haar uitrusting achter in Drassen (B13).",
 	L"%s gaat binnenkort weg en laat haar uitrusting achter in %s.",
@@ -4175,7 +4175,7 @@ STR16 pMilitiaButtonsHelpText[] =
 STR16 pMapScreenJustStartedHelpText[] =
 {
 	L"Ga naar AIM en huur wat huurlingen in ( *Hint* dat kan bij Laptop )",
-	L"Als je klaar bent om naar Arulco te gaan, klik dan op TijdVersneller onder rechts op het scherm.",	// to inform the player to hit time compression to get the game underway
+	L"Als je klaar bent om naar Tracona te gaan, klik dan op TijdVersneller onder rechts op het scherm.",	// to inform the player to hit time compression to get the game underway
 };
 
 STR16 pAntiHackerString[] = 
@@ -4402,7 +4402,7 @@ STR16 gzLateLocalizedString[] =
 	L"Al je huurlingen zijn verbonden.",
 
 	//14
-	L"Arulco",
+	L"Tracona",
 
 	L"(dak)",
 
@@ -5068,7 +5068,7 @@ STR16	zNewTacticalMessages[]=
 	L"New Recruits cannot arrive there.",
 	L"Since your laptop has no transmitter, you won't be able to hire new team members.  Perhaps this would be a good time to load a saved game or start over!",
 	L"%s hears the sound of crumpling metal coming from underneath Jerry's body.  It sounds disturbingly like your laptop antenna being crushed.",  //the %s is the name of a merc.  @@@  Modified
-	L"After scanning the note left behind by Deputy Commander Morris, %s senses an oppurtinity.  The note contains the coordinates for launching missiles against different towns in Arulco.  It also gives the coodinates of the origin - the missile facility.",
+	L"After scanning the note left behind by Deputy Commander Morris, %s senses an oppurtinity.  The note contains the coordinates for launching missiles against different towns in Tracona.  It also gives the coodinates of the origin - the missile facility.",
 	L"Noticing the control panel, %s figures the numbers can be reveresed, so that the missile might destroy this very facility.  %s needs to find an escape route.  The elevator appears to offer the fastest solution...",
 	L"This is an IRON MAN game and you cannot save when enemies are around.",	//	@@@  new text
 	L"(Cannot save during combat)", //@@@@ new text
