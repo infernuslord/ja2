@@ -120,6 +120,9 @@
     <ClCompile Include="MessageBoxScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="legion cfg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="builddefines.h">
@@ -253,6 +256,9 @@
     </ClInclude>
     <ClInclude Include="Multiplayer\test_space.h">
       <Filter>Multiplayer\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="legion cfg.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

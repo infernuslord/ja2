@@ -61,6 +61,7 @@
     <ClInclude Include="Inventory Choosing.h" />
     <ClInclude Include="Item Types.h" />
     <ClInclude Include="Items.h" />
+    <ClInclude Include="Ja25_Tactical.h" />
     <ClInclude Include="Keys.h" />
     <ClInclude Include="LOS.h" />
     <ClInclude Include="Map Information.h" />
@@ -144,6 +145,7 @@
     <ClCompile Include="Inventory Choosing.cpp" />
     <ClCompile Include="Item Types.cpp" />
     <ClCompile Include="Items.cpp" />
+    <ClCompile Include="Ja25_Tactical.cpp" />
     <ClCompile Include="Keys.cpp" />
     <ClCompile Include="LOS.cpp" />
     <ClCompile Include="Map Information.cpp" />
@@ -216,8 +218,11 @@
     <ClCompile Include="XML_NASIncompatibleAttachments.cpp" />
     <ClCompile Include="XML_Opinions.cpp" />
     <ClCompile Include="XML_Profiles.cpp" />
+    <ClCompile Include="XML_Qarray.cpp" />
+    <ClCompile Include="XML_RandomStats.cpp" />
     <ClCompile Include="XML_RPCFacesSmall.cpp" />
     <ClCompile Include="XML_SectorLoadscreens.cpp" />
+    <ClCompile Include="XML_SoundProfile.cpp" />
     <ClCompile Include="XML_Sounds.cpp" />
     <ClCompile Include="XML_SpreadPatterns.cpp" />
     <ClCompile Include="XML_TonyInventory.cpp" />

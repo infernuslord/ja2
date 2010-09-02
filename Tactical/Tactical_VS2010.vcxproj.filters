@@ -258,6 +258,9 @@
     <ClInclude Include="XML_Profiles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Ja25_Tactical.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Air Raid.cpp">
@@ -597,6 +600,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="XML_NASIncompatibleAttachments.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ja25_Tactical.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XML_Qarray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XML_RandomStats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XML_SoundProfile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -229,6 +229,7 @@
     <ClCompile Include="JA2 Splash.cpp" />
     <ClCompile Include="jascreens.cpp" />
     <ClCompile Include="Language Defines.cpp" />
+    <ClCompile Include="legion cfg.cpp" />
     <ClCompile Include="Loading Screen.cpp" />
     <ClCompile Include="MainMenuScreen.cpp" />
     <ClCompile Include="MessageBoxScreen.cpp" />
@@ -270,6 +271,7 @@
     <ClInclude Include="JA2Prototypes.h" />
     <ClInclude Include="jascreens.h" />
     <ClInclude Include="Language Defines.h" />
+    <ClInclude Include="legion cfg.h" />
     <ClInclude Include="Loading Screen.h" />
     <ClInclude Include="local.h" />
     <ClInclude Include="mainmenuscreen.h" />

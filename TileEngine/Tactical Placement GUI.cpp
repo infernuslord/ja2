@@ -988,8 +988,8 @@ void TacticalPlacementHandle()
 				case ENTER:
 					if( ButtonList[ iTPButtons[ DONE_BUTTON ] ]->uiFlags & BUTTON_ENABLED )
 					{
-									/*if(!is_client)KillTacticalPlacementGUI();*/
-									//if(is_client)send_donegui(0); only by mouse //hayden
+						if(!is_client)KillTacticalPlacementGUI();
+						if(is_client)send_donegui(0);
 					}
 					break;
 				case 'c':
