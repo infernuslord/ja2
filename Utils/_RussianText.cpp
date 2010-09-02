@@ -1,4 +1,4 @@
-Тракона#pragma setlocale("RUSSIAN")
+#pragma setlocale("RUSSIAN")
 #ifdef PRECOMPILEDHEADERS
 	#include "Utils All.h"
 #else

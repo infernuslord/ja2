@@ -150,6 +150,32 @@ void HandleHowPlayerGotThroughFan();
 
 BOOLEAN OldNew = TRUE;
 
+UINT32	BARRETT_UB = 43;
+UINT32	CALICO_960_UB = 44;
+UINT32	PSG1_UB =45;
+UINT32	L85_UB =46;
+UINT32	TAR21_UB =47;
+UINT32	VAL_SILENT_UB =48;
+UINT32	MICRO_UZI_UB = 57;
+UINT32	CALICO_950_UB = 66;
+UINT32	CALICO_900_UB = 67;
+	
+UINT32	CLIP_CANNON_BALL = 115;
+UINT32	MERC_UMBRELLA = 70;
+UINT32	HAND_CANNON = 63;
+UINT32	HARTFORD_6_SHOOTER = 68;
+UINT32	TEX_MOVIE_ATTACK_CLYDESDALES = 328;
+UINT32	TEX_MOVIE_WILD_EAST = 329;
+UINT32	TEX_MOVIE_HAVE_HONDA = 330;
+UINT32	LAPTOP_TRANSMITTER = 331;
+UINT32	CHE_GUEVARA_CANTEEN = 332;
+UINT32	MERC_WRISTWATCH = 333;
+UINT32	SAM_GARVER_COMBAT_KNIFE = 69;
+UINT32	MERC_UMBRELLA_OLD = 335;
+UINT32	MORRIS_INSTRUCTION_NOTE = 336;
+	
+	
+/*
 UINT32	TEX_MOVIE_ATTACK_CLYDESDALES;
 UINT32	TEX_MOVIE_WILD_EAST;
 UINT32	TEX_MOVIE_HAVE_HONDA;
@@ -174,7 +200,7 @@ UINT32	CALICO_950_UB;
 UINT32	CALICO_900_UB;
 
 UINT32	CLIP_CANNON_BALL;
-
+*/
 void Old_UB_Inventory ();
 void New_UB_Inventory ();
 
@@ -1010,8 +1036,8 @@ BOOLEAN HandleNewGunComment( SOLDIERTYPE *pSoldier, INT32 iItemIndex, BOOLEAN fF
 	}
 	
 	
-if ( OldNew == TRUE )
-{
+//if ( OldNew == TRUE )
+//{
 
 	//if the quote has already been said
 	if( HasNewGunQuoteBeenPlayedForThisGun( iItemIndex ) )
@@ -1041,7 +1067,7 @@ if ( OldNew == TRUE )
 			pSoldier->usQuoteSaidFlags |= SOLDIER_QUOTE_SAID_FOUND_SOMETHING_NICE;
 		}
 	}
-}
+//}
 	//if it is a new merc
 	if( fNewMerc )
 	{
@@ -1054,12 +1080,12 @@ if ( OldNew == TRUE )
 		else
 		{
 			//say the new gun quote
-			if (OldNew == TRUE )
+			//if (OldNew == TRUE )
 			TacticalCharacterDialogue( pSoldier, QUOTE_HATE_MERC_1_ON_TEAM_WONT_RENEW );
 		}
 
 		//rememeber we have played the quote
-		if ( OldNew == TRUE )
+		//if ( OldNew == TRUE )
 			SetNewGunQuoteToBePlayedForThisGun( iItemIndex );
 	}
 	
@@ -1119,7 +1145,7 @@ BOOLEAN LoadNewGunQuotesArrayToSaveGameFile( HWFILE hFile )
 	if( guiSaveGameVersion < 1005 )
 	{
 */
-		if ( OldNew == TRUE )
+		//if ( OldNew == TRUE )
 			InitNewGunArray();
 /*
 	}
@@ -1131,8 +1157,8 @@ void InitNewGunArray()
 {
 
 INT32 iCnt=0;
-if ( OldNew == TRUE )
-{
+//if ( OldNew == TRUE )
+//{
 	gNewGunQuotes[iCnt++].sItem = BARRETT_UB;
 	gNewGunQuotes[iCnt++].sItem = CALICO_960_UB;
 	gNewGunQuotes[iCnt++].sItem = PSG1_UB;
@@ -1143,15 +1169,15 @@ if ( OldNew == TRUE )
 	gNewGunQuotes[iCnt++].sItem = HAND_CANNON;
 	gNewGunQuotes[iCnt++].sItem = CALICO_950_UB;
 	gNewGunQuotes[iCnt++].sItem = CALICO_900_UB;
-}
+//}
 
 }
 
 
 BOOLEAN IsThisGunANewJa25Gun( INT32 iItemIndex )
 {
-if ( OldNew == TRUE )
-{
+//if ( OldNew == TRUE )
+//{
 	//if this gun ISNT a new gun
 	if( !( iItemIndex == BARRETT_UB	||
 			iItemIndex == CALICO_960_UB	|| 
@@ -1166,7 +1192,7 @@ if ( OldNew == TRUE )
 	{
 		return( FALSE );
 	}
-}
+//}
 	return( TRUE );
 }
 

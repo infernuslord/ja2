@@ -1,4 +1,4 @@
-Tracona#pragma setlocale("POLISH")
+#pragma setlocale("POLISH")
 #ifdef PRECOMPILEDHEADERS
 	#include "Utils All.h"
 #else

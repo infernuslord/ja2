@@ -780,6 +780,10 @@ BOOLEAN InitNewGame( BOOLEAN fReset )
 		}
 		
 	}
+	
+#ifdef JA2UB	
+	//	New_UB_Inventory ();
+#endif
 
 /*
 	if ( gubScreenCount == 2 )

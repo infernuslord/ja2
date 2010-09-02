@@ -4282,6 +4282,10 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 	uiRelStartPerc = uiRelEndPerc;
 #endif
 
+#ifdef JA2UB	
+	//	New_UB_Inventory ();
+#endif
+
 	//
 	//Close the saved game file
 	//

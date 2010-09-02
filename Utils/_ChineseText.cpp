@@ -1,4 +1,4 @@
-﻿Tracona//#pragma setlocale("CHINESE")
+﻿//#pragma setlocale("CHINESE")
 #ifdef PRECOMPILEDHEADERS
 	#include "Utils All.h"
 #else

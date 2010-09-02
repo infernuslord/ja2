@@ -872,7 +872,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	//if ( OldNew == TRUE )
 	//	Old_UB_Inventory ();
 	//else
-		New_UB_Inventory ();
+	//	New_UB_Inventory ();
 #endif
 
 	// load Lua for Strategic Mines initialization
