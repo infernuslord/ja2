@@ -109,6 +109,7 @@
 #ifdef JA2UB
 
 #include "Ja25Update.h"
+#include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
 #include "MapScreen Quotes.h"
 #include "email.h"
@@ -237,7 +238,7 @@ UINT32	GetNumberOfJA25EnemiesInSector( INT16 sSectorX, INT16 sSectorY, INT8 bSec
 void InitJa25StrategicAi()
 {
 	//Initialize the array of new gun quotes
-//	InitNewGunArray();
+	InitNewGunArray();
 /*
 	#ifdef ENABLE_CUSTOM_MAP_INTERFACE
 		//if the player is using a CUSTOM MAP SCENARIO disable the S.A.I.

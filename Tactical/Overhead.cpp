@@ -5996,6 +5996,11 @@ void ExitCombatMode( )
 	// since this would be the same as what would happen at the end of the turn
 	gTacticalStatus.uiTimeSinceLastOpplistDecay = __max( 0, GetWorldTotalSeconds() - TIME_BETWEEN_RT_OPPLIST_DECAYS );
 	NonCombatDecayPublicOpplist( GetWorldTotalSeconds() );
+	
+#ifdef JA2UB	
+	//if we are in J13 and the fan is stopped, handle it
+	HandleFanStartingAtEndOfCombat();
+#endif
 }
 
 

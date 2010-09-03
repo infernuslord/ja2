@@ -2430,6 +2430,13 @@ void PrepareLoadedSector()
 
 	ScreenMsg( FONT_YELLOW, MSG_DEBUG, L"Current Time is: %d", GetWorldTotalMin() );
 
+#ifdef JA2UB	
+	HandleSectorSpecificModificatioToMap( gWorldSectorX, gWorldSectorY, gbWorldSectorZ, FALSE );
+
+	//If there needs to be modifications done to the enemy exp levels...
+	HandleJa25EnemyExpLevelModifier( );
+#endif
+
 	AllTeamsLookForAll( TRUE );
 }
 
