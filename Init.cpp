@@ -444,10 +444,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	//UB
 	strcpy(fileName, directoryName);
 	strcat(fileName, RAULINVENTORYFILENAME);
-//	if ( FileExists(fileName) )
-//	{
-	THROWIFFALSE(ReadInInventoryStats(gPerkoInventory,fileName),RAULINVENTORYFILENAME);
-//	}
+	THROWIFFALSE(ReadInInventoryStats(gRaulInventory,fileName),RAULINVENTORYFILENAME);
 
 #else
 	strcpy(fileName, directoryName);
@@ -519,10 +516,6 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, ARNIEINVENTORYFILENAME);
 	THROWIFFALSE(ReadInInventoryStats(gArnieInventory,fileName),ARNIEINVENTORYFILENAME);
-
-	strcpy(fileName, directoryName);
-	strcat(fileName, PERKOINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gPerkoInventory,fileName),PERKOINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, FREDOINVENTORYFILENAME);

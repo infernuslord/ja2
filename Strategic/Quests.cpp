@@ -65,6 +65,7 @@ void SetFactTrue( UINT16 usFact )
 	// and code is more readable that way
 
 	// must intercept when Jake is first trigered to start selling fuel
+
 	if ( ( usFact == FACT_ESTONI_REFUELLING_POSSIBLE ) && ( CheckFact( usFact, 0 ) == FALSE ) )
 	{
 		// give him some gas...

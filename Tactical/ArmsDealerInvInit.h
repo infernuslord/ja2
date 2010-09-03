@@ -75,6 +75,10 @@ extern DEALER_POSSIBLE_INV gAlbertoInventory[MAXITEMS+1];
 extern DEALER_POSSIBLE_INV gCarloInventory[MAXITEMS+1];
 extern DEALER_POSSIBLE_INV gMickyInventory[MAXITEMS+1];
 extern DEALER_POSSIBLE_INV gArnieInventory[MAXITEMS+1];
+#ifdef JA2UB
+extern DEALER_POSSIBLE_INV gRaulInventory[MAXITEMS+1];
+#else
 extern DEALER_POSSIBLE_INV gPerkoInventory[MAXITEMS+1];
+#endif
 extern DEALER_POSSIBLE_INV gFredoInventory[MAXITEMS+1];
 #endif

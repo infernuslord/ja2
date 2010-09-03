@@ -8,16 +8,17 @@
 //enums for the various arms dealers
 enum
 {
+//Ja25 None are in exp.
 	ARMS_DEALER_TONY,
 	ARMS_DEALER_FRANZ,
 	ARMS_DEALER_KEITH,
 	ARMS_DEALER_JAKE,
 	ARMS_DEALER_GABBY,
-	#ifdef JA2UB
-	//ja25 ub Biggins
-	#else
-	ARMS_DEALER_DEVIN, 
-	#endif
+#ifdef JA2UB
+//no UB
+#else
+	ARMS_DEALER_DEVIN,
+#endif
 
 	ARMS_DEALER_HOWARD,
 	ARMS_DEALER_SAM,
@@ -32,18 +33,22 @@ enum
 
 	ARMS_DEALER_ARNIE,
 	ARMS_DEALER_FREDO,
+	
+#ifdef JA2UB
+	ARMS_DEALER_RAUL,
+#else
 	ARMS_DEALER_PERKO,
+#endif
 
 // added only in GameVersion 54
 	ARMS_DEALER_ELGIN,
 
 // added only in GameVersion 55
 	ARMS_DEALER_MANNY,
-	
-	//Betty UB
-	#ifdef JA2UB
+
+#ifdef JA2UB
 	ARMS_DEALER_BETTY,
-	#endif
+#endif
 
 	NUM_ARMS_DEALERS,
 };

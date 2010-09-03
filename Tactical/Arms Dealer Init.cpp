@@ -91,6 +91,7 @@ const ARMS_DEALER_INFO	DefaultarmsDealerInfo[ NUM_ARMS_DEALERS ] =
 /* Betty  */		{ 0.75f,	1.25f,	73,		ARMS_DEALER_BUYS_SELLS, 10000,	ARMS_DEALER_SOME_USED_ITEMS | ARMS_DEALER_GIVES_CHANGE , 1000, 1000, 0, 1, 10, 1, 10, 1, 2, false, true },
 #endif
 
+
 };
 std::vector<ARMS_DEALER_INFO>	armsDealerInfo (NUM_ARMS_DEALERS);
 
@@ -453,7 +454,7 @@ void DailyCheckOnItemQuantities()
 						iter->uiOrderArrivalTime = 0;
 #ifdef JA2UB						
 						//JA25 UB if the dealer is RAUL
-						if( ubArmsDealer == ARMS_DEALER_PERKO )
+						if( ubArmsDealer == ARMS_DEALER_RAUL )
 						{
 							//set the fact the raul refreshed his inventory
 							SetFactTrue( FACT_RAULS_INVENTORY_CHANGED_SINCE_LAST_VISIT );
@@ -625,15 +626,15 @@ BOOLEAN AdjustCertainDealersInventory( )
 	{
 		GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_FRANZ, VIDEO_CAMERA, 1 );
 	}
-#ifdef JA2UB	
+#ifdef JA2UB
 	//------------UB---------------------
 	
 	
 	//if Raul hasnt yet sold the barret
-	if( !( gArmsDealerStatus[ ARMS_DEALER_PERKO ].ubSpecificDealerFlags & ARMS_DEALER_FLAG__RAUL_HAS_SOLD_BARRETT_TO_PLAYER ) )
+	if( !( gArmsDealerStatus[ ARMS_DEALER_RAUL ].ubSpecificDealerFlags & ARMS_DEALER_FLAG__RAUL_HAS_SOLD_BARRETT_TO_PLAYER ) )
 	{
 		//Guarentee at least 1 Barrett
-		GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_PERKO, BARRETT, 1 );
+		GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_RAUL, BARRETT, 1 );
 	}
 
 
@@ -1265,11 +1266,21 @@ BOOLEAN CanDealerRepairItem( UINT8 ubArmsDealer, UINT16 usItemIndex )
 	{
 		return(FALSE);
 	}
-
+	
+//#ifdef JA2UB	
+//Ja25: TEMP!!!
+//	return( FALSE );
+//#endif
 	switch ( ubArmsDealer )
 	{
+	
+
 		case ARMS_DEALER_ARNIE:
+#ifdef JA2UB
+//Ja25 neither in exp.
+#else		
 		case ARMS_DEALER_PERKO:
+#endif		
 			// repairs ANYTHING non-electronic
 //			if ( !( uiFlags & ITEM_ELECTRONIC ) )
 			if ( !( Item[ usItemIndex ].electronic ) )
@@ -1286,7 +1297,6 @@ BOOLEAN CanDealerRepairItem( UINT8 ubArmsDealer, UINT16 usItemIndex )
 				return(TRUE);
 			}
 			break;
-
 		default:
 			AssertMsg( FALSE, String( "CanDealerRepairItem(), Arms Dealer %d is not a recognized repairman!.	AM 1.", ubArmsDealer ) );
 	}
@@ -1749,10 +1759,10 @@ BOOLEAN AddDeadArmsDealerItemsToWorld( UINT8 ubMercID )
 		Assert(0);
 		return( FALSE );
 	}
-#ifdef JA2UB	
+#ifdef JA2UB	//RAUL
 	//Ja25 UB
 	//if Raul blew him,self up, dont drop any items
-	if( pSoldier->ubProfile == PERKO && IsJa25GeneralFlagSet( JA_GF__RAUL_BLOW_HIMSELF_UP ) )
+	if( pSoldier->ubProfile == PERKO /* RAUL */ && IsJa25GeneralFlagSet( JA_GF__RAUL_BLOW_HIMSELF_UP ) )
 	{
 		return( TRUE );
 	}

@@ -669,7 +669,11 @@ DEALER_POSSIBLE_INV gArnieInventory[MAXITEMS+1];// =
 //
 // Perko			( REPAIR)
 //
+#ifdef JA2UB
+DEALER_POSSIBLE_INV gRaulInventory[MAXITEMS+1];
+#else
 DEALER_POSSIBLE_INV gPerkoInventory[MAXITEMS+1];// =
+#endif
 //{
 //	// NO INVENTORY
 //
@@ -698,6 +702,13 @@ INT8 GetDealersMaxItemAmount( UINT8 ubDealerID, UINT16 usItemIndex )
 {
 	switch( ubDealerID )
 	{
+	
+#ifdef JA2UB
+		case ARMS_DEALER_BETTY:
+			return( GetMaxItemAmount( gBettyInventory, usItemIndex ) );
+			break;
+#endif			
+  // Ja25: Not in exp.
 		case ARMS_DEALER_TONY:
 			return( GetMaxItemAmount( gTonyInventory, usItemIndex ) );
 			break;
@@ -713,11 +724,15 @@ INT8 GetDealersMaxItemAmount( UINT8 ubDealerID, UINT16 usItemIndex )
 		case ARMS_DEALER_ARNIE:
 			return( GetMaxItemAmount( gArnieInventory, usItemIndex ) );
 			break;
-
+#ifdef JA2UB
+		case ARMS_DEALER_RAUL:
+			return( GetMaxItemAmount( gRaulInventory, usItemIndex ) ); //
+			break;
+#else			
 		case ARMS_DEALER_PERKO:
 			return( GetMaxItemAmount( gPerkoInventory, usItemIndex ) );
 			break;
-
+#endif
 		case ARMS_DEALER_KEITH:
 			return( GetMaxItemAmount( gKeithInventory, usItemIndex ) );
 			break;
@@ -762,16 +777,12 @@ INT8 GetDealersMaxItemAmount( UINT8 ubDealerID, UINT16 usItemIndex )
 			return( GetMaxItemAmount( gGabbyInventory, usItemIndex ) );
 			break;
 #ifdef JA2UB
-		case ARMS_DEALER_BETTY:
-			return( GetMaxItemAmount( gBettyInventory, usItemIndex ) );
-			break;
-#else  //ja25 ub Biggins
-
+			//no ub
+#else
 		case ARMS_DEALER_DEVIN:
 			return( GetMaxItemAmount( gDevinInventory, usItemIndex ) );
 			break;
 #endif
-
 		case ARMS_DEALER_ELGIN:
 			return( GetMaxItemAmount( gElginInventory, usItemIndex ) );
 			break;
@@ -780,7 +791,6 @@ INT8 GetDealersMaxItemAmount( UINT8 ubDealerID, UINT16 usItemIndex )
 			return( GetMaxItemAmount( gMannyInventory, usItemIndex ) );
 			break;
 			
-
 
 		default:
 			Assert( FALSE );
@@ -813,6 +823,11 @@ DEALER_POSSIBLE_INV *GetPointerToDealersPossibleInventory( UINT8 ubArmsDealerID 
 {
 	switch( ubArmsDealerID )
 	{
+	#ifdef JA2UB
+		case ARMS_DEALER_BETTY:
+			return( gBettyInventory );
+			break;
+	#endif
 		case ARMS_DEALER_TONY:
 			return( gTonyInventory );
 			break;
@@ -829,10 +844,15 @@ DEALER_POSSIBLE_INV *GetPointerToDealersPossibleInventory( UINT8 ubArmsDealerID 
 			return( gArnieInventory );
 			break;
 
+#ifdef JA2UB
+		case ARMS_DEALER_RAUL:
+			return( gRaulInventory );
+			break;
+#else
 		case ARMS_DEALER_PERKO:
 			return( gPerkoInventory );
 			break;
-
+#endif
 		case ARMS_DEALER_KEITH:
 			return( gKeithInventory );
 			break;
@@ -877,22 +897,19 @@ DEALER_POSSIBLE_INV *GetPointerToDealersPossibleInventory( UINT8 ubArmsDealerID 
 			return( gGabbyInventory );
 			break;
 #ifdef JA2UB
-		case ARMS_DEALER_BETTY:
-			return( gBettyInventory );
-			break;
-#else //ja25 Biggins
+			//no UB
+#else
 		case ARMS_DEALER_DEVIN:
 			return( gDevinInventory );
 			break;
-#endif
+#endif			
 		case ARMS_DEALER_ELGIN:
 			return( gElginInventory );
 			break;
 
 		case ARMS_DEALER_MANNY:
 			return( gMannyInventory );
-			break;
-			
+			break;		
 
 
 		default:

@@ -1259,7 +1259,7 @@ ATM:
 #ifdef JA2UB	
 	//JA25 UB
 	//if the dealer is RAUL
-	if( gbSelectedArmsDealerID == ARMS_DEALER_PERKO )
+	if( gbSelectedArmsDealerID == ARMS_DEALER_RAUL )
 	{
 		//set the fact the raul refreshed his inventory
 		SetFactFalse( FACT_RAULS_INVENTORY_CHANGED_SINCE_LAST_VISIT );
@@ -3155,13 +3155,16 @@ BOOLEAN RepairIsDone(DEALER_SPECIAL_ITEM* pSpecial)
 		}
 	}
 
+#ifdef JA2UB
+	//no UB
+#else
 	// if the item is imprinted (by anyone, even player's mercs), and it's Fredo repairing it
 	if ( ( gbSelectedArmsDealerID == ARMS_DEALER_FREDO ) )
 	{
 		// then reset the imprinting!
 		RepairItem.ItemObject[0]->data.ubImprintID = NO_PROFILE;
 	}
-
+#endif
 	//try to add the item to the players offer area
 	INT8		bSlotNum;
 	bSlotNum = AddItemToPlayersOfferArea( RepairItem.ubIdOfMercWhoOwnsTheItem, &RepairItem, -1 );
@@ -3350,7 +3353,7 @@ UINT8		ubItemsNotCounted = 0; //ja25 UB
 	}
 
 	//if the dealer is Raul
-	if( gbSelectedArmsDealerID == ARMS_DEALER_PERKO )
+	if( gbSelectedArmsDealerID == ARMS_DEALER_RAUL )
 	{
 		//if the item is the antique musket
 		if( usItemID == HAND_CANNON ) //4498
@@ -4069,7 +4072,7 @@ void PerformTransaction( UINT32 uiMoneyFromPlayersAccount )
 #ifdef JA2UB			
 			//JA25 UB
 			//if the arms dealer is Raul
-			if( gbSelectedArmsDealerID == ARMS_DEALER_PERKO )
+			if( gbSelectedArmsDealerID == ARMS_DEALER_RAUL )
 			{
 				//if this is the first time that the player purchased somehting form raul
 				if( gArmsDealerStatus[ gbSelectedArmsDealerID ].fHasSoldSomethingToPlayer == FALSE )
@@ -4132,7 +4135,7 @@ void PerformTransaction( UINT32 uiMoneyFromPlayersAccount )
 			}
 
 			//if the arms dealer is Raul, set fact 407
-			if( gbSelectedArmsDealerID == ARMS_DEALER_PERKO )
+			if( gbSelectedArmsDealerID == ARMS_DEALER_RAUL )
 			{
 				//if the player spent more the X
 				if( uiMoneyFromPlayersAccount >= SKI_RAUL_MINIMUM_AMOUNT_TO_SET_FACT )
@@ -4237,7 +4240,7 @@ void MoveAllArmsDealersItemsInOfferAreaToPlayersOfferArea( )
 #ifdef JA2UB				
 				
 				//if the player has just purchased the BArrett form Raul
-				if( ( gbSelectedArmsDealerID == ARMS_DEALER_PERKO ) && ( ArmsDealerOfferArea[ uiCnt ].sItemIndex == BARRETT ) )
+				if( ( gbSelectedArmsDealerID == ARMS_DEALER_RAUL ) && ( ArmsDealerOfferArea[ uiCnt ].sItemIndex == BARRETT ) )
 				{
 					// set a special flag
 					gArmsDealerStatus[ gbSelectedArmsDealerID ].ubSpecificDealerFlags |= ARMS_DEALER_FLAG__RAUL_HAS_SOLD_BARRETT_TO_PLAYER;
@@ -4321,7 +4324,7 @@ void MovePlayerOfferedItemsOfValueToArmsDealersInventory()
 					fAddItemToDealer = TRUE;
 
 					//if the dealer is raul
-					if( gbSelectedArmsDealerID == ARMS_DEALER_PERKO )
+					if( gbSelectedArmsDealerID == ARMS_DEALER_RAUL )
 					{
 						//if the item is the cannon balls
 						if( PlayersOfferArea[ uiCnt ].sItemIndex == CLIP_CANNON_BALL )// 4499 )
@@ -4491,7 +4494,7 @@ void BeginSkiItemPointer( UINT8 ubSource, INT16 bSlotNum, BOOLEAN fOfferToDealer
 #ifdef JA2UB				
 				//ja25 ub
 			//if the dealer is Raul
-			if( gbSelectedArmsDealerID == ARMS_DEALER_PERKO )
+			if( gbSelectedArmsDealerID == ARMS_DEALER_RAUL )
 			{
 				//if the item is the antique musket
 				if( gMoveingItem.ItemObject.usItem == HAND_CANNON ) //4498  )
@@ -7655,7 +7658,7 @@ void HandlePossibleRepairDelays()
 	gfStartWithRepairsDelayedQuote = FALSE;
 
 	// if it's Fredo or Perko
-	if ( ( gbSelectedArmsDealerID == ARMS_DEALER_FREDO ) || ( gbSelectedArmsDealerID == ARMS_DEALER_PERKO ) )
+	if ( ( gbSelectedArmsDealerID == ARMS_DEALER_FREDO ) || ( gbSelectedArmsDealerID == ARMS_DEALER_RAUL ) )
 	{
 		// because the quotes are so specific, we'll only use them once per game per repairman
 		if( !gArmsDealerStatus[ gbSelectedArmsDealerID ].fRepairDelayBeenUsed )
