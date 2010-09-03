@@ -444,10 +444,10 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	//UB
 	strcpy(fileName, directoryName);
 	strcat(fileName, RAULINVENTORYFILENAME);
-	if ( FileExists(fileName) )
-	{
+//	if ( FileExists(fileName) )
+//	{
 	THROWIFFALSE(ReadInInventoryStats(gPerkoInventory,fileName),RAULINVENTORYFILENAME);
-	}
+//	}
 
 #else
 	strcpy(fileName, directoryName);

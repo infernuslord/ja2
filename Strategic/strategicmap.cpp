@@ -2101,10 +2101,14 @@ BOOLEAN	SetCurrentWorldSector( INT16 sMapX, INT16 sMapY, INT8 bMapZ )
 
 				SetMusicMode( MUSIC_TACTICAL_NOTHING );
 			}
-
+			
+	#ifdef JA2UB			
+			// Say a quote from a merc who has new lines for the sector ( if any )
+			HandlePlayerTeamQuotesWhenEnteringSector( sMapX, sMapY, bMapZ ); 
+	#else
 			// ATE: Check what sector we are in, to show description if we have an RPC.....
 			HandleRPCDescriptionOfSector( sMapX, sMapY, bMapZ );
-
+	#endif
 
 
 			// ATE: Set Flag for being visited...
