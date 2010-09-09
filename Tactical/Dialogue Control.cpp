@@ -2065,10 +2065,12 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 				else
 			#endif
 			{	// build name of wav file (characternum + quotenum)
-				sprintf( zFileName,"SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
-				
+
 				if ( gSoundProfileValue[ubCharacterNum].EnabledSound == TRUE )
 				{
+                                     sprintf( zFileName,"SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
+				
+
 					if ( !FileExists( zFileName ) )
 					{
 #ifdef JA2UB

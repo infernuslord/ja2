@@ -1919,7 +1919,7 @@ void HandleOpenControlPanelToRevealSwitchInMorrisArea()
 		if ( ItemTypeExistsAtLocation( 15231, SWITCH, 0, &iItemIndex ) )
 		{
 			//gWorldItems[ iItemIndex ]->data.bTrap = 0;
-			gWorldItems[ iItemIndex ].object[0]->data.bTrap;
+			gWorldItems[ iItemIndex ].object[0]->data.bTrap = 0;
 			GetItemPool( 15231, &pItemPool, 0 );
 			if ( pItemPool )
 			{
