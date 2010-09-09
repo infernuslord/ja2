@@ -5075,8 +5075,8 @@ STR16	zNewTacticalMessages[]=
 	L"Nowi rekruci nie mog¹ tam przybyæ.",
 	L"Dopóki twój laprop bêdzie bez nadajnika, nie bêdziesz móg³ zatrudniaæ nowych cz³onków zespo³u.  Mo¿liwe, ¿e to odpowiedni moment ¿eby odczytaæ zapisany stan gry lub zacz¹æ graæ od nowa!",
 	L"%s s³yszy dŸwiêk zgniatanego metalu dochodz¹cy spod cia³a Jerrego.  To niestety zabrzmia³o jak dŸwiêk zgniatanej anteny od twojego laptopa.",  //the %s is the name of a merc.  @@@  Modified
-	L"After scanning the note left behind by Deputy Commander Morris, %s senses an oppurtinity.  The note contains the coordinates for launching missiles against different towns in Tracona.  It also gives the coodinates of the origin - the missile facility.",
-	L"Noticing the control panel, %s figures the numbers can be reveresed, so that the missile might destroy this very facility.  %s needs to find an escape route.  The elevator appears to offer the fastest solution...",
+	L"Po zapoznaniu siê z treœci¹ notki zostawionej przez wice-dowódcê Morrisa, %s wyczuwa nadarzaj¹c¹ siê okazjê. Notka zawiera koordynaty dotycz¹ce odpalenia pocisków na ró¿ne miasta w Arluco. Znajduj¹ siê na niej tak¿e koordynaty wyrzutni pocisków.",
+	L"Spostrzeg³szy panel sterowania, %s zauwa¿a, ¿e liczby mo¿na odwróciæ tak, ¿eby pociski zniszczy³y sam¹ wyrzutniê. %s musi znaleŸæ drogê ucieczki. Najszybszym rozwi¹zaniem wydaje siê byæ winda...",
 	L"To jest tryb CZ£OWIEK ZE STALI i nie mo¿esz zapisywaæ gry gdy wróg jest w sektorze.",	//	@@@  new text
 	L"(Nie mo¿na zapisywaæ gry podczas walki)", //@@@@ new text
 	L"Kampania ma wiêcej ni¿ 30 postaci.",							// @@@ new text
