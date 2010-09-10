@@ -17,6 +17,11 @@
 	#include "render dirty.h"
 #endif
 
+#ifdef JA2UB
+	#include "Ja25_Tactical.h"
+	#include "Ja25 Strategic Ai.h"
+#endif
+
 extern HVSURFACE ghFrameBuffer;
 
 STR8 szSectorMap[MAP_WORLD_Y][MAP_WORLD_X] =	{
@@ -532,7 +537,96 @@ UINT8 GetLoadScreenID( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ )
 				break;
 			/* WANNE: Sir-Tech System */
 		}
+#ifdef JA2UB
 
+		case 1:
+		{
+			switch( ubSectorID )
+			{
+				case SEC_I13:
+				case SEC_J13:
+				{
+					if( fNight )
+						return LOADINGSCREEN_MINE;
+					return LOADINGSCREEN_MINE;
+					break;
+				}
+
+				//tunnels
+				case SEC_J14:
+				case SEC_K14:
+				{
+					return LOADINGSCREEN_TUNNELS;
+					break;
+				}
+
+				case SEC_K15:
+				{
+					if( gJa25SaveStruct.ubLoadScreenStairTraversal == LS__GOING_UP_STAIRS )
+						return( LOADINGSCREEN_UP_STAIRS );
+					else if( gJa25SaveStruct.ubLoadScreenStairTraversal == LS__GOING_DOWN_STAIRS )
+						return( LOADINGSCREEN_DOWN_STAIRS );
+					else
+						return( LOADINGSCREEN_COMPLEX_BASEMENT_GENERIC );
+					break;
+				}
+				default:
+					return LOADINGSCREEN_BASEMENT;
+			}
+		}
+		case 2:
+		{
+			switch( ubSectorID )
+			{
+				case SEC_K15:
+				{	
+					//if we are going up stairs, else traversing at same level
+					if( gJa25SaveStruct.ubLoadScreenStairTraversal == LS__GOING_UP_STAIRS )
+						return( LOADINGSCREEN_UP_STAIRS );
+					else if( gJa25SaveStruct.ubLoadScreenStairTraversal == LS__GOING_DOWN_STAIRS )
+						return( LOADINGSCREEN_DOWN_STAIRS );
+					else
+						return( LOADINGSCREEN_COMPLEX_BASEMENT );
+					break;
+				}
+
+				case SEC_L15:
+				{
+					//if we are going up stairs, else traversing at same level
+					if( gJa25SaveStruct.ubLoadScreenStairTraversal == LS__GOING_UP_STAIRS )
+						return( LOADINGSCREEN_UP_STAIRS );
+					else
+						return( LOADINGSCREEN_COMPLEX_BASEMENT );
+					break;
+				}
+
+				default:
+					return LOADINGSCREEN_BASEMENT;
+			}
+		}
+		case 3:
+		{
+			switch( ubSectorID )
+			{
+				case SEC_L15:
+				{
+					//if we are going up stairs, else traversing at same level
+					if( gJa25SaveStruct.ubLoadScreenStairTraversal == LS__GOING_DOWN_STAIRS )
+						return( LOADINGSCREEN_DOWN_STAIRS );
+					else
+						return( LOADINGSCREEN_COMPLEX_BASEMENT_GENERIC );
+					break;
+				}
+
+				default:
+					return LOADINGSCREEN_CAVE;
+			}
+		}
+		break;
+			return LOADINGSCREEN_CAVE;
+		default:
+
+#else
 		// Basement Level 1
 		case 1:
 			switch( ubSectorID )
@@ -554,6 +648,7 @@ UINT8 GetLoadScreenID( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ )
 			//all level 2 and 3 maps are caves!
 			return LOADINGSCREEN_CAVE;
 		default:
+#endif		
 			// shouldn't ever happen
 			Assert( FALSE );
 
@@ -1471,6 +1566,196 @@ void DisplayLoadScreenWithID( UINT8 ubLoadScreenID )
 				}
 
 				break;
+			#ifdef JA2UB
+			case LOADINGSCREEN_DAY_SNOW:
+				strcpy(smallImage, "LOADSCREENS\\LS_Snow_day1.sti");
+				if (iResolution == 0)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Snow_day1.sti" );
+				}
+				else if (iResolution == 1)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Snow_day1_800x600.sti" );
+				}
+				else if (iResolution == 2)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Snow_day1_1024x768.sti" );
+				}
+			break;
+			case LOADINGSCREEN_NIGHT_SNOW:
+				strcpy(smallImage, "LOADSCREENS\\LS_Snow_Night1.sti");
+				if (iResolution == 0)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Snow_Night1.sti" );
+				}
+				else if (iResolution == 1)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Snow_Night1_800x600.sti" );
+				}
+				else if (iResolution == 2)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Snow_Night1_1024x768.sti" );
+				}
+			break;
+			
+			case LOADINGSCREEN_GUARDPOST_DAY:
+				strcpy(smallImage, "LOADSCREENS\\LS_Guardpostday.sti");
+				if (iResolution == 0)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Guardpostday.sti" );
+				}
+				else if (iResolution == 1)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Guardpostday_800x600.sti" );
+				}
+				else if (iResolution == 2)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Guardpostday_1024x768.sti" );
+				}
+			break;
+
+			case LOADINGSCREEN_GUARDPOST_NIGHT:
+				strcpy(smallImage, "LOADSCREENS\\LS_Guardpostnight.sti");
+				if (iResolution == 0)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Guardpostnight.sti" );
+				}
+				else if (iResolution == 1)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Guardpostnight_800x600.sti" );
+				}
+				else if (iResolution == 2)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Guardpostnight_1024x768.sti" );
+				}
+			break;
+
+			case LOADINGSCREEN_POWERPLANT_DAY:
+				strcpy(smallImage, "LOADSCREENS\\LS_PowerPlantDay.sti");
+				if (iResolution == 0)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_PowerPlantDay.sti" );
+				}
+				else if (iResolution == 1)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_PowerPlantDay_800x600.sti" );
+				}
+				else if (iResolution == 2)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_PowerPlantDay_1024x768.sti" );
+				}
+			break;
+
+			case LOADINGSCREEN_POWERPLANT_NIGHT:
+				strcpy(smallImage, "LOADSCREENS\\LS_PowerPlantNight.sti");
+				if (iResolution == 0)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_PowerPlantNight.sti" );
+				}
+				else if (iResolution == 1)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_PowerPlantNight_800x600.sti" );
+				}
+				else if (iResolution == 2)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_PowerPlantNight_1024x768.sti" );
+				}
+			break;
+			case 	LOADINGSCREEN_UP_STAIRS:
+				strcpy(smallImage, "LOADSCREENS\\LS_UpStairs.sti");
+				if (iResolution == 0)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_UpStairs.sti" );
+				}
+				else if (iResolution == 1)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_UpStairs_800x600.sti" );
+				}
+				else if (iResolution == 2)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_UpStairs_1024x768.sti" );
+				}
+			break;
+
+			case 	LOADINGSCREEN_COMPLEX_BASEMENT:
+				strcpy(smallImage, "LOADSCREENS\\ls_Complexbsmnt.sti");
+				if (iResolution == 0)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\ls_Complexbsmnt.sti" );
+				}
+				else if (iResolution == 1)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\ls_Complexbsmnt_800x600.sti" );
+				}
+				else if (iResolution == 2)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\ls_Complexbsmnt_1024x768.sti" );
+				}
+			break;
+			case 	LOADINGSCREEN_COMPLEX_BASEMENT_GENERIC:
+				strcpy(smallImage, "LOADSCREENS\\LS_Basement_Generic.sti");
+				if (iResolution == 0)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Basement_Generic.sti" );
+				}
+				else if (iResolution == 1)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Basement_Generic_800x600.sti" );
+				}
+				else if (iResolution == 2)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_Basement_Generic_1024x768.sti" );
+				}
+			break;
+			case 	LOADINGSCREEN_TUNNELS:
+				strcpy(smallImage, "LOADSCREENS\\ls_tunnels.sti");
+				if (iResolution == 0)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\ls_tunnels.sti" );
+				}
+				else if (iResolution == 1)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\ls_tunnels_800x600.sti" );
+				}
+				else if (iResolution == 2)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\ls_tunnels_1024x768.sti" );
+				}
+			break;
+
+			case 	LOADINGSCREEN_COMPLEX_TOP_LEVEL_DAY:
+				strcpy(smallImage, "LOADSCREENS\\LS_MissleDay.sti");
+				if (iResolution == 0)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_MissleDay.sti" );
+				}
+				else if (iResolution == 1)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_MissleDay_800x600.sti" );
+				}
+				else if (iResolution == 2)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_MissleDay_1024x768.sti" );
+				}
+			break;
+			case 	LOADINGSCREEN_COMPLEX_TOP_LEVEL_NIGHT:
+				strcpy(smallImage, "LOADSCREENS\\LS_MissleNight.sti");
+				if (iResolution == 0)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_MissleNight.sti" );
+				}
+				else if (iResolution == 1)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_MissleNight_800x600.sti" );
+				}
+				else if (iResolution == 2)
+				{
+					strcpy(vs_desc.ImageFile, "LOADSCREENS\\LS_MissleNight_1024x768.sti" );
+				}
+			break;
+			
+			#endif
+			
 			default:
 				strcpy(smallImage, "LOADSCREENS\\LS_Heli.sti");
 				if (iResolution == 0)
