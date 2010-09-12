@@ -19,6 +19,10 @@
 // Four different sector names, used at different times.
 extern CHAR16 gzSectorNames[256][4][MAX_SECTOR_NAME_LENGTH];
 
+extern CHAR16 gzSectorUndergroundNames1[256][4][MAX_SECTOR_NAME_LENGTH]; 
+extern CHAR16 gzSectorUndergroundNames2[256][4][MAX_SECTOR_NAME_LENGTH]; 
+extern CHAR16 gzSectorUndergroundNames3[256][4][MAX_SECTOR_NAME_LENGTH]; 
+
 typedef enum
 {
 	SECTORNAME_ELEMENT_NONE = 0,
@@ -43,6 +47,8 @@ typedef struct
 
 BOOLEAN SectorName_TextOnly;
 
+INT8 Sector_Level;
+
 
 static void XMLCALL
 SectorNameStartElementHandle(void *userData, const XML_Char *name, const char **atts)
@@ -59,13 +65,38 @@ SectorNameStartElementHandle(void *userData, const XML_Char *name, const char **
 			// Initiate Array by setting first character to 0.
 			for (UINT16 x = 0; x < 256; x++)
 			{
+			
+			if (Sector_Level == 0 )
+			{
 				gzSectorNames[x][0][0]=0;
 				gzSectorNames[x][1][0]=0;
 				gzSectorNames[x][2][0]=0;
 				gzSectorNames[x][3][0]=0;
 			}
+			if (Sector_Level == 1 )
+			{
+				gzSectorUndergroundNames1[x][0][0]=0;
+				gzSectorUndergroundNames1[x][1][0]=0;
+				gzSectorUndergroundNames1[x][2][0]=0;
+				gzSectorUndergroundNames1[x][3][0]=0;
+			}
+			 if (Sector_Level == 2 )
+			{
+				gzSectorUndergroundNames2[x][0][0]=0;
+				gzSectorUndergroundNames2[x][1][0]=0;
+				gzSectorUndergroundNames2[x][2][0]=0;
+				gzSectorUndergroundNames2[x][3][0]=0;
+			}
+			if (Sector_Level == 3 )
+			{
+				gzSectorUndergroundNames3[x][0][0]=0;
+				gzSectorUndergroundNames3[x][1][0]=0;
+				gzSectorUndergroundNames3[x][2][0]=0;
+				gzSectorUndergroundNames3[x][3][0]=0;
+			}			
+			
+			}
 		}
-
 		else if(strcmp(name, "SECTOR") == 0 && pData->curElement == SECTORNAME_ELEMENT_SECTOR_NAMES)
 		{
 			pData->curElement = SECTORNAME_ELEMENT_SECTOR;
@@ -123,21 +154,68 @@ SectorNameEndElementHandle(void *userData, const XML_Char *name)
 			{
 				if (!SectorName_TextOnly)
 				{
+					if (Sector_Level == 0 )
+					{
 					wcscpy(gzSectorNames[ubSectorId][0], pData->szCurUnexploredName);
 					wcscpy(gzSectorNames[ubSectorId][1], pData->szCurDetailedUnexploredName);
 					wcscpy(gzSectorNames[ubSectorId][2], pData->szCurExploredName);
 					wcscpy(gzSectorNames[ubSectorId][3], pData->szCurDetailedExploredName);
+					}
+					else if (Sector_Level == 1 )
+					{
+					wcscpy(gzSectorUndergroundNames1[ubSectorId][0], pData->szCurUnexploredName);
+					wcscpy(gzSectorUndergroundNames1[ubSectorId][1], pData->szCurDetailedUnexploredName);
+					wcscpy(gzSectorUndergroundNames1[ubSectorId][2], pData->szCurExploredName);
+					wcscpy(gzSectorUndergroundNames1[ubSectorId][3], pData->szCurDetailedExploredName);					
+					}
+					else if (Sector_Level == 2 )
+					{
+					wcscpy(gzSectorUndergroundNames2[ubSectorId][0], pData->szCurUnexploredName);
+					wcscpy(gzSectorUndergroundNames2[ubSectorId][1], pData->szCurDetailedUnexploredName);
+					wcscpy(gzSectorUndergroundNames2[ubSectorId][2], pData->szCurExploredName);
+					wcscpy(gzSectorUndergroundNames2[ubSectorId][3], pData->szCurDetailedExploredName);					
+					}
+					else if (Sector_Level == 3 )
+					{
+					wcscpy(gzSectorUndergroundNames3[ubSectorId][0], pData->szCurUnexploredName);
+					wcscpy(gzSectorUndergroundNames3[ubSectorId][1], pData->szCurDetailedUnexploredName);
+					wcscpy(gzSectorUndergroundNames3[ubSectorId][2], pData->szCurExploredName);
+					wcscpy(gzSectorUndergroundNames3[ubSectorId][3], pData->szCurDetailedExploredName);					
+					}
 				}
 				else
 				{
+					if (Sector_Level == 0 )
+					{
 					wcscpy(gzSectorNames[ubSectorId][0], pData->szCurUnexploredName);
 					wcscpy(gzSectorNames[ubSectorId][1], pData->szCurDetailedUnexploredName);
 					wcscpy(gzSectorNames[ubSectorId][2], pData->szCurExploredName);
 					wcscpy(gzSectorNames[ubSectorId][3], pData->szCurDetailedExploredName);
+					}
+					else if (Sector_Level == 1 )
+					{
+					wcscpy(gzSectorUndergroundNames1[ubSectorId][0], pData->szCurUnexploredName);
+					wcscpy(gzSectorUndergroundNames1[ubSectorId][1], pData->szCurDetailedUnexploredName);
+					wcscpy(gzSectorUndergroundNames1[ubSectorId][2], pData->szCurExploredName);
+					wcscpy(gzSectorUndergroundNames1[ubSectorId][3], pData->szCurDetailedExploredName);
+					}
+					else if (Sector_Level == 2 )
+					{
+					wcscpy(gzSectorUndergroundNames2[ubSectorId][0], pData->szCurUnexploredName);
+					wcscpy(gzSectorUndergroundNames2[ubSectorId][1], pData->szCurDetailedUnexploredName);
+					wcscpy(gzSectorUndergroundNames2[ubSectorId][2], pData->szCurExploredName);
+					wcscpy(gzSectorUndergroundNames2[ubSectorId][3], pData->szCurDetailedExploredName);
+					}					
+					else if (Sector_Level == 3 )
+					{
+					wcscpy(gzSectorUndergroundNames3[ubSectorId][0], pData->szCurUnexploredName);
+					wcscpy(gzSectorUndergroundNames3[ubSectorId][1], pData->szCurDetailedUnexploredName);
+					wcscpy(gzSectorUndergroundNames3[ubSectorId][2], pData->szCurExploredName);
+					wcscpy(gzSectorUndergroundNames3[ubSectorId][3], pData->szCurDetailedExploredName);
+					}					
 				}
 			}	
 		}
-
 		else if(strcmp(name, "SectorGrid") == 0 )
 		{
 			UINT8	x, y;
@@ -190,7 +268,7 @@ SectorNameEndElementHandle(void *userData, const XML_Char *name)
 }
 
 
-BOOLEAN ReadInSectorNames(STR fileName, BOOLEAN localizedVersion)
+BOOLEAN ReadInSectorNames(STR fileName, BOOLEAN localizedVersion, INT8 Level )
 {
 	HWFILE		hFile;
 	UINT32		uiBytesRead;
@@ -199,6 +277,8 @@ BOOLEAN ReadInSectorNames(STR fileName, BOOLEAN localizedVersion)
 	XML_Parser	parser = XML_ParserCreate(NULL);
 
 	SectorNameParseData pData;
+	
+	Sector_Level = Level;
 
 	SectorName_TextOnly = localizedVersion;
 	hFile = FileOpen( fileName, FILE_ACCESS_READ, FALSE );

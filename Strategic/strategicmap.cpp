@@ -316,6 +316,10 @@ STR8 pHortStrings[]={
 // HEADROCK HAM 3.6: Array to hold user-defined sector names
 CHAR16 gzSectorNames[256][4][MAX_SECTOR_NAME_LENGTH];
 
+CHAR16 gzSectorUndergroundNames1[256][4][MAX_SECTOR_NAME_LENGTH]; 
+CHAR16 gzSectorUndergroundNames2[256][4][MAX_SECTOR_NAME_LENGTH]; 
+CHAR16 gzSectorUndergroundNames3[256][4][MAX_SECTOR_NAME_LENGTH]; 
+
 BOOLEAN ReadInStrategicMapSectorTownNames(STR fileName, BOOLEAN localizedVersion);
 
 void DoneFadeOutAdjacentSector( void );
@@ -3173,6 +3177,83 @@ void GetSectorIDString( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ , STR16 zS
 	}
 	else if( bSectorZ != 0 )
 	{
+			////////////////////////////////////
+		// Read and verify XML sector names
+		
+		ubSectorID = (UINT8)SECTOR( sSectorX, sSectorY );
+		AssertGE(ubSectorID, 0);
+		AssertLT(ubSectorID,256);
+		pSector = &SectorInfo[ ubSectorID ];
+		ubLandType = pSector->ubTraversability[ 4 ];
+		swprintf( zString, L"%c%d: ", 'A' + sSectorY - 1, sSectorX );
+		
+		BOOLEAN fSectorHasXMLNames = TRUE;
+		CHAR16 zUnexploredUnderground[MAX_SECTOR_NAME_LENGTH];
+		CHAR16 zDetailedUnexploredUnderground[MAX_SECTOR_NAME_LENGTH];
+		CHAR16 zExploredUnderground[MAX_SECTOR_NAME_LENGTH];
+		CHAR16 zDetailedExploredUnderground[MAX_SECTOR_NAME_LENGTH];	
+	
+		if ( bSectorZ == 1 )
+		{		
+			wcscpy( zUnexploredUnderground, gzSectorUndergroundNames1[ ubSectorID ][0] );
+			wcscpy( zDetailedUnexploredUnderground, gzSectorUndergroundNames1[ ubSectorID ][1] );
+			wcscpy( zExploredUnderground, gzSectorUndergroundNames1[ ubSectorID ][2] );
+			wcscpy( zDetailedExploredUnderground, gzSectorUndergroundNames1[ ubSectorID ][3] );
+		}
+		else if ( bSectorZ == 2 )
+		{
+			wcscpy( zUnexploredUnderground, gzSectorUndergroundNames2[ ubSectorID ][0] );
+			wcscpy( zDetailedUnexploredUnderground, gzSectorUndergroundNames2[ ubSectorID ][1] );
+			wcscpy( zExploredUnderground, gzSectorUndergroundNames2[ ubSectorID ][2] );
+			wcscpy( zDetailedExploredUnderground, gzSectorUndergroundNames2[ ubSectorID ][3] );
+		}
+		else if ( bSectorZ == 3 )
+		{
+			wcscpy( zUnexploredUnderground, gzSectorUndergroundNames3[ ubSectorID ][0] );
+			wcscpy( zDetailedUnexploredUnderground, gzSectorUndergroundNames3[ ubSectorID ][1] );
+			wcscpy( zExploredUnderground, gzSectorUndergroundNames3[ ubSectorID ][2] );
+			wcscpy( zDetailedExploredUnderground, gzSectorUndergroundNames3[ ubSectorID ][3] );
+		}
+	
+		if (zUnexploredUnderground[0] == 0 || zDetailedUnexploredUnderground[0] == 0 || zExploredUnderground[0] == 0 || zDetailedExploredUnderground[0] == 0)
+		{
+			fSectorHasXMLNames = FALSE;
+		}
+
+		if (fSectorHasXMLNames)
+		{
+	
+		pUnderground = FindUnderGroundSector( sSectorX, sSectorY, bSectorZ );
+
+		if ( pUnderground )
+		{
+			if ( pUnderground->fVisited )
+			{
+				if (fDetailed)
+				{			
+					wcscat( zString, zDetailedExploredUnderground );	
+				}
+				else
+				{
+					wcscat( zString, zExploredUnderground );
+				}
+			}
+			else
+			{
+				if (fDetailed)
+				{
+					wcscat( zString, zDetailedUnexploredUnderground );
+				}
+				else
+				{
+					wcscat( zString, zUnexploredUnderground );
+				}
+			}
+		}		
+
+} 
+else
+{	
 		pUnderground = FindUnderGroundSector( sSectorX, sSectorY, bSectorZ );
 		if( pUnderground && ( pUnderground->fVisited || gfGettingNameFromSaveLoadScreen ) )
 		{
@@ -3210,6 +3291,7 @@ void GetSectorIDString( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ , STR16 zS
 		{ //Display nothing
 			wcscpy( zString, L"" );
 		}
+}
 	}
 	else
 	{
@@ -3228,13 +3310,14 @@ void GetSectorIDString( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ , STR16 zS
 		CHAR16 zUnexplored[MAX_SECTOR_NAME_LENGTH];
 		CHAR16 zDetailedUnexplored[MAX_SECTOR_NAME_LENGTH];
 		CHAR16 zExplored[MAX_SECTOR_NAME_LENGTH];
-		CHAR16 zDetailedExplored[MAX_SECTOR_NAME_LENGTH];
+		CHAR16 zDetailedExplored[MAX_SECTOR_NAME_LENGTH];	
+		
 		
 		wcscpy( zUnexplored, gzSectorNames[ ubSectorID ][0] );
 		wcscpy( zDetailedUnexplored, gzSectorNames[ ubSectorID ][1] );
 		wcscpy( zExplored, gzSectorNames[ ubSectorID ][2] );
 		wcscpy( zDetailedExplored, gzSectorNames[ ubSectorID ][3] );
-
+			
 		if (zUnexplored[0] == 0 || zDetailedUnexplored[0] == 0 || zExplored[0] == 0 || zDetailedExplored[0] == 0)
 		{
 			fSectorHasXMLNames = FALSE;

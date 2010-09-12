@@ -203,7 +203,9 @@ typedef PARSE_STAGE;
 
 #define RANDOMSTATS					"RandomStats.xml"
 
-
+#define SECTORLEVEL1NAMESFILENAME						"Map\\SectorNamesLevel_1.xml"
+#define SECTORLEVEL2NAMESFILENAME						"Map\\SectorNamesLevel_2.xml"
+#define SECTORLEVEL3NAMESFILENAME						"Map\\SectorNamesLevel_3.xml"
 extern BOOLEAN ReadInItemStats(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteItemStats();
 
@@ -362,7 +364,7 @@ extern BOOLEAN ReadInDynamicRoamingRestrictions(STR fileName);
 extern BOOLEAN ReadInFacilityTypes(STR fileName, BOOLEAN localizedVersion);
 
 // HEADROCK HAM 3.6: Customized Sector Names
-extern BOOLEAN ReadInSectorNames(STR fileName, BOOLEAN localizedVersion);
+extern BOOLEAN ReadInSectorNames(STR fileName, BOOLEAN localizedVersion, INT8 Level );
 
 // HEADROCK PROFEX: Merc Profiles
 extern BOOLEAN ReadInMercProfiles(STR fileName, BOOLEAN localizedVersion);
