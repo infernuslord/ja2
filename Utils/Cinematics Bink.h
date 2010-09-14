@@ -39,11 +39,11 @@ typedef struct
 
 
 
-void				BinkInitialize(HWND hWindow, UINT32 uiWidth, UINT32 uiHeight);
-BOOLEAN			BinkPollFlics(void);
-void				BinkCloseFlic(BINKFLIC *pBink);
-void				BinkShutdownVideo(void);
-BINKFLIC		*BinkPlayFlic(CHAR8 *cFilename, UINT32 uiLeft, UINT32 uiTop, UINT32 uiFlags );
+extern void				BinkInitialize(HWND hWindow, UINT32 uiWidth, UINT32 uiHeight);
+extern BOOLEAN			BinkPollFlics(void);
+extern void				BinkCloseFlic(BINKFLIC *pBink);
+extern void				BinkShutdownVideo(void);
+extern BINKFLIC		*BinkPlayFlic(CHAR8 *cFilename, UINT32 uiLeft, UINT32 uiTop, UINT32 uiFlags );
 
 
 #endif

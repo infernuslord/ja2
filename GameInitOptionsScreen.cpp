@@ -1552,8 +1552,12 @@ void DoneFadeOutForExitGameInitOptionScreen( void )
 	}
 
 	//	gubGIOExitScreen = INIT_SCREEN;
+	#ifdef JA2UB
+	gubGIOExitScreen = INIT_SCREEN;
+	//JA25: No longer going to the intro screen
+	#else
 	gubGIOExitScreen = INTRO_SCREEN;
-
+	#endif
 	//set the fact that we should do the intro videos
 //	gbIntroScreenMode = INTRO_BEGINING;
 #ifdef JA2TESTVERSION
@@ -1569,7 +1573,12 @@ void DoneFadeOutForExitGameInitOptionScreen( void )
 	}
 	else
 #endif
+	
+		#ifdef JA2UB
+		//Ja25: No intro videos
+		#else
 		SetIntroType( INTRO_BEGINING );
+		#endif
 
 	ExitGIOScreen();
 

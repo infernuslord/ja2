@@ -11,9 +11,11 @@ UINT32	IntroScreenInit( void );
 //enums used for when the intro screen can come up, used with 'gbIntroScreenMode'
 enum
 {
-	INTRO_BEGINING,			//set when viewing the intro at the begining of the game
+	
 #ifdef JA2UB
 	INTRO_HELI_CRASH,
+#else
+	INTRO_BEGINING,			//set when viewing the intro at the begining of the game
 #endif
 	INTRO_ENDING,				//set when viewing the end game video.
 

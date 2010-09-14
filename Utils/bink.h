@@ -10,7 +10,7 @@
 #ifndef __RADRES__
 
 #ifndef __RADBASEH__
-#include "RAD.h"
+#include "rad.h"
 #include "radbase.h"
 #endif
 

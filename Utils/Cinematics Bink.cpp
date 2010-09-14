@@ -11,18 +11,25 @@
 
 #include "DEBUG.H"
 #include "FileMan.h"
-#include "smack.h"
+//#include "smack.h"
 #include "ddraw.h"
 #include "mss.h"
 #include "DirectX Common.h"
 #include "DirectDraw Calls.h"
 #include "soundman.h"
-#include "video.h"
-
-#include "Cinematics Bink.h"
 #include "bink.h"
+#include "Cinematics Bink.h"
+#include <vfs/Core/vfs.h>
+#include <vfs/Core/vfs_file_raii.h>
+
+#ifdef JA2
+	#include "video.h"
+#else
+	#include "video2.h"
+#endif
+
 #include "vsurface_private.h"
-#include "radbase.h"
+
 //#include "Intro.h"
 
 
@@ -30,6 +37,7 @@
 
 
 #include <crtdbg.h>
+
 
 
 
@@ -77,9 +85,6 @@ BINKFLIC		*BinkGetFreeFlic(void);
 void				BinkSetupVideo(void);
 void				BinkShutdownVideo(void);
 UINT16			GetNumberOfBits( UINT32 uiMask );
-
-
-
 
 
 //*******************************************************************

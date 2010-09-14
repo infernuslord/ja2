@@ -379,6 +379,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\bink.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Cinematics Bink.h"
 				>
 			</File>
@@ -603,7 +607,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\bink.h"
+				RelativePath=".\Cinematics Bink.cpp"
 				>
 			</File>
 			<File

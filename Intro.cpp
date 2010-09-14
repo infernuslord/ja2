@@ -39,6 +39,7 @@
 #include "Map Screen Interface Map.h"
 #include "Map Screen Interface.h"
 #include "End Game.h"
+#include "Cinematics Bink.h"
 #endif
 
 extern STR16	gzIntroScreen[];
@@ -61,7 +62,11 @@ UINT32		guiIntroExitScreen = INTRO_SCREEN;
 
 extern	BOOLEAN	gfDoneWithSplashScreen;
 
+#ifdef JA2UB
+BINKFLIC *gpBinkFlic = NULL;
+#else
 SMKFLIC *gpSmackFlic = NULL;
+#endif
 
 #define		SMKINTRO_FIRST_VIDEO				255
 #define		SMKINTRO_NO_VIDEO						-1
@@ -69,6 +74,14 @@ SMKFLIC *gpSmackFlic = NULL;
 //enums for the various smacker files
 enum
 {
+#ifdef JA2UB	
+
+	SMKINTRO_SPLASH_SCREEN,
+	SMKINTRO_SPLASH_INTERPLAY,
+
+	SMKINTRO_HELI_CRASH_SCENE_1,
+//	SMKINTRO_HELI_CRASH_SCENE_2,
+#else
 	SMKINTRO_REBEL_CRDT,
 	SMKINTRO_OMERTA,
 	SMKINTRO_PRAGUE_CRDT,
@@ -85,10 +98,6 @@ enum
 
 	SMKINTRO_SPLASH_SCREEN,
 	SMKINTRO_SPLASH_TALONSOFT,
-
-#ifdef JA2UB	
-	SMKINTRO_HELI_CRASH_SCENE_1,
-//	SMKINTRO_HELI_CRASH_SCENE_2,
 #endif
 
 	//there are no more videos shown for the endgame
@@ -99,6 +108,17 @@ INT32	giCurrentIntroBeingPlayed = SMKINTRO_NO_VIDEO;
 
 CHAR		*gpzSmackerFileNames[] =
 {
+#ifdef JA2UB	
+
+	"INTRO\\SplashScreen.bik",
+	"INTRO\\IPLYLogo.bik",
+	
+	//Ja25: New vidoes
+	"INTRO\\Intro.bik",
+
+	"INTRO\\MissileEnding.bik"
+	
+#else
 	//begining of the game
 	"INTRO\\Rebel_cr.smk",
 	"INTRO\\Omerta.smk",
@@ -115,13 +135,6 @@ CHAR		*gpzSmackerFileNames[] =
 
 	"INTRO\\SplashScreen.smk",
 	"INTRO\\TalonSoftid_endhold.smk",
-
-#ifdef JA2UB	
-	//Ja25: New vidoes
-	"INTRO\\Intro.smk",
-//	"INTRO\\Fade.bik",
-
-	"INTRO\\MissileEnding.smk"
 #endif
 
 };
@@ -231,8 +244,11 @@ BOOLEAN EnterIntroScreen()
 #endif
 
 	//initialize smacker
+#ifdef JA2UB	
+	BinkInitialize(  ghWindow, SCREEN_WIDTH, SCREEN_HEIGHT );
+#else
 	SmkInitialize( ghWindow, SCREEN_WIDTH, SCREEN_HEIGHT);
-
+#endif
 
 	//get the index opf the first video to watch
 	iFirstVideoID = GetNextIntroVideo( SMKINTRO_FIRST_VIDEO );
@@ -262,7 +278,11 @@ void ExitIntroScreen()
 {
 
 	//shutdown smaker
+	#ifdef JA2UB
 	SmkShutdown();
+	#else
+	BinkShutdownVideo( );
+	#endif
 }
 
 void HandleIntroScreen()
@@ -275,8 +295,12 @@ void HandleIntroScreen()
 
 
 	//handle smaker each frame
+	#ifdef JA2UB
+	fFlicStillPlaying = BinkPollFlics();
+	#else
 	fFlicStillPlaying = SmkPollFlics();
-
+	#endif
+	
 	//if the flic is not playing
 	if( !fFlicStillPlaying )
 	{
@@ -340,10 +364,23 @@ void		GetIntroScreenUserInput()
 			switch( Event.usParam )
 			{
 				case ESC:
+					#ifdef JA2UB
+										// ATE: if in splash, don't exit all!
+					BinkCloseFlic( gpBinkFlic );
+					if ( gbIntroScreenMode != INTRO_SPLASH )
+					{
+						PrepareToExitIntroScreen();
+					}
+					#else
 					PrepareToExitIntroScreen();
+					#endif
 					break;
 				case SPACE:
+					#ifdef JA2UB
+					BinkCloseFlic( gpBinkFlic );
+					#else
 					SmkCloseFlic( gpSmackFlic );
+					#endif
 					break;
 
 #ifdef JA2TESTVERSION
@@ -364,21 +401,19 @@ void		GetIntroScreenUserInput()
 	if( gfLeftButtonState || gfRightButtonState )
 	{
 		//advance to the next flic
+		#ifdef JA2UB
+		BinkCloseFlic( gpBinkFlic );
+		#else
 		SmkCloseFlic( gpSmackFlic );
+		#endif
 	}
 }
 
 
 void PrepareToExitIntroScreen()
 {
-	//if its the intro at the begining of the game
-	if( gbIntroScreenMode == INTRO_BEGINING )
-	{
-		//go to the init screen
-		guiIntroExitScreen = INIT_SCREEN;
-	}
 #ifdef JA2UB
-	else if( gbIntroScreenMode == INTRO_HELI_CRASH )
+	if( gbIntroScreenMode == INTRO_HELI_CRASH )
 	{
 		//go to the init screen
 //Ja25: no longer going to initscreen ( cause this is now AFTER mapscreen )
@@ -386,6 +421,13 @@ void PrepareToExitIntroScreen()
 
 		guiIntroExitScreen = GAME_SCREEN;
 		SetCurrentWorldSector( sSelMapX, sSelMapY, ( UINT8 )iCurrentMapSectorZ );
+	}
+#else
+		//if its the intro at the begining of the game
+	if( gbIntroScreenMode == INTRO_BEGINING )
+	{
+		//go to the init screen
+		guiIntroExitScreen = INIT_SCREEN;
 	}
 #endif
 	else if( gbIntroScreenMode == INTRO_SPLASH )
@@ -424,11 +466,51 @@ void PrepareToExitIntroScreen()
 INT32 GetNextIntroVideo( UINT32 uiCurrentVideo )
 {
 	INT32 iStringToUse = -1;
+	
+#ifdef JA2UB
 
+	switch( gbIntroScreenMode )
+	{
+		case INTRO_HELI_CRASH:
+			switch( uiCurrentVideo )
+			{
+				case SMKINTRO_FIRST_VIDEO:
+					iStringToUse = SMKINTRO_HELI_CRASH_SCENE_1;
+					break;
+			}
+			break;
+
+		//end game
+		case INTRO_ENDING:
+		{
+			switch( uiCurrentVideo )
+			{
+				case SMKINTRO_FIRST_VIDEO:
+					iStringToUse = SMKINTRO_LAST_END_GAME;
+					break;
+			}
+
+		}
+		break;
+
+		case INTRO_SPLASH:
+		
+			switch( uiCurrentVideo )
+			{
+				case SMKINTRO_FIRST_VIDEO:
+
+					iStringToUse = SMKINTRO_SPLASH_INTERPLAY;
+			}
+			
+
+		break;
+	}
+#else
 	//switch on whether it is the beginging or the end game video
 	switch( gbIntroScreenMode )
 	{
 		//the video at the begining of the game
+
 		case INTRO_BEGINING:
 		{
 			switch( uiCurrentVideo )
@@ -454,22 +536,13 @@ INT32 GetNextIntroVideo( UINT32 uiCurrentVideo )
 			}
 		}
 		break;
-#ifdef JA2UB		
-		case INTRO_HELI_CRASH:
-			switch( uiCurrentVideo )
-			{
-				case SMKINTRO_FIRST_VIDEO:
-					iStringToUse = SMKINTRO_HELI_CRASH_SCENE_1;
-					break;
-			}
-			break;
-#endif
 
 		//end game
 		case INTRO_ENDING:
 		{
 			switch( uiCurrentVideo )
 			{
+			
 				case SMKINTRO_FIRST_VIDEO:
 					//if Miguel is dead, play the flic with out him in it
 					if( gMercProfiles[ MIGUEL ].bMercStatus == MERC_IS_DEAD )
@@ -489,12 +562,14 @@ INT32 GetNextIntroVideo( UINT32 uiCurrentVideo )
 						iStringToUse = SMKINTRO_END_NOSKYRIDER_HELICOPTER;
 					else
 						iStringToUse = SMKINTRO_END_SKYRIDER_HELICOPTER;
-					break;
+					break;						
 			}
+		
 		}
 		break;
 
 		case INTRO_SPLASH:
+
 			switch( uiCurrentVideo )
 			{
 				case SMKINTRO_FIRST_VIDEO:
@@ -506,7 +581,7 @@ INT32 GetNextIntroVideo( UINT32 uiCurrentVideo )
 			}
 			break;
 	}
-
+#endif
 	return( iStringToUse );
 }
 
@@ -517,9 +592,17 @@ void StartPlayingIntroFlic( INT32 iIndexOfFlicToPlay )
 	if( iIndexOfFlicToPlay != -1 )
 	{
 		//start playing a flic
+		#ifdef JA2UB
+		gpBinkFlic = BinkPlayFlic( gpzSmackerFileNames[ iIndexOfFlicToPlay ], (SCREEN_WIDTH-640)/2, (SCREEN_HEIGHT-480)/2, BINK_FLIC_AUTOCLOSE | BINK_FLIC_CENTER_VERTICAL );
+		#else
 		gpSmackFlic = SmkPlayFlic( gpzSmackerFileNames[ iIndexOfFlicToPlay ], (SCREEN_WIDTH-640)/2, (SCREEN_HEIGHT-480)/2, TRUE );
+		#endif
 
+		#ifdef JA2UB
+		if( gpBinkFlic != NULL )
+		#else
 		if( gpSmackFlic != NULL )
+		#endif
 		{
 			giCurrentIntroBeingPlayed = iIndexOfFlicToPlay;
 		}
@@ -539,14 +622,15 @@ void StartPlayingIntroFlic( INT32 iIndexOfFlicToPlay )
 
 void SetIntroType( INT8 bIntroType )
 {
+#ifdef JA2UB
+	if( bIntroType == INTRO_HELI_CRASH )
+	{
+		gbIntroScreenMode = INTRO_HELI_CRASH;
+	}
+#else
 	if( bIntroType == INTRO_BEGINING )
 	{
 		gbIntroScreenMode = INTRO_BEGINING;
-	}
-#ifdef JA2UB
-	else if( bIntroType == INTRO_HELI_CRASH )
-	{
-		gbIntroScreenMode = INTRO_HELI_CRASH;
 	}
 #endif
 	else if( bIntroType == INTRO_ENDING )
