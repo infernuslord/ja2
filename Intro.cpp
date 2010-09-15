@@ -294,9 +294,10 @@ void ExitIntroScreen()
 
 	//shutdown smaker
 	#ifdef JA2UB
-	SmkShutdown();
-	#else
 	BinkShutdownVideo( );
+	
+	#else
+	SmkShutdown();
 	#endif
 }
 

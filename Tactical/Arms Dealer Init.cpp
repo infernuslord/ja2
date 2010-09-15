@@ -514,7 +514,9 @@ void DailyCheckOnItemQuantities()
 									ubReorderDays = ( UINT8) ( armsDealerInfo[ ubArmsDealer ].daysDelayMin + Random( armsDealerInfo[ ubArmsDealer ].daysDelayMax - armsDealerInfo[ ubArmsDealer ].daysDelayMin ) );
 								}
 								
-#endif								
+#else
+									ubReorderDays = ( UINT8) ( armsDealerInfo[ ubArmsDealer ].daysDelayMin + Random( armsDealerInfo[ ubArmsDealer ].daysDelayMax - armsDealerInfo[ ubArmsDealer ].daysDelayMin ) );
+#endif
 								//Determine when the inventory should arrive
 								uiArrivalDay = GetWorldDay() + ubReorderDays;	// consider changing this to minutes
 								// post new order

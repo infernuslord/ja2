@@ -7658,7 +7658,12 @@ void HandlePossibleRepairDelays()
 	gfStartWithRepairsDelayedQuote = FALSE;
 
 	// if it's Fredo or Perko
+#ifdef JA2UB
 	if ( ( gbSelectedArmsDealerID == ARMS_DEALER_FREDO ) || ( gbSelectedArmsDealerID == ARMS_DEALER_RAUL ) )
+#else
+	if ( ( gbSelectedArmsDealerID == ARMS_DEALER_FREDO ) || ( gbSelectedArmsDealerID == ARMS_DEALER_PERKO ) )
+#endif
+
 	{
 		// because the quotes are so specific, we'll only use them once per game per repairman
 		if( !gArmsDealerStatus[ gbSelectedArmsDealerID ].fRepairDelayBeenUsed )
