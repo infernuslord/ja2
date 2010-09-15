@@ -27,7 +27,7 @@ STR16 gzIMPSkillTraitsText[]=
 	L"Метание",
 	L"Инструктор",
 	L"Тяжелое оружие",
-	L"Авт. оружие",
+	L"Автоматическое оружие",
 	L"Скрытность",
 	L"Стрельба с двух рук",
 	L"Холодное оружие",
@@ -36,7 +36,7 @@ STR16 gzIMPSkillTraitsText[]=
 	L"Боевые искусства",
 
 	L"Нет",
-	L"Специализация I.M.P.",
+	L"I.M.P.: Специализация",
 };
 //@@@:  New string as of March 3, 2000.
 STR16	gzIronManModeWarningText[]=
