@@ -2301,7 +2301,6 @@ void DoneFadeOutForSaveLoadScreen( void )
 			//{
 			MakeBadSectorListFromMapsOnHardDrive( TRUE );
 			LetLuaMakeBadSectorListFromMapsOnHardDrive( 0 );
-
 			//}
 #endif
 			

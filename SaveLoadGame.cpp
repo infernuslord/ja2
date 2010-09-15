@@ -145,7 +145,13 @@
 /////////////////////////////////////////////////////
 
 #ifdef JA2UB
+#include "Strategic Movement.h"
+#include "LuaInitNPCs.h"
+#endif
+
+#ifdef JA2UB
 void ConvertMercKnifeAndUmbrellaToBeWeapons( SOLDIERTYPE *pSoldier );
+extern void MakeBadSectorListFromMapsOnHardDrive( BOOLEAN fDisplayMessages ); // ja25 UB
 #endif
 
 void GetBestPossibleSectorXYZValues( INT16 *psSectorX, INT16 *psSectorY, INT8 *pbSectorZ );
@@ -3451,8 +3457,6 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 	RenderProgressBar( 0, 100 );
 	uiRelStartPerc = uiRelEndPerc;
 
-
-
 	//Load the strategic Information
 	if( !LoadStrategicInfoFromSavedFile( hFile ) )
 	{
@@ -3464,7 +3468,17 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 		LoadGameFilePosition( FileGetPos( hFile ), "Strategic Information" );
 	#endif
 
+#ifdef JA2UB			
+			//JA25 UB
+			// ATE: Validate any new maps...
+			// OK, if we're a camapign, check for new maps
+			//if ( !InDefaultCampaign( ) )
+			//{
+			MakeBadSectorListFromMapsOnHardDrive( TRUE );
+			LetLuaMakeBadSectorListFromMapsOnHardDrive( 0 );
 
+			//}
+#endif
 
 	uiRelEndPerc += 1;
 	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"UnderGround Information..." );

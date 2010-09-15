@@ -112,7 +112,7 @@ enemyNamesEndElementHandle(void *userData, const XML_Char *name)
 		else if(strcmp(name, "Enabled") == 0)
 		{
 			pData->curElement = ELEMENT;
-			pData->curEnemyNames.Enabled	= (UINT16) atol(pData->szCharData);
+			pData->curEnemyNames.Enabled	= (BOOLEAN) atol(pData->szCharData);
 		}
 		else if(strcmp(name, "Sector") == 0 )
 		{

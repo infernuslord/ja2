@@ -6120,6 +6120,15 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 void MakeBadSectorListFromMapsOnHardDrive( BOOLEAN fDisplayMessages )
 {
 	INT32			iRow, iCol;
+	
+	
+	for( iRow=1; iRow<=16; iRow++ )
+	{
+		for( iCol=1; iCol<=16; iCol++ )
+		{
+			sBadSectorsList[iCol][iRow] = 1;
+		}
+	}
 
 	SetUpValidCampaignSectors( );
 
