@@ -100,7 +100,7 @@ void				BinkInitialize(HWND hWindow, UINT32 uiWidth, UINT32 uiHeight)
 	//HDIGDRIVER pSoundDriver = NULL;
 
 	void *pSoundDriver = NULL;
-
+	
 	//Get the sound Driver handle
 	pSoundDriver = SoundGetDriverHandle();
 
@@ -177,7 +177,7 @@ BINKFLIC *BinkOpenFlic( CHAR8 *cFilename )
 		ErrorMsg("BINK ERROR: Out of flic slots, cannot open another");
 		return(NULL);
 	}
-
+#ifndef USE_VFS
 	// Attempt opening the filename
 	if(!(pBink->hFileHandle = FileOpen( cFilename, FILE_OPEN_EXISTING | FILE_ACCESS_READ, FALSE ) ) )
 	{
@@ -187,8 +187,54 @@ BINKFLIC *BinkOpenFlic( CHAR8 *cFilename )
 
 	//Get the real file handle for the file man handle for the smacker file
 	hFile = GetRealFileHandleFromFileManFileHandle( pBink->hFileHandle );
+#else
+	vfs::Path introname(cFilename);
+	vfs::Path dir,filename;
+	introname.splitLast(dir,filename);
+	vfs::Path tempfile = vfs::Path(L"Temp") + filename;
+	if(!getVFS()->fileExists(tempfile))
+	{
+		try
+		{
+			if(!getVFS()->fileExists(introname))
+			{
+				return NULL;
+			}
+			vfs::COpenReadFile rfile(introname);
+			vfs::size_t size = rfile->getSize();
+			std::vector<vfs::Byte> data(size);
+			rfile->read(&data[0],size);
 
+			vfs::COpenWriteFile wfile(tempfile,true);
+			wfile->write(&data[0],size);
+		}
+		catch(CBasicException& ex)
+		{
+			BuildString bs;
+			bs.add(L"Intro file \"").add(filename()).add(L"\" could not be extracted");
+			RETHROWEXCEPTION(bs.get(), &ex);
+		}
+	}
+#endif
+
+#ifndef USE_VFS
 	if( !( pBink->BinkHandle = BinkOpen((CHAR8 *)hFile, BINKFILEHANDLE ) ) ) //| SMACKTRACKS 
+#else
+	vfs::Path tempfilename;
+	try
+	{
+		vfs::COpenWriteFile wfile(tempfile);
+		if(!wfile->_getRealPath(tempfilename))
+		{
+			return NULL;
+		}
+	}
+	catch(CBasicException& ex)
+	{
+		RETHROWEXCEPTION(L"Temporary intro file could not be read", &ex);
+	}
+	if(!(pBink->BinkHandle=BinkOpen(tempfilename.to_string().c_str(), BINKFILEHANDLE )))
+#endif
 	{
 		ErrorMsg("BINK ERROR: Bink won't open the BINK file");
 		return(NULL);
