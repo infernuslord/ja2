@@ -83,6 +83,7 @@
 	#include "Item Types.h"
 	#include "Items.h"
 	#include "text.h"
+	#include "GameSettings.h"
 //	#include "XMLWriter.h"
 #endif
 
@@ -104,8 +105,8 @@
 
 GAME_LEGION_OPTIONS gGameLegionOptions; 
 Legion2Dane	gLegion2Dane; //legion
-UINT32	ProfileNum_Legion[200];
-SLOTY_LEGION_VALUES gLegionSloty[200];
+UINT32	ProfileNum_Legion[NUM_PROFILES];
+SLOTY_LEGION_VALUES gLegionSloty[NUM_PROFILES];
 
 SOUND_PROFILE_VALUES gSoundProfileValue[NUM_PROFILES];
 RANDOM_STATS_VALUES gRandomStatsValue[NUM_PROFILES];
@@ -124,9 +125,11 @@ void LoadGameLegionOptions();
 void RandomAddEnemy( UINT8 SectorX, UINT8 SectorY, UINT8 Level );
 #endif
 
+void RandomStats ();
+
 BOOLEAN sUSTAW[500]; //legion2
-BOOLEAN sNPCSPEECH[171]; //legion2
-BOOLEAN sSPEECH[171]; //legion2
+BOOLEAN sNPCSPEECH[NUM_PROFILES]; //legion2
+BOOLEAN sSPEECH[NUM_PROFILES]; //legion2
 
 void RandomStats ()
 {
@@ -290,7 +293,7 @@ BOOLEAN HandleSlotA( SOLDIERTYPE *pSoldier, UINT32 uiHandPos, UINT16 usReplaceIt
 	UINT32 val;
 	
 	
-			for ( cnt = 0; cnt < 200; cnt++ )
+			for ( cnt = 0; cnt < NUM_PROFILES; cnt++ )
 			{
 				// We've found one!
 				if ( ProfileNum_Legion[ cnt ] == pSoldier->ubProfile )
@@ -308,12 +311,13 @@ BOOLEAN HandleSlotA( SOLDIERTYPE *pSoldier, UINT32 uiHandPos, UINT16 usReplaceIt
 	{
 
 		if (usidSLOT == 0) val = HELMETPOS; 
-		if (usidSLOT == 1) val = VESTPOS; 
-		if (usidSLOT == 2) val = LEGPOS;
-		if (usidSLOT == 3) val = HEAD1POS; 
-		if (usidSLOT == 4) val = HEAD2POS;  
-		if (usidSLOT == 5) val = HANDPOS; 
-		if (usidSLOT == 6) val = SECONDHANDPOS; 
+		else if (usidSLOT == 1) val = VESTPOS; 
+		else if (usidSLOT == 2) val = LEGPOS;
+		else if (usidSLOT == 3) val = HEAD1POS; 
+		else if (usidSLOT == 4) val = HEAD2POS;  
+		else if (usidSLOT == 5) val = HANDPOS; 
+		else if (usidSLOT == 6) val = SECONDHANDPOS; 
+		else val = HANDPOS; 
 		
 		if ( uiHandPos == val )//|| uiHandPos == SECONDHANDPOS )
 		{
@@ -358,7 +362,7 @@ BOOLEAN HandleSlotB( SOLDIERTYPE *pSoldier, UINT32 uiHandPos, UINT16 usReplaceIt
 	UINT32 val;
 	
 	
-			for ( cnt = 0; cnt < 200; cnt++ )
+			for ( cnt = 0; cnt < NUM_PROFILES; cnt++ )
 			{
 				// We've found one!
 				if ( ProfileNum_Legion[ cnt ] == pSoldier->ubProfile )
@@ -376,12 +380,13 @@ BOOLEAN HandleSlotB( SOLDIERTYPE *pSoldier, UINT32 uiHandPos, UINT16 usReplaceIt
 	{
 
 		if (usidSLOT == 0) val = HELMETPOS; 
-		if (usidSLOT == 1) val = VESTPOS; 
-		if (usidSLOT == 2) val = LEGPOS;
-		if (usidSLOT == 3) val = HEAD1POS; 
-		if (usidSLOT == 4) val = HEAD2POS;  
-		if (usidSLOT == 5) val = HANDPOS; 
-		if (usidSLOT == 6) val = SECONDHANDPOS; 
+		else if (usidSLOT == 1) val = VESTPOS; 
+		else if (usidSLOT == 2) val = LEGPOS;
+		else if (usidSLOT == 3) val = HEAD1POS; 
+		else if (usidSLOT == 4) val = HEAD2POS;  
+		else if (usidSLOT == 5) val = HANDPOS; 
+		else if (usidSLOT == 6) val = SECONDHANDPOS; 
+		else val = HANDPOS; 
 		
 		if ( uiHandPos == val )//|| uiHandPos == SECONDHANDPOS )
 		{
@@ -423,7 +428,7 @@ INT cnt,i;
 BOOLEAN Wyb2; 
 CHAR8						zFileName[255];
 
-	for ( cnt = 0; cnt < 171; cnt++ )
+	for ( cnt = 0; cnt < NUM_PROFILES; cnt++ )
 		{	
 		sNPCSPEECH[cnt]		= TRUE;
 		sSPEECH[cnt]		= TRUE;
@@ -523,6 +528,16 @@ void LoadGameLegionOptions()
 	
 	gGameLegionOptions.LOCATEGRIDNO  = iniReader.ReadInteger("IN_GAME_HELI_CRASH","InternalLocateGridNo",  15427);
 	
+	gGameLegionOptions.LAPTOP_IMP_PASS_JA2  = iniReader.ReadBoolean("LAPTOP","IMP_PASS_JA2",  FALSE);
+	
+	gGameLegionOptions.LAPTOP_IMP_PASS_UB  = iniReader.ReadBoolean("LAPTOP","IMP_PASS_UB",  TRUE);
+	
+	gGameLegionOptions.ubDefaultArrivalSectorX	= iniReader.ReadInteger("Strategic Gamestart Settings","DEFAULT_ARRIVAL_SECTOR_X", 9, 1, 16);
+	gGameLegionOptions.ubDefaultArrivalSectorY	= iniReader.ReadInteger("Strategic Gamestart Settings","DEFAULT_ARRIVAL_SECTOR_Y", 1, 1, 16);
+
+	gGameExternalOptions.ubDefaultArrivalSectorX	= gGameLegionOptions.ubDefaultArrivalSectorX;
+	gGameExternalOptions.ubDefaultArrivalSectorY	= gGameLegionOptions.ubDefaultArrivalSectorY;
+
 	
 //	gGameLegionOptions.BobbyRayInventory_UB = iniReader.ReadBoolean("UB","INIT_BOBBYRAY_INVENTORY", FALSE);
 //	gGameLegionOptions.InitTownLoyalty_UB = iniReader.ReadBoolean("UB","INIT_TOWN_LOYALTY", FALSE);

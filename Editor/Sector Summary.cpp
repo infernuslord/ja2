@@ -41,6 +41,7 @@
 	#include "Campaign Types.h"
 #endif
 
+#include "GameSettings.h"
 #include <vfs/Core/vfs.h>
 #include <vfs/Core/vfs_file_raii.h>
 
@@ -416,9 +417,10 @@ void CreateSummaryWindow()
 	if( gfAutoLoadA9 )
 	{
 		gfAutoLoadA9++;
-		gsSelSectorX = 9;
-		gsSelSectorY = 1;
-		gpCurrentSectorSummary = gpSectorSummary[ 8 ][ 0 ][ 0 ];
+		gsSelSectorX = gGameExternalOptions.ubDefaultArrivalSectorX;//9;
+		gsSelSectorY = gGameExternalOptions.ubDefaultArrivalSectorY;//1;
+		//gpCurrentSectorSummary = gpSectorSummary[ 8 ][ 0 ][ 0 ];
+		gpCurrentSectorSummary = gpSectorSummary[ gGameExternalOptions.ubDefaultArrivalSectorX - 1 ][ gGameExternalOptions.ubDefaultArrivalSectorY - 1 ][ 0 ];
 		ButtonList[ iSummaryButton[ SUMMARY_LOAD ] ]->uiFlags |= BUTTON_CLICKED_ON;
 	}
 }

@@ -4,8 +4,8 @@
 #include "soldier profile type.h"
 
 extern BOOLEAN sUSTAW[500];
-extern BOOLEAN sNPCSPEECH[171];
-extern BOOLEAN sSPEECH[171];
+extern BOOLEAN sNPCSPEECH[NUM_PROFILES];
+extern BOOLEAN sSPEECH[NUM_PROFILES];
 
 extern void LoadGameLegionOptions();
 
@@ -48,8 +48,8 @@ typedef struct
 } SLOTY_LEGION_VALUES;
 
 //legion
-extern UINT32	ProfileNum_Legion[200];
-extern SLOTY_LEGION_VALUES gLegionSloty[200];
+extern UINT32	ProfileNum_Legion[NUM_PROFILES];
+extern SLOTY_LEGION_VALUES gLegionSloty[NUM_PROFILES];
 //---------------------------------------------------
 
 
@@ -116,6 +116,11 @@ typedef struct
 	INT32	INITIALHELIGRIDNO[ 7 ];
 	INT16	INITIALHELIRANDOMTIMES[ 7 ];
 	INT32	LOCATEGRIDNO;
+	BOOLEAN LAPTOP_IMP_PASS_JA2;
+	BOOLEAN LAPTOP_IMP_PASS_UB;
+	
+	UINT8 ubDefaultArrivalSectorX;
+	UINT8 ubDefaultArrivalSectorY;
        
 } GAME_LEGION_OPTIONS;
 
@@ -124,6 +129,7 @@ extern Legion2Dane	gLegion2Dane; //legion
 
 #ifdef JA2UB
 extern void RandomAddEnemy( UINT8 SectorX, UINT8 SectorY, UINT8 Level );
+extern void RandomStats ();
 #endif
 
 extern void RandomStats ();

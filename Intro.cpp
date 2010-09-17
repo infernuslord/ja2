@@ -205,8 +205,6 @@ UINT32	IntroScreenHandle( void )
 
 	HandleIntroScreen();
 
-	SetCurrentCursorFromDatabase( VIDEO_NO_CURSOR );
-
 	ExecuteBaseDirtyRectQueue();
 	EndFrameBufferRender();
 

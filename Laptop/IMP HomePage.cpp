@@ -30,6 +30,10 @@
 	#include "Squads.h"
 #endif
 
+#ifdef JA2UB
+#include "legion cfg.h"
+#endif
+
 void GetPlayerKeyBoardInputForIMPHomePage( void );
 void DisplayPlayerActivationString( void );
 void ProcessPlayerInputActivationString( void );
@@ -404,8 +408,7 @@ void ProcessPlayerInputActivationString( void )
 		freeMercSlot = FALSE;
 	}
 #ifdef JA2UB
-	//Madd multiple imps if( ( ( wcscmp(pPlayerActivationString, L"GP97SL") == 0 ) || ( wcscmp(pPlayerActivationString, L"gp97sl") == 0 ) )&&( LaptopSaveInfo.fIMPCompletedFlag == FALSE ) &&( LaptopSaveInfo.gfNewGameLaptop < 2 ) )
-	if( ( ( wcscmp(pPlayerActivationString, L"GP97SL") == 0 ) || ( wcscmp(pPlayerActivationString, L"gp97sl") == 0 ) ) &&( LaptopSaveInfo.gfNewGameLaptop < 2 ) )
+	if( ( ( gGameLegionOptions.LAPTOP_IMP_PASS_JA2 == TRUE && wcscmp(pPlayerActivationString, L"XEP624") == 0 ) || ( gGameLegionOptions.LAPTOP_IMP_PASS_JA2 == TRUE && wcscmp(pPlayerActivationString, L"xep624") == 0 ) ) || ( ( gGameLegionOptions.LAPTOP_IMP_PASS_UB == TRUE && wcscmp(pPlayerActivationString, L"GP97SL") == 0 ) || ( gGameLegionOptions.LAPTOP_IMP_PASS_UB == TRUE && wcscmp(pPlayerActivationString, L"gp97sl") == 0 ) ) && ( LaptopSaveInfo.gfNewGameLaptop < 2 ) )
 #else
 	//Madd multiple imps if( ( ( wcscmp(pPlayerActivationString, L"XEP624") == 0 ) || ( wcscmp(pPlayerActivationString, L"xep624") == 0 ) )&&( LaptopSaveInfo.fIMPCompletedFlag == FALSE ) &&( LaptopSaveInfo.gfNewGameLaptop < 2 ) )
 	if( ( ( wcscmp(pPlayerActivationString, L"XEP624") == 0 ) || ( wcscmp(pPlayerActivationString, L"xep624") == 0 ) ) &&( LaptopSaveInfo.gfNewGameLaptop < 2 ) )
@@ -485,7 +488,7 @@ void ProcessPlayerInputActivationString( void )
 	else
 	{
 #ifdef JA2UB
-		if( ( ( wcscmp(pPlayerActivationString, L"GP97SL") != 0 ) && ( wcscmp(pPlayerActivationString, L"gp97sl") != 0 ) ) )
+		if( ( ( gGameLegionOptions.LAPTOP_IMP_PASS_JA2 == TRUE && wcscmp(pPlayerActivationString, L"XEP624") != 0 ) && ( gGameLegionOptions.LAPTOP_IMP_PASS_JA2 == TRUE && wcscmp(pPlayerActivationString, L"xep624") != 0 ) ) || ( ( gGameLegionOptions.LAPTOP_IMP_PASS_UB == TRUE && wcscmp(pPlayerActivationString, L"GP97SL") != 0 ) && ( gGameLegionOptions.LAPTOP_IMP_PASS_UB == TRUE && wcscmp(pPlayerActivationString, L"gp97sl") != 0 ) ) )
 #else
 		if( ( ( wcscmp(pPlayerActivationString, L"XEP624") != 0 ) && ( wcscmp(pPlayerActivationString, L"xep624") != 0 ) ) )
 #endif
