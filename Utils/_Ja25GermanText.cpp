@@ -1,4 +1,4 @@
-//#pragma setlocale("GERMAN")
+#pragma setlocale("GERMAN")
 #ifdef PRECOMPILEDHEADERS
 	#include "Utils All.h"
 	#include "_Ja25GermanText.h"

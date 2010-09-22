@@ -2386,6 +2386,12 @@ STR16 pFilesTitle[] =
 	L"Przegl¹darka plików",
 };
 
+CHAR16 pFilesSenderList[255][128] =
+{
+	L"",
+};
+
+/*
 STR16 pFilesSenderList[] =
 {
 	L"Raport Rozp.", 		// the recon report sent to the player. Recon is an abbreviation for reconissance
@@ -2395,8 +2401,9 @@ STR16 pFilesSenderList[] =
 	L"Intercept #4", // fourth intercept file
 	L"Intercept #5", // fifth intercept file
 	L"Intercept #6", // sixth intercept file
+	L"Mission briefing", //mission briefing by Jazz
 };
-
+*/
 // Text having to do with the History Log
 
 STR16 pHistoryTitle[] =

@@ -316,16 +316,36 @@
 
 #else
 
+#ifndef u8
   #define u8 U8
+#endif
+#ifndef s8
   #define s8 S8
+#endif
+#ifndef u16
   #define u16 U16
+#endif
+#ifndef s16
   #define s16 S16
+#endif
+#ifndef u32
   #define u32 U32
+#endif
+#ifndef s32
   #define s32 S32
+#endif
+#ifndef u64
   #define u64 U64
+#endif
+#ifndef s64
   #define s64 S64
+#endif
+#ifndef f32
   #define f32 F32
+#endif
+#ifndef f64
   #define f64 F64
+#endif
 
 #endif
 

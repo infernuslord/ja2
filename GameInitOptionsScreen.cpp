@@ -1559,7 +1559,7 @@ void DoneFadeOutForExitGameInitOptionScreen( void )
 	gubGIOExitScreen = INTRO_SCREEN;
 	#endif
 	//set the fact that we should do the intro videos
-//	gbIntroScreenMode = INTRO_BEGINING;
+//	gbIntroScreenMode = INTRO_BEGINNING;
 #ifdef JA2TESTVERSION
 	if( gfKeyState[ ALT ] )
 	{
@@ -1577,7 +1577,7 @@ void DoneFadeOutForExitGameInitOptionScreen( void )
 		#ifdef JA2UB
 		//Ja25: No intro videos
 		#else
-		SetIntroType( INTRO_BEGINING );
+		SetIntroType( INTRO_BEGINNING );
 		#endif
 
 	ExitGIOScreen();

@@ -778,6 +778,10 @@
 				RelativePath="Sys Globals.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\XML_IntroFiles.cpp"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

@@ -17,6 +17,12 @@
 #include "Overhead.h"
 #include "Music Control.h"
 
+#include "Intro.h"
+#include "End Game.h"
+#include "Queen Command.h"
+#include "gamescreen.h"
+#include "Map Screen Interface Map.h"
+
 extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
@@ -24,6 +30,8 @@ extern "C" {
 }
 
 using namespace std;
+
+extern	BOOLEAN	gfDoneWithSplashScreen;
 
 
 void IniGlobalGameSetting(lua_State *L)
@@ -112,5 +120,30 @@ void IniGlobalGameSetting(lua_State *L)
 	lua_pushinteger(L, gGameExternalOptions.fCanTrueCiviliansBecomeHostile);
 	lua_setglobal(L, "fCanTrueCiviliansBecomeHostile");
 	
+	//intro
+	lua_pushboolean(L, gfEnteringMapScreen);
+	lua_setglobal(L, "gfEnteringMapScreen");
+	
+	lua_pushboolean(L, guiIntroExitScreen);
+	lua_setglobal(L, "guiIntroExitScreen");
+	
+	lua_pushboolean(L, gfIntroScreenExit);
+	lua_setglobal(L, "gfIntroScreenExit");
+	
+	lua_pushinteger(L, sSelMapX);
+	lua_setglobal(L, "sSelMapX");
+	
+	lua_pushinteger(L, sSelMapY);
+	lua_setglobal(L, "sSelMapY");
+	
+	lua_pushinteger(L, iCurrentMapSectorZ);
+	lua_setglobal(L, "iCurrentMapSectorZ");	
+	
+	lua_pushboolean(L, gfDoneWithSplashScreen);
+	lua_setglobal(L, "gfDoneWithSplashScreen");		
+	
+	lua_pushinteger(L, gbIntroScreenMode);
+	lua_setglobal(L, "gbIntroScreenMode");	
+
 	
 }

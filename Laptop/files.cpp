@@ -20,6 +20,10 @@
 	#include "GameSettings.h"
 #endif
 
+#ifdef JA2UB
+#include "legion cfg.h"
+#endif
+
 #define TOP_X														LAPTOP_SCREEN_UL_X
 #define TOP_Y														LAPTOP_SCREEN_UL_Y
 #define BLOCK_FILE_HEIGHT								10
@@ -188,6 +192,8 @@ void AddStringToFilesList( STR16 pString );
 BOOLEAN HandleSpecialFiles( UINT8 ubFormat );
 BOOLEAN HandleSpecialTerroristFile( INT32 iFileNumber, STR sPictureName );
 
+BOOLEAN HandleMissionBriefingFiles( UINT8 ubFormat ); //mission briefing by Jazz
+FileRecordWidthPtr CreateWidthRecordsForMissionBriefingFile( void );
 
 // callbacks
 void FilesBtnCallBack(MOUSE_REGION * pRegion, INT32 iReason );
@@ -236,8 +242,16 @@ void GameInitFiles( )
 	ClearFilesList( );
 
 	// add background check by RIS
-	AddFilesToPlayersLog( ENRICO_BACKGROUND, 0,255, NULL, NULL );
 
+	//#ifdef JA2UB
+	//if ( gGameLegionOptions.RISRAPORT == TRUE )
+	//	AddFilesToPlayersLog( ENRICO_BACKGROUND, 0,255, NULL, NULL );
+	//#else
+	AddFilesToPlayersLog( ENRICO_BACKGROUND, 0,255, NULL, NULL );
+	//#endif
+	
+	//mission briefing by Jazz
+	//AddFilesToPlayersLog( MISSION_BRIEFING, 0,4, NULL, NULL );
 }
 
 void EnterFiles()
@@ -1009,6 +1023,11 @@ BOOLEAN DisplayFormattedText( void )
 		// load first graphic
 			HandleSpecialTerroristFile( pFilesList->ubCode, pFilesList->pPicFileNameList[ 0 ] );
 		break;
+		case 4:
+		// picture on the left, with text on right and below
+		// load first graphic
+		   HandleMissionBriefingFiles( pFilesList->ubFormat );
+		break;
 		default:
 			HandleSpecialFiles( pFilesList->ubFormat );
 	 break;
@@ -1021,6 +1040,224 @@ BOOLEAN DisplayFormattedText( void )
 	return ( TRUE );
 }
 
+//Mission briefing by Jazz
+
+FileRecordWidthPtr CreateWidthRecordsForMissionBriefingFile( void )
+{
+	// this fucntion will create the width list for the Arulco intelligence file
+	FileRecordWidthPtr pTempRecord = NULL;
+	FileRecordWidthPtr pRecordListHead = NULL;
+
+
+		// first record width
+//	pTempRecord = CreateRecordWidth( 7, 350, 200,0 );
+	pTempRecord = CreateRecordWidth( FILES_COUNTER_1_WIDTH, 200, 0,0 );
+
+	// set up head of list now
+	pRecordListHead = pTempRecord;
+
+	// next record
+//	pTempRecord->Next = CreateRecordWidth( 43, 200,0, 0 );
+	pTempRecord->Next = CreateRecordWidth( FILES_COUNTER_2_WIDTH, 200,0, 0 );
+	pTempRecord = pTempRecord->Next;
+
+	// and the next..
+//	pTempRecord->Next = CreateRecordWidth( 45, 200,0, 0 );
+	pTempRecord->Next = CreateRecordWidth( FILES_COUNTER_3_WIDTH, 200,0, 0 );
+	pTempRecord = pTempRecord->Next;
+
+	return( pRecordListHead );
+
+}
+
+BOOLEAN HandleMissionBriefingFiles( UINT8 ubFormat )
+{
+	INT32 iCounter = 0;
+	CHAR16 sString[2048];
+	FileStringPtr pTempString = NULL ;
+	FileStringPtr pLocatorString = NULL;
+	INT32 iYPositionOnPage = 0;
+	INT32 iFileLineWidth = 0;
+	INT32 iFileStartX = 0;
+	UINT32 uiFlags = 0;
+	UINT32 uiFont = 0;
+	BOOLEAN fGoingOffCurrentPage = FALSE;
+	FileRecordWidthPtr WidthList = NULL;
+
+
+	UINT32 uiPicture;
+	HVOBJECT hHandle;
+	VOBJECT_DESC VObjectDesc;
+
+
+	ClearFileStringList( );
+
+	switch( ubFormat )
+	{
+		case( 4 ):
+			// load data
+			// read one record from file manager file
+
+			WidthList = CreateWidthRecordsForMissionBriefingFile( );
+		while( iCounter < 250 )
+			{			
+				LoadEncryptedDataFromFile( "binarydata\\MissionBriefing.EDT", sString, FILE_STRING_SIZE * ( iCounter ) * 2, FILE_STRING_SIZE * 2 );
+				
+				AddStringToFilesList( sString );
+				iCounter++;
+			}
+
+			pTempString = pFileStringList;
+
+
+		iYPositionOnPage = 0;
+			iCounter = 0;
+			pLocatorString = pTempString;
+
+			pTempString = GetFirstStringOnThisPage( pFileStringList,FILES_TEXT_FONT,	350, FILE_GAP, giFilesPage, MAX_FILE_MESSAGE_PAGE_SIZE, WidthList);
+
+			// find out where this string is
+			while( pLocatorString != pTempString )
+			{
+				iCounter++;
+				pLocatorString = pLocatorString->Next;
+			}
+
+
+			// move through list and display
+			while( pTempString )
+			{
+				uiFlags = IAN_WRAP_NO_SHADOW;
+						// copy over string
+				wcscpy( sString, pTempString->pString );
+
+				if( sString[ 0 ] == 0 )
+				{
+					// on last page
+					fOnLastFilesPageFlag = TRUE;
+				}
+
+
+				// set up font
+				uiFont = FILES_TEXT_FONT;
+				if( giFilesPage == 0 )
+				{
+				switch( iCounter )
+					{
+				 case( 0 ):
+						uiFont = FILES_TITLE_FONT;
+					break;
+
+					}
+				}
+				
+				if( iCounter == 0 )
+				{			
+				// reset width
+				iFileLineWidth = 350;
+				iFileStartX = (UINT16) ( FILE_VIEWER_X +	10 );
+				}
+				else
+				{
+				// reset width
+				iFileLineWidth = 350;
+				iFileStartX = (UINT16) ( FILE_VIEWER_X +	10 );
+				}
+
+				if( ( iYPositionOnPage + IanWrappedStringHeight(0, 0, ( UINT16 )iFileLineWidth, FILE_GAP,
+															uiFont, 0, sString,
+															0, 0, 0 ) )	< MAX_FILE_MESSAGE_PAGE_SIZE	)
+				{
+	 		// now print it
+			iYPositionOnPage += ( INT32 )IanDisplayWrappedString((UINT16) ( iFileStartX ), ( UINT16 )( FILE_VIEWER_Y + iYPositionOnPage), ( INT16 )iFileLineWidth, FILE_GAP, uiFont, FILE_TEXT_COLOR, sString,0,FALSE, uiFlags );
+
+				fGoingOffCurrentPage = FALSE;
+				}
+			else
+				{
+				// gonna get cut off...end now
+				fGoingOffCurrentPage = TRUE;
+				}
+
+				pTempString = pTempString->Next;
+
+				if( pTempString == NULL )
+				{
+					// on last page
+					fOnLastFilesPageFlag = TRUE;
+				}
+				else
+				{
+					fOnLastFilesPageFlag = FALSE;
+				}
+
+				// going over the edge, stop now
+				if( fGoingOffCurrentPage == TRUE )
+				{
+					pTempString = NULL;
+				}
+				iCounter++;
+			}
+			ClearOutWidthRecordsList( WidthList );
+			ClearFileStringList( );
+		break;
+	}
+
+	// place pictures
+	// page 1 picture of country
+	if( giFilesPage == 0 )
+	{
+		// title bar
+		VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
+		//Ja25, new map	
+		if (FileExists(MAP_JA25))
+		{
+		FilenameForBPP("LAPTOP\\TraconaMap.sti", VObjectDesc.ImageFile);
+		}
+		else
+		{
+		FilenameForBPP("LAPTOP\\ArucoFilesMap.sti", VObjectDesc.ImageFile);
+		}
+		CHECKF(AddVideoObject(&VObjectDesc, &uiPicture));
+
+		// get title bar object
+	GetVideoObject(&hHandle, uiPicture);
+
+	// blt title bar to screen
+	BltVideoObject(FRAME_BUFFER, hHandle, 0,iScreenWidthOffset + 300, iScreenHeightOffset + 270, VO_BLT_SRCTRANSPARENCY,NULL);
+
+		DeleteVideoObjectFromIndex( uiPicture );
+
+	}
+	else 	if( giFilesPage == 1 )
+	{
+		// title bar
+		VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
+		//Ja25, new map	
+		if (FileExists(MAP_JA25))
+		{
+		FilenameForBPP("LAPTOP\\TraconaMap.sti", VObjectDesc.ImageFile);
+		}
+		else
+		{
+		FilenameForBPP("LAPTOP\\ArucoFilesMap.sti", VObjectDesc.ImageFile);
+		}
+		CHECKF(AddVideoObject(&VObjectDesc, &uiPicture));
+
+		// get title bar object
+	GetVideoObject(&hHandle, uiPicture);
+
+	// blt title bar to screen
+	BltVideoObject(FRAME_BUFFER, hHandle, 0,iScreenWidthOffset + 300, iScreenHeightOffset + 270, VO_BLT_SRCTRANSPARENCY,NULL);
+
+		DeleteVideoObjectFromIndex( uiPicture );
+
+	}
+
+	return ( TRUE );
+}
+
+//-------------------------------------------
 
 BOOLEAN HandleSpecialFiles( UINT8 ubFormat )
 {

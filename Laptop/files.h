@@ -46,6 +46,7 @@ enum{
 	TIFFANY_BACKGROUND, 
 	REXALL_BACKGROUND, 
 	ELGIN_BACKGROUND, 
+	MISSION_BRIEFING, //mission briefing by Jazz
 
 };
 extern UINT8 ubFileRecordsLength[];

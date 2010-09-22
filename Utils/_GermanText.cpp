@@ -1,4 +1,4 @@
-//#pragma setlocale("GERMAN")
+#pragma setlocale("GERMAN")
 #ifdef PRECOMPILEDHEADERS
 	#include "Utils All.h"
 #else
@@ -2297,6 +2297,9 @@ STR16 pFilesTitle[] =
 	L"Akten einsehen",
 };
 
+CHAR16 pFilesSenderList[255][128];
+
+/*
 STR16 pFilesSenderList[] =
 {
 	L"Aufklärungsbericht", 		// the recon report sent to the player. Recon is an abbreviation for reconissance
@@ -2307,7 +2310,7 @@ STR16 pFilesSenderList[] =
 	L"Abschnitt #5",		// fifth intercept file
 	L"Abschnitt #6",		// sixth intercept file
 };
-
+*/
 // Text having to do with the History Log
 STR16 pHistoryTitle[] =
 {

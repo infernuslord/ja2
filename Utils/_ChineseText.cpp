@@ -2386,6 +2386,9 @@ STR16 pFilesTitle[] =
   L"文件查看器",
 };
 
+CHAR16 pFilesSenderList[255][128];
+
+/*
 STR16 pFilesSenderList[] =
 {
   L"侦察报告",
@@ -2396,7 +2399,7 @@ STR16 pFilesSenderList[] =
 	L"5号通缉令",
 	L"6号通缉令",
 };
-
+*/
 // Text having to do with the History Log
 
 STR16 pHistoryTitle[] =

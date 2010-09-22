@@ -47,14 +47,20 @@
 #include "Ja25Update.h"
 #endif
 
+#include "Intro.h"
+#include "End Game.h"
 #include "Queen Command.h"
-
+#include "gamescreen.h"
 
 extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
 }
+
+extern	BOOLEAN	gfDoneWithSplashScreen;
+extern UINT32 iStringToUseLua;
+extern INT8 Test;
 
 //Mercs
 static int l_AddNPC(lua_State *L);
@@ -89,6 +95,7 @@ static int l_GetStartingCashInsane (lua_State *L);
 //email
 static int l_AddPreReadEmail (lua_State *L);
 static int l_AddEmail (lua_State *L);
+static int l_AddCustomEmail (lua_State *L);
 
 static int l_SectorInfoBloodCats(lua_State *L);
 static int l_SectorEnemy(lua_State *L);
@@ -119,6 +126,25 @@ static int l_SetNumberOfJa25BloodCatsInSector(lua_State *L);
 static int l_FindUnderGroundSector(lua_State *L);
 static int l_AddEnemyToUnderGroundSector(lua_State *L);
 static int l_FindUnderGroundSectorVisited(lua_State *L);
+
+static int l_SetCurrentWorldSector(lua_State *L);
+
+static int l_EnterTacticalInFinalSector(lua_State *L);
+
+static int l_ReStartingGame(lua_State *L);
+
+static int l_Merc_Is_Dead (lua_State *L);
+
+//Intro
+static int l_DisplaySirtechSplashScreen(lua_State *L);
+static int l_gfIntroScreenExit(lua_State *L);
+static int l_gfEnteringMapScreen(lua_State *L);
+static int l_gfDoneWithSplashScreen(lua_State *L);
+static int l_guiIntroExitScreen(lua_State *L);
+static int l_gbIntroScreenMode(lua_State *L);
+static int l_iStringToUse(lua_State *L);
+static int l_StopVideo(lua_State *L);
+static int l_StartVideo(lua_State *L);
 
 UNDERGROUND_SECTORINFO* NewUndergroundNode( UINT8 ubSectorX, UINT8 ubSectorY, UINT8 ubSectorZ );
 #endif
@@ -161,7 +187,8 @@ void IniFunction(lua_State *L)
 	//Email
 	lua_register(L, "AddPreReadEmail", l_AddPreReadEmail);
 	lua_register(L, "AddEmail", l_AddEmail);
-	
+	lua_register(L, "AddCustomEmail", l_AddCustomEmail);
+
 	//Add enemy and bloodcats
 	lua_register(L, "GetSectorInfoBloodCats", l_SectorInfoBloodCats);
 	lua_register(L, "SectorEnemy", l_SectorEnemy);
@@ -190,7 +217,240 @@ void IniFunction(lua_State *L)
 	lua_register(L, "AddEnemyToUnderGroundSector", l_AddEnemyToUnderGroundSector);
 	lua_register(L, "FindUnderGroundSectorVisited", l_FindUnderGroundSectorVisited);
 #endif	
+
+	lua_register(L, "SetCurrentWorldSector", l_SetCurrentWorldSector);	
+
+	lua_register(L, "EnterTacticalInFinalSector", l_EnterTacticalInFinalSector);	
+
+	lua_register(L, "ReStartingGame", l_ReStartingGame);
+
+	lua_register(L, "CheckMercIsDead", l_Merc_Is_Dead);	
+	
+//intro
+	lua_register(L, "DisplaySirtechSplashScreen", l_DisplaySirtechSplashScreen);
+	
+	lua_register(L, "SetEnteringMapScreen", l_gfEnteringMapScreen);
+	lua_register(L, "SetIntroScreenExit", l_gfIntroScreenExit);
+	lua_register(L, "SetDoneWithSplashScreen", l_gfDoneWithSplashScreen);
+	lua_register(L, "SetIntroExitScreen", l_guiIntroExitScreen);	
+	lua_register(L, "SetIntroScreenMode", l_gbIntroScreenMode);	
+
+	lua_register(L, "SetVideo", l_iStringToUse);	
+	lua_register(L, "StopVideo", l_StopVideo);	
+	lua_register(L, "StartVideo", l_StartVideo);	
 }
+
+//------------------- intro -----------
+
+BOOLEAN LuaIntro(UINT8 Init, UINT32 uiCurrentVideo, INT8 bIntroType, UINT32 iStringToUse )
+{
+	char * filename = "scripts\\Intro.lua";
+	UINT32 size, bytesRead;
+	char* buffer;
+
+	HWFILE file = FileOpen(filename, FILE_ACCESS_READ, FALSE);
+
+	if (!file)
+		return false;
+
+	size = FileSize(filename);
+	buffer = new char[size+1];
+	buffer[size] = 0;
+	FileRead(file, buffer, size, &bytesRead);
+	FileClose(file);
+
+	lua_State *L = lua_open();
+	luaL_openlibs(L);
+
+	IniFunction(L);
+	IniGlobalGameSetting(L);
+	
+	if (luaL_dostring(L, buffer))
+	{
+		// oh noes, error
+		// TODO: write to log or something
+		return false;
+	}
+	
+	if ( Init == 0 )
+	{
+		lua_getglobal(L , "PrepareToExitIntroScreen");
+		lua_call(L,0,0); 
+	}
+	
+	if ( Init == 1 )
+	{
+		lua_getglobal(L , "GetNextIntroVideo");
+		lua_pushnumber (L, uiCurrentVideo );
+		lua_call(L,1,0); 
+	}
+	
+	if ( Init == 2 )
+	{
+		lua_getglobal(L , "SetIntroType");
+		lua_pushnumber (L, bIntroType );
+		lua_call(L,1,0); 
+	}
+
+	lua_close(L);
+
+	delete[] buffer;
+	
+	
+	return true;
+
+}
+
+static int l_DisplaySirtechSplashScreen(lua_State *L)
+{
+
+	DisplaySirtechSplashScreen ();
+	
+	return 0;
+}
+
+static int l_EnterTacticalInFinalSector(lua_State *L)
+{
+
+	EnterTacticalInFinalSector ();
+	
+	return 0;
+}
+
+static int l_ReStartingGame(lua_State *L)
+{
+
+	ReStartingGame ();
+	
+	return 0;
+}
+
+static int l_SetCurrentWorldSector(lua_State *L)
+{
+UINT8  n = lua_gettop(L);
+int i;
+INT16 sMapX;
+INT16 sMapY;
+INT8 bMapZ;
+BOOLEAN Bool;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) sMapX = lua_tointeger(L,i);
+		if (i == 2 ) sMapY = lua_tointeger(L,i);
+		if (i == 3 ) bMapZ = lua_tointeger(L,i);
+	}
+	
+	SetCurrentWorldSector( sMapX, sMapY, bMapZ );
+	
+return 0;
+}
+
+static int l_gfIntroScreenExit(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+int i;
+BOOLEAN BOOL;
+	
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) BOOL = lua_toboolean(L,i);
+	}	
+		
+		gfIntroScreenExit = BOOL;
+	return 0;
+}
+
+static int l_gfDoneWithSplashScreen(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+int i;
+BOOLEAN BOOL;
+	
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) BOOL = lua_toboolean(L,i);
+	}	
+		
+		gfDoneWithSplashScreen = BOOL;
+	return 0;
+}
+
+static int l_guiIntroExitScreen(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+int i;
+UINT8 VAL;;
+	
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) VAL = lua_tointeger(L,i);
+	}	
+		
+		guiIntroExitScreen = VAL;
+	return 0;
+}
+
+static int l_gbIntroScreenMode(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+int i;
+UINT8 VAL;;
+	
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) VAL = lua_tointeger(L,i);
+	}	
+		
+		gbIntroScreenMode = VAL;
+	return 0;
+}
+
+static int l_iStringToUse(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+int i;
+UINT8 VAL;;
+	
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) VAL = lua_tointeger(L,i);
+	}	
+		
+		iStringToUseLua = VAL;
+	return 0;
+}
+
+static int l_gfEnteringMapScreen(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+int i;
+BOOLEAN BOOL;
+	
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) BOOL = lua_toboolean(L,i);
+	}	
+		
+		gfEnteringMapScreen = BOOL;
+	return 0;
+}
+
+static int l_StopVideo(lua_State *L)
+{
+
+		Test = 1;
+	return 0;
+}
+
+static int l_StartVideo(lua_State *L)
+{
+
+		Test = 0;
+	return 0;
+}
+
+//------------------- intro -----------
 
 #ifdef JA2UB
 BOOLEAN LetLuaMakeBadSectorListFromMapsOnHardDrive(UINT8 Init)
@@ -289,6 +549,31 @@ BOOLEAN LetLuaGameInit(UINT8 Init)
 	return true;
 
 }
+
+//Check merc is dead
+static int l_Merc_Is_Dead (lua_State *L)
+{
+UINT8 npcID = lua_gettop(L);
+BOOLEAN dead;
+UINT8 id;
+	
+		id = lua_tointeger(L,npcID);
+		
+		if ( gMercProfiles[ id ].bMercStatus  == MERC_IS_DEAD )
+		{
+			dead = TRUE;
+		}
+		else
+		{
+			dead = FALSE;
+		}
+		
+		lua_pushboolean (L, dead);
+
+return 1;
+
+}
+
 
 #ifdef JA2UB
 BOOLEAN LuaInitStrategicLayer(UINT8 Init)
@@ -677,6 +962,29 @@ INT32 iCurrentIMPPosition;
 	}
 
 	AddEmail(iMessageOffset,iMessageLength,ubSender,	GetWorldTotalMin(), iCurrentIMPPosition);	
+	
+return 0;
+}
+
+static int l_AddCustomEmail (lua_State *L)
+{
+UINT8  n = lua_gettop(L);
+int i;
+INT32 iMessageOffset;
+INT32 iMessageLength;
+UINT8 ubSender;
+INT32 iCurrentIMPPosition;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) iMessageOffset = lua_tointeger(L,i);
+		if (i == 2 ) iMessageLength = lua_tointeger(L,i);
+		if (i == 3 ) ubSender = lua_tointeger(L,i);
+		//if (i == 4 ) iDate = lua_tointeger(L,i);
+		if (i == 4 ) iCurrentIMPPosition = lua_tointeger(L,i);
+	}
+
+	AddCustomEmail(iMessageOffset,iMessageLength,ubSender,	GetWorldTotalMin(), iCurrentIMPPosition);	
 	
 return 0;
 }

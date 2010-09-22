@@ -902,6 +902,22 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcat(fileName, QUOTEARRAYFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
 	THROWIFFALSE(ReadInQarray(QuoteExp,fileName),QUOTEARRAYFILENAME);
+	
+		// Files Name List by Jazz
+		strcpy(fileName, directoryName);
+		strcat(fileName, FILESSENDERLISTFILENAME);
+		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+		THROWIFFALSE(ReadInFilesSenderList(fileName,FALSE), FILESSENDERLISTFILENAME);
+
+#ifndef ENGLISH
+		AddLanguagePrefix(fileName);
+		if ( FileExists(fileName) )
+		{
+			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+			if(!ReadInFilesSenderList(fileName,TRUE))
+				return FALSE;
+		}
+#endif
 
 	
 	LoadIMPPortraitsTEMP();

@@ -9,35 +9,29 @@
 #include <malloc.h>
 #include <stdlib.h>
 
-#include "DEBUG.H"
+#include "Debug.h"
 #include "FileMan.h"
-//#include "smack.h"
-#include "ddraw.h"
+#include "smack.h"
+#include "DDraw.h"
 #include "mss.h"
 #include "DirectX Common.h"
 #include "DirectDraw Calls.h"
-#include "soundman.h"
-#include "bink.h"
-#include "Cinematics Bink.h"
-#include <vfs/Core/vfs.h>
-#include <vfs/Core/vfs_file_raii.h>
+#include "SoundMan.h"
+#include "Video.h"
 
-#ifdef JA2
-	#include "video.h"
-#else
-	#include "video2.h"
-#endif
+#include "Cinematics Bink.h"
 
 #include "vsurface_private.h"
 
 //#include "Intro.h"
+#include <vfs/Core/vfs.h>
+#include <vfs/Core/vfs_file_raii.h>
 
 
 #include "radmalw.i"
 
 
 #include <crtdbg.h>
-
 
 
 
@@ -74,17 +68,20 @@ UINT32			guiHeight;
 //
 //*******************************************************************
 
-void				BinkInitialize(HWND hWindow, UINT32 uiWidth, UINT32 uiHeight);
-void				BinkShutdown(void);
+void			BinkInitialize(HWND hWindow, UINT32 uiWidth, UINT32 uiHeight);
+void			BinkShutdown(void);
 BINKFLIC		*BinkPlayFlic(CHAR8 *cFilename, UINT32 uiLeft, UINT32 uiTop, UINT32 uiFlags );
 BOOLEAN			BinkPollFlics(void);
-BINKFLIC		*BinkOpenFlic(CHAR8 *cFilename);
-void				BinkSetBlitPosition(BINKFLIC *pBink, UINT32 uiLeft, UINT32 uiTop);
-void				BinkCloseFlic(BINKFLIC *pBink);
+BINKFLIC		*BinkOpenFlic(const CHAR8 *cFilename);
+void			BinkSetBlitPosition(BINKFLIC *pBink, UINT32 uiLeft, UINT32 uiTop);
+void			BinkCloseFlic(BINKFLIC *pBink);
 BINKFLIC		*BinkGetFreeFlic(void);
-void				BinkSetupVideo(void);
-void				BinkShutdownVideo(void);
+void			BinkSetupVideo(void);
+void			BinkShutdownVideo(void);
 UINT16			GetNumberOfBits( UINT32 uiMask );
+
+
+
 
 
 //*******************************************************************
@@ -98,16 +95,16 @@ UINT16			GetNumberOfBits( UINT32 uiMask );
 void				BinkInitialize(HWND hWindow, UINT32 uiWidth, UINT32 uiHeight)
 {
 	//HDIGDRIVER pSoundDriver = NULL;
+	void* pSoundDriver = NULL;
 
-	void *pSoundDriver = NULL;
-	
+
 	//Get the sound Driver handle
 	pSoundDriver = SoundGetDriverHandle();
 
 	//if we got the sound handle, use sound during the intro
 	if( pSoundDriver )
 	{
-		BinkSoundUseMiles( pSoundDriver );
+		BinkSoundUseDirectSound( pSoundDriver );
 	}
 
 	guiHeight = uiHeight;
@@ -132,7 +129,7 @@ void				BinkShutdown(void)
 
 
 
-BINKFLIC			*BinkPlayFlic(CHAR8 *cFilename, UINT32 uiLeft, UINT32 uiTop, UINT32 uiFlags )
+BINKFLIC			*BinkPlayFlic(const CHAR8 *cFilename, UINT32 uiLeft, UINT32 uiTop, UINT32 uiFlags )
 {
 	BINKFLIC *pBink;
 
@@ -166,10 +163,9 @@ BINKFLIC			*BinkPlayFlic(CHAR8 *cFilename, UINT32 uiLeft, UINT32 uiTop, UINT32 u
 	return(pBink);
 }
 
-BINKFLIC *BinkOpenFlic( CHAR8 *cFilename )
+BINKFLIC *BinkOpenFlic( const CHAR8 *cFilename )
 {
 	BINKFLIC *pBink;
-	HANDLE	hFile;
 
 	// Get an available flic slot from the list
 	if( !( pBink = BinkGetFreeFlic() ) )
@@ -179,14 +175,14 @@ BINKFLIC *BinkOpenFlic( CHAR8 *cFilename )
 	}
 #ifndef USE_VFS
 	// Attempt opening the filename
-	if(!(pBink->hFileHandle = FileOpen( cFilename, FILE_OPEN_EXISTING | FILE_ACCESS_READ, FALSE ) ) )
+	if(!(pBink->hFileHandle = FileOpen( const_cast<CHAR8*>(cFilename), FILE_OPEN_EXISTING | FILE_ACCESS_READ, FALSE ) ) )
 	{
 		ErrorMsg("BINK ERROR: Can't open the BINK file");
 		return(NULL);
 	}
 
 	//Get the real file handle for the file man handle for the smacker file
-	hFile = GetRealFileHandleFromFileManFileHandle( pBink->hFileHandle );
+	HANDLE hFile = GetRealFileHandleFromFileManFileHandle( pBink->hFileHandle );
 #else
 	vfs::Path introname(cFilename);
 	vfs::Path dir,filename;
@@ -208,11 +204,9 @@ BINKFLIC *BinkOpenFlic( CHAR8 *cFilename )
 			vfs::COpenWriteFile wfile(tempfile,true);
 			wfile->write(&data[0],size);
 		}
-		catch(CBasicException& ex)
+		catch(std::exception& ex)
 		{
-			BuildString bs;
-			bs.add(L"Intro file \"").add(filename()).add(L"\" could not be extracted");
-			RETHROWEXCEPTION(bs.get(), &ex);
+	//		SGP_RETHROW(_BS(L"Intro file \"") << filename << L"\" could not be extracted" << _BS::wget, ex);
 		}
 	}
 #endif
@@ -229,11 +223,11 @@ BINKFLIC *BinkOpenFlic( CHAR8 *cFilename )
 			return NULL;
 		}
 	}
-	catch(CBasicException& ex)
+	catch(std::exception& ex)
 	{
-		RETHROWEXCEPTION(L"Temporary intro file could not be read", &ex);
+//		SGP_RETHROW(L"Temporary intro file could not be read", ex);
 	}
-	if(!(pBink->BinkHandle=BinkOpen(tempfilename.to_string().c_str(), BINKFILEHANDLE )))
+	if( !( pBink->BinkHandle = BinkOpen(tempfilename.to_string().c_str(), BINKNOTHREADEDIO /*BINKFILEHANDLE*/ ) ) ) //| SMACKTRACKS 
 #endif
 	{
 		ErrorMsg("BINK ERROR: Bink won't open the BINK file");
@@ -437,6 +431,3 @@ UINT16 GetNumberOfBits( UINT32 uiMask )
 void				BinkShutdownVideo(void)
 {
 }
-
-
-

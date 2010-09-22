@@ -22,6 +22,7 @@
 	#include "Line.h"
 	#include "Intro.h"
 	#include "Cinematics.h"
+	#include "Cinematics Bink.h"
 	#include "mainmenuscreen.h"
 	#include "Music Control.h"
 	#include "LibraryDataBase.h"
@@ -30,6 +31,8 @@
 	#include "Soldier Profile.h"
 	#include "soldier profile type.h"
 	#include "MessageBoxScreen.h"
+//	#include "sgp_logger.h"
+#include "INIReader.h"
 #endif
 
 #include <vfs/Core/vfs.h>
@@ -41,6 +44,159 @@
 #include "End Game.h"
 #include "Cinematics Bink.h"
 #endif
+
+#include "LuaInitNPCs.h"
+#include "XML.h"
+
+BOOLEAN Style_JA = TRUE;
+extern INT8 Test = 0;
+
+INTRO_NAMES_VALUES zVideoFile[255];
+UINT32 iStringToUseLua = -1;
+
+// BF
+class VideoPlayer
+{
+public:
+	enum VideoType
+	{
+		VT_NONE = 0,
+		VT_SMK  = 1,
+		VT_BINK = 2,
+	};
+	VideoPlayer(UINT32 type) : _type(type), _smk(NULL), _bink(NULL), _current(VT_NONE)
+	{
+	}
+	void Initialize()
+	{
+		if(_type & VT_SMK)
+		{
+			SmkInitialize( ghWindow, SCREEN_WIDTH, SCREEN_HEIGHT);
+		}
+		if(_type & VT_BINK)
+		{
+			BinkInitialize(ghWindow, SCREEN_WIDTH, SCREEN_HEIGHT);
+		}
+	}
+	void Shutdown()
+	{
+		if(_type & VT_SMK)
+		{
+			SmkShutdown();
+		}
+		if(_type & VT_BINK)
+		{
+			BinkShutdownVideo();
+		}
+	}
+
+	bool isValid()
+	{
+		if(	(_current == VT_SMK && _smk && !_bink) || (_current == VT_BINK && !_smk && _bink) )
+		{
+			return true;
+		}
+		return false;
+	}
+
+	bool isPlaying()
+	{
+		if(	_current == VT_SMK && _smk && !_bink )
+		{
+			return SmkPollFlics() != 0;
+		}
+		else if(_current == VT_BINK && !_smk && _bink) 
+		{
+			return BinkPollFlics() != 0;
+		}
+		else if(_current == VT_NONE && !_smk && !_bink)
+		{
+			return false;
+		}
+	//	SGP_THROW(L"Invalid Video Player state!");
+	}
+	
+	void stopVideo()
+	{
+		if(_current == VT_SMK && _smk && !_bink)
+		{
+			SmkCloseFlic(_smk);
+			_smk = NULL;
+		}
+		else if(_current == VT_BINK && !_smk && _bink)
+		{
+			BinkCloseFlic(_bink);
+			_bink = NULL;
+		}
+		_current = VT_NONE;
+	}
+
+	bool startVideo(std::string const& filename)
+	{
+		if(isPlaying())
+		{
+			return false;
+		}
+		
+		/// check file extension
+		std::string ext;
+		std::string::size_type pos = filename.find_last_of(".");
+		if(pos != std::string::npos)
+		{
+			ext = filename.substr(pos, filename.size() - pos);
+		}
+		if(vfs::StrCmp::Equal(ext, ".smk"))
+		{
+			return startSmkVideo(filename);
+		}
+		else if(vfs::StrCmp::Equal(ext, ".bik"))
+		{
+			return startBinkVideo(filename);
+		}
+		else if(ext.empty())
+		{
+			// try .bik first
+			if(!startBinkVideo(filename + ".bik"))
+			{
+				return startSmkVideo(filename + ".smk");
+			}
+			return true;
+		}
+		else
+		{
+		//	SGP_INFO(L"Unknown video file format");
+		}
+		return false;
+	}
+private:
+	bool startSmkVideo(std::string const& filename)
+	{
+		_smk = SmkPlayFlic( filename.c_str(), (SCREEN_WIDTH-640)/2, (SCREEN_HEIGHT-480)/2, TRUE );
+		if(_smk)
+		{
+			_current = VT_SMK;
+			return true;
+		}
+		return false;
+	}
+	bool startBinkVideo(std::string const& filename)
+	{
+		_bink = BinkPlayFlic( filename.c_str(), (SCREEN_WIDTH-640)/2, (SCREEN_HEIGHT-480)/2, BINK_FLIC_AUTOCLOSE | BINK_FLIC_CENTER_VERTICAL);
+		if(_bink)
+		{
+			_current = VT_BINK;
+			return true;
+		}
+		return false;
+	}
+private:
+	UINT32		_type;
+	SMKFLIC*	_smk;
+	BINKFLIC*	_bink;
+	VideoType	_current;
+};
+
+static VideoPlayer s_VP(VideoPlayer::VT_SMK | VideoPlayer::VT_BINK);
 
 extern STR16	gzIntroScreen[];
 extern HVSURFACE ghFrameBuffer;
@@ -62,75 +218,40 @@ UINT32		guiIntroExitScreen = INTRO_SCREEN;
 
 extern	BOOLEAN	gfDoneWithSplashScreen;
 
-#ifdef JA2UB
-BINKFLIC *gpBinkFlic = NULL;
-#else
-SMKFLIC *gpSmackFlic = NULL;
-#endif
-
-#define		SMKINTRO_FIRST_VIDEO				255
-#define		SMKINTRO_NO_VIDEO						-1
+//BF SMKFLIC *gpSmackFlic = NULL;
 
 //enums for the various smacker files
-enum
+enum EGameVideos
 {
-	SMKINTRO_REBEL_CRDT,
-	SMKINTRO_OMERTA,
-	SMKINTRO_PRAGUE_CRDT,
-	SMKINTRO_PRAGUE,
+	INTRO_NO_VIDEO						= -1,
+	INTRO_REBEL_CRDT					= 0,
+	INTRO_OMERTA,
+	INTRO_PRAGUE_CRDT,
+	INTRO_PRAGUE,
 
 	//there are no more videos shown for the begining
 
 
-	SMKINTRO_END_END_SPEECH_MIGUEL,
-	SMKINTRO_END_END_SPEECH_NO_MIGUEL,
-	SMKINTRO_END_HELI_FLYBY,
-	SMKINTRO_END_SKYRIDER_HELICOPTER,
-	SMKINTRO_END_NOSKYRIDER_HELICOPTER,
+	INTRO_END_END_SPEECH_MIGUEL,
+	INTRO_END_END_SPEECH_NO_MIGUEL,
+	INTRO_END_HELI_FLYBY,
+	INTRO_END_SKYRIDER_HELICOPTER,
+	INTRO_END_NOSKYRIDER_HELICOPTER,
 
-	#ifdef JA2UB
-	SMKINTRO_SPLASH_SCREEN,
-	SMKINTRO_SPLASH_INTERPLAY,
-
-	SMKINTRO_HELI_CRASH_SCENE_1,
-
-	#else
-	SMKINTRO_SPLASH_SCREEN,
-	SMKINTRO_SPLASH_TALONSOFT,
-	#endif
+	INTRO_SPLASH_SCREEN,
+	INTRO_SPLASH_1,
+	
+	INTRO_HELI_CRASH_SCENE_1,
+	INTRO_END_SCENE_1,
 	//there are no more videos shown for the endgame
-	SMKINTRO_LAST_END_GAME,
+	INTRO_LAST_END_GAME,
+
+	INTRO_FIRST_VIDEO					= 255
 };
 
-INT32	giCurrentIntroBeingPlayed = SMKINTRO_NO_VIDEO;
-
-#ifdef JA2UB
-CHAR		*gpzBinkFileNames[] = 
-{
-	//begining of the game
-	"INTRO\\Rebel_cr.smk",
-	"INTRO\\Omerta.smk",
-	"INTRO\\Prague_cr.smk",
-	"INTRO\\Prague.smk",
-
-
-	//endgame
-	"INTRO\\Throne_Mig.smk",
-	"INTRO\\Throne_NoMig.smk",
-	"INTRO\\Heli_FlyBy.smk",
-	"INTRO\\Heli_Sky.smk",
-	"INTRO\\Heli_NoSky.smk",
-
-	"INTRO\\SplashScreen.bik",
-	"INTRO\\IPLYLogo.bik",
-
-	//Ja25: New vidoes
-	"INTRO\\Intro.bik",
-
-	"INTRO\\MissileEnding.bik"
-};
-#else
-CHAR		*gpzSmackerFileNames[] = 
+EGameVideos	giCurrentIntroBeingPlayed = INTRO_NO_VIDEO;
+/*
+CHAR		*gpzSmackerFileNames[] =
 {
 	//begining of the game
 	"INTRO\\Rebel_cr.smk",
@@ -149,7 +270,9 @@ CHAR		*gpzSmackerFileNames[] =
 	"INTRO\\SplashScreen.smk",
 	"INTRO\\TalonSoftid_endhold.smk",
 };
-#endif
+*/
+typedef std::map<EGameVideos,std::string> VideoFileNames_t;
+static VideoFileNames_t s_VFN;
 
 //enums used for when the intro screen can come up, either begining game intro, or end game cinematic
 INT8	gbIntroScreenMode=-1;
@@ -157,15 +280,15 @@ INT8	gbIntroScreenMode=-1;
 
 extern	void		CDromEjectionErrorMessageBoxCallBack( UINT8 bExitValue );
 
-void	GetIntroScreenUserInput();
-BOOLEAN	EnterIntroScreen();
-void	RenderIntroScreen();
-void	ExitIntroScreen();
-void	HandleIntroScreen();
-void	PrepareToExitIntroScreen();
-INT32 GetNextIntroVideo( UINT32 uiCurrentVideo );
-void	StartPlayingIntroFlic( INT32 iIndexOfFlicToPlay );
-void	DisplaySirtechSplashScreen();
+void		GetIntroScreenUserInput();
+BOOLEAN		EnterIntroScreen();
+void		RenderIntroScreen();
+void		ExitIntroScreen();
+void		HandleIntroScreen();
+void		PrepareToExitIntroScreen();
+EGameVideos	GetNextIntroVideo( EGameVideos uiCurrentVideo );
+void		StartPlayingIntroFlic( EGameVideos iIndexOfFlicToPlay );
+void		DisplaySirtechSplashScreen();
 
 
 //ppp
@@ -175,6 +298,41 @@ UINT32	IntroScreenInit( void )
 {
 	//Set so next time we come in, we can set up
 	gfIntroScreenEntry = TRUE;
+/*	
+	char fileName[MAX_PATH];
+	
+		// Sender Name List by Jazz
+		strcpy(fileName, TABLEDATA_DIRECTORY);
+		strcat(fileName, INTROFILESFILENAME);
+		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+		THROWIFFALSE(ReadInIntroNames(fileName,FALSE), INTROFILESFILENAME);
+		
+*/
+	CIniReader inireader("IntroVideos2.ini");
+//	Style_JA					= inireader.ReadBoolean("VERSION","STYLE",TRUE);
+	
+	s_VFN[INTRO_REBEL_CRDT]					= inireader.ReadString("INTRO_BEGINNING","INTRO_REBEL_CRDT","INTRO\\Rebel_cr");
+	s_VFN[INTRO_OMERTA]						= inireader.ReadString("INTRO_BEGINNING","INTRO_OMERTA","INTRO\\Omerta");
+	s_VFN[INTRO_PRAGUE_CRDT]				= inireader.ReadString("INTRO_BEGINNING","INTRO_PRAGUE_CRDT","INTRO\\Prague_cr");
+	s_VFN[INTRO_PRAGUE]						= inireader.ReadString("INTRO_BEGINNING","INTRO_PRAGUE","INTRO\\Prague");
+
+
+	//there are no more videos shown for the begining
+	s_VFN[INTRO_END_END_SPEECH_MIGUEL]		= inireader.ReadString("INTRO_ENDING","INTRO_END_END_SPEECH_MIGUEL","INTRO\\Throne_Mig");
+	s_VFN[INTRO_END_END_SPEECH_NO_MIGUEL]	= inireader.ReadString("INTRO_ENDING","INTRO_END_END_SPEECH_NO_MIGUEL","INTRO\\Throne_NoMig");
+	s_VFN[INTRO_END_HELI_FLYBY]				= inireader.ReadString("INTRO_ENDING","INTRO_END_HELI_FLYBY","INTRO\\Heli_FlyBy");
+	s_VFN[INTRO_END_SKYRIDER_HELICOPTER]	= inireader.ReadString("INTRO_ENDING","INTRO_END_SKYRIDER_HELICOPTER","INTRO\\Heli_Sky");
+	s_VFN[INTRO_END_NOSKYRIDER_HELICOPTER]	= inireader.ReadString("INTRO_ENDING","INTRO_END_NOSKYRIDER_HELICOPTER","INTRO\\Heli_NoSky");
+
+	s_VFN[INTRO_SPLASH_SCREEN]				= inireader.ReadString("INTRO_SPLASH","INTRO_SPLASH_SCREEN","INTRO\\SplashScreen");
+	s_VFN[INTRO_SPLASH_1]						= inireader.ReadString("INTRO_SPLASH","INTRO_SPLASH","INTRO\\IPLYLogo");
+	
+	//UB
+	s_VFN[INTRO_HELI_CRASH_SCENE_1]		= inireader.ReadString("INTRO_BEGINNING","INTRO_HELI_CRASH_SCENE","INTRO\\Intro");
+	s_VFN[INTRO_END_SCENE_1]			= inireader.ReadString("INTRO_ENDING","INTRO_END_SCENE","INTRO\\MissileEnding");
+	
+
+	//there are no more videos shown for the endgame
 
 	return( 1 );
 }
@@ -190,11 +348,10 @@ UINT32	IntroScreenHandle( void )
 {
 	if( gfIntroScreenEntry )
 	{
+		EnterIntroScreen();
 		gfIntroScreenEntry = FALSE;
 		gfIntroScreenExit = FALSE;
 
-		EnterIntroScreen();
-		
 		InvalidateRegion( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
 	}
 
@@ -222,11 +379,10 @@ UINT32	IntroScreenHandle( void )
 
 BOOLEAN EnterIntroScreen()
 {
-	INT32 iFirstVideoID = -1;
 
-	// CLEAR THE FRAME BUFFER
+Test = 0;
+
 	ClearMainMenu();
-
 
 	SetCurrentCursorFromDatabase( VIDEO_NO_CURSOR );
 
@@ -240,34 +396,26 @@ BOOLEAN EnterIntroScreen()
 		return( TRUE );
 	}
 
-//#ifdef JA2BETAVERSION
-//	if( FileExists( "..\\NoIntro.txt" ) )
-//	{
-//		PrepareToExitIntroScreen();
-//		return( TRUE );
-//	}
-//#endif
-
+#ifndef USE_VFS
 	//if the library doesnt exist, exit
 	if( !IsLibraryOpened( LIBRARY_INTRO ) )
 	{
 		PrepareToExitIntroScreen();
 		return( TRUE );
 	}
+#endif
 
-	//initialize smacker
-	#ifdef JA2UB	
-	BinkInitialize(  ghWindow, SCREEN_WIDTH, SCREEN_HEIGHT );
-	#else
-	SmkInitialize( ghWindow, SCREEN_WIDTH, SCREEN_HEIGHT);
-	#endif
-
+	//initialize video player
+	s_VP.Initialize();
 
 	//get the index opf the first video to watch
-	iFirstVideoID = GetNextIntroVideo( SMKINTRO_FIRST_VIDEO );
+	EGameVideos iFirstVideoID = GetNextIntroVideo( INTRO_FIRST_VIDEO );
 
 	if( iFirstVideoID != -1 )
 	{
+	
+		//Test = 1;
+		
 		StartPlayingIntroFlic( iFirstVideoID );
 
 		guiIntroExitScreen = INTRO_SCREEN;
@@ -278,7 +426,7 @@ BOOLEAN EnterIntroScreen()
 	{
 		PrepareToExitIntroScreen();
 	}
-	
+
 
 	return( TRUE );
 }
@@ -289,47 +437,37 @@ void RenderIntroScreen()
 
 void ExitIntroScreen()
 {
-
-	//shutdown smaker
-	#ifdef JA2UB
-	BinkShutdownVideo( );
-	
-	#else
-	SmkShutdown();
-	#endif
+	//shutdown video player
+	s_VP.Shutdown();
 }
 
 void HandleIntroScreen()
 {
-	BOOLEAN	fFlicStillPlaying = FALSE;
-
 	//if we are exiting this screen, this frame, dont update the screen
 	if( gfIntroScreenExit )
 		return;
 
-
-	//handle smaker each frame
-	#ifdef JA2UB
-	fFlicStillPlaying = BinkPollFlics();
-	#else
-	fFlicStillPlaying = SmkPollFlics();
-	#endif
+	//handle video in each frame
+	BOOLEAN	fFlicStillPlaying = s_VP.isPlaying();
 
 	//if the flic is not playing
 	if( !fFlicStillPlaying )
 	{
-		INT32 iNextVideoToPlay = -1;
-
-		iNextVideoToPlay = GetNextIntroVideo( giCurrentIntroBeingPlayed );
+		EGameVideos iNextVideoToPlay = GetNextIntroVideo( giCurrentIntroBeingPlayed );
 
 		if( iNextVideoToPlay != -1 )
 		{
+		
+			//Test = 1;
+			
 			StartPlayingIntroFlic( iNextVideoToPlay );
+			
+			
 		}
 		else
 		{
 			PrepareToExitIntroScreen();
-			giCurrentIntroBeingPlayed = -1;
+			giCurrentIntroBeingPlayed = INTRO_NO_VIDEO;
 		}
 	}
 
@@ -338,11 +476,10 @@ void HandleIntroScreen()
 
 
 
-void		GetIntroScreenUserInput()
+void GetIntroScreenUserInput()
 {
 	InputAtom Event;
-	POINT  MousePos;
-
+	POINT	MousePos;
 
 	GetCursorPos(&MousePos);
 	ScreenToClient(ghWindow, &MousePos); // In window coords!
@@ -351,7 +488,7 @@ void		GetIntroScreenUserInput()
 	{
 		// HOOK INTO MOUSE HOOKS
 		switch( Event.usEvent)
-	{
+		{
 			case LEFT_BUTTON_DOWN:
 				MouseSystemHook(LEFT_BUTTON_DOWN, (INT16)MousePos.x, (INT16)MousePos.y,_LeftButtonDown, _RightButtonDown);
 				break;
@@ -372,30 +509,15 @@ void		GetIntroScreenUserInput()
 				break;
 		}
 
-
 		if( Event.usEvent == KEY_UP )
 		{
 			switch( Event.usParam )
 			{
 				case ESC:
-
-					// ATE: if in splash, don't exit all!
-					#ifdef JA2UB
-					BinkCloseFlic( gpBinkFlic );
-					if ( gbIntroScreenMode != INTRO_SPLASH )
-					{
-						PrepareToExitIntroScreen();
-					}
-					#else
 					PrepareToExitIntroScreen();
-					#endif
 					break;
 				case SPACE:
-					#ifdef JA2UB
-					BinkCloseFlic( gpBinkFlic );
-					#else
-					SmkCloseFlic( gpSmackFlic );
-					#endif
+					s_VP.stopVideo();
 					break;
 
 #ifdef JA2TESTVERSION
@@ -416,12 +538,7 @@ void		GetIntroScreenUserInput()
 	if( gfLeftButtonState || gfRightButtonState )
 	{
 		//advance to the next flic
-		#ifdef JA2UB
-		BinkCloseFlic( gpBinkFlic );
-		#else
-		SmkCloseFlic( gpSmackFlic );
-		#endif
-
+		s_VP.stopVideo();
 	}
 }
 
@@ -429,10 +546,12 @@ void		GetIntroScreenUserInput()
 void PrepareToExitIntroScreen()
 {
 
+/*
+#if 0
+
 //Ja25: no begining intro
-#ifdef JA2UB
 	//if its the heli crash intro 
-	if( gbIntroScreenMode == INTRO_HELI_CRASH )
+	if( gbIntroScreenMode == INTRO_HELI_CRASH && Style_JA == TRUE )
 	{
 		//go to the init screen
 //Ja25: no longer going to initscreen ( cause this is now AFTER mapscreen )
@@ -441,14 +560,12 @@ void PrepareToExitIntroScreen()
 		guiIntroExitScreen = GAME_SCREEN;
 		SetCurrentWorldSector( sSelMapX, sSelMapY, ( UINT8 )iCurrentMapSectorZ );
 	}
-#else
 	//if its the intro at the begining of the game
-	if( gbIntroScreenMode == INTRO_BEGINING )
+	else if( gbIntroScreenMode == INTRO_BEGINNING && Style_JA == FALSE )
 	{
 		//go to the init screen
 		guiIntroExitScreen = INIT_SCREEN;
 	}
-#endif
 	else if( gbIntroScreenMode == INTRO_SPLASH )
 	{
 		//display a logo when exiting
@@ -457,8 +574,7 @@ void PrepareToExitIntroScreen()
 		gfDoneWithSplashScreen = TRUE;
 		guiIntroExitScreen = INIT_SCREEN;
 	}
-#ifdef JA2UB
-	else if( gbIntroScreenMode == INTRO_ENDING )
+	else if( gbIntroScreenMode == INTRO_ENDING && Style_JA == TRUE )
 	{
 		guiIntroExitScreen = GAME_SCREEN;
 		SetCurrentWorldSector( 16, 11, 0 );
@@ -468,7 +584,6 @@ void PrepareToExitIntroScreen()
 		//Dont leave tactical
 		gfEnteringMapScreen = FALSE;
 	}
-#endif
 	else
 	{
 		//We want to reinitialize the game
@@ -479,21 +594,30 @@ void PrepareToExitIntroScreen()
 	}
 
 	gfIntroScreenExit = TRUE;
+#endif
+*/
+
+LuaIntro(0, 0, 0, 0);
+
 }
 
 
-INT32 GetNextIntroVideo( UINT32 uiCurrentVideo )
+EGameVideos GetNextIntroVideo( EGameVideos uiCurrentVideo )
 {
-	INT32 iStringToUse = -1;
-#ifdef JA2UB
+	EGameVideos iStringToUse = INTRO_NO_VIDEO;
+	
+/*
+#if 0
+if ( Style_JA == TRUE )
+{
 	//switch on whether it is the beginging or the end game video
 	switch( gbIntroScreenMode )
 	{
 		case INTRO_HELI_CRASH:
 			switch( uiCurrentVideo )
 			{
-				case SMKINTRO_FIRST_VIDEO:
-					iStringToUse = SMKINTRO_HELI_CRASH_SCENE_1;
+				case INTRO_FIRST_VIDEO:
+					iStringToUse = INTRO_HELI_CRASH_SCENE_1;
 					break;
 			}
 			break;
@@ -503,8 +627,8 @@ INT32 GetNextIntroVideo( UINT32 uiCurrentVideo )
 		{
 			switch( uiCurrentVideo )
 			{
-				case SMKINTRO_FIRST_VIDEO:
-					iStringToUse = SMKINTRO_LAST_END_GAME;
+				case INTRO_FIRST_VIDEO:
+					iStringToUse = INTRO_END_SCENE_1;
 					break;
 			}
 		}
@@ -513,121 +637,129 @@ INT32 GetNextIntroVideo( UINT32 uiCurrentVideo )
 		case INTRO_SPLASH:
 				switch( uiCurrentVideo )
 			{
-				case SMKINTRO_FIRST_VIDEO:
-				iStringToUse = SMKINTRO_SPLASH_SCREEN;
+				case INTRO_FIRST_VIDEO:
+				iStringToUse = INTRO_SPLASH_SCREEN;
 				break;
 			}				
 		break;
 	}
 	
-#else
+} else
+{
 	//switch on whether it is the beginging or the end game video
 	switch( gbIntroScreenMode )
 	{
 		//the video at the begining of the game
-		case INTRO_BEGINING:
+		case INTRO_BEGINNING:
 		{
 			switch( uiCurrentVideo )
 			{
-				case SMKINTRO_FIRST_VIDEO:
-					iStringToUse = SMKINTRO_REBEL_CRDT;
+				case INTRO_FIRST_VIDEO:
+					iStringToUse = INTRO_REBEL_CRDT;
 					break;
-				case SMKINTRO_REBEL_CRDT:
-					iStringToUse = SMKINTRO_OMERTA;
+				case INTRO_REBEL_CRDT:
+					iStringToUse = INTRO_OMERTA;
 					break;
-				case SMKINTRO_OMERTA:
-					iStringToUse = SMKINTRO_PRAGUE_CRDT;
+				case INTRO_OMERTA:
+					iStringToUse = INTRO_PRAGUE_CRDT;
 					break;
-				case SMKINTRO_PRAGUE_CRDT:
-					iStringToUse = SMKINTRO_PRAGUE;
+				case INTRO_PRAGUE_CRDT:
+					iStringToUse = INTRO_PRAGUE;
 					break;
-				case SMKINTRO_PRAGUE:
-					iStringToUse = -1;
+				case INTRO_PRAGUE:
+					iStringToUse = INTRO_NO_VIDEO;
 					break;
-//				case SMKINTRO_LAST_INTRO:
+//				case INTRO_LAST_INTRO:
 //					iStringToUse = -1;
 //					break;
 			}
+			break;
 		}
-		break;
 
 		//end game
 		case INTRO_ENDING:
 		{
 			switch( uiCurrentVideo )
 			{
-				case SMKINTRO_FIRST_VIDEO:
+				case INTRO_FIRST_VIDEO:
+				{
 					//if Miguel is dead, play the flic with out him in it
 					if( gMercProfiles[ MIGUEL ].bMercStatus == MERC_IS_DEAD )
-						iStringToUse = SMKINTRO_END_END_SPEECH_NO_MIGUEL;
+						iStringToUse = INTRO_END_END_SPEECH_NO_MIGUEL;
 					else
-						iStringToUse = SMKINTRO_END_END_SPEECH_MIGUEL;
+						iStringToUse = INTRO_END_END_SPEECH_MIGUEL;
 					break;
-
-				case SMKINTRO_END_END_SPEECH_MIGUEL:
-				case SMKINTRO_END_END_SPEECH_NO_MIGUEL:
-					iStringToUse = SMKINTRO_END_HELI_FLYBY;
+				}
+				case INTRO_END_END_SPEECH_MIGUEL:
+				case INTRO_END_END_SPEECH_NO_MIGUEL:
+				{
+					iStringToUse = INTRO_END_HELI_FLYBY;
 					break;
-
+				}
 				//if SkyRider is dead, play the flic without him
-				case SMKINTRO_END_HELI_FLYBY:
+				case INTRO_END_HELI_FLYBY:
+				{
 					if( gMercProfiles[ SKYRIDER ].bMercStatus == MERC_IS_DEAD )
-						iStringToUse = SMKINTRO_END_NOSKYRIDER_HELICOPTER;
+						iStringToUse = INTRO_END_NOSKYRIDER_HELICOPTER;
 					else
-						iStringToUse = SMKINTRO_END_SKYRIDER_HELICOPTER;
+						iStringToUse = INTRO_END_SKYRIDER_HELICOPTER;
 					break;
+				}
 			}
+			break;
 		}
-		break;
 
 		case INTRO_SPLASH:
 			switch( uiCurrentVideo )
 			{
-				case SMKINTRO_FIRST_VIDEO:
-					iStringToUse = SMKINTRO_SPLASH_SCREEN;
+				case INTRO_FIRST_VIDEO:
+					iStringToUse = INTRO_SPLASH_SCREEN;
 					break;
-				case SMKINTRO_SPLASH_SCREEN:
+				case INTRO_SPLASH_SCREEN:
 					//iStringToUse = SMKINTRO_SPLASH_TALONSOFT;
 					break;
 			}
 			break;
 	}
+
+}
+
 #endif
+*/
+
+	switch( Test )
+	{
+		case 0:
+		LuaIntro(1, uiCurrentVideo, 0, 0);
+		iStringToUse = (EGameVideos)iStringToUseLua;
+		//Test = 1;
+		break;
+	}
+
+//LuaIntro(1, uiCurrentVideo, 0, 0);
+//iStringToUse = (EGameVideos)iStringToUseLua;
 
 	return( iStringToUse );
 }
 
 
-void StartPlayingIntroFlic( INT32 iIndexOfFlicToPlay )
+void StartPlayingIntroFlic( EGameVideos iIndexOfFlicToPlay )
 {
-
-
 	if( iIndexOfFlicToPlay != -1 )
 	{
+		giCurrentIntroBeingPlayed = iIndexOfFlicToPlay;
 		//start playing a flic
-		#ifdef JA2UB
-		gpBinkFlic = BinkPlayFlic( gpzBinkFileNames[ iIndexOfFlicToPlay ], (SCREEN_WIDTH-640)/2, (SCREEN_HEIGHT-480)/2, BINK_FLIC_AUTOCLOSE | BINK_FLIC_CENTER_VERTICAL );
-		#else
-		gpSmackFlic = SmkPlayFlic( gpzSmackerFileNames[ iIndexOfFlicToPlay ], (SCREEN_WIDTH-640)/2, (SCREEN_HEIGHT-480)/2, TRUE );
-		#endif
-
-		#ifdef JA2UB
-		if( gpBinkFlic != NULL )
-		#else
-		if( gpSmackFlic != NULL )
-		#endif
+		if(s_VP.startVideo( s_VFN[iIndexOfFlicToPlay] ))
 		{
-			giCurrentIntroBeingPlayed = iIndexOfFlicToPlay;
-		}
-		else
-		{
-			//do a check
+			if(!s_VP.isValid())
+			{
+				//do a check
 #ifdef JA2BETAVERSION
-			PrepareToExitIntroScreen();
+				PrepareToExitIntroScreen();
 #else
-
-			DoScreenIndependantMessageBox( gzIntroScreen[INTRO_TXT__CANT_FIND_INTRO], MSG_BOX_FLAG_OK, CDromEjectionErrorMessageBoxCallBack );
+				DoScreenIndependantMessageBox( gzIntroScreen[INTRO_TXT__CANT_FIND_INTRO], MSG_BOX_FLAG_OK, CDromEjectionErrorMessageBoxCallBack );
 #endif
+			}
 		}
 	}
 }
@@ -635,17 +767,16 @@ void StartPlayingIntroFlic( INT32 iIndexOfFlicToPlay )
 
 void SetIntroType( INT8 bIntroType )
 {
-#ifdef JA2UB
-	if( bIntroType == INTRO_HELI_CRASH )
+/*
+#if 0
+	if( bIntroType == INTRO_HELI_CRASH && Style_JA == TRUE )
 	{
 		gbIntroScreenMode = INTRO_HELI_CRASH;
 	}
-#else
-	if( bIntroType == INTRO_BEGINING )
+	else if( bIntroType == INTRO_BEGINNING && Style_JA == FALSE )
 	{
-		gbIntroScreenMode = INTRO_BEGINING;
+		gbIntroScreenMode = INTRO_BEGINNING;
 	}
-#endif
 	else if( bIntroType == INTRO_ENDING )
 	{
 		gbIntroScreenMode = INTRO_ENDING;
@@ -654,57 +785,55 @@ void SetIntroType( INT8 bIntroType )
 	{
 		gbIntroScreenMode = INTRO_SPLASH;
 	}
+	
+#endif
+*/
+LuaIntro(2, 0, bIntroType, 0);
 }
 
 
 void DisplaySirtechSplashScreen()
 {
-	HVOBJECT hPixHandle;
-	VOBJECT_DESC	VObjectDesc;
-	UINT32 uiLogoID;
-
-	UINT32										uiDestPitchBYTES;
-	UINT8											*pDestBuf;
-
-
 	// CLEAR THE FRAME BUFFER
-	pDestBuf = LockVideoSurface( FRAME_BUFFER, &uiDestPitchBYTES );
+	UINT32 uiDestPitchBYTES;
+	UINT8* pDestBuf = LockVideoSurface( FRAME_BUFFER, &uiDestPitchBYTES );
 	memset(pDestBuf, 0, SCREEN_HEIGHT * uiDestPitchBYTES );
 	UnLockVideoSurface( FRAME_BUFFER );
 
-
+	VOBJECT_DESC VObjectDesc;
 	memset( &VObjectDesc, 0, sizeof( VOBJECT_DESC ) );
 	VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
 	FilenameForBPP("INTERFACE\\SirtechSplash.sti", VObjectDesc.ImageFile);
-
 //	FilenameForBPP("INTERFACE\\TShold.sti", VObjectDesc.ImageFile);
+
+	UINT32 uiLogoID;
 	if( !AddVideoObject(&VObjectDesc, &uiLogoID) )
 	{
 		FilenameForBPP("GERMAN\\SPLASH_GERMAN.sti", VObjectDesc.ImageFile);
-	if( !AddVideoObject(&VObjectDesc, &uiLogoID) )
-	{
-		/*
-		* This is the place, where most non english coders stranding.
-		* Don't hesitate, don't give up!
-		* I'll now tell You what You made wrong
-		*								(2006-10-10, Sergeant_Kolja)
-		*/
-		#ifdef _DEBUG
-		#	if defined(ENGLISH)
-			AssertMsg( 0, String( "Wheter English nor German works. May be You built English - but have only German or other foreign Disk?" ) );
-		#	elif defined(GERMAN)
-			AssertMsg( 0, String( "Weder Englisch noch Deutsch geht. Deutsche Version kompiliert und mit englischer CDs gestartet? Das geht nicht!" ) );
-		#	endif
-		#endif
-		AssertMsg( 0, String( "Failed to load %s", VObjectDesc.ImageFile ) );
-		return;
-	}
+		if( !AddVideoObject(&VObjectDesc, &uiLogoID) )
+		{
+			/*
+			* This is the place, where most non english coders stranding.
+			* Don't hesitate, don't give up!
+			* I'll now tell You what You made wrong
+			*								(2006-10-10, Sergeant_Kolja)
+			*/
+			#ifdef _DEBUG
+			#	if defined(ENGLISH)
+				AssertMsg( 0, String( "Wheter English nor German works. May be You built English - but have only German or other foreign Disk?" ) );
+			#	elif defined(GERMAN)
+				AssertMsg( 0, String( "Weder Englisch noch Deutsch geht. Deutsche Version kompiliert und mit englischer CDs gestartet? Das geht nicht!" ) );
+			#	endif
+			#endif
+			AssertMsg( 0, String( "Failed to load %s", VObjectDesc.ImageFile ) );
+			return;
+		}
 	}
 
+	HVOBJECT hPixHandle;
 	GetVideoObject(&hPixHandle, uiLogoID);
 	BltVideoObject(FRAME_BUFFER, hPixHandle, 0,(SCREEN_WIDTH-640)/2, (SCREEN_HEIGHT-480)/2, VO_BLT_SRCTRANSPARENCY,NULL);
 	DeleteVideoObjectFromIndex(uiLogoID);
-
 
 	InvalidateScreen();
 	RefreshScreen( NULL );

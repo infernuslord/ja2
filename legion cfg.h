@@ -121,6 +121,13 @@ typedef struct
 	
 	UINT8 ubDefaultArrivalSectorX;
 	UINT8 ubDefaultArrivalSectorY;
+	
+	INT32	iStartingCashNovice;
+	INT32	iStartingCashExperienced;
+	INT32	iStartingCashExpert;
+	INT32	iStartingCashInsane;
+	
+	BOOLEAN RISRAPORT;
        
 } GAME_LEGION_OPTIONS;
 

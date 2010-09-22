@@ -2383,6 +2383,9 @@ STR16 pFilesTitle[] =
   L"Fichiers",
 };
 
+CHAR16 pFilesSenderList[255][128];
+
+/*
 STR16 pFilesSenderList[] =
 {
 L"Rapport Tracona", 		// the recon report sent to the player. Recon is an abbreviation for reconissance
@@ -2393,7 +2396,7 @@ L"Rapport Tracona", 		// the recon report sent to the player. Recon is an abbrev
 	L"Intercept #5", // fifth intercept file
 	L"Intercept #6", // sixth intercept file
 };
-
+*/
 // Text having to do with the History Log
 
 STR16 pHistoryTitle[] =

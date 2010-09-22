@@ -7,7 +7,7 @@
 #include "faces.h"
 #include "Interface.h"
 #include "XML_SenderNameList.h"
-
+#include "XML_FilesSenderList.h"
 
 #include "legion cfg.h"
 
@@ -206,6 +206,13 @@ typedef PARSE_STAGE;
 #define SECTORLEVEL1NAMESFILENAME						"Map\\SectorNamesLevel_1.xml"
 #define SECTORLEVEL2NAMESFILENAME						"Map\\SectorNamesLevel_2.xml"
 #define SECTORLEVEL3NAMESFILENAME						"Map\\SectorNamesLevel_3.xml"
+
+#define FILESSENDERLISTFILENAME						"FilesSenderList.xml"
+
+#define INTROFILESFILENAME						"IntroFiles.xml"
+
+
+
 extern BOOLEAN ReadInItemStats(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteItemStats();
 
@@ -405,5 +412,9 @@ extern BOOLEAN ReadInRandomStats(STR fileName);
 
 extern BOOLEAN WriteQarray(QARRAY_VALUES *pQarray, STR fileName);
 extern BOOLEAN ReadInQarray(QARRAY_VALUES *pQarray, STR fileName);
+
+extern BOOLEAN ReadInFilesSenderList(STR fileName, BOOLEAN localizedVersion);
+
+extern BOOLEAN ReadInIntroNames(STR fileName, BOOLEAN localizedVersion);
 
 #endif

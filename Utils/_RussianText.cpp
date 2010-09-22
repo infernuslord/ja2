@@ -2381,6 +2381,9 @@ STR16 pFilesTitle[] =
   L"Просмотр данных",
 };
 
+CHAR16 pFilesSenderList[255][128];
+
+/*
 STR16 pFilesSenderList[] =
 {
   L"Отчет разведки", 		// the recon report sent to the player. Recon is an abbreviation for reconissance
@@ -2391,7 +2394,7 @@ STR16 pFilesSenderList[] =
 	L"В розыске №5", // fifth intercept file
 	L"В розыске №6", // sixth intercept file
 };
-
+*/
 // Text having to do with the History Log
 
 STR16 pHistoryTitle[] =

@@ -148,7 +148,10 @@ extern STR16 pImpPopUpStrings[];
 extern STR16 pImpButtonText[];
 extern STR16 pExtraIMPStrings[];
 extern STR16 pFilesTitle[];
-extern STR16 pFilesSenderList[];
+
+extern CHAR16 pFilesSenderList [255][128];
+
+//extern STR16 pFilesSenderList[];
 extern STR16 pHistoryLocations[];
 //extern STR16 pHistoryAlternateStrings[];
 extern STR16 pHistoryStrings[];

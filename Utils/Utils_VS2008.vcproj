@@ -515,6 +515,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\XML_FilesSenderList.h"
+				>
+			</File>
+			<File
 				RelativePath=".\XML_Parser.h"
 				>
 			</File>
@@ -728,6 +732,10 @@
 			</File>
 			<File
 				RelativePath="WordWrap.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\XML_FilesSenderList.cpp"
 				>
 			</File>
 			<File
