@@ -636,7 +636,7 @@ BOOLEAN AdjustCertainDealersInventory( )
 	if( !( gArmsDealerStatus[ ARMS_DEALER_RAUL ].ubSpecificDealerFlags & ARMS_DEALER_FLAG__RAUL_HAS_SOLD_BARRETT_TO_PLAYER ) )
 	{
 		//Guarentee at least 1 Barrett
-		GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_RAUL, BARRETT, 1 );
+		GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_RAUL, BARRETT_UB, 1 );
 	}
 
 
