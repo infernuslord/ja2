@@ -3389,7 +3389,7 @@ UINT8		ubItemsNotCounted = 0; //ja25 UB
 		}
 
 		//if the item is the barrat
-		if( usItemID == BARRETT )
+		if( usItemID == BARRETT_UB )
 		{
 			//and if the player found the antique musket for Raul
 			if( IsJa25GeneralFlagSet( JA_GF__BARRETT_IS_HALF_PRICE ) )
@@ -4240,7 +4240,7 @@ void MoveAllArmsDealersItemsInOfferAreaToPlayersOfferArea( )
 #ifdef JA2UB				
 				
 				//if the player has just purchased the BArrett form Raul
-				if( ( gbSelectedArmsDealerID == ARMS_DEALER_RAUL ) && ( ArmsDealerOfferArea[ uiCnt ].sItemIndex == BARRETT ) )
+				if( ( gbSelectedArmsDealerID == ARMS_DEALER_RAUL ) && ( ArmsDealerOfferArea[ uiCnt ].sItemIndex == BARRETT_UB ) )
 				{
 					// set a special flag
 					gArmsDealerStatus[ gbSelectedArmsDealerID ].ubSpecificDealerFlags |= ARMS_DEALER_FLAG__RAUL_HAS_SOLD_BARRETT_TO_PLAYER;
