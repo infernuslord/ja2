@@ -217,9 +217,73 @@ extern	void	_DebugMessage(const char *pSourceFile, unsigned uiLineNum, const cha
 #define DebugAttackBusy(x)
 #endif
 
+#define SGP_CALLER_LOCATION			, int line=0, const char* function=NULL, const char* file=NULL
+#define SGP_CALLER_LOCATION_IMPL	, int line, const char* function, const char* file
+#define SGP_GET_CALLER_LOCATION		, __LINE__, __FUNCTION__, __FILE__
+#define SGP_SET_CALLER_LOCATION		, line, function, file
+
+#include <stdexcept>
+#include <list>
+
+namespace vfs { class Exception; }
+namespace sgp
+{
+	class WString
+	{
+	public:
+		WString(std::string const& s){
+			convert_string(s,str);
+		}
+		WString(const char* s) {
+			convert_string(s,str);
+		}
+		WString(std::wstring const& s) : str(s) {
+		}
+		WString(const wchar_t* s) : str(s) {
+		}
+	public:
+		std::wstring str;
+	};
+
+	class Exception : public std::exception
+	{
+	public:
+		Exception(WString const& msg SGP_CALLER_LOCATION);
+
+		// default exception
+		Exception(WString const& msg, Exception& ex SGP_CALLER_LOCATION);
+
+		// compatibility with std::exception
+		Exception(WString const& msg, std::exception& ex SGP_CALLER_LOCATION);
+
+#if defined(USE_VFS)
+		// compatibility with vfs::Exception
+		Exception(WString const& msg, vfs::Exception& ex SGP_CALLER_LOCATION);
+#endif
+
+		virtual const char* what() const throw();
+
+		struct Excp
+		{
+			int line;
+			std::string function, file;
+			std::wstring msg;
+		};
+		std::list<Excp> _msg;
+	};
+}
+
+#define SGP_THROW(msg)						throw sgp::Exception( (msg) SGP_GET_CALLER_LOCATION )
+#define SGP_RETHROW(msg, ex)				throw sgp::Exception( (msg), (ex) SGP_GET_CALLER_LOCATION )
+#define SGP_TRYCATCH_RETHROW(expr, msg)		try { (expr); } catch(std::exception &ex) { throw sgp::Exception((msg), (ex) SGP_GET_CALLER_LOCATION); }
+
+#define SGP_THROW_IFFALSE(cond, msg)		if((cond) == false) { throw sgp::Exception(msg SGP_GET_CALLER_LOCATION); }
+#define SGP_THROW_IFNULL(ptr, msg)			if((ptr) == NULL) { throw sgp::Exception(msg SGP_GET_CALLER_LOCATION); }
+
 #include <vfs/Core/vfs_debug.h>
 
-void _ExceptionMessage( CBasicException &ex );
+void _ExceptionMessage( sgp::Exception &ex );
+void _ExceptionMessage( vfs::Exception &ex );
 
 /*
 #ifdef __cplusplus

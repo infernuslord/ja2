@@ -38,6 +38,9 @@
 	#include "GameSettings.h"
 #endif
 
+#include <vfs/Core/vfs.h>
+#include <vfs/Aspects/vfs_settings.h>
+
 // Changed by ADB (rev 1513) to resolve IMPs created prior to structural changes
 //#define IMP_FILENAME_SUFFIX ".dat"
 #define OLD_IMP_FILENAME_SUFFIX ".dat"
@@ -333,18 +336,23 @@ void	BtnIMPConfirmYes(GUI_BUTTON *btn,INT32 reason)
 				return;
 			}
 */
-			if( LaptopSaveInfo.iCurrentBalance < COST_OF_PROFILE )
+			// SANDRO - changed to find the actual profile cost
+			//if( LaptopSaveInfo.iCurrentBalance < COST_OF_PROFILE )
+			if( LaptopSaveInfo.iCurrentBalance < iGetProfileCost() ) 
 			{
 				// not enough
-		 return;
+				 return;
 			}
 
 			// line moved by CJC Nov 28 2002 to AFTER the check for money
 			LaptopSaveInfo.fIMPCompletedFlag = TRUE;
 
 			// charge the player
-			AddTransactionToPlayersBook(IMP_PROFILE, (UINT8)(LaptopSaveInfo.iIMPIndex), GetWorldTotalMin( ), - ( COST_OF_PROFILE ) );
-		AddHistoryToPlayersLog( HISTORY_CHARACTER_GENERATED, 0,GetWorldTotalMin( ), -1, -1 );
+			// SANDRO - changed to find the actual profile cost
+			//AddTransactionToPlayersBook(IMP_PROFILE, (UINT8)(LaptopSaveInfo.iIMPIndex), GetWorldTotalMin( ), - ( COST_OF_PROFILE ) );
+			AddTransactionToPlayersBook(IMP_PROFILE, (UINT8)(LaptopSaveInfo.iIMPIndex), GetWorldTotalMin( ), - ( iGetProfileCost() ) );
+
+			AddHistoryToPlayersLog( HISTORY_CHARACTER_GENERATED, 0,GetWorldTotalMin( ), -1, -1 );
 			AddCharacterToPlayersTeam( );
 
 			// write the created imp merc
@@ -449,8 +457,8 @@ void BtnIMPConfirmNo( GUI_BUTTON *btn,INT32 reason )
 }
 */
 
-
-#define PROFILE_HAS_SKILL_TRAIT( p, t ) ((p->bSkillTrait == t) || (p->bSkillTrait2 == t))
+// SANDRO - improved this function
+#define PROFILE_HAS_SKILL_TRAIT( p, t ) ( gGameOptions.fNewTraitSystem ? ((p->bSkillTrait == t) || (p->bSkillTrait2 == t) || (p->bSkillTrait3 == t)) : ((p->bSkillTrait == t) || (p->bSkillTrait2 == t)))
 
 //CHRISL: New function to handle proper distribution of starting gear
 void DistributeInitialGear(MERCPROFILESTRUCT *pProfile)
@@ -588,96 +596,22 @@ void GiveItemsToPC( UINT8 ubProfileId )
 {
 	MERCPROFILESTRUCT *pProfile;
 
-
 	// gives starting items to merc
 	// NOTE: Any guns should probably be from those available in regular gun set
 
 	pProfile = &(gMercProfiles[ubProfileId]);
 
-
 	// STANDARD EQUIPMENT
+	// SANDRO - obsolete code deleted
 
 	GiveIMPItems(pProfile, 100, IMP_DEFAULT);
 	GiveIMPRandomItems(pProfile, IMP_RANDOMDEFAULT);
 
-
-	// kevlar vest, leggings, & helmet
-//	MakeProfileInvItemThisSlot(pProfile, VESTPOS, FLAK_JACKET, 100, 1);
-
 	GiveIMPItems (pProfile,pProfile->bWisdom,IMP_WISDOM);
-
-
-	//if ( PreRandom( 100 ) < (UINT32) pProfile->bWisdom )
-	//{
-	//	MakeProfileInvItemThisSlot(pProfile, HELMETPOS, STEEL_HELMET, 100, 1);
-	//}
-
-	// canteen
-//	MakeProfileInvItemThisSlot(pProfile, SMALLPOCK4POS, CANTEEN, 100, 1);
-
 	GiveIMPItems (pProfile,pProfile->bMarksmanship,IMP_MARKSMANSHIP);
-
-
-	//Give ANY imp the calico
-//	MakeProfileInvItemThisSlot( pProfile, HANDPOS, M950, 100, 1);
-
-
-
-	//No ammo clip	MakeProfileInvItemThisSlot( pProfile, SMALLPOCK1POS, CLIP9_30, 100, 2);
-
-	/*
-	Ja25 IMP only gets 1 gun now
-
-
-
-
-	if (pProfile->bMarksmanship >= 80)
-	{
-		// good shooters get a better & matching ammo
-		MakeProfileInvItemThisSlot( pProfile, HANDPOS, MP5K, 100, 1);
-		MakeProfileInvItemThisSlot( pProfile, SMALLPOCK1POS, CLIP9_30, 100, 2);
-	}
-	else
-	{
-		// Automatic pistol, with matching ammo
-		MakeProfileInvItemThisSlot( pProfile, HANDPOS, BERETTA_93R, 100, 1 );
-		MakeProfileInvItemThisSlot( pProfile, SMALLPOCK1POS, CLIP9_15, 100, 3 );
-	}
-	*/
-
-	// OPTIONAL EQUIPMENT: depends on skills & special skills
-
 	GiveIMPItems (pProfile,pProfile->bMedical,IMP_MEDICAL);
-
-	//if (pProfile->bMedical >= 60)
-	//{
-	//	// strong medics get full medic kit
-	//	MakeProfileInvItemAnySlot(pProfile, MEDICKIT, 100, 1);
-	//}
-	//else
-	//if (pProfile->bMedical >= 30)
-	//{
-	//	// passable medics get first aid kit
-	//	MakeProfileInvItemAnySlot(pProfile, FIRSTAIDKIT, 100, 1);
-	//}
-
 	GiveIMPItems (pProfile,pProfile->bMechanical,IMP_MECHANICAL);
-
-	//if (pProfile->bMechanical >= 50)
-	//{
-	//	// mechanics get toolkit
-	//	MakeProfileInvItemAnySlot(pProfile, TOOLKIT, 100, 1);
-	//}
-
 	GiveIMPItems (pProfile,pProfile->bExplosive,IMP_EXPLOSIVE);
-
-	//if (pProfile->bExplosive >= 50)
-	//{
-	//	// loonies get TNT & Detonator
-		//MakeProfileInvItemAnySlot(pProfile, TNT, 100, 1);
-		//MakeProfileInvItemAnySlot(pProfile, DETONATOR, 100, 1);
-	//}
-
 	GiveIMPItems (pProfile,pProfile->bAgility,IMP_AGILITY);
 	GiveIMPItems (pProfile,pProfile->bDexterity,IMP_DEXTERITY);
 	GiveIMPItems (pProfile,pProfile->bStrength,IMP_STRENGTH);
@@ -685,94 +619,168 @@ void GiveItemsToPC( UINT8 ubProfileId )
 	GiveIMPItems (pProfile,pProfile->bLeadership,IMP_LEADERSHIP);
 
 	// check for special skills
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, LOCKPICKING) && ( iMechanical ) )
+	/////////////////////////////////////////////////////////////////////
+	// Check for new traits - SANDRO
+	if ( gGameOptions.fNewTraitSystem )
 	{
-		//MakeProfileInvItemAnySlot(pProfile, LOCKSMITHKIT, 100, 1);
-		GiveIMPRandomItems(pProfile,IMP_LOCKPICKING);
-	}
-
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, HANDTOHAND))
-	{
-		//MakeProfileInvItemAnySlot(pProfile, BRASS_KNUCKLES, 100, 1);
-		GiveIMPRandomItems(pProfile,IMP_HTH);
-	}
-
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, ELECTRONICS) && ( iMechanical ) )
-	{
-		//MakeProfileInvItemAnySlot(pProfile, METALDETECTOR, 100, 1);
-		GiveIMPRandomItems(pProfile,IMP_ELECTRONICS);
-	}
-
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, NIGHTOPS))
-	{
-//		MakeProfileInvItemAnySlot(pProfile, SILENCER, 100, 2);
-		GiveIMPRandomItems(pProfile,IMP_NIGHTOPS);
-	}
-
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, THROWING))
-	{
-//		MakeProfileInvItemAnySlot(pProfile, THROWING_KNIFE, 100, 1);
-		GiveIMPRandomItems(pProfile,IMP_THROWING);
-	}
-
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, STEALTHY))
-	{
-//		MakeProfileInvItemAnySlot(pProfile, SILENCER, 100, 1);
-		GiveIMPRandomItems(pProfile,IMP_STEALTHY);
-	}
-
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, KNIFING))
-	{
-//		MakeProfileInvItemAnySlot(pProfile, COMBAT_KNIFE, 100, 1);
-		GiveIMPRandomItems(pProfile,IMP_KNIFING);
-	}
-
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, CAMOUFLAGED)) // TODO: Madd - other camouflage types, once we figure out a way to enable more traits
-	{
-//		MakeProfileInvItemAnySlot(pProfile, CAMOUFLAGEKIT, 100, 1);
-		GiveIMPRandomItems(pProfile,IMP_CAMOUFLAGED);
+		// MAJOR TRAITS
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, AUTO_WEAPONS_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_AUTO_WEAPONS);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, HEAVY_WEAPONS_NT ))
+		{
+			GiveIMPRandomItems(pProfile,IMP_HEAVY_WEAPONS);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, SNIPER_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_SNIPER);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, RANGER_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_RANGER);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, GUNSLINGER_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_GUNSLINGER);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, MARTIAL_ARTS_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_MARTIAL_ARTS);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, SQUADLEADER_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_SQUADLEADER);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, TECHNICIAN_NT) && ( iMechanical ) )
+		{
+			GiveIMPRandomItems(pProfile,IMP_TECHNICIAN);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, DOCTOR_NT ))
+		{
+			GiveIMPRandomItems(pProfile,IMP_DOCTOR);
+		}
+		// MINOR TRAITS
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, AMBIDEXTROUS_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_AMBIDEXTROUS);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, MELEE_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_MELEE);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, THROWING_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_THROWING);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, NIGHT_OPS_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_NIGHT_OPS);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, STEALTHY_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_STEALTHY);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, ATHLETICS_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_ATHLETICS);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, BODYBUILDING_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_BODYBUILDING);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, DEMOLITIONS_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_DEMOLITIONS);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, TEACHING_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_TEACHING);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, SCOUTING_NT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_SCOUTING);
+		}
 		
-		gCamoFace[ubProfileId].gCamoface = TRUE;
-		gCamoFace[ubProfileId].gUrbanCamoface = FALSE;
-		gCamoFace[ubProfileId].gDesertCamoface = FALSE;
-		gCamoFace[ubProfileId].gSnowCamoface = FALSE;
 	}
-
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, AMBIDEXT))
+	else
 	{
-//		MakeProfileInvItemAnySlot(pProfile, M950, 100, 1);
-		GiveIMPRandomItems(pProfile,IMP_AMBIDEXTROUS);
-	}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, LOCKPICKING_OT) && ( iMechanical ) )
+		{
+			//MakeProfileInvItemAnySlot(pProfile, LOCKSMITHKIT, 100, 1);
+			GiveIMPRandomItems(pProfile,IMP_LOCKPICKING);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, ELECTRONICS_OT) && ( iMechanical ) )
+		{
+			//MakeProfileInvItemAnySlot(pProfile, METALDETECTOR, 100, 1);
+			GiveIMPRandomItems(pProfile,IMP_ELECTRONICS);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, CAMOUFLAGED_OT)) // TODO: Madd - other camouflage types, once we figure out a way to enable more traits
+		{
+			//MakeProfileInvItemAnySlot(pProfile, CAMOUFLAGEKIT, 100, 1);
+			GiveIMPRandomItems(pProfile,IMP_CAMOUFLAGED);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, AMBIDEXT_OT))
+		{
+			//MakeProfileInvItemAnySlot(pProfile, M950, 100, 1);
+			GiveIMPRandomItems(pProfile,IMP_AMBIDEXTROUS);
+		}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, NIGHTOPS_OT))
+		{
+//			MakeProfileInvItemAnySlot(pProfile, SILENCER, 100, 2);
+			GiveIMPRandomItems(pProfile,IMP_NIGHT_OPS);
+		}
+		
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, HANDTOHAND_OT))
+		{
+			//MakeProfileInvItemAnySlot(pProfile, BRASS_KNUCKLES, 100, 1);
+			GiveIMPRandomItems(pProfile,IMP_MARTIAL_ARTS);
+		}
 
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, MARTIALARTS))
-	{
-		GiveIMPRandomItems(pProfile,IMP_MARTIALARTS);
-	}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, THROWING_OT))
+		{
+//			MakeProfileInvItemAnySlot(pProfile, THROWING_KNIFE, 100, 1);
+			GiveIMPRandomItems(pProfile,IMP_THROWING);
+		}
 
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, PROF_SNIPER))
-	{
-		GiveIMPRandomItems(pProfile,IMP_PROF_SNIPER);
-	}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, STEALTHY_OT))
+		{
+//			MakeProfileInvItemAnySlot(pProfile, SILENCER, 100, 1);
+			GiveIMPRandomItems(pProfile,IMP_STEALTHY);
+		}
 
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, TEACHING))
-	{
-		GiveIMPRandomItems(pProfile,IMP_TEACHING);
-	}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, KNIFING_OT))
+		{
+//			MakeProfileInvItemAnySlot(pProfile, COMBAT_KNIFE, 100, 1);
+			GiveIMPRandomItems(pProfile,IMP_MELEE);
+		}
 
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, AUTO_WEAPS))
-	{
-		GiveIMPRandomItems(pProfile,IMP_AUTOWEAPONS);
-	}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, MARTIALARTS_OT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_MARTIAL_ARTS);
+		}
 
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, HEAVY_WEAPS ))
-	{
-		GiveIMPRandomItems(pProfile,IMP_HEAVYWEAPONS);
-	}
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, PROF_SNIPER_OT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_SNIPER);
+		}
 
-	if (PROFILE_HAS_SKILL_TRAIT(pProfile, THIEF ))
-	{
-		GiveIMPRandomItems(pProfile,IMP_THIEF);
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, TEACHING_OT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_TEACHING);
+		}
+
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, AUTO_WEAPS_OT))
+		{
+			GiveIMPRandomItems(pProfile,IMP_AUTO_WEAPONS);
+		}
+
+		if (PROFILE_HAS_SKILL_TRAIT(pProfile, HEAVY_WEAPS_OT ))
+		{
+			GiveIMPRandomItems(pProfile,IMP_HEAVY_WEAPONS);
+		}
 	}
+	/////////////////////////////////////////////////////////////////////
 
 	// CHRISL: Now that all items have been issued, distribute them into appropriate pockets, starting with the largest items
 	DistributeInitialGear(pProfile);
@@ -1145,8 +1153,6 @@ INT32 AnyFreeBigEnoughPocket(MERCPROFILESTRUCT *pProfile, INVNODE *tInv)
 	return(-1);
 }
 
-#include <vfs/Core/vfs.h>
-#include <vfs/Aspects/vfs_settings.h>
 void WriteOutCurrentImpCharacter( INT32 iProfileId )
 {
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("WriteOutCurrentImpCharacter: IMP.dat"));
@@ -1367,7 +1373,8 @@ BOOLEAN LoadImpCharacter( STR nickName )
 		//CHRISL: At this point, we need to resort profile inventory so that NewInv items don't accidentally appear in OldInv
 		DistributeInitialGear(&gMercProfiles[iProfileId]);
 
-		if( LaptopSaveInfo.iCurrentBalance < COST_OF_PROFILE )
+		// Changed to find actual IMP cost - SANDRO
+		if( LaptopSaveInfo.iCurrentBalance < iGetProfileCost() )
 		{
 			DoLapTopMessageBox( MSG_BOX_IMP_STYLE, pImpPopUpStrings[ 3 ], LAPTOP_SCREEN, MSG_BOX_FLAG_OK, NULL);
 
@@ -1384,11 +1391,13 @@ BOOLEAN LoadImpCharacter( STR nickName )
 					gCamoFace[iProfileId].gSnowCamoface = FALSE;
 				}
 
+
 		// charge the player
 		// is the character male?
 		fCharacterIsMale = ( gMercProfiles[ iProfileId ].bSex == MALE );
 		fLoadingCharacterForPreviousImpProfile = TRUE;
-		AddTransactionToPlayersBook(IMP_PROFILE,0, GetWorldTotalMin( ), - ( COST_OF_PROFILE ) );
+		// Changed to find actual IMP cost - SANDRO
+		AddTransactionToPlayersBook(IMP_PROFILE,0, GetWorldTotalMin( ), - ( iGetProfileCost() ) );
 		AddHistoryToPlayersLog( HISTORY_CHARACTER_GENERATED, 0,GetWorldTotalMin( ), -1, -1 );
 		LaptopSaveInfo.iIMPIndex = iProfileId;
 		AddCharacterToPlayersTeam( );
@@ -1493,12 +1502,12 @@ void GiveIMPRandomItems( MERCPROFILESTRUCT *pProfile, UINT8 typeIndex )
 		while (usItem == 0 )
 		{
 				iChoice = Random( ubNumChoices );
-			usItem = gIMPItemChoices[ typeIndex ].bItemNo[ iChoice ];
+				usItem = gIMPItemChoices[ typeIndex ].bItemNo[ iChoice ];
 				// is this legal and we don't have it already?
 				if (ItemIsLegal(usItem) && !ubItemsGiven[iChoice] )
 					ubItemsGiven[iChoice] = TRUE;
 				else
-				usItem=0;
+					usItem=0;
 		}
 		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("GiveIMPRandomItems: typeIndex = %d, usItem = %d ",typeIndex, usItem ));
 		if ( usItem > 0 )
@@ -1573,6 +1582,24 @@ void GiveIMPItems( MERCPROFILESTRUCT *pProfile, INT8 abilityValue, UINT8 typeInd
 	}
 
 
+}
+
+// SANDRO - Function to determine actual cost of profile
+INT32 iGetProfileCost()
+{
+	if (gGameExternalOptions.fDynamicIMPProfileCost)
+	{
+		INT32 iIMPProfileCost;
+
+		iIMPProfileCost = gGameExternalOptions.iIMPProfileCost * CountFilledIMPSlots(-1);
+
+		if (iIMPProfileCost >= gGameExternalOptions.iIMPProfileCost)
+			return(iIMPProfileCost);
+		else
+			return(gGameExternalOptions.iIMPProfileCost);
+	}
+	else
+		return(gGameExternalOptions.iIMPProfileCost);
 }
 
 

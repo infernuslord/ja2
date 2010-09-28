@@ -792,6 +792,7 @@ BOOLEAN InitOverhead( )
 	gTacticalStatus.fDidGameJustStart				= TRUE;
 
 	gTacticalStatus.ubLastRequesterTargetID					= NO_PROFILE;
+	gTacticalStatus.ubLastRequesterSurgeryTargetID = NOBODY; // SANDRO - reset surgery requester too
 
 	for ( cnt = 0; cnt < NUM_PANIC_TRIGGERS; cnt++ )
 	{
@@ -1478,7 +1479,7 @@ BOOLEAN ExecuteOverhead( )
 											}
 											else
 											{
-												CalcInteractiveObjectAPs( sGridNo, pStructure, &sAPCost, &sBPCost );
+												CalcInteractiveObjectAPs( pSoldier, sGridNo, pStructure, &sAPCost, &sBPCost ); // SANDRO - added argument
 
 												if ( EnoughPoints( pSoldier, sAPCost, sBPCost , TRUE ) )
 												{
@@ -2080,15 +2081,16 @@ BOOLEAN HandleGotoNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving, BOOLE
 		// Do we have APs?
 		// CHRISL: Added penalty for jumping a fence while wearing a backpack
 		// Do we have APs?
+		// SANDRO - changed the static values to precise calculation here
 		if((UsingNewInventorySystem() == true) && pSoldier->inv[BPACKPOCKPOS].exists() == true)
 		{
-			sAPCost = APBPConstants[AP_JUMPFENCEBPACK];
-			sBPCost = APBPConstants[BP_JUMPFENCEBPACK];
+			sAPCost = GetAPsToJumpFence( pSoldier, TRUE );
+			sBPCost = GetBPsToJumpFence( pSoldier, TRUE );
 		}
 		else
 		{
-			sAPCost = APBPConstants[AP_JUMPFENCE];
-			sBPCost = APBPConstants[BP_JUMPFENCE];
+			sAPCost = GetAPsToJumpFence( pSoldier, FALSE );
+			sBPCost = GetBPsToJumpFence( pSoldier, FALSE );
 		}
 
 
@@ -2251,8 +2253,14 @@ BOOLEAN HandleGotoNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving, BOOLE
 				// we reuse the boobytrap gridno variable here
 				gsBoobyTrapGridNo = sMineGridNo;
 				gpBoobyTrapSoldier = pSoldier;
-				SetStopTimeQuoteCallback( MineSpottedDialogueCallBack );
-				TacticalCharacterDialogue( pSoldier, QUOTE_SUSPICIOUS_GROUND );
+				// silversurfer: if TRUE the merc won't comment that he found a mine, otherwise old behaviour
+				if (gGameExternalOptions.fMineSpottedNoTalk )
+					MineSpottedDialogueCallBack ();
+				else
+				{
+					SetStopTimeQuoteCallback( MineSpottedDialogueCallBack );
+					TacticalCharacterDialogue( pSoldier, QUOTE_SUSPICIOUS_GROUND );
+				}
 			}
 		}
 		else
@@ -2470,7 +2478,7 @@ BOOLEAN HandleGotoNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving, BOOLE
 				else
 					// ATE; First check for profile
 					// Forgetful guy might forget his path
-					if ( (pSoldier->bTeam == gbPlayerNum) && ( pSoldier->ubProfile != NO_PROFILE ) && gMercProfiles[pSoldier->ubProfile].bPersonalityTrait == FORGETFUL )
+					if ( (pSoldier->bTeam == gbPlayerNum) && ( pSoldier->ubProfile != NO_PROFILE ) && gMercProfiles[pSoldier->ubProfile].bDisability == FORGETFUL )
 					{
 						if ( pSoldier->ubNumTilesMovesSinceLastForget < 255 )
 						{
@@ -2862,8 +2870,14 @@ BOOLEAN HandleAtNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving )
 				// we reuse the boobytrap gridno variable here
 				gsBoobyTrapGridNo = sMineGridNo;
 				gpBoobyTrapSoldier = pSoldier;
-				SetStopTimeQuoteCallback( MineSpottedDialogueCallBack );
-				TacticalCharacterDialogue( pSoldier, QUOTE_SUSPICIOUS_GROUND );
+				// silversurfer: if TRUE the merc won't comment that he found a mine, otherwise old behaviour
+				if (gGameExternalOptions.fMineSpottedNoTalk )
+					MineSpottedDialogueCallBack ();
+				else
+				{
+					SetStopTimeQuoteCallback( MineSpottedDialogueCallBack );
+					TacticalCharacterDialogue( pSoldier, QUOTE_SUSPICIOUS_GROUND );
+				}
 			}
 		}
 		else
@@ -3147,7 +3161,7 @@ void InternalSelectSoldier( UINT16 usSoldierID, BOOLEAN fAcknowledge, BOOLEAN fF
 	// possibly say personality quote
 	if ( (pSoldier->bTeam == gbPlayerNum) && (pSoldier->ubProfile != NO_PROFILE && pSoldier->ubWhatKindOfMercAmI != MERC_TYPE__PLAYER_CHARACTER) && !( pSoldier->usQuoteSaidFlags & SOLDIER_QUOTE_SAID_PERSONALITY) )
 	{
-		switch ( gMercProfiles[ pSoldier->ubProfile ].bPersonalityTrait )
+		switch ( gMercProfiles[ pSoldier->ubProfile ].bDisability )
 		{
 		case PSYCHO:
 			if ( Random( 50 ) == 0 )
@@ -3614,7 +3628,22 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 			// check to see if dynamo quest is on
 			if ( gubQuest[ QUEST_FREE_DYNAMO ] == QUESTINPROGRESS)
 			{
-				EndQuest( QUEST_FREE_DYNAMO, pSoldierOld->sSectorX, pSoldierOld->sSectorY );
+				// SANDRO - quest failed if Dynamo is killed
+				InternalEndQuest( QUEST_FREE_DYNAMO, pSoldierOld->sSectorX, pSoldierOld->sSectorY, FALSE );
+			}
+			break;
+		// SANDRO - if we kill Carmen with Slay in our team, end the terrorists quest
+		case CARMEN :
+			// Carmen must have seen Slay, to finish the quest properly, he must know we betrayd him
+			if ( pSoldierOld->aiData.bAttitude == ATTACKSLAYONLY )
+			{
+				pOther = FindSoldierByProfileID( SLAY, FALSE );			
+				if (pOther && pOther->stats.bLife && pOther->bTeam == gbPlayerNum &&
+					pSoldierOld->sSectorX == pOther->sSectorX && pSoldierOld->sSectorY == pOther->sSectorY)
+				{
+					// Slay is in sector and alive, Carmen dead, end quest, award some exp
+					EndQuest( QUEST_KILL_TERRORISTS, pSoldierOld->sSectorX, pSoldierOld->sSectorY );
+				}
 			}
 			break;
 		case KINGPIN:
@@ -3644,6 +3673,17 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 			}
 			break;
 	#endif
+
+#ifdef JA2UB
+
+#else
+			// SANDRO - Check if queen bitch is dead 
+		case QUEEN:
+			// Muhahahahaaa, QUEST COMPLETED! Give us everything!! Exp, glory, fame!
+			EndQuest( QUEST_KILL_DEIDRANNA, pSoldierOld->sSectorX, pSoldierOld->sSectorY );
+		break;
+#endif
+			
 		}
 #ifdef JA2UB
 // Ja25no queen
@@ -3685,7 +3725,8 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 		}
 
 		// If the militia's killer is known
-		if ( pSoldierOld->ubAttackerID != NOBODY )
+		// silversurfer: did the player team kill the militia? If not, militia shouldn't become hostile towards the player.
+		if ( pSoldierOld->ubAttackerID != NOBODY && MercPtrs[ pSoldierOld->ubAttackerID ]->bTeam == OUR_TEAM )
 		{
 			// also treat this as murder - but player will never be blamed for militia death he didn't cause
 			// HEADROCK HAM 3.6: Actually this function never runs for militia (see function for details)
@@ -3763,21 +3804,49 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 
 
 	// killing crows/cows is not worth any experience!
-	if ( ( pSoldierOld->ubBodyType != CROW ) && ( pSoldierOld->ubBodyType != COW ) && pSoldierOld->ubLastDamageReason != TAKE_DAMAGE_BLOODLOSS )
+	if ( ( pSoldierOld->ubBodyType != CROW ) && ( pSoldierOld->ubBodyType != COW ) ) //&& pSoldierOld->ubLastDamageReason != TAKE_DAMAGE_BLOODLOSS ) // SANDRO - why not give exp for bleeding out?
 	{
-		UINT8	ubAssister;
+		UINT8	ubAssister = NOBODY;
 
 		// if it was a kill by a player's merc
 		if (pSoldierOld->ubAttackerID != NOBODY && MercPtrs[ pSoldierOld->ubAttackerID ]->bTeam == gbPlayerNum )
 		{
+			// SANDRO - for special NPCs, you gain more experiences
+			UINT16 usNumExpChances = ( 10 * pSoldierOld->stats.bExpLevel ); // basic value
+			switch( pSoldierOld->ubProfile )
+			{
+				case CARMEN:
+				case QUEEN:
+				case JOE:
+				case ANNIE:
+				case CHRIS:
+				case KINGPIN:
+				case TIFFANY:
+				case T_REX:
+				case DRUGGIST:
+				case GENERAL:
+				case JACK:
+				case OLAF:
+				case RAY:
+				case OLGA:
+				case TYRONE:
+				case MIKE:
+					usNumExpChances *= 2; // make it double for special guys
+					if( gGameExternalOptions.usSpecialNPCStronger > 0 ) // if set stronger, adjust the value
+					{
+						usNumExpChances += (usNumExpChances * gGameExternalOptions.usSpecialNPCStronger / 100);
+					}
+					break;
+			}
 			// EXPERIENCE CLASS GAIN:	Earned a kill
-			StatChange( MercPtrs[ pSoldierOld->ubAttackerID ], EXPERAMT, (UINT16)( 10 * pSoldierOld->stats.bExpLevel ), FALSE );
+			StatChange( MercPtrs[ pSoldierOld->ubAttackerID ], EXPERAMT, usNumExpChances, FALSE );
 		}
 
 		// JA2 Gold: if previous and current attackers are the same, the next-to-previous attacker gets the assist
 		if (pSoldierOld->ubPreviousAttackerID == pSoldierOld->ubAttackerID)
 		{
-			ubAssister = pSoldierOld->ubNextToPreviousAttackerID;
+			if (pSoldierOld->ubNextToPreviousAttackerID != pSoldierOld->ubAttackerID ) // SANDRO - carefully with this, if we are still one person don't do this
+				ubAssister = pSoldierOld->ubNextToPreviousAttackerID;
 		}
 		else
 		{
@@ -5570,14 +5639,17 @@ void HandleTeamServices( UINT8 ubTeamNum )
 
 					if ( pTargetSoldier->ubServiceCount )
 					{
+						BOOLEAN fThrowMessage = (pTargetSoldier->bBleeding ? TRUE : FALSE); // added by SANDRO
+
 						usKitPts = TotalPoints( &(pTeamSoldier->inv[ HANDPOS ] ) );
 
 						uiPointsUsed = pTeamSoldier->SoldierDressWound( pTargetSoldier, usKitPts, usKitPts );
 
 						// Determine if they are all banagded
-						if ( !pTargetSoldier->bBleeding && pTargetSoldier->stats.bLife >= OKLIFE )
+						if ( !pTargetSoldier->bBleeding && pTargetSoldier->stats.bLife >= OKLIFE && !(pTargetSoldier->iHealableInjury >= 100 && pTeamSoldier->fDoingSurgery)) // check for surgery added by SANDRO
 						{
-							ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, TacticalStr[ MERC_IS_ALL_BANDAGED_STR ], pTargetSoldier->name );
+							if ( fThrowMessage ) // throw message "all bandaged" only if there was something to bandage - SANDRO
+								ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, TacticalStr[ MERC_IS_ALL_BANDAGED_STR ], pTargetSoldier->name );
 
 							// Cancel all services for this guy!
 							pTargetSoldier->ReceivingSoldierCancelServices( );
@@ -5656,14 +5728,17 @@ void HandlePlayerServices( SOLDIERTYPE *pTeamSoldier )
 
 				if ( pTargetSoldier->ubServiceCount )
 				{
+					BOOLEAN fThrowMessage = (pTargetSoldier->bBleeding ? TRUE : FALSE); // added by SANDRO 
+
 					usKitPts = TotalPoints( &(pTeamSoldier->inv[ HANDPOS ] ) );
 
 					uiPointsUsed = pTeamSoldier->SoldierDressWound( pTargetSoldier, usKitPts, usKitPts );
 
 					// Determine if they are all banagded
-					if ( !pTargetSoldier->bBleeding && pTargetSoldier->stats.bLife >= OKLIFE )
+					if ( !pTargetSoldier->bBleeding && pTargetSoldier->stats.bLife >= OKLIFE && !(pTargetSoldier->iHealableInjury >= 100 && pTeamSoldier->fDoingSurgery)) // check for surgery added by SANDRO
 					{
-						ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, TacticalStr[ MERC_IS_ALL_BANDAGED_STR ], pTargetSoldier->name );
+						if ( fThrowMessage ) // throw message "all bandaged" only if there was something to bandage - SANDRO
+							ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, TacticalStr[ MERC_IS_ALL_BANDAGED_STR ], pTargetSoldier->name );
 
 						// Cancel all services for this guy!
 						pTargetSoldier->ReceivingSoldierCancelServices( );
@@ -5685,16 +5760,24 @@ void HandlePlayerServices( SOLDIERTYPE *pTeamSoldier )
 						}
 						else
 						{
-							bSlot = FindFirstAidKit ( pTeamSoldier);
-							if ( bSlot == NO_SLOT )
+							// SANDRO - on surgery, only search for medic bags
+							if (pTeamSoldier->fDoingSurgery)
 							{
 								bSlot = FindMedKit ( pTeamSoldier );
+							}
+							else
+							{
+								bSlot = FindFirstAidKit ( pTeamSoldier);
+								if ( bSlot == NO_SLOT )
+								{
+									bSlot = FindMedKit ( pTeamSoldier );
+								}
 							}
 						}
 
 						if ( bSlot != NO_SLOT )
 						{
-							SwapObjs( pTeamSoldier, HANDPOS, bSlot, TRUE );
+							SwapObjs( pTeamSoldier, HANDPOS, bSlot, FALSE ); // SANDRO - changed to FALSE, so we can continue in the service (???)
 						}
 						else
 						{
@@ -5724,7 +5807,8 @@ void CommonEnterCombatModeCode( )
 	//gTacticalStatus.ubAttackBusyCount = 0;
 
 	// Reset num enemies fought flag...
-	memset( &(gTacticalStatus.bNumFoughtInBattle), 0, MAXTEAMS );
+	// SANDRO - removed from here
+	//memset( &(gTacticalStatus.bNumFoughtInBattle), 0, MAXTEAMS );
 	gTacticalStatus.ubLastBattleSectorX = (UINT8) gWorldSectorX;
 	gTacticalStatus.ubLastBattleSectorY = (UINT8) gWorldSectorY;
 	gTacticalStatus.fLastBattleWon		= FALSE;
@@ -5759,7 +5843,8 @@ void CommonEnterCombatModeCode( )
 				pSoldier->flags.uiStatusFlags &= ~SOLDIER_UNDERAICONTROL;
 
 				// Check if this guy is an enemy....
-				CheckForPotentialAddToBattleIncrement( pSoldier );
+				// SANDRO - don't check this here, we've already checked that once
+				//CheckForPotentialAddToBattleIncrement( pSoldier );
 
 				// If guy is sleeping, wake him up!
 				if ( pSoldier->flags.fMercAsleep == TRUE )
@@ -6512,6 +6597,8 @@ BOOLEAN CheckForEndOfBattle( BOOLEAN fAnEnemyRetreated )
 		// Set enemy presence to false
 		// This is safe 'cause we're about to unload the friggen sector anyway....
 		gTacticalStatus.fEnemyInSector = FALSE;
+		// SANDRO - reset number of enemies here
+		memset( &(gTacticalStatus.bNumFoughtInBattle), 0, MAXTEAMS );
 
 		// If here, the battle has been lost!
 		UnSetUIBusy( (UINT8)gusSelectedSoldier );
@@ -6524,6 +6611,13 @@ BOOLEAN CheckForEndOfBattle( BOOLEAN fAnEnemyRetreated )
 
 		HandleMoraleEvent( NULL, MORALE_HEARD_BATTLE_LOST, gWorldSectorX, gWorldSectorY, gbWorldSectorZ );
 		HandleGlobalLoyaltyEvent( GLOBAL_LOYALTY_BATTLE_LOST, gWorldSectorX, gWorldSectorY, gbWorldSectorZ );
+
+		// SANDRO - end quest if cleared the sector after interrogation (sector N7 by Meduna)
+		if ( gWorldSectorX == 7 && gWorldSectorY == 14 && gbWorldSectorZ == 0 && gubQuest[ QUEST_INTERROGATION ] == QUESTINPROGRESS )
+		{
+			// Quest failed
+			InternalEndQuest( QUEST_INTERROGATION, gWorldSectorX, gWorldSectorY, FALSE );
+		}
 
 		// Play death music
 		SetMusicMode( MUSIC_TACTICAL_DEATH );
@@ -6624,7 +6718,13 @@ BOOLEAN CheckForEndOfBattle( BOOLEAN fAnEnemyRetreated )
 						{
 							if( pTeamSoldier->bTeam == gbPlayerNum )
 							{
-								gMercProfiles[pTeamSoldier->ubProfile].usBattlesFought++;
+								// SANDRO - records - num tactical battles
+								gMercProfiles[pTeamSoldier->ubProfile].records.usBattlesTactical++;
+								// largest battle experienced
+								if (gMercProfiles[pTeamSoldier->ubProfile].records.usLargestBattleFought < ( gTacticalStatus.bNumFoughtInBattle[ ENEMY_TEAM ] + gTacticalStatus.bNumFoughtInBattle[ CREATURE_TEAM ] + gTacticalStatus.bNumFoughtInBattle[ CIV_TEAM ] ))
+								{
+									gMercProfiles[pTeamSoldier->ubProfile].records.usLargestBattleFought = ( gTacticalStatus.bNumFoughtInBattle[ ENEMY_TEAM ] + gTacticalStatus.bNumFoughtInBattle[ CREATURE_TEAM ] + gTacticalStatus.bNumFoughtInBattle[ CIV_TEAM ] );
+								}
 
 								// If this guy is OKLIFE & not standing, make stand....
 								if ( pTeamSoldier->stats.bLife >= OKLIFE && !pTeamSoldier->bCollapsed )
@@ -6680,6 +6780,12 @@ BOOLEAN CheckForEndOfBattle( BOOLEAN fAnEnemyRetreated )
 					if (!is_networked)
 						ShouldBeginAutoBandage( );
 				}
+				// SANDRO - end quest if cleared the sector after interrogation (sector N7 by Meduna)
+				if ( gWorldSectorX == 7 && gWorldSectorY == 14 && gbWorldSectorZ == 0 && gubQuest[ QUEST_INTERROGATION ] == QUESTINPROGRESS )
+				{
+					// Complete quest
+					EndQuest( QUEST_INTERROGATION, gWorldSectorX, gWorldSectorY );
+				}
 
 				// Say battle end quote....
 
@@ -6705,6 +6811,8 @@ BOOLEAN CheckForEndOfBattle( BOOLEAN fAnEnemyRetreated )
 					}
 				}
 
+				// SANDRO - reset number of enemies here
+				memset( &(gTacticalStatus.bNumFoughtInBattle), 0, MAXTEAMS );
 			}
 			else
 			{
@@ -6732,7 +6840,14 @@ BOOLEAN CheckForEndOfBattle( BOOLEAN fAnEnemyRetreated )
 					pTeamSoldier->aiData.bNewSituation = FALSE;
 					pTeamSoldier->aiData.bOrders = STATIONARY;
 					if ( pTeamSoldier->stats.bLife < OKLIFE )
+					{
+						// SANDRO - the insta-healable value for doctor trait check
+						pTeamSoldier->iHealableInjury -= ((OKLIFE - pTeamSoldier->stats.bLife) * 100);
+						if (pTeamSoldier->iHealableInjury < 0)
+							pTeamSoldier->iHealableInjury = 0;
+
 						pTeamSoldier->stats.bLife = OKLIFE;
+					}
 
 					pTeamSoldier->bBleeding = 0; // let's think, the autobandage was done for the militia too
 				}
@@ -7336,7 +7451,16 @@ BOOLEAN KillIncompacitatedEnemyInSector( )
 			if ( !pTeamSoldier->aiData.bNeutral && (pTeamSoldier->bSide != gbPlayerNum ) )
 			{
 				// KIll......
-				pTeamSoldier->SoldierTakeDamage( ANIM_CROUCH, pTeamSoldier->stats.bLife, 100, TAKE_DAMAGE_BLOODLOSS, NOBODY, NOWHERE, 0, TRUE );
+				// SANDRO - if the soldier is bleeding out, consider this damage as done by the last attacker
+				if ( pTeamSoldier->ubAttackerID != NOBODY )
+					pTeamSoldier->SoldierTakeDamage( ANIM_CROUCH, pTeamSoldier->stats.bLife, 100, TAKE_DAMAGE_BLOODLOSS, pTeamSoldier->ubAttackerID, NOWHERE, 0, TRUE );
+				else if ( pTeamSoldier->ubPreviousAttackerID != NOBODY )
+					pTeamSoldier->SoldierTakeDamage( ANIM_CROUCH, pTeamSoldier->stats.bLife, 100, TAKE_DAMAGE_BLOODLOSS, pTeamSoldier->ubPreviousAttackerID, NOWHERE, 0, TRUE );
+				else if ( pTeamSoldier->ubNextToPreviousAttackerID != NOBODY )
+					pTeamSoldier->SoldierTakeDamage( ANIM_CROUCH, pTeamSoldier->stats.bLife, 100, TAKE_DAMAGE_BLOODLOSS, pTeamSoldier->ubNextToPreviousAttackerID, NOWHERE, 0, TRUE );
+				else 
+					pTeamSoldier->SoldierTakeDamage( ANIM_CROUCH, pTeamSoldier->stats.bLife, 100, TAKE_DAMAGE_BLOODLOSS, NOBODY, NOWHERE, 0, TRUE );
+
 				fReturnVal = TRUE;
 			}
 		}
@@ -7390,17 +7514,28 @@ INT8 CalcSuppressionTolerance( SOLDIERTYPE * pSoldier )
 
 	if ( pSoldier->ubProfile != NO_PROFILE )
 	{
-		// change tolerance based on attitude
-		switch ( gMercProfiles[ pSoldier->ubProfile ].bAttitude )
+		// SANDRO - check for character traits
+		if ( gGameOptions.fNewTraitSystem )
 		{
-		case ATT_AGGRESSIVE:
-			bTolerance +=	2;
-			break;
-		case ATT_COWARD:
-			bTolerance += -2;
-			break;
-		default:
-			break;
+			if ( gMercProfiles[ pSoldier->ubProfile ].bCharacterTrait == CHAR_TRAIT_INTELLECTUAL )
+				bTolerance += -2;
+			else if  ( gMercProfiles[ pSoldier->ubProfile ].bCharacterTrait == CHAR_TRAIT_DAUNTLESS )
+				bTolerance += 2;
+		}
+		else
+		{
+			// change tolerance based on attitude
+			switch ( gMercProfiles[ pSoldier->ubProfile ].bAttitude )
+			{
+			case ATT_AGGRESSIVE:
+				bTolerance += 2;
+				break;
+			case ATT_COWARD:
+				bTolerance += -2;
+				break;
+			default:
+				break;
+			}
 		}
 	}
 	else
@@ -7441,6 +7576,19 @@ INT8 CalcSuppressionTolerance( SOLDIERTYPE * pSoldier )
 		{
 			bTolerance -= gGameExternalOptions.ubCowerEffectOnSuppression;
 		}
+	}
+	
+	// SANDRO - STOMP traits - squadleader's bonus to suppression tolerance
+	if ( gGameOptions.fNewTraitSystem && IS_MERC_BODY_TYPE(pSoldier) && 
+		(pSoldier->bTeam == ENEMY_TEAM || pSoldier->bTeam == MILITIA_TEAM || pSoldier->bTeam == gbPlayerNum) )
+	{
+		UINT8 ubNumberOfSL = GetSquadleadersCountInVicinity( pSoldier, FALSE, FALSE );
+		// Also take ourselves into account
+		if ((ubNumberOfSL < gSkillTraitValues.ubSLMaxBonuses) && HAS_SKILL_TRAIT( pSoldier, SQUADLEADER_NT ))
+		{
+			ubNumberOfSL = max( gSkillTraitValues.ubSLMaxBonuses, (ubNumberOfSL + NUM_SKILL_TRAITS( pSoldier, SQUADLEADER_NT )) );
+		}
+		bTolerance += (bTolerance * gSkillTraitValues.ubSLOverallSuppresionBonusPercent * ubNumberOfSL / 100);
 	}
 	
 	bTolerance = __max(bTolerance, gGameExternalOptions.ubSuppressionToleranceMin);
@@ -7551,6 +7699,8 @@ void HandleSuppressionFire( UINT8 ubTargetedMerc, UINT8 ubCausedAttacker )
 					bShockLimit = MAXIMUM_SUPPRESSION_SHOCK;
 					// The amount of shock received depends on how many APs we've lost - Every AP lost will cause one 
 					// point of shock. This is then divided by 4 if using the 100AP system.
+					if (uiShockPerAPLossDivisor == 0) // SANDRO - check if we are not going to divide by zero
+						uiShockPerAPLossDivisor = 4; // set to default value in this case
 					bShockValue = ubPointsLost / uiShockPerAPLossDivisor;
 
 					bShockValue = __max(0,bShockValue);
@@ -7585,7 +7735,26 @@ void HandleSuppressionFire( UINT8 ubTargetedMerc, UINT8 ubCausedAttacker )
 			fCower = false;
 			if ( gGameExternalOptions.usSuppressionShockEffect > 0 )
 			{
-				if (pSoldier->aiData.bShock >= bTolerance)
+				// SANDRO - STOMP traits
+				INT8 bShockForCower = pSoldier->aiData.bShock;
+				if ( gGameOptions.fNewTraitSystem )
+				{
+					// Squadleader's resistance to cowering
+					if ( HAS_SKILL_TRAIT( pSoldier, SQUADLEADER_NT ))
+					{
+						bShockForCower = (INT8)((bShockForCower * (100 - gSkillTraitValues.ubSLFearResistance * NUM_SKILL_TRAITS( pSoldier, SQUADLEADER_NT )) /100) + 0.5);
+					}
+					// Check for character traits
+					if ( gMercProfiles[pSoldier->ubProfile].bCharacterTrait == CHAR_TRAIT_INTELLECTUAL )
+					{
+						bShockForCower = (INT8)((bShockForCower * 23 / 20 ) + 0.5); // +15% as shock
+					}
+					else if ( gMercProfiles[pSoldier->ubProfile].bCharacterTrait == CHAR_TRAIT_DAUNTLESS )
+					{
+						bShockForCower = (INT8)((bShockForCower * 17 / 20 ) + 0.5); // -15% as shock				
+					}
+				}
+				if (bShockForCower >= bTolerance)
 				{ 
 					fCower = true; 
 
@@ -7620,13 +7789,13 @@ void HandleSuppressionFire( UINT8 ubTargetedMerc, UINT8 ubCausedAttacker )
 					// can't change stance below prone!
 					break;
 				case ANIM_CROUCH:
-					if (ubPointsLost >= APBPConstants[AP_PRONE] && IsValidStance( pSoldier, ANIM_PRONE ) && gAnimControl[ pSoldier->usAnimState ].ubEndHeight != ANIM_PRONE )
+					if (ubPointsLost >= GetAPsProne(pSoldier, TRUE) && IsValidStance( pSoldier, ANIM_PRONE ) && gAnimControl[ pSoldier->usAnimState ].ubEndHeight != ANIM_PRONE ) // SANDRO - changed to GetAPsProne
 					{
 						sClosestOpponent = ClosestKnownOpponent( pSoldier, &sClosestOppLoc, NULL );
 						// HEADROCK: Added cowering.						
 						if (TileIsOutOfBounds(sClosestOpponent) || SpacesAway( pSoldier->sGridNo, sClosestOppLoc ) > 8 || fCower)
 						{
-							ubPointsLost -= APBPConstants[AP_PRONE];
+							ubPointsLost -= GetAPsProne(pSoldier, TRUE);
 							ubNewStance = ANIM_PRONE;
 						}
 					}
@@ -7637,7 +7806,7 @@ void HandleSuppressionFire( UINT8 ubTargetedMerc, UINT8 ubCausedAttacker )
 						// can't change stance here!
 						break;
 					}
-					else if (ubPointsLost >= (APBPConstants[AP_CROUCH] + APBPConstants[AP_PRONE]) && ( gAnimControl[ pSoldier->usAnimState ].ubEndHeight != ANIM_PRONE ) && IsValidStance( pSoldier, ANIM_PRONE ) )
+					else if (ubPointsLost >= (GetAPsCrouch(pSoldier, TRUE) + GetAPsProne(pSoldier, TRUE)) && ( gAnimControl[ pSoldier->usAnimState ].ubEndHeight != ANIM_PRONE ) && IsValidStance( pSoldier, ANIM_PRONE ) ) // SANDRO - changed to GetAPsCrouch/Prone
 					{
 						sClosestOpponent = ClosestKnownOpponent( pSoldier, &sClosestOppLoc, NULL );
 						// HEADROCK: Added cowering.
@@ -7660,7 +7829,7 @@ void HandleSuppressionFire( UINT8 ubTargetedMerc, UINT8 ubCausedAttacker )
 							ubNewStance = ANIM_CROUCH;
 						}
 					}
-					else if ( ubPointsLost >= APBPConstants[AP_CROUCH] && ( gAnimControl[ pSoldier->usAnimState ].ubEndHeight != ANIM_CROUCH ) && IsValidStance( pSoldier, ANIM_CROUCH ) )
+					else if ( ubPointsLost >= GetAPsCrouch(pSoldier, TRUE) && ( gAnimControl[ pSoldier->usAnimState ].ubEndHeight != ANIM_CROUCH ) && IsValidStance( pSoldier, ANIM_CROUCH ) ) // SANDRO - changed to GetAPsCrouch
 					{
 						// crouch!
 						ubNewStance = ANIM_CROUCH;
@@ -7821,11 +7990,16 @@ BOOLEAN ProcessImplicationsOfPCAttack( SOLDIERTYPE * pSoldier, SOLDIERTYPE ** pp
 		}
 	}
 
-	if ( (pTarget->bTeam == MILITIA_TEAM) && (pTarget->bSide == gbPlayerNum) )
+	// silversurfer: if militia was attacked and not already hostile make them hostile towards the player
+	// but only IF the player was the attacker!
+	if ( (pTarget->bTeam == MILITIA_TEAM) && (pSoldier->bTeam == OUR_TEAM) )
 	{
 		// HEADROCK HAM 3.6: INI setting controls their response
 		{
-			if (gGameExternalOptions.ubCanMilitiaBecomeHostile == 2)
+			if (pTarget->flags.fIntendedTarget // Must be intentional
+				&& gGameExternalOptions.ubCanMilitiaBecomeHostile == 2 // INI setting
+				&& pTarget->bSide == gbPlayerNum // Must not be hostile by now
+				)
 			{
 				// rebel militia attacked by the player!
 				MilitiaChangesSides();
@@ -9079,6 +9253,7 @@ INT8 CheckStatusNearbyFriendlies( SOLDIERTYPE *pSoldier )
 	UINT16 usEffectiveRangeToLeader = 0;
 	INT16 usBestLeader = 0;
 	INT16 usFriendBonus = 0;
+	UINT8 ubLevelDifference = 0;
 
 	// Run through each friendly.
 	for ( UINT8 iCounter = gTacticalStatus.Team[ pSoldier->bTeam ].bFirstID ; iCounter <= gTacticalStatus.Team[ pSoldier->bTeam ].bLastID ; iCounter ++ )
@@ -9087,27 +9262,39 @@ INT8 CheckStatusNearbyFriendlies( SOLDIERTYPE *pSoldier )
 		// Make sure that character is alive, not too shocked, and conscious, and of higher experience level
 		// than the character being suppressed.
 		if (pLeader != pSoldier && pLeader->bActive && pLeader->aiData.bShock < pLeader->stats.bLeadership/5 && 
-			pLeader->stats.bLife >= OKLIFE && pLeader->stats.bExpLevel >= pSoldier->stats.bExpLevel)
+			pLeader->stats.bLife >= OKLIFE )
 		{
+			ubLevelDifference = (pLeader->stats.bExpLevel - pSoldier->stats.bExpLevel );
 			// Calculate character's leadership and range/3
 			usEffectiveLeadership = ((EffectiveLeadership( pLeader ) - 25) / 15);
 			usEffectiveRangeToLeader = PythSpacesAway( pSoldier->sGridNo, pLeader->sGridNo ) / 3;
-			// If leader is within range of his leadership stat
-			if (usEffectiveRangeToLeader <= usEffectiveLeadership+1)
-			{
-				// The difference in experience level is important!
-				usEffectiveLeadership += (pLeader->stats.bExpLevel - pSoldier->stats.bExpLevel);
-				// Reduce effective leadership with every 3 tiles of distance
-				usEffectiveLeadership -= usEffectiveRangeToLeader-1;
 
-				// If this is the best leader we've seen so far,
-				if (usEffectiveLeadership > usBestLeader)
+			// SANDRO - add effective leadership and level to determine if we can help our friend to feel better :)
+			if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pLeader, SQUADLEADER_NT ) ) 
+			{
+				ubLevelDifference += (gSkillTraitValues.ubSLEffectiveLevelAsStandby * NUM_SKILL_TRAITS( pLeader, SQUADLEADER_NT ));
+				usEffectiveLeadership += (gSkillTraitValues.ubSLEffectiveLevelAsStandby * NUM_SKILL_TRAITS( pLeader, SQUADLEADER_NT ));
+			}
+
+			if ( ubLevelDifference >= 0 )
+			{
+				// If leader is within range of his leadership stat
+				if (usEffectiveRangeToLeader <= usEffectiveLeadership+1)
 				{
-					// Set this as the best leader
-					usBestLeader = usEffectiveLeadership;
+					// The difference in experience level is important!
+					usEffectiveLeadership += ubLevelDifference;
+					// Reduce effective leadership with every 3 tiles of distance
+					usEffectiveLeadership -= usEffectiveRangeToLeader-1;
+
+					// If this is the best leader we've seen so far,
+					if (usEffectiveLeadership > usBestLeader)
+					{
+						// Set this as the best leader
+						usBestLeader = usEffectiveLeadership;
+					}
+					// Friends within range always give at least one tolerance bonus point.
+					usFriendBonus += 1;
 				}
-				// Friends within range always give at least one tolerance bonus point.
-				usFriendBonus += 1;
 			}
 		}
 		// Incapacitated or heavily suppressed friends will not be good for our tolerance!
@@ -9121,6 +9308,12 @@ INT8 CheckStatusNearbyFriendlies( SOLDIERTYPE *pSoldier )
 				// and is never less than 1 point.
 				usEffectiveLeadership = (pLeader->stats.bExpLevel - pSoldier->stats.bExpLevel) / __max(1,(usEffectiveRangeToLeader/2));
 				usFriendBonus -= __max(1, usEffectiveLeadership);
+			}
+			// SANDRO - however, dead squadleader is very bad for our psychics
+			if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pLeader, SQUADLEADER_NT ) && 
+				( pLeader->flags.uiStatusFlags & SOLDIER_DEAD ) && usEffectiveRangeToLeader <= 10 ) 
+			{
+				usFriendBonus -= ( gSkillTraitValues.ubSLDeathMoralelossMultiplier * NUM_SKILL_TRAITS( pLeader, SQUADLEADER_NT ));
 			}
 		}
 	}

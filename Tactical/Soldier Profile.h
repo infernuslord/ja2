@@ -5,13 +5,13 @@
 #include "Soldier Profile Type.h"
 #include "Merc Hiring.h"
 
-extern INT8 gbSkillTraitBonus[NUM_SKILLTRAITS];
+extern INT8 gbSkillTraitBonus[NUM_SKILLTRAITS_OT];
 extern UINT8 gubTerrorists[];
 extern INT16 gsTerroristSector[][5][2];
 extern BOOLEAN	gfPotentialTeamChangeDuringDeath;
 
 extern MERCPROFILESTRUCT gMercProfiles[ NUM_PROFILES ];
-extern MERCPROFILEGEAR gMercProfileGear[ NUM_PROFILES ];
+extern MERCPROFILEGEAR gMercProfileGear[ NUM_PROFILES ][ NUM_MERCSTARTINGGEAR_KITS ];
 
 
 #define AIM_AND_MERC_MERCS		51		// A.I.M. is 0-39, M.E.R.C.s are 40-50
@@ -199,6 +199,8 @@ void UpdateSoldierPointerDataIntoProfile( BOOLEAN fPlayerMercs );
 
 // Returns true if a buddy of the merc is on team
 BOOLEAN DoesMercHaveABuddyOnTheTeam( UINT8 ubMercID );
+BOOLEAN MercIsHot( SOLDIERTYPE * pSoldier ); // added by SANDRO
+BOOLEAN MercIsInTropicalSector( SOLDIERTYPE * pSoldier ); // added by SANDRO
 
 void StartSomeMercsOnAssignment( void );
 
@@ -236,7 +238,8 @@ typedef struct
 	UINT32		uiBodyTypeSubFlags;
 
 	INT8		bAttitude;
-	INT8		bPersonalityTrait;
+	INT8		bCharacterTrait; // added by SANDRO
+	INT8		bDisability;
 	UINT8		ubNeedForSleep;
 
 	INT8		bReputationTolerance;
@@ -257,8 +260,13 @@ typedef struct
 	INT8		bExpLevel;
 
 	INT8		bEvolution;
-	INT8		bSkillTrait;
-	INT8		bSkillTrait2;
+	// changed by SANDRO
+	INT8		bOldSkillTrait;
+	INT8		bOldSkillTrait2;
+	// added by SANDRO
+	INT8		bNewSkillTrait1;
+	INT8		bNewSkillTrait2;
+	INT8		bNewSkillTrait3;
 
 	INT8		bBuddy[5];
 	INT8		bLearnToLike;
@@ -296,5 +304,8 @@ extern BOOLEAN WriteMercOpinions();
 
 void OverwriteMercProfileWithXMLData( UINT32 uiLoop );
 void OverwriteMercOpinionsWithXMLData( UINT32 uiLoop );
+
+// SANDRO - added function
+INT8 CheckMercsNearForCharTraits( UINT8 ubProfileID, INT8 bCharTraitID );
 
 #endif

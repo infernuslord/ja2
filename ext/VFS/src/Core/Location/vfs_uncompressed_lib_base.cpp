@@ -1,3 +1,27 @@
+/* 
+ * bfVFS : vfs/Core/Location/vfs_uncompressed_lib_base.cpp
+ *  - partially implements library interface for uncompressed archive files
+ *  - initialization is done in format-specific sub-classes
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include <vfs/Core/Location/vfs_uncompressed_lib_base.h>
 
 /********************************************************************************************/
@@ -8,7 +32,7 @@ vfs::CUncompressedLibraryBase::SFileData& vfs::CUncompressedLibraryBase::_fileDa
 	{
 		return it->second;
 	}
-	THROWEXCEPTION(L"Invalid file handle");
+	VFS_THROW(L"Invalid file handle");
 }
 /********************************************************************************************/
 /********************************************************************************************/
@@ -90,7 +114,7 @@ void vfs::CUncompressedLibraryBase::closeLibrary()
 	{
 		// what if closing of (at least) one file fails?? continue or not??
 		// in the end, these are not real files!
-		IGNOREEXCEPTION(it->first->close());
+		VFS_IGNOREEXCEPTION(it->first->close(), true);
 	}
 }
 
@@ -142,9 +166,9 @@ void vfs::CUncompressedLibraryBase::close(tFileType *fileHandle)
 			}
 		}
 	}
-	catch(CBasicException& ex)
+	catch(std::exception& ex)
 	{
-		RETHROWEXCEPTION(L"", &ex);
+		VFS_RETHROW(L"", ex);
 	}
 }
 bool vfs::CUncompressedLibraryBase::openRead(tFileType *fileHandle)
@@ -153,9 +177,9 @@ bool vfs::CUncompressedLibraryBase::openRead(tFileType *fileHandle)
 	{
 		_fileDataFromHandle(fileHandle);
 	}
-	catch(CBasicException& ex)
+	catch(std::exception& ex)
 	{
-		RETHROWEXCEPTION(L"", &ex);
+		VFS_RETHROW(L"", ex);
 	}
 
 	m_numberOfOpenedFiles++;
@@ -189,13 +213,13 @@ vfs::size_t vfs::CUncompressedLibraryBase::read(tFileType *fileHandle, vfs::Byte
 		m_libraryFile->setReadPosition(file._fileOffset + file._currentReadPosition, IBaseFile::SD_BEGIN);
 
 		vfs::size_t bytesRead = m_libraryFile->read(data, bytesToRead);
-		THROWIFFALSE( bytesToRead == bytesRead, L"Number of bytes doesn't match" );
+		VFS_THROW_IFF( bytesToRead == bytesRead, L"Number of bytes doesn't match" );
 		file._currentReadPosition += bytesRead;
 		return bytesRead;
 	}
-	catch(CBasicException& ex)
+	catch(std::exception& ex)
 	{
-		RETHROWEXCEPTION(L"", &ex);
+		VFS_RETHROW(L"", ex);
 	}
 }
 
@@ -205,9 +229,9 @@ vfs::size_t vfs::CUncompressedLibraryBase::getReadPosition(tFileType *fileHandle
 	{
 		return _fileDataFromHandle(fileHandle)._currentReadPosition;
 	}
-	catch(CBasicException& ex)
+	catch(std::exception& ex)
 	{
-		RETHROWEXCEPTION(L"", &ex);
+		VFS_RETHROW(L"", ex);
 	}
 }
 
@@ -224,9 +248,9 @@ void vfs::CUncompressedLibraryBase::setReadPosition(tFileType *fileHandle, vfs::
 		// positionInBytes is offset to file-offset
 		file._currentReadPosition = positionInBytes;
 	}
-	catch(CBasicException& ex)
+	catch(std::exception& ex)
 	{
-		RETHROWEXCEPTION(L"", &ex);
+		VFS_RETHROW(L"", ex);
 	}
 }
 
@@ -257,12 +281,12 @@ void vfs::CUncompressedLibraryBase::setReadPosition(tFileType *fileHandle, vfs::
 		}
 		else
 		{
-			THROWEXCEPTION(L"Unknown seek direction");
+			VFS_THROW(L"Unknown seek direction");
 		}
 	}
-	catch(CBasicException& ex)
+	catch(std::exception& ex)
 	{
-		RETHROWEXCEPTION(L"", &ex);
+		VFS_RETHROW(L"", ex);
 	}
 }
 
@@ -272,9 +296,9 @@ vfs::size_t vfs::CUncompressedLibraryBase::getSize(tFileType *fileHandle)
 	{
 		return _fileDataFromHandle(fileHandle)._fileSize;
 	}
-	catch(CBasicException& ex)
+	catch(std::exception& ex)
 	{
-		RETHROWEXCEPTION(L"", &ex);
+		VFS_RETHROW(L"", ex);
 	}
 }
 

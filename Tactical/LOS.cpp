@@ -407,25 +407,28 @@ inline UINT8 GetCurrentHeightOfSoldier( SOLDIERTYPE* pSoldier )
 */
 inline INT8 GetJungleCamouflage( SOLDIERTYPE* pSoldier )
 {
-	if (HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED )) {
-		return 100;
-	}
+	// SANDRO - the Camouflage trait has been solved differently
+	//if (HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED )) {
+	//	return 100;
+	//}
 	
 	return MINMAX100N(pSoldier->bCamo + pSoldier->wornCamo);
 }
 inline INT8 GetDesertCamouflage( SOLDIERTYPE* pSoldier )
 {
-	if (HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_DESERT )) {
-		return 100;
-	}
+	// SANDRO - the Camouflage trait has been solved differently
+	//if (HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_DESERT )) {
+	//	return 100;
+	//}
 	
 	return MINMAX100N(pSoldier->desertCamo + pSoldier->wornDesertCamo);
 }
 inline INT8 GetUrbanCamouflage( SOLDIERTYPE* pSoldier )
 {
-	if (HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_URBAN )) {
-		return 100;
-	}
+	// SANDRO - the Camouflage trait has been solved differently
+	//if (HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_URBAN )) {
+	//	return 100;
+	//}
 	
 	return MINMAX100N(pSoldier->urbanCamo + pSoldier->wornUrbanCamo);
 }
@@ -445,9 +448,10 @@ inline UINT8 GetBrightness(const UINT8& ubLightLevel)
 inline INT8 GetStealth( SOLDIERTYPE* pSoldier )
 {
 	INT16 stealth = GetWornStealth( pSoldier );
-	if (HAS_SKILL_TRAIT( pSoldier, STEALTHY ))
+	// SANDRO - this only counts with old traits
+	if (HAS_SKILL_TRAIT( pSoldier, STEALTHY_OT ) && !gGameOptions.fNewTraitSystem)
 	{
-		stealth += gGameExternalOptions.ubStealthTraitCoverValue * NUM_SKILL_TRAITS( pSoldier, STEALTHY );
+		stealth += gGameExternalOptions.ubStealthTraitCoverValue * NUM_SKILL_TRAITS( pSoldier, STEALTHY_OT );
 	}
 
 	return MINMAX100N(stealth);
@@ -551,6 +555,10 @@ INT8 GetSightAdjustmentThroughMovement( SOLDIERTYPE* pSoldier, const INT8& bTile
 	INT8 stealth = GetStealth(pSoldier);
 
 	INT8 bMovementAdjustment = bTilesMoved * ( 100 - stealth ) / 100;
+
+	// SANDRO - added reduction of penalty for moving for Stealthy trait with new traits
+	if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, STEALTHY_NT ))
+		bMovementAdjustment = max(0, (bMovementAdjustment * (100 - gSkillTraitValues.ubSTStealthPenaltyForMovingReduction) / 100) );
 
 	UINT8 ubBrightness = GetBrightness( ubLightLevel );
 
@@ -2537,7 +2545,18 @@ BOOLEAN BulletHitMerc( BULLET * pBullet, STRUCTURE * pStructure, BOOLEAN fIntend
 		// handle hit here...
 		if( ( pFirer->bTeam == 0 ) )
 		{
-			gMercProfiles[ pFirer->ubProfile ].usShotsHit++;
+			// SANDRO - new mercs' records 
+			// if we shoot with buckshot or similar, do not count a hit for every pellet
+			if ( pBullet->usFlags & BULLET_FLAG_BUCKSHOT ) 
+			{
+				// if just one pellet hits the target, record it as successful hit, ignore the rest
+				if ( pTarget->bNumPelletsHitBy == 0 )
+					gMercProfiles[ pFirer->ubProfile ].records.usShotsHit++;
+			}
+			else
+			{
+				gMercProfiles[ pFirer->ubProfile ].records.usShotsHit++;
+			}
 		}
 
 		// intentionally shot
@@ -2600,7 +2619,19 @@ BOOLEAN BulletHitMerc( BULLET * pBullet, STRUCTURE * pStructure, BOOLEAN fIntend
 	// check to see if the guy is a friendly?..if so, up the number of times wounded
 	if( ( pTarget->bTeam == gbPlayerNum ) )
 	{
-		gMercProfiles[ pTarget->ubProfile ].usTimesWounded++;
+		if ( pBullet->usFlags & BULLET_FLAG_BUCKSHOT ) 
+		{
+			// SANDRO - if just one pellet hits the target, record it as being wounded, ignore the rest
+			if ( pTarget->bNumPelletsHitBy == 0 )
+				gMercProfiles[ pTarget->ubProfile ].records.usTimesWoundedShot++;
+		}
+		else if ( iDamage > 1 ) // damage of 1 is just a scratch, not a real wound
+		{
+			if ( pBullet->usFlags & BULLET_FLAG_KNIFE )
+				gMercProfiles[ pTarget->ubProfile ].records.usTimesWoundedStabbed++;
+			else
+				gMercProfiles[ pTarget->ubProfile ].records.usTimesWoundedShot++;
+		}
 	}
 
 	// check to see if someone was accidentally hit when no target was specified by the player
@@ -2936,6 +2967,9 @@ INT32 HandleBulletStructureInteraction( BULLET * pBullet, STRUCTURE * pStructure
 						// MARKSMANSHIP GAIN (marksPts): Opened/Damaged a door
 						StatChange( pBullet->pFirer, MARKAMT, 10, FALSE );
 
+						// SANDRO - merc records - locks breached
+						if ( pBullet->pFirer->ubProfile != NO_PROFILE )
+							gMercProfiles[ pBullet->pFirer->ubProfile ].records.usLocksBreached++;
 					}
 				}
 			}
@@ -3886,11 +3920,21 @@ INT8 FireBullet( SOLDIERTYPE * pFirer, BULLET * pBullet, BOOLEAN fFake )
 		//}
 
 		// increment shots fired if shooter has a merc profile
-		if( ( pFirer->ubProfile != NO_PROFILE ) && ( pFirer->bTeam == 0 ) )
-		{
-			// another shot fired
-			gMercProfiles[ pFirer->ubProfile ].usShotsFired++;
-		}
+		// SANDRO - this was moved elsewhere
+		//if( ( pFirer->ubProfile != NO_PROFILE ) && ( pFirer->bTeam == gbPlayerNum ) )
+		//{
+		//	// another shot fired
+		//	/////////////////////////////////////////////////////////////////////////////////////
+		//	// SANDRO - new mercs' records
+		//	if ( Item[ pFirer->usAttackingWeapon ].usItemClass == IC_LAUNCHER || Item[pFirer->usAttackingWeapon].grenadelauncher || Item[pFirer->usAttackingWeapon].rocketlauncher || Item[pFirer->usAttackingWeapon].singleshotrocketlauncher || Item[pFirer->usAttackingWeapon].mortar)
+		//		gMercProfiles[ pFirer->ubProfile ].records.usMissilesLaunched++;
+		//	else if ( Item[ pFirer->usAttackingWeapon ].usItemClass == IC_THROWING_KNIFE )
+		//		gMercProfiles[ pFirer->ubProfile ].records.usKnivesThrown++;
+		//	else 
+		//		gMercProfiles[ pFirer->ubProfile ].records.usShotsFired++;
+		//	
+		//	/////////////////////////////////////////////////////////////////////////////////////
+		//}
 
 		if ( Item[ pFirer->usAttackingWeapon ].usItemClass == IC_THROWING_KNIFE )
 		{
@@ -4369,7 +4413,7 @@ INT8 FireBulletGivenTarget( SOLDIERTYPE * pFirer, FLOAT dEndX, FLOAT dEndY, FLOA
 
 		pBullet->iImpact = ubImpact;
 
-		pBullet->iRange = GunRange( &(pFirer->inv[pFirer->ubAttackingHand]) );
+		pBullet->iRange = GunRange( &(pFirer->inv[pFirer->ubAttackingHand]), pFirer ); // SANDRO - added argument
 		pBullet->sTargetGridNo = ((INT32)dEndX) / CELL_X_SIZE + ((INT32)dEndY) / CELL_Y_SIZE * WORLD_COLS;
 
 		pBullet->bStartCubesAboveLevelZ = (INT8) CONVERT_HEIGHTUNITS_TO_INDEX( (INT32)dStartZ - CONVERT_PIXELS_TO_HEIGHTUNITS( gpWorldLevelData[ pFirer->sGridNo ].sHeight ) );
@@ -4416,6 +4460,20 @@ INT8 FireBulletGivenTarget( SOLDIERTYPE * pFirer, FLOAT dEndX, FLOAT dEndY, FLOA
 			FireBullet( pFirer, pBullet, FALSE );
 		}
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// SANDRO - new mercs' records
+	if( !fFake && ( pFirer->ubProfile != NO_PROFILE ) && ( pFirer->bTeam == gbPlayerNum ) )
+	{
+		// another shot fired
+		if ( Item[usHandItem].usItemClass == IC_LAUNCHER || Item[usHandItem].grenadelauncher || Item[usHandItem].rocketlauncher || Item[usHandItem].singleshotrocketlauncher || Item[usHandItem].mortar)
+			gMercProfiles[ pFirer->ubProfile ].records.usMissilesLaunched++;
+		else if ( Item[usHandItem].usItemClass == IC_THROWING_KNIFE )
+			gMercProfiles[ pFirer->ubProfile ].records.usKnivesThrown++;
+		else 
+			gMercProfiles[ pFirer->ubProfile ].records.usShotsFired++;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
 
 	//DebugMsg(TOPIC_JA2,DBG_LEVEL_3,String("FireBulletGivenTargetDone"));
 

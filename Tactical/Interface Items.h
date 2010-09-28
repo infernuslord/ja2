@@ -55,7 +55,8 @@ void ItemDescCallback( MOUSE_REGION * pRegion, INT32 iReason );
 #define		INV_BAR_DY						21
 #define		ITEM_STATS_WIDTH				26
 #define		ITEM_STATS_HEIGHT				8
-#define		EXCEPTIONAL_DAMAGE				40
+#define		EXCEPTIONAL_GUN_DAMAGE			40
+#define		EXCEPTIONAL_MELEE_DAMAGE		40
 #define		EXCEPTIONAL_WEIGHT				20
 #define		EXCEPTIONAL_RANGE				400
 #define		EXCEPTIONAL_MAGAZINE			50

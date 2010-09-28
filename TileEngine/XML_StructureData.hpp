@@ -139,10 +139,10 @@ public:
 	DEFINE_TRANSITION(TR_AUXIMAGE_DATA, _myt, false);
 	TRANSITION_ENTER{
 		long num = 0;
-		THROWIFFALSE(atts.getLong("number_of",num), L"no attribute 'number_of'");
+		SGP_THROW_IFFALSE(atts.getLong("number_of",num), L"no attribute 'number_of'");
 		if(num > 0)
 		{
-			THROWIFFALSE(num == P_DATA->oHeader.usNumberOfImages , L"inconsistent data");
+			SGP_THROW_IFFALSE(num == P_DATA->oHeader.usNumberOfImages , L"inconsistent data");
 			P_DATA->pStructureFileRef->usNumberOfStructures = num;
 			int size = sizeof(AuxObjectData) * num;
 			P_DATA->pStructureFileRef->pAuxData = (AuxObjectData*)MemAlloc(size);
@@ -157,8 +157,8 @@ public:
 	DEFINE_TRANSITION(TR_AUX_image, _myt, false);
 	TRANSITION_ENTER{
 		long index = -1;
-		THROWIFFALSE(atts.getLong("index", index), L"no attribute 'index'");
-		THROWIFFALSE(index >= 0 && index < P_DATA->oHeader.usNumberOfImages, L"index out of range");
+		SGP_THROW_IFFALSE(atts.getLong("index", index), L"no attribute 'index'");
+		SGP_THROW_IFFALSE(index >= 0 && index < P_DATA->oHeader.usNumberOfImages, L"index out of range");
 		P_DATA->current_aux = &P_DATA->pStructureFileRef->pAuxData[index];
 	}
 	TRANSITION_LEAVE{
@@ -169,7 +169,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_AUX_image_tile_index, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE(P_DATA->current_aux, L"aux is null");
+		SGP_THROW_IFFALSE(P_DATA->current_aux, L"aux is null");
 		P_DATA->current_aux->usTileLocIndex = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -177,7 +177,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_AUX_image_wall_orient, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE(P_DATA->current_aux, L"aux is null");
+		SGP_THROW_IFFALSE(P_DATA->current_aux, L"aux is null");
 		P_DATA->current_aux->ubWallOrientation = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -185,7 +185,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_AUX_image_num_tiles, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE(P_DATA->current_aux, L"aux is null");
+		SGP_THROW_IFFALSE(P_DATA->current_aux, L"aux is null");
 		int num_tiles = atoi(char_data.c_str());
 		P_DATA->current_aux->ubNumberOfTiles = num_tiles;
 		P_DATA->count_aux_tiles += num_tiles;
@@ -195,7 +195,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_AUX_image_num_frames, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE(P_DATA->current_aux, L"aux is null");
+		SGP_THROW_IFFALSE(P_DATA->current_aux, L"aux is null");
 		P_DATA->current_aux->ubNumberOfFrames = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -203,7 +203,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_AUX_image_cur_frame, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE(P_DATA->current_aux, L"aux is null");
+		SGP_THROW_IFFALSE(P_DATA->current_aux, L"aux is null");
 		P_DATA->current_aux->ubCurrentFrame = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -211,7 +211,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_AUX_image_FLAGS, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE(P_DATA->current_aux, L"aux is null");
+		SGP_THROW_IFFALSE(P_DATA->current_aux, L"aux is null");
 		if(std::string(tag_name) == "AUX_FULL_TILE")		P_DATA->current_aux->fFlags |= AUX_FULL_TILE;
 		if(std::string(tag_name) == "AUX_ANIMATED_TILE")	P_DATA->current_aux->fFlags |= AUX_ANIMATED_TILE;
 		if(std::string(tag_name) == "AUX_DYNAMIC_TILE")		P_DATA->current_aux->fFlags |= AUX_DYNAMIC_TILE;
@@ -227,10 +227,10 @@ public:
 	DEFINE_TRANSITION(TR_AUX_TILES, _myt, false);
 	TRANSITION_ENTER{
 		long num = 0;
-		THROWIFFALSE(atts.getLong("number_of",num), L"no attribute 'number_of'");
+		SGP_THROW_IFFALSE(atts.getLong("number_of",num), L"no attribute 'number_of'");
 		if(num > 0)
 		{
-			THROWIFFALSE(num == P_DATA->count_aux_tiles && num == P_DATA->oHeader.usNumberOfImageTileLocsStored,
+			SGP_THROW_IFFALSE(num == P_DATA->count_aux_tiles && num == P_DATA->oHeader.usNumberOfImageTileLocsStored,
 				L"counted number and given number of tiles aux images are not equal");
 
 			int size = num * sizeof(RelTileLoc);
@@ -243,10 +243,10 @@ public:
 	DEFINE_TRANSITION(TR_AUX_Tile_offset, _myt, false);
 	TRANSITION_ENTER{
 		long index = 0, x = 0 , y = 0;
-		THROWIFFALSE(atts.getLong("index", index), L"nu attribute 'index'");
-		THROWIFFALSE(index >= 0 && index < P_DATA->oHeader.usNumberOfImageTileLocsStored, L"index out of range");
-		THROWIFFALSE(atts.getLong("x", x), L"no attribute 'x'");
-		THROWIFFALSE(atts.getLong("y", y), L"no attribute 'y'");
+		SGP_THROW_IFFALSE(atts.getLong("index", index), L"nu attribute 'index'");
+		SGP_THROW_IFFALSE(index >= 0 && index < P_DATA->oHeader.usNumberOfImageTileLocsStored, L"index out of range");
+		SGP_THROW_IFFALSE(atts.getLong("x", x), L"no attribute 'x'");
+		SGP_THROW_IFFALSE(atts.getLong("y", y), L"no attribute 'y'");
 		P_DATA->pStructureFileRef->pTileLocData[index].bTileOffsetX = (INT8)x;
 		P_DATA->pStructureFileRef->pTileLocData[index].bTileOffsetY = (INT8)y;
 	}
@@ -260,7 +260,7 @@ public:
 	DEFINE_TRANSITION(TR_Structure_data,_myt, false);
 	TRANSITION_ENTER{
 		long num = 0, stored = 0;
-		THROWIFFALSE(atts.getLong("number_of",num), L"structure data : no attribute 'number_of'");
+		SGP_THROW_IFFALSE(atts.getLong("number_of",num), L"structure data : no attribute 'number_of'");
 		if(!atts.getLong("stored",stored))
 		{
 			stored = num;
@@ -268,8 +268,8 @@ public:
 		if(num > 0)
 		{
 			// header consistency check (to be removed later ?)
-			THROWIFFALSE(num == P_DATA->oHeader.usNumberOfStructures, L"inconsistent data : number of structures");
-			THROWIFFALSE(stored == P_DATA->oHeader.usNumberOfStructuresStored, L"inconsistent data : number of stored structures");
+			SGP_THROW_IFFALSE(num == P_DATA->oHeader.usNumberOfStructures, L"inconsistent data : number of structures");
+			SGP_THROW_IFFALSE(stored == P_DATA->oHeader.usNumberOfStructuresStored, L"inconsistent data : number of stored structures");
 			P_DATA->_structures.resize(stored);
 			for(int i=0; i < stored; ++i)
 			{
@@ -286,7 +286,7 @@ public:
 		// copy gathered data into game object
 		if(!P_DATA->_structures.empty())
 		{
-			THROWIFFALSE(P_DATA->pStructureFileRef->usNumberOfStructuresStored == P_DATA->structure_count, L"wrong number of structures");
+			SGP_THROW_IFFALSE(P_DATA->pStructureFileRef->usNumberOfStructuresStored == P_DATA->structure_count, L"wrong number of structures");
 
 			int size = 0;
 			for(::size_t i = 0; i < P_DATA->_structures.size(); ++i)
@@ -298,8 +298,8 @@ public:
 				}
 			}
 
-			THROWIFFALSE(size == P_DATA->oHeader.usStructureDataSize,
-				BuildString(L"data size is supposed to be '").add(P_DATA->oHeader.usStructureDataSize).add(L"' but is '").add(size).add(L"'").get());
+			SGP_THROW_IFFALSE(size == P_DATA->oHeader.usStructureDataSize,
+				_BS(L"data size is supposed to be '") << P_DATA->oHeader.usStructureDataSize << L"' but is '" << size << L"'" << _BS::wget);
 
 			P_DATA->structure_data_size = size;
 
@@ -323,9 +323,9 @@ public:
 	DEFINE_TRANSITION(TR_Structure, _myt, false);
 	TRANSITION_ENTER{
 		long index;
-		THROWIFFALSE( atts.getLong("index", index), L"no attribute 'index'" );
-		THROWIFFALSE( (index >= 0) && (index < P_DATA->pStructureFileRef->usNumberOfStructures), L"structure index out of range");
-		THROWIFFALSE( (P_DATA->structure_count >= 0) && (P_DATA->structure_count < P_DATA->pStructureFileRef->usNumberOfStructuresStored), L"structure count larger than announced");
+		SGP_THROW_IFFALSE( atts.getLong("index", index), L"no attribute 'index'" );
+		SGP_THROW_IFFALSE( (index >= 0) && (index < P_DATA->pStructureFileRef->usNumberOfStructures), L"structure index out of range");
+		SGP_THROW_IFFALSE( (P_DATA->structure_count >= 0) && (P_DATA->structure_count < P_DATA->pStructureFileRef->usNumberOfStructuresStored), L"structure count larger than announced");
 		P_DATA->current_structure = &P_DATA->_structures[P_DATA->structure_count];
 		P_DATA->current_structure->structure.usStructureNumber = index;
 		P_DATA->structure_index = index;
@@ -341,16 +341,16 @@ public:
 	/**********************************************************************/
 	//DEFINE_TRANSITION(TR_Structure_number, _myt, true);
 	//TRANSITION_LEAVE{
-	//	THROWIFFALSE( P_DATA->current_structure, L"null structure" );
+	//	SGP_THROW_IFFALSE( P_DATA->current_structure, L"null structure" );
 	//	P_DATA->current_structure->structure.usStructureNumber = atoi(char_data.c_str());
-	//	THROWIFFALSE( P_DATA->current_structure->structure.usStructureNumber == P_DATA->structure_index, L"inconsistent data");
+	//	SGP_THROW_IFFALSE( P_DATA->current_structure->structure.usStructureNumber == P_DATA->structure_index, L"inconsistent data");
 	//}
 	//FINISH_TRANSITION;
 
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_Structure_armour, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE( P_DATA->current_structure, L"null structure" );
+		SGP_THROW_IFFALSE( P_DATA->current_structure, L"null structure" );
 		P_DATA->current_structure->structure.ubArmour = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -358,7 +358,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_Structure_hitpoints, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE( P_DATA->current_structure, L"null structure" );
+		SGP_THROW_IFFALSE( P_DATA->current_structure, L"null structure" );
 		P_DATA->current_structure->structure.ubHitPoints = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -366,7 +366,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_Structure_density, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE( P_DATA->current_structure, L"null structure" );
+		SGP_THROW_IFFALSE( P_DATA->current_structure, L"null structure" );
 		P_DATA->current_structure->structure.ubDensity = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -374,7 +374,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_Structure_wall_orient, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE( P_DATA->current_structure, L"null structure" );
+		SGP_THROW_IFFALSE( P_DATA->current_structure, L"null structure" );
 		P_DATA->current_structure->structure.ubWallOrientation = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -382,7 +382,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_Structure_destr_partner, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE( P_DATA->current_structure, L"null structure" );
+		SGP_THROW_IFFALSE( P_DATA->current_structure, L"null structure" );
 		P_DATA->current_structure->structure.bDestructionPartner = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -390,7 +390,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_Structure_partner_delta, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE( P_DATA->current_structure, L"null structure" );
+		SGP_THROW_IFFALSE( P_DATA->current_structure, L"null structure" );
 		P_DATA->current_structure->structure.bPartnerDelta = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -398,7 +398,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_Structure_offX, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE( P_DATA->current_structure, L"null structure" );
+		SGP_THROW_IFFALSE( P_DATA->current_structure, L"null structure" );
 		P_DATA->current_structure->structure.bZTileOffsetX = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -406,7 +406,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_Structure_offY, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE( P_DATA->current_structure, L"null structure" );
+		SGP_THROW_IFFALSE( P_DATA->current_structure, L"null structure" );
 		P_DATA->current_structure->structure.bZTileOffsetY = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -414,9 +414,9 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_Structure_num_tiles, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE( P_DATA->current_structure, L"null structure" );
+		SGP_THROW_IFFALSE( P_DATA->current_structure, L"null structure" );
 		int num_tiles = atoi(char_data.c_str());
-		THROWIFFALSE(num_tiles >= 0, L"invalid number");
+		SGP_THROW_IFFALSE(num_tiles >= 0, L"invalid number");
 		P_DATA->current_structure->structure.ubNumberOfTiles = num_tiles;
 		P_DATA->current_structure->tiles.resize(num_tiles);
 		for(int i = 0 ;i < num_tiles; ++i)
@@ -429,7 +429,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_Structure_FLAGS, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE( P_DATA->current_structure, L"null structure" );
+		SGP_THROW_IFFALSE( P_DATA->current_structure, L"null structure" );
 		if(std::string(tag_name) == "STRUCTURE_BASE_TILE")		P_DATA->current_structure->structure.fFlags |= STRUCTURE_BASE_TILE;
 		if(std::string(tag_name) == "STRUCTURE_OPEN")			P_DATA->current_structure->structure.fFlags |= STRUCTURE_OPEN;
 		if(std::string(tag_name) == "STRUCTURE_OPENABLE")		P_DATA->current_structure->structure.fFlags |= STRUCTURE_OPENABLE;
@@ -482,7 +482,7 @@ public:
 		long num = 0;
 		if(atts.getLong("number_of",num))
 		{
-			THROWIFFALSE(num == P_DATA->current_structure->structure.ubNumberOfTiles, L"inconsistent data");
+			SGP_THROW_IFFALSE(num == P_DATA->current_structure->structure.ubNumberOfTiles, L"inconsistent data");
 		}
 	}
 	FINISH_TRANSITION;
@@ -492,8 +492,8 @@ public:
 	DEFINE_TRANSITION(TR_SD_Tile, _myt, false);
 	TRANSITION_ENTER{
 		long index = 0;
-		THROWIFFALSE( atts.getLong("index",index), L"no attribute 'index'" );
-		THROWIFFALSE( index >= 0 && index < (long)P_DATA->current_structure->tiles.size(), L"structure index out of range");
+		SGP_THROW_IFFALSE( atts.getLong("index",index), L"no attribute 'index'" );
+		SGP_THROW_IFFALSE( index >= 0 && index < (long)P_DATA->current_structure->tiles.size(), L"structure index out of range");
 		P_DATA->current_str_tile = &P_DATA->current_structure->tiles[index];
 	}
 	TRANSITION_LEAVE{
@@ -504,7 +504,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_SD_Tile_offX, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE(P_DATA->current_str_tile, L"null structure tile");
+		SGP_THROW_IFFALSE(P_DATA->current_str_tile, L"null structure tile");
 		P_DATA->current_str_tile->bXPosRelToBase = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -512,7 +512,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_SD_Tile_offY, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE(P_DATA->current_str_tile, L"null structure tile");
+		SGP_THROW_IFFALSE(P_DATA->current_str_tile, L"null structure tile");
 		P_DATA->current_str_tile->bYPosRelToBase = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -520,7 +520,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_SD_Tile_offBase, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE(P_DATA->current_str_tile, L"null structure tile");
+		SGP_THROW_IFFALSE(P_DATA->current_str_tile, L"null structure tile");
 		P_DATA->current_str_tile->sPosRelToBase = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -528,7 +528,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_SD_Tile_VehHitLoc, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE(P_DATA->current_str_tile, L"null structure tile");
+		SGP_THROW_IFFALSE(P_DATA->current_str_tile, L"null structure tile");
 		P_DATA->current_str_tile->ubVehicleHitLocation = atoi(char_data.c_str());
 	}
 	FINISH_TRANSITION;
@@ -536,7 +536,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_SD_Tile_FLAGS, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE(P_DATA->current_str_tile, L"null structure tile");
+		SGP_THROW_IFFALSE(P_DATA->current_str_tile, L"null structure tile");
 		if(std::string(tag_name) == "TILE_ON_ROOF")		P_DATA->current_str_tile->fFlags |= TILE_ON_ROOF;
 		if(std::string(tag_name) == "TILE_PASSABLE")	P_DATA->current_str_tile->fFlags |= TILE_PASSABLE;
 	}
@@ -545,7 +545,7 @@ public:
 	/**********************************************************************/
 	DEFINE_TRANSITION(TR_SD_Tile_profile, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE(P_DATA->current_str_tile, L"null structure tile");
+		SGP_THROW_IFFALSE(P_DATA->current_str_tile, L"null structure tile");
 		int y = -1;
 		if     (std::string(tag_name) == "y0") y = 0;
 		else if(std::string(tag_name) == "y1") y = 1;
@@ -563,7 +563,7 @@ public:
 				if(x >= 0 && x < 5)
 				{
 					int z;
-					THROWIFFALSE( vfs::convertTo<int>(token,z), L"" );
+					SGP_THROW_IFFALSE( vfs::convertTo<int>(token,z), L"" );
 					if(z >= 0 && z < 16)
 					{
 						P_DATA->current_str_tile->Shape[y][x] = z;
@@ -583,7 +583,7 @@ public:
 	CStructureDataReader(STRUCTURE_FILE_REF* sfr) 
 		: pStructureFileRef(sfr), current_structure(NULL), current_str_tile(NULL), current_aux(NULL)
 	{
-		THROWIFFALSE(sfr, L"");
+		SGP_THROW_IFFALSE(sfr, L"");
 		
 		TR_PASS  (STATE_NONE,				"STRUCTURE_FILE",					STATE_STRUCTURE_FILE);
 		// HEADER

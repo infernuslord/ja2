@@ -339,7 +339,23 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\lauxlib.h"
+				RelativePath="lauxlib.h"
+				>
+			</File>
+			<File
+				RelativePath="Lua Interpreter.h"
+				>
+			</File>
+			<File
+				RelativePath="lua.h"
+				>
+			</File>
+			<File
+				RelativePath="lua.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lua_class_interface.h"
 				>
 			</File>
 			<File
@@ -373,7 +389,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\lua.cpp"
+				RelativePath="lua.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lua_class_interface.cpp"
 				>
 			</File>
 			<File
@@ -381,7 +401,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\lua_function.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lua_state.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\lua_strategic.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lua_table.cpp"
 				>
 			</File>
 			<File

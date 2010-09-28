@@ -31,7 +31,7 @@
 	#include "Soldier Profile.h"
 	#include "soldier profile type.h"
 	#include "MessageBoxScreen.h"
-//	#include "sgp_logger.h"
+	#include "sgp_logger.h"
 #include "INIReader.h"
 #endif
 
@@ -113,7 +113,7 @@ public:
 		{
 			return false;
 		}
-	//	SGP_THROW(L"Invalid Video Player state!");
+		SGP_THROW(L"Invalid Video Player state!");
 	}
 	
 	void stopVideo()
@@ -164,7 +164,7 @@ public:
 		}
 		else
 		{
-		//	SGP_INFO(L"Unknown video file format");
+			SGP_INFO(L"Unknown video file format");
 		}
 		return false;
 	}

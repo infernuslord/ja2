@@ -40,8 +40,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\7z;..\..\utf8\source"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;VFS_STATIC"
+				AdditionalIncludeDirectories="..\include;..\ext\7z\src;..\ext\utfcpp\source"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;SZIP_STATIC;VFS_STATIC;VFS_WITH_SLF;VFS_WITH_7ZIP"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -104,8 +104,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\include;..\..\7z;..\..\utf8\source"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;VFS_STATIC"
+				AdditionalIncludeDirectories="..\include;..\ext\7z\src;..\ext\utfcpp\source"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;SZIP_STATIC;VFS_STATIC;VFS_WITH_SLF;VFS_WITH_7ZIP"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="false"
@@ -167,8 +167,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\7z;..\..\utf8\source"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;VFS_STATIC"
+				AdditionalIncludeDirectories="..\include;..\ext\7z\src;..\ext\utfcpp\source"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;SZIP_STATIC;VFS_STATIC;VFS_WITH_SLF;VFS_WITH_7ZIP"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -231,8 +231,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\include;..\..\7z;..\..\utf8\source"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;VFS_STATIC"
+				AdditionalIncludeDirectories="..\include;..\ext\7z\src;..\ext\utfcpp\source"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;SZIP_STATIC;VFS_STATIC;VFS_WITH_SLF;VFS_WITH_7ZIP"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="false"
@@ -296,8 +296,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\include;..\..\7z;..\..\utf8\source"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;VFS_STATIC;VFS_SYNCHRONIZE"
+				AdditionalIncludeDirectories="..\include;..\ext\7z\src;..\ext\utfcpp\source"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;SZIP_STATIC;VFS_STATIC;VFS_SYNCHRONIZE;VFS_WITH_SLF;VFS_WITH_7ZIP"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="false"
@@ -342,14 +342,6 @@
 			Name="Aspects"
 			>
 			<File
-				RelativePath="..\src\Aspects\vfs_debugging.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\vfs\Aspects\vfs_debugging.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\Aspects\vfs_logging.cpp"
 				>
 			</File>
@@ -377,14 +369,6 @@
 		<Filter
 			Name="Core"
 			>
-			<File
-				RelativePath="..\src\Core\os_functions.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\vfs\Core\os_functions.h"
-				>
-			</File>
 			<File
 				RelativePath="..\src\Core\vfs.cpp"
 				>
@@ -415,6 +399,14 @@
 			</File>
 			<File
 				RelativePath="..\include\vfs\Core\vfs_init.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Core\vfs_os_functions.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\vfs\Core\vfs_os_functions.h"
 				>
 			</File>
 			<File
@@ -469,6 +461,14 @@
 				Name="File"
 				>
 				<File
+					RelativePath="..\src\Core\File\vfs_buffer_file.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\vfs\Core\File\vfs_buffer_file.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Core\File\vfs_dir_file.cpp"
 					>
 				</File>
@@ -490,14 +490,6 @@
 				</File>
 				<File
 					RelativePath="..\include\vfs\Core\File\vfs_lib_file.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Core\File\vfs_memory_file.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\include\vfs\Core\File\vfs_memory_file.h"
 					>
 				</File>
 			</Filter>

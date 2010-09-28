@@ -41,7 +41,7 @@ typedef struct
 
 } HIDDEN_NAMES_VALUES;
 
-extern HIDDEN_NAMES_VALUES zPokaznazwe[500];
+extern HIDDEN_NAMES_VALUES zHiddenNames[500];
 
 typedef struct
 {

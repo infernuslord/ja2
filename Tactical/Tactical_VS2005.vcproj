@@ -973,6 +973,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\XML_AlteringAttachments.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\XML_AmmoStrings.cpp"
 				>
 			</File>
@@ -990,10 +994,6 @@
 			</File>
 			<File
 				RelativePath=".\XML_Attachments.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\XML_AttachmentSlotAssign.cpp"
 				>
 			</File>
 			<File
@@ -1109,11 +1109,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\XML_RandomStats.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\XML_RPCFacesSmall.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\XML_SectorLoadscreens.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\XML_SoundProfile.cpp"
 				>
 			</File>
 			<File

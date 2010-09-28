@@ -82,6 +82,11 @@
 #include "Ja25_Tactical.h"
 #endif
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SANDRO - all "APBPConstants[AP_PICKUP_ITEM]" were replaced by GetBasicAPsToPickupItem()
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -186,7 +191,7 @@ INT16		ITEMDESC_DONE_Y;
 #define		ITEM_FONT								TINYFONT1
 
 //CHRISL: Moved to Interface Items.h for EDB
-//#define EXCEPTIONAL_DAMAGE					40
+//#define EXCEPTIONAL_GUN_DAMAGE					40
 //#define EXCEPTIONAL_WEIGHT					20
 //#define EXCEPTIONAL_RANGE					400
 //#define EXCEPTIONAL_MAGAZINE				50
@@ -567,7 +572,9 @@ void GenerateProsString( STR16 zItemPros, OBJECTTYPE * pObject, UINT32 uiPixLimi
 		}
 	}
 
-	if ( GunRange( pObject ) >= EXCEPTIONAL_RANGE )
+	UINT16 exceptionalRange = (UINT16)((EXCEPTIONAL_RANGE * gGameExternalOptions.iGunRangeModifier ) / 100);
+
+	if ( GunRange( pObject, NULL ) >= exceptionalRange ) // SANDRO - added argument
 	{
 		zTemp = Message[STR_LONG_RANGE];
 		if ( ! AttemptToAddSubstring( zItemPros, zTemp, &uiStringLength, uiPixLimit ) )
@@ -576,7 +583,19 @@ void GenerateProsString( STR16 zItemPros, OBJECTTYPE * pObject, UINT32 uiPixLimi
 		}
 	}
 
-	if (GetDamage(pObject) >= EXCEPTIONAL_DAMAGE)
+	UINT16 exceptionalDamage;
+	// Melee damage
+	if ( Item[pObject->usItem].usItemClass == IC_BLADE || Item[pObject->usItem].usItemClass == IC_PUNCH || Item[pObject->usItem].usItemClass == IC_TENTACLES )
+	{
+		exceptionalDamage = (UINT16)(( EXCEPTIONAL_MELEE_DAMAGE * gGameExternalOptions.iMeleeDamageModifier ) / 100);
+	}
+	// Gun damage
+	else
+	{
+		exceptionalDamage = (UINT16)(( EXCEPTIONAL_GUN_DAMAGE * gGameExternalOptions.iGunDamageModifier ) / 100);
+	}
+
+	if (GetDamage(pObject) >= exceptionalDamage)
 	{
 		zTemp = Message[STR_HIGH_DAMAGE];
 		if ( ! AttemptToAddSubstring( zItemPros, zTemp, &uiStringLength, uiPixLimit ) )
@@ -693,7 +712,7 @@ void GenerateConsString( STR16 zItemCons, OBJECTTYPE * pObject, UINT32 uiPixLimi
 		}
 	}
 
-	if ( GunRange( pObject ) <= BAD_RANGE)
+	if ( GunRange( pObject, NULL ) <= BAD_RANGE) // SANDRO - added argument
 	{
 		zTemp = Message[STR_SHORT_RANGE];
 		if ( ! AttemptToAddSubstring( zItemCons, zTemp, &uiStringLength, uiPixLimit ) )
@@ -780,7 +799,7 @@ void GenerateConsString( STR16 zItemCons, OBJECTTYPE * pObject, UINT32 uiPixLimi
 BOOLEAN UseNASDesc(OBJECTTYPE *pObject){
 	if(pObject->exists() == FALSE)
 		return FALSE;
-	return (Item[pObject->usItem].usItemClass != IC_LBEGEAR && Item[pObject->usItem].usItemClass != IC_MONEY && gGameExternalOptions.fNewAttachmentSystem);
+	return (Item[pObject->usItem].usItemClass != IC_LBEGEAR && Item[pObject->usItem].usItemClass != IC_MONEY && gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW);
 }
 
 //WarmSteel - This function is used to move groups of items with NAS along the Y axe
@@ -1563,7 +1582,7 @@ void INVRenderINVPanelItem( SOLDIERTYPE *pSoldier, INT16 sPocket, UINT8 fDirtyLe
 	if(gpItemPointer != NULL)
 	{
 		if(!gfSMDisableForItems && !CanItemFitInPosition(pSoldier, gpItemPointer, (INT8)sPocket, FALSE)){
-			if(!NASValidAttachment(gpItemPointer->usItem, pObject->usItem)){
+			if(!ValidAttachment(gpItemPointer->usItem, pObject )){
 				fHatchItOut = TRUE;
 			}
 			else{
@@ -1662,11 +1681,7 @@ BOOLEAN	CompatibleItemForApplyingOnMerc( OBJECTTYPE *pTestObject )
 	// ATE: Would be nice to have flag here to check for these types....
 	if ( Item[usItem].camouflagekit || usItem == ADRENALINE_BOOSTER || usItem == REGEN_BOOSTER ||
 			 usItem == SYRINGE_3		 || usItem == SYRINGE_4 || usItem == SYRINGE_5 ||
-#ifdef JA2UB
-			 Item[usItem].alcohol  || Item[usItem].canteen || usItem == JAR_ELIXIR || usItem == CHE_GUEVARA_CANTEEN ) // JA25 UB 4504
-#else
-			 Item[usItem].alcohol  || Item[usItem].canteen || usItem == JAR_ELIXIR )
-#endif
+			 Item[usItem].alcohol  || Item[usItem].canteen || usItem == JAR_ELIXIR || (usItem == 1022 && gGameExternalOptions.fCamoRemoving)  ) // Added rag usable on self - SANDRO
 	{
 		return( TRUE );
 	}
@@ -1832,8 +1847,8 @@ BOOLEAN HandleCompatibleAmmoUIForMapScreen( SOLDIERTYPE *pSoldier, INT32 bInvPos
 				continue;
 			}
 
-			if ( NASValidAttachment( pObject->usItem, pTestObject->usItem ) ||
-					 NASValidAttachment( pTestObject->usItem, pObject->usItem ) ||
+			if ( ValidAttachment( pObject->usItem, pTestObject ) ||
+					 ValidAttachment( pTestObject->usItem, pObject ) ||
 					 ValidLaunchable( pTestObject->usItem, pObject->usItem ) ||
 					 ValidLaunchable( pObject->usItem, pTestObject->usItem ) )
 			{
@@ -1933,8 +1948,8 @@ BOOLEAN HandleCompatibleAmmoUIForMapInventory( SOLDIERTYPE *pSoldier, INT32 bInv
 			continue;
 		}
 
-		if ( NASValidAttachment( pObject->usItem, pTestObject->usItem ) ||
-				 NASValidAttachment( pTestObject->usItem, pObject->usItem ) ||
+		if ( ValidAttachment( pObject->usItem, pTestObject ) ||
+				 ValidAttachment( pTestObject->usItem, pObject ) ||
 				 ValidLaunchable( pTestObject->usItem, pObject->usItem ) ||
 				 ValidLaunchable( pObject->usItem, pTestObject->usItem ) )
 		{
@@ -2065,8 +2080,8 @@ BOOLEAN InternalHandleCompatibleAmmoUI( SOLDIERTYPE *pSoldier, OBJECTTYPE *pTest
 			continue;
 		}
 
-		if ( NASValidAttachment( pObject->usItem, pTestObject->usItem ) ||
-				 NASValidAttachment( pTestObject->usItem, pObject->usItem ) ||
+		if ( ValidAttachment( pObject->usItem, pTestObject ) ||
+				 ValidAttachment( pTestObject->usItem, pObject ) ||
 				 ValidLaunchable( pTestObject->usItem, pObject->usItem ) ||
 				 ValidLaunchable( pObject->usItem, pTestObject->usItem ) )
 		{
@@ -2393,7 +2408,7 @@ void RenderPocketItemCapacity( UINT32 uiWhichBuffer, UINT8 pCapacity, INT16 bPos
 	if(pSoldier != NULL && !CanItemFitInPosition( pSoldier, gpItemPointer, (INT8)bPos, FALSE ))
 	{
 		// Further check to see if the cursor item is valid ammo or a valid attachment
-		if(!CompatibleAmmoForGun(gpItemPointer, &pSoldier->inv[bPos]) && !NASValidAttachment(gpItemPointer->usItem, pSoldier->inv[bPos].usItem))
+		if(!CompatibleAmmoForGun(gpItemPointer, &pSoldier->inv[bPos]) && !ValidAttachment(gpItemPointer->usItem, &(pSoldier->inv[bPos])))
 		{
 			return;
 		}
@@ -2423,7 +2438,7 @@ void RenderPocketItemCapacity( UINT32 uiWhichBuffer, UINT8 pCapacity, INT16 bPos
 		SetFontForeground( FONT_YELLOW );
 		swprintf( pStr, L"L" );
 	}
-	else if(NASValidAttachment(gpItemPointer->usItem, pSoldier->inv[bPos].usItem))
+	else if(ValidAttachment(gpItemPointer->usItem, &(pSoldier->inv[bPos]) ))
 	{
 		SetFontForeground( FONT_YELLOW );
 		swprintf( pStr, L"A" );
@@ -3465,7 +3480,7 @@ BOOLEAN InternalInitItemDescriptionBox( OBJECTTYPE *pObject, INT16 sX, INT16 sY,
 		}
 
 //		if ( !(Item[ pObject->usItem ].fFlags & ITEM_HIDDEN_ADDON) && ( ValidAttachment( gpItemPointer->usItem, pObject->usItem ) || ValidLaunchable( gpItemPointer->usItem, pObject->usItem ) || ValidMerge( gpItemPointer->usItem, pObject->usItem ) ) )
-		if ( !(Item[ pObject->usItem ].hiddenaddon ) && ( NASValidAttachment( gpItemPointer->usItem, pObject->usItem ) || ValidLaunchable( gpItemPointer->usItem, pObject->usItem ) || ValidMerge( gpItemPointer->usItem, pObject->usItem ) ) )
+		if ( !(Item[ pObject->usItem ].hiddenaddon ) && ( ValidAttachment( gpItemPointer->usItem, pObject ) || ValidLaunchable( gpItemPointer->usItem, pObject->usItem ) || ValidMerge( gpItemPointer->usItem, pObject->usItem ) ) )
 		{
 			SetUpFastHelpListRegions(
 				gItemDescHelpText.iXPosition,
@@ -3498,7 +3513,6 @@ BOOLEAN InternalInitItemDescriptionBox( OBJECTTYPE *pObject, INT16 sX, INT16 sY,
 //CHRISL: This function is designed to recreate the attachment tooltips
 void UpdateAttachmentTooltips(OBJECTTYPE *pObject, UINT8 ubStatusIndex)
 {
-	UINT16	iLoop;
 	UINT32	slotCount = 0;
 
 	//WarmSteel - Copied most of this from bobby rays attachment listing. No need to reinvent the wheel.
@@ -3522,8 +3536,8 @@ void UpdateAttachmentTooltips(OBJECTTYPE *pObject, UINT8 ubStatusIndex)
 	//now, create new regions
 	for (slotCount = 0; ;++slotCount )
 	{
-		//stopping conditions
-		if (gGameExternalOptions.fNewAttachmentSystem && !pObject->usAttachmentSlotIndexVector.empty()){
+		//stopping conditions, not inside the for loop because it is different depending on the attachment system.
+		if (gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW )	{
 			if(slotCount >= pObject->usAttachmentSlotIndexVector.size())
 				break;
 		} else {
@@ -3557,38 +3571,34 @@ void UpdateAttachmentTooltips(OBJECTTYPE *pObject, UINT8 ubStatusIndex)
 		OBJECTTYPE* pAttachment = (*pObject)[ubStatusIndex]->GetAttachmentAtIndex(slotCount);
 		if (pAttachment->exists()) {
 			SetRegionFastHelpText( &(gItemDescAttachmentRegions[ slotCount ]), ItemNames[ pAttachment->usItem ] );
-		} else if (gGameExternalOptions.fNewAttachmentSystem && !pObject->usAttachmentSlotIndexVector.empty()) {	
-			//This determines what attachments will fit on this slot.
-			for(iLoop = 0; iLoop < MAXATTACHMENTS; iLoop++){
-				
-				//We're done here
-				if(AttachmentSlotAssign[iLoop].usAttachmentSlotIndexAssign == 0)
-					break;
-				
-				//Does the slot of this attachment match any of the slots on the weapons?
-				if (AttachmentSlotAssign[iLoop].usAttachmentSlotIndexAssign == pObject->usAttachmentSlotIndexVector[slotCount]){
-					
-					//this one fits!
-					usAttachment = AttachmentSlotAssign[iLoop].uiAttachmentIndex;
+		} else if (gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW && !pObject->usAttachmentSlotIndexVector.empty()) {	
 
-					// If the attachment is not hidden
-					if (!Item[ usAttachment ].hiddenaddon && !Item[ usAttachment ].hiddenattachment)
+			UINT16 usLoopSlotID = pObject->usAttachmentSlotIndexVector[slotCount];
+								
+			//Print all attachments that fit on this item.
+			for(UINT16 usLoop = 0; usLoop < AttachmentSlots[usLoopSlotID].AttachmentAssignVector.size(); usLoop++)
+			{
+				//this one fits!
+				usAttachment = AttachmentSlots[usLoopSlotID].AttachmentAssignVector[usLoop].usAttachmentIndex;
+										
+				// If the attachment is not hidden
+				if (!Item[ usAttachment ].hiddenaddon && !Item[ usAttachment ].hiddenattachment)
+				{
+					if (wcslen( attachStr3 ) + wcslen(Item[usAttachment].szItemName) > 3600)
 					{
-						if (wcslen( attachStr3 ) + wcslen(Item[usAttachment].szItemName) > 2500)
-						{
-							// End list early to avoid stack overflow
-							wcscat( attachStr3, L"\n..." );
-							break;
-						}
-						else
-						{// Add the attachment's name to the list.
-							fAttachmentsFound = TRUE;
-							swprintf( attachStr2, L"\n%s", Item[ usAttachment ].szItemName );
-							wcscat( attachStr3, attachStr2);
-						}
+						// End list early to avoid overflow
+						wcscat( attachStr3, L"\n..." );
+						break;
+					}
+					else
+					{// Add the attachment's name to the list.
+						fAttachmentsFound = TRUE;
+						swprintf( attachStr2, L"\n%s", Item[ usAttachment ].szItemName );
+						wcscat( attachStr3, attachStr2);
 					}
 				}
 			}
+			
 			if (fAttachmentsFound)
 			{
 				// Add extra empty line and attachment list title
@@ -3601,7 +3611,6 @@ void UpdateAttachmentTooltips(OBJECTTYPE *pObject, UINT8 ubStatusIndex)
 			SetRegionFastHelpText( &(gItemDescAttachmentRegions[ slotCount ]), attachStr );
 		} else {
 			SetRegionFastHelpText( &(gItemDescAttachmentRegions[ slotCount ]), Message[ STR_ATTACHMENTS ] );
-
 		}
 		SetRegionHelpEndCallback( &(gItemDescAttachmentRegions[ slotCount ]), HelpTextDoneCallback );
 	}
@@ -3931,10 +3940,10 @@ void ItemDescAttachmentsCallback( MOUSE_REGION * pRegion, INT32 iReason )
 		if ( gpItemPointer != NULL )
 		{
 			// nb pointer could be NULL because of inventory manipulation in mapscreen from sector inv
-			if ( !gpItemPointerSoldier || EnoughPoints( gpItemPointerSoldier, AttachmentAPCost( gpItemPointer->usItem, gpItemDescObject->usItem ), 0, TRUE ) )
+			if ( !gpItemPointerSoldier || EnoughPoints( gpItemPointerSoldier, AttachmentAPCost( gpItemPointer->usItem, gpItemDescObject, gpItemPointerSoldier ), 0, TRUE ) )
 			{
 //				if ( (Item[ gpItemPointer->usItem ].fFlags & ITEM_INSEPARABLE) && ValidAttachment( gpItemPointer->usItem, gpItemDescObject->usItem ) )
-				if ( (Item[ gpItemPointer->usItem ].inseparable ) && NASValidAttachment( gpItemPointer->usItem, gpItemDescObject->usItem ) )
+				if ( (Item[ gpItemPointer->usItem ].inseparable ) && ValidAttachment( gpItemPointer->usItem, gpItemDescObject ) )
 				{
 					iItemPosition = uiItemPos;
 					DoScreenIndependantMessageBox( Message[ STR_PERMANENT_ATTACHMENT ], ( UINT8 )MSG_BOX_FLAG_YESNO, PermanantAttachmentMessageBoxCallBack );
@@ -3977,7 +3986,7 @@ void ItemDescAttachmentsCallback( MOUSE_REGION * pRegion, INT32 iReason )
 		else
 		{
 			// ATE: Make sure we have enough AP's to drop it if we pick it up!
-			if ( pAttachment->exists() && EnoughPoints( gpItemDescSoldier, ( AttachmentAPCost( pAttachment->usItem, gpItemDescObject->usItem ) + APBPConstants[AP_PICKUP_ITEM] ), 0, TRUE ) )
+			if ( pAttachment->exists() && EnoughPoints( gpItemDescSoldier, ( AttachmentAPCost( pAttachment->usItem, gpItemDescObject, gpItemPointerSoldier ) + APBPConstants[AP_PICKUP_ITEM] ), 0, TRUE ) )
 			{
 				// Get attachment if there is one
 				// The follwing function will handle if no attachment is here
@@ -4070,22 +4079,22 @@ INT8 DetermineShowBox( )
 		if (UsingEDBSystem() == 2)
 		{
 			if (Item[gpItemDescObject->usItem].usItemClass & (IC_WEAPON|IC_EXPLOSV|IC_AMMO|IC_ARMOUR|IC_PUNCH) && UsingEDBSystem() > 0 )
-				return(gGameExternalOptions.fNewAttachmentSystem == TRUE ? 8 : 6);
+				return(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW ? 8 : 6);
 			else
-				return(gGameExternalOptions.fNewAttachmentSystem == TRUE ? 9 : 7);
+				return(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW ? 9 : 7);
 		}
 		else if (guiCurrentItemDescriptionScreen == MAP_SCREEN)
 		{
 			if (Item[gpItemDescObject->usItem].usItemClass & (IC_WEAPON|IC_EXPLOSV|IC_AMMO|IC_ARMOUR|IC_PUNCH) && UsingEDBSystem() > 0 )
-				return(gGameExternalOptions.fNewAttachmentSystem == TRUE ? 7 : 6);
+				return(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW ? 7 : 6);
 			else
 				if(UsingEDBSystem() > 0)
-					return(gGameExternalOptions.fNewAttachmentSystem == TRUE ? 8 : 1);
+					return(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW ? 8 : 1);
 				else
-					return(gGameExternalOptions.fNewAttachmentSystem == TRUE ? 6 : 1);
+					return(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW ? 6 : 1);
 		}
 		else
-			return(gGameExternalOptions.fNewAttachmentSystem == TRUE ? 5 : 0);
+			return(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW ? 5 : 0);
 	}
 	else if(UsingNewInventorySystem() == true)	//NIV
 	{
@@ -4094,14 +4103,14 @@ INT8 DetermineShowBox( )
 		else if(Item[gpItemDescObject->usItem].usItemClass == IC_LBEGEAR)
 			return (LoadBearingEquipment[Item[gpItemDescObject->usItem].ubClassIndex].lbeClass + (guiCurrentItemDescriptionScreen == MAP_SCREEN ? 1 : 0));
 		else if (Item[gpItemDescObject->usItem].usItemClass & (IC_WEAPON|IC_EXPLOSV|IC_AMMO|IC_ARMOUR|IC_PUNCH) && UsingEDBSystem() > 0 ){
-			if(gGameExternalOptions.fNewAttachmentSystem)
+			if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW)
 				return (guiCurrentItemDescriptionScreen == MAP_SCREEN ? 7 : 8);
 			else
 				return (guiCurrentItemDescriptionScreen == MAP_SCREEN ? 6 : 5);
 		}else{
-			if(gGameExternalOptions.fNewAttachmentSystem && UsingEDBSystem() > 0 && Item[gpItemDescObject->usItem].usItemClass != IC_MONEY)
+			if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW && UsingEDBSystem() > 0 && Item[gpItemDescObject->usItem].usItemClass != IC_MONEY)
 				return (guiCurrentItemDescriptionScreen == MAP_SCREEN ? 8 : 9);
-			else if(gGameExternalOptions.fNewAttachmentSystem && Item[gpItemDescObject->usItem].usItemClass != IC_MONEY)
+			else if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW && Item[gpItemDescObject->usItem].usItemClass != IC_MONEY)
 				return (guiCurrentItemDescriptionScreen == MAP_SCREEN ? 6 : 5);
 			else
 				return (guiCurrentItemDescriptionScreen == MAP_SCREEN ? 1 : 0);
@@ -4180,7 +4189,7 @@ void RenderItemDescriptionBox( )
 		}
 
 		//WarmSteel - Draw the attachment slots needed for NAS, read their positions from XML.
-		if(gGameExternalOptions.fNewAttachmentSystem && UseNASDesc(gpItemDescObject) && !gpItemDescObject->usAttachmentSlotIndexVector.empty()){
+		if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW && UseNASDesc(gpItemDescObject) && !gpItemDescObject->usAttachmentSlotIndexVector.empty()){
 
 			for(UINT16 slotCount = 0; slotCount < gpItemDescObject->usAttachmentSlotIndexVector.size(); slotCount++){
 				INT16 sX = gsInvDescX + AttachmentSlots[gpItemDescObject->usAttachmentSlotIndexVector[slotCount]].usDescPanelPosX - 6; //Warmsteel - Retracting a number to account for the status bar.
@@ -4228,7 +4237,7 @@ void RenderItemDescriptionBox( )
 
 		if (gpItemPointer)
 		{
-			if(gGameExternalOptions.fNewAttachmentSystem)
+			if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW)
 			{
 				//WarmSteel - This hatches out attachment slots one by one, instead of all of em.
 				for(cnt = 0; cnt < (INT32)(*gpItemDescObject)[0]->attachments.size(); cnt++)
@@ -4499,7 +4508,7 @@ void RenderItemDescriptionBox( )
 				else
 					mprintf( gWeaponStats[ 2 ].sX + gsInvDescX, gWeaponStats[ 2 ].sY + gsInvDescY, L"%s", gWeaponStatsDesc[ 3 ] );
 
-				if ( GunRange( gpItemDescObject ) >= EXCEPTIONAL_RANGE)
+				if ( GunRange( gpItemDescObject, NULL ) >= EXCEPTIONAL_RANGE) // SANDRO - added argument
 				{
 					SetFontForeground( ITEMDESC_FONTHIGHLIGHT );
 				}
@@ -4507,7 +4516,7 @@ void RenderItemDescriptionBox( )
 				{
 					SetFontForeground( 5 );
 				}
-				swprintf( pStr, L"%2d", ( GunRange( gpItemDescObject ) ) / 10 );
+				swprintf( pStr, L"%2d", ( GunRange( gpItemDescObject, NULL ) ) / 10 ); // SANDRO - added argument
 				FindFontRightCoordinates( (INT16)(gWeaponStats[ 2 ].sX + gsInvDescX + gWeaponStats[ 2 ].sValDx), (INT16)(gWeaponStats[ 2 ].sY + gsInvDescY ), ITEM_STATS_WIDTH ,ITEM_STATS_HEIGHT ,pStr, BLOCKFONT2, &usX, &usY);
 				mprintf( usX, usY, pStr );
 			}
@@ -4522,7 +4531,20 @@ void RenderItemDescriptionBox( )
 
 				UINT8 ubImpact = GetDamage(gpItemDescObject);
 
-				if ( ubImpact  >= EXCEPTIONAL_DAMAGE)
+
+				UINT16 exceptionalDamage;
+				// Melee damage
+				if ( Item[gpItemDescObject->usItem].usItemClass == IC_BLADE || Item[gpItemDescObject->usItem].usItemClass == IC_PUNCH || Item[gpItemDescObject->usItem].usItemClass == IC_TENTACLES )
+				{
+					exceptionalDamage = (UINT16)(( EXCEPTIONAL_MELEE_DAMAGE * gGameExternalOptions.iMeleeDamageModifier ) / 100);
+				}
+				// Gun damage
+				else
+				{
+					exceptionalDamage = (UINT16)(( EXCEPTIONAL_GUN_DAMAGE * gGameExternalOptions.iGunDamageModifier ) / 100);
+				}
+
+				if ( ubImpact  >= exceptionalDamage)
 				{
 					SetFontForeground( ITEMDESC_FONTHIGHLIGHT );
 				}
@@ -5049,7 +5071,7 @@ void DeleteItemDescriptionBox( )
 				}
 				if (newSize < originalSize) {
 					//an attachment was removed, charge APs
-					ubAPCost = AttachmentAPCost(originalIter->usItem,gpItemDescObject->usItem);
+					ubAPCost = AttachmentAPCost(originalIter->usItem,gpItemDescObject, gpAttachSoldier ); // SANDRO - added argument
 				}
 				else {
 					//an attachment was added charge APs
@@ -5060,7 +5082,7 @@ void DeleteItemDescriptionBox( )
 					}
 					else
 					{
-						ubAPCost = AttachmentAPCost(newIter->usItem,gpItemDescObject->usItem);
+						ubAPCost = AttachmentAPCost(newIter->usItem,gpItemDescObject, gpAttachSoldier); // SANDRO - added argument
 					}
 				}
 			}
@@ -5099,9 +5121,31 @@ void DeleteItemDescriptionBox( )
 
 	if( gpItemDescObject->usItem != MONEY )
 	{
-		for ( cnt = 0; cnt < (INT32)(*gpItemDescObject)[0]->attachments.size(); cnt++ )
+		if (gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW)
 		{
-			MSYS_RemoveRegion( &gItemDescAttachmentRegions[cnt]);
+			// WANNE: Bugfix: Fixed CTD when closing sector inventory in strategy screen with open item description
+			if (gpItemDescObject[0].objectStack.size() == 0)
+			{
+				for ( cnt = 0; cnt < MAX_ATTACHMENTS; cnt++)
+				{
+					MSYS_RemoveRegion( &gItemDescAttachmentRegions[cnt]);
+				}
+			}
+			else
+			{
+				for ( cnt = 0; cnt < (INT32)(*gpItemDescObject)[0]->attachments.size(); cnt++ )
+				{
+					MSYS_RemoveRegion( &gItemDescAttachmentRegions[cnt]);
+				}
+			}
+		}
+		else
+		{
+			// WANNE: Bugfix: Attachment regions were not removed when playing without NAS and when closing the description box
+			for (cnt = 0; cnt < OLD_MAX_ATTACHMENTS_101; cnt++)
+			{
+				MSYS_RemoveRegion( &gItemDescAttachmentRegions[cnt]);
+			}
 		}
 	}
 	else
@@ -5497,7 +5541,7 @@ void DrawItemTileCursor( )
 			// If we are tossing...
 			if (  sDist <= 1 && gfUIMouseOnValidCatcher == 0 || gfUIMouseOnValidCatcher == 4 )
 			{
-				gsCurrentActionPoints = APBPConstants[AP_PICKUP_ITEM];
+				gsCurrentActionPoints = GetBasicAPsToPickupItem( gpItemPointerSoldier );
 			}
 			else
 			{
@@ -5736,7 +5780,7 @@ BOOLEAN HandleItemPointerClick( INT32 usMapPos )
 	// Check if we have APs....
 	if ( !EnoughPoints( gpItemPointerSoldier, gsCurrentActionPoints, 0, TRUE ) )
 	{
-		if ( gfDontChargeAPsToPickup && gsCurrentActionPoints == APBPConstants[AP_PICKUP_ITEM] )
+		if ( gfDontChargeAPsToPickup && gsCurrentActionPoints == GetBasicAPsToPickupItem( gpItemPointerSoldier ) )
 		{
 
 		}
@@ -5903,7 +5947,7 @@ BOOLEAN HandleItemPointerClick( INT32 usMapPos )
 			if ( !gfDontChargeAPsToPickup )
 			{
 				// Deduct points
-				DeductPoints( gpItemPointerSoldier, APBPConstants[AP_PICKUP_ITEM], 0 );
+				DeductPoints( gpItemPointerSoldier, GetBasicAPsToPickupItem( gpItemPointerSoldier ), 0 );
 			}
 
 			SoldierDropItem( gpItemPointerSoldier, gpItemPointer );
@@ -5919,7 +5963,7 @@ BOOLEAN HandleItemPointerClick( INT32 usMapPos )
 				if ( !gfDontChargeAPsToPickup )
 				{
 					// Deduct points
-					DeductPoints( gpItemPointerSoldier, APBPConstants[AP_PICKUP_ITEM], 0 );
+					DeductPoints( gpItemPointerSoldier, GetBasicAPsToPickupItem(gpItemPointerSoldier), 0 );
 				}
 
 				// Play animation....
@@ -5957,7 +6001,7 @@ BOOLEAN HandleItemPointerClick( INT32 usMapPos )
 				if ( !gfDontChargeAPsToPickup )
 				{
 					// Deduct points
-					DeductPoints( gpItemPointerSoldier, APBPConstants[AP_PICKUP_ITEM], 0 );
+					DeductPoints( gpItemPointerSoldier, GetBasicAPsToPickupItem(gpItemPointerSoldier), 0 );
 				}
 
 				SoldierDropItem( gpItemPointerSoldier, gpItemPointer );
@@ -6863,29 +6907,22 @@ UINT32 GetInterfaceGraphicForItem( INVTYPE *pItem )
 	// CHECK SUBCLASS
 	if ( pItem->ubGraphicType == 0 )
 	{
-		TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oGUNSM.getVObjectForItem(pItem->ubGraphicNum) : guiGUNSM,
+		SGP_TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oGUNSM.getVObjectForItem(pItem->ubGraphicNum) : guiGUNSM,
 			L"Failed to retrieve gun image" );
 	}
 	else if ( pItem->ubGraphicType == 1 )
 	{
-		TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oP1ITEMS.getVObjectForItem(pItem->ubGraphicNum) : guiP1ITEMS,
+		SGP_TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oP1ITEMS.getVObjectForItem(pItem->ubGraphicNum) : guiP1ITEMS,
 			L"Failed to retrieve P1 item image" );
 	}
 	else if ( pItem->ubGraphicType == 2 )
 	{
-		TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oP2ITEMS.getVObjectForItem(pItem->ubGraphicNum) : guiP2ITEMS,
+		SGP_TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oP2ITEMS.getVObjectForItem(pItem->ubGraphicNum) : guiP2ITEMS,
 			L"Failed to retrieve P2 item image" );
 	}
-#ifdef JA2UB
-	else if ( pItem->ubGraphicType == 9 ) // Items UB
-	{
-		TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oP4ITEMS.getVObjectForItem(pItem->ubGraphicNum) : guiP4ITEMS,
-			L"Failed to retrieve P4 item image" );
-	}
-#endif
 	else
 	{
-		TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oP3ITEMS.getVObjectForItem(pItem->ubGraphicNum) : guiP3ITEMS,
+		SGP_TRYCATCH_RETHROW( id = g_bUsePngItemImages ? g_oP3ITEMS.getVObjectForItem(pItem->ubGraphicNum) : guiP3ITEMS,
 			L"Failed to retrieve P3 item image" );
 	}
 	return id;
@@ -8768,8 +8805,8 @@ void GetHelpTextForItem( STR16 pzStr, OBJECTTYPE *pObject, SOLDIERTYPE *pSoldier
 					gWeaponStatsDesc[ 11 ],		//Damage String
 					GetDamage(pObject),
 					gWeaponStatsDesc[ 10 ],		//Range String
-					gGameSettings.fOptions[ TOPTION_SHOW_WEAPON_RANGE_IN_TILES ] ? GunRange( pObject )/10 : GunRange( pObject ),			//Modified Range
-					gGameSettings.fOptions[ TOPTION_SHOW_WEAPON_RANGE_IN_TILES ] ? Weapon[ usItem ].usRange/10 : Weapon[ usItem ].usRange,	//Gun Range
+					gGameSettings.fOptions[ TOPTION_SHOW_WEAPON_RANGE_IN_TILES ] ? GunRange( pObject, NULL )/10 : GunRange( pObject, NULL ),	 // SANDRO - added argument		//Modified Range
+					gGameSettings.fOptions[ TOPTION_SHOW_WEAPON_RANGE_IN_TILES ] ? GetModifiedGunRange(usItem)/10 : GetModifiedGunRange(usItem),	//Gun Range		// TODO.RW: Wird das wirklich gebraucht??
 					gWeaponStatsDesc[ 6 ],		//AP String
 					(Weapon[ usItem ].ubReadyTime * (100 - GetPercentReadyTimeAPReduction( pObject )) / 100),    // Ready AP's
 					apStr,						//AP's
@@ -8824,8 +8861,8 @@ void GetHelpTextForItem( STR16 pzStr, OBJECTTYPE *pObject, SOLDIERTYPE *pSoldier
 					gWeaponStatsDesc[ 11 ],		//Damage String
 					GetDamage(pObject),
 					gWeaponStatsDesc[ 10 ],		//Range String
-					gGameSettings.fOptions[ TOPTION_SHOW_WEAPON_RANGE_IN_TILES ] ? GunRange( pObject )/10 : GunRange( pObject ),			//Modified Range
-					gGameSettings.fOptions[ TOPTION_SHOW_WEAPON_RANGE_IN_TILES ] ? Weapon[ usItem ].usRange/10 : Weapon[ usItem ].usRange,	//Gun Range
+					gGameSettings.fOptions[ TOPTION_SHOW_WEAPON_RANGE_IN_TILES ] ? GunRange( pObject, NULL )/10 : GunRange( pObject, NULL ),	 // SANDRO - added argument		//Modified Range
+					gGameSettings.fOptions[ TOPTION_SHOW_WEAPON_RANGE_IN_TILES ] ? GetModifiedGunRange(usItem)/10 : GetModifiedGunRange(usItem),	//Gun Range	// TODO.RW: Wird das wirklich gebraucht??
 					gWeaponStatsDesc[ 6 ],		//AP String
 					apStr,						//AP's
 					gWeaponStatsDesc[ 12 ],		//Weight String

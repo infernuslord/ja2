@@ -95,12 +95,12 @@ extern UNDERGROUND_SECTORINFO* FindUnderGroundSector( INT16 sMapX, INT16 sMapY, 
 UINT8			gubScreenCount=0;
 
 void InitNPCs( void )
-{
-	MERCPROFILESTRUCT * pProfile;
-	
+{		
 	LetLuaGameInit(1);
 	
 	#if 0
+
+	MERCPROFILESTRUCT * pProfile;
 
 	// add the pilot at a random location!
 	pProfile = &(gMercProfiles[ SKYRIDER ]);
@@ -337,7 +337,7 @@ void InitBloodCatSectors()
 	}
 	else
 	{
-		THROWEXCEPTION(L"At least one Bloodcat Lair must be defined in BloodcatPlacements.XML!");
+		SGP_THROW(L"At least one Bloodcat Lair must be defined in BloodcatPlacements.XML!");
 	}
 
 	/*
@@ -506,9 +506,7 @@ void ShutdownStrategicLayer()
 }
 
 BOOLEAN InitNewGame( BOOLEAN fReset )
-{
-	INT32		iStartingCash;
-
+{	
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"InitNewGame");
 //	static fScreenCount = 0;
 
@@ -595,6 +593,9 @@ BOOLEAN InitNewGame( BOOLEAN fReset )
 		
 		LetLuaGameInit(0);
 	#if 0
+
+		INT32		iStartingCash;
+
 		if(!is_networked)
 		{
 		// Setup two new messages!
@@ -737,9 +738,9 @@ BOOLEAN InitNewGame( BOOLEAN fReset )
 	// Do not hide any person names
 	if ( gGameExternalOptions.fIndividualHiddenPersonNames == FALSE )
 	{
-		for (int i=0;i<501;i++)
+		for (int i=0;i<500;i++)
 		{
-			zPokaznazwe[i].Hidden = FALSE;
+			zHiddenNames[i].Hidden = FALSE;
 		}	
 	}
 	else
@@ -759,26 +760,28 @@ BOOLEAN InitNewGame( BOOLEAN fReset )
 			gCamoFace[i].gSnowCamoface = FALSE;
 		}
 		
-		for(int uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
+		if ( !gGameOptions.fNewTraitSystem ) // SANDRO - only with old traits, we get the camo instantly
 		{
-			if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED )
-				{
-					gCamoFace[uiLoop].gCamoface = TRUE;
-				}
-			else if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_URBAN || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_URBAN )
-				{
-					gCamoFace[uiLoop].gUrbanCamoface = TRUE;
-				}			
-			else if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_DESERT || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_DESERT )
-				{
-					gCamoFace[uiLoop].gDesertCamoface = TRUE;
-				}
-			else if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_SNOW || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_SNOW )
-				{
-					gCamoFace[uiLoop].gSnowCamoface = TRUE;
-				}						
+			for(int uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
+			{
+				if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_OT || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_OT )
+					{
+						gCamoFace[uiLoop].gCamoface = TRUE;
+					}
+//				else if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_URBAN || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_URBAN )
+//					{
+//						gCamoFace[uiLoop].gUrbanCamoface = TRUE;
+//					}			
+//				else if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_DESERT || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_DESERT )
+//					{
+//						gCamoFace[uiLoop].gDesertCamoface = TRUE;
+//					}
+//				else if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_SNOW || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_SNOW )
+//					{
+//						gCamoFace[uiLoop].gSnowCamoface = TRUE;
+//					}						
+			}
 		}
-		
 	}
 	
 #ifdef JA2UB	
@@ -904,7 +907,10 @@ void QuickSetupOfMercProfileItems( UINT32 uiCount, UINT8 ubProfileIndex )
 		gMercProfiles[ ubProfileIndex ].bInvStatus[ BIGPOCK1POS ] = 100;
 		gMercProfiles[ ubProfileIndex ].bInvNumber[ BIGPOCK1POS ] = 1;
 
-		gMercProfiles[ ubProfileIndex ].bSkillTrait = MARTIALARTS;
+		if (gGameOptions.fNewTraitSystem) // SANDRO - traits
+			gMercProfiles[ ubProfileIndex ].bSkillTrait = MARTIAL_ARTS_NT;
+		else
+			gMercProfiles[ ubProfileIndex ].bSkillTrait = MARTIALARTS_OT;
 
 		gMercProfiles[ ubProfileIndex ].inv[ SMALLPOCK3POS ] = KEY_2;
 		gMercProfiles[ ubProfileIndex ].bInvStatus[ SMALLPOCK3POS ] = 100;
@@ -1073,24 +1079,27 @@ void ReStartingGame()
 			gCamoFace[i].gSnowCamoface = FALSE;
 		}
 		
-		for(int uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
+		if ( !gGameOptions.fNewTraitSystem ) // SANDRO - only with old traits, we get the camo instantly
 		{
-			if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED )
-				{
-					gCamoFace[uiLoop].gCamoface = TRUE;
-				}
-			else if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_URBAN || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_URBAN )
-				{
-					gCamoFace[uiLoop].gUrbanCamoface = TRUE;
-				}			
-			else if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_DESERT || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_DESERT )
-				{
-					gCamoFace[uiLoop].gDesertCamoface = TRUE;
-				}
-			else if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_SNOW || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_SNOW )
-				{
-					gCamoFace[uiLoop].gSnowCamoface = TRUE;
-				}						
+			for(int uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
+			{
+				if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_OT || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_OT )
+					{
+						gCamoFace[uiLoop].gCamoface = TRUE;
+					}
+//				else if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_URBAN || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_URBAN )
+//					{
+//						gCamoFace[uiLoop].gUrbanCamoface = TRUE;
+//					}			
+//				else if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_DESERT || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_DESERT )
+//					{
+//						gCamoFace[uiLoop].gDesertCamoface = TRUE;
+//					}
+//				else if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_SNOW || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_SNOW )
+//					{
+//						gCamoFace[uiLoop].gSnowCamoface = TRUE;
+//					}						
+			}
 		}
 		
 	}
@@ -1098,9 +1107,9 @@ void ReStartingGame()
 	//Legion by Jazz
 	if ( gGameExternalOptions.fIndividualHiddenPersonNames == FALSE )
 	{
-		for (int i=0;i<501;i++)
+		for (int i=0;i<500;i++)
 		{
-			zPokaznazwe[i].Hidden = FALSE;
+			zHiddenNames[i].Hidden = FALSE;
 		}	
 	} 
 	else

@@ -1,8 +1,31 @@
+/* 
+ * bfVFS : vfs/Core/vfs_path.cpp
+ *  - Path class, stores and validates a file/directory path string, offers meaningful path operations
+ *  - path comparison functions (operator overloading)
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include <vfs/Core/vfs_path.h>
 #include <vfs/Core/vfs_debug.h>
-#include <vfs/Core/os_functions.h>
+#include <vfs/Core/vfs_os_functions.h>
 
-#include <vfs/Aspects/vfs_debugging.h>
 #include <vfs/Aspects/vfs_settings.h>
 
 #include <stack>
@@ -56,9 +79,9 @@ bool vfs::Path::expandEnv()
 			t_env v = pos.top();
 			vfs::String var_name = _path.substr(v.start+2, v.end-v.start-2);
 			vfs::String var_value;
-			if(!os::getEnv(var_name, var_value))
+			if(!vfs::OS::getEnv(var_name, var_value))
 			{
-				VFS_ON_ERROR(BuildString(L"Could not expand environment variable : ").add(var_name).get().c_str());
+				VFS_LOG_WARNING(_BS(L"Could not expand environment variable : ") << var_name << _BS::wget);
 				return false;
 			}
 			_path.replace(v.start,v.end-v.start+1,var_value.c_wcs());
@@ -391,7 +414,7 @@ static void pathSplitLast(vfs::String::str_t const& path,
 	}
 	if(&head == &path || &last == &path)
 	{
-		THROWEXCEPTION(L"cannot use output parameters that are equal to 'this'");
+		VFS_THROW(L"cannot use output parameters that are equal to 'this'");
 	}
 #if 1
 	// use results from "GetFirstLastSeparator(..)"
@@ -446,7 +469,7 @@ static void pathSplitFirst(vfs::String::str_t const& path,
 	}
 	if(&first == &path || &tail == &path)
 	{
-		THROWEXCEPTION(L"cannot use output parameters that are equal to 'this'");
+		VFS_THROW(L"cannot use output parameters that are equal to 'this'");
 	}
 
 #if 1
@@ -568,3 +591,9 @@ BuildString& BuildString::add<vfs::Path>(vfs::Path const& value)
 	return *this;
 }
 
+template<>
+BuildString& BuildString::operator<< <vfs::Path>(vfs::Path const& value)
+{
+	this->add(value.c_str());
+	return *this;
+}

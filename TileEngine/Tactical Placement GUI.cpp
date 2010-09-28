@@ -740,7 +740,6 @@ void RenderTacticalPlacementGUI()
 		}
 		else
 		{
-			// TODO.RW: Check for insertion
 			if (is_networked)
 			{
 				gMercPlacement[ gbCursorMercID ].ubStrategicInsertionCode = GetValidInsertionDirectionForMP(gMercPlacement[ gbCursorMercID ].ubStrategicInsertionCode);
@@ -988,8 +987,8 @@ void TacticalPlacementHandle()
 				case ENTER:
 					if( ButtonList[ iTPButtons[ DONE_BUTTON ] ]->uiFlags & BUTTON_ENABLED )
 					{
-						if(!is_client)KillTacticalPlacementGUI();
-						if(is_client)send_donegui(0);
+									if(!is_client)KillTacticalPlacementGUI();
+									if(is_client)send_donegui(0);
 					}
 					break;
 				case 'c':

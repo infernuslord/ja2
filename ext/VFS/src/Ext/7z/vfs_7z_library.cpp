@@ -1,3 +1,28 @@
+/* 
+ * bfVFS : vfs/Ext/7z/vfs_7z_library.cpp
+ *  - implements Library interface, creates library object from uncompressed 7-zip archive files
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#ifdef VFS_WITH_7ZIP
+
 #include <vfs/Ext/7z/vfs_7z_library.h>
 #include <vfs/Core/Location/vfs_lib_dir.h>
 #include <vfs/Core/File/vfs_lib_file.h>
@@ -7,10 +32,12 @@ namespace sz
 {
 extern "C"
 {
+#include <7z.h>
 #include <7zCrc.h>
-#include <Archive/7z/7zAlloc.h>
-#include <Archive/7z/7zExtract.h>
-#include <Archive/7z/7zIn.h>
+#include <7zAlloc.h>
+//#include <Archive/7z/7zAlloc.h>
+//#include <Archive/7z/7zExtract.h>
+//#include <Archive/7z/7zIn.h>
 }
 }
 
@@ -42,9 +69,9 @@ namespace szExt
 			*size = (::size_t)p->file.file->read((vfs::Byte*)buf,to_read);
 			res = SZ_OK;
 		}
-		catch(CBasicException &ex)
+		catch(std::exception &ex)
 		{
-			logException(ex);
+			VFS_LOG_ERROR(ex.what());
 			res = SZ_ERROR_READ;
 		}
 		return res;
@@ -77,9 +104,9 @@ namespace szExt
 			*pos = p->file.file->getReadPosition();
 			res = SZ_OK;
 		}
-		catch(CBasicException& ex)
+		catch(std::exception& ex)
 		{
-			logException(ex);
+			VFS_LOG_ERROR(ex.what());
 			res = SZ_ERROR_READ;
 		}
 		return res;
@@ -159,13 +186,16 @@ bool vfs::CUncompressed7zLibrary::init()
 		sz::SzArEx_Init(&db);
 		if( SZ_OK != (res = sz::SzArEx_Open(&db, &lookStream.s, &allocImp, &allocTempImp)) )
 		{
-			THROWEXCEPTION(BuildString().add(L"Could not open 7z archive [").add(m_libraryFile->getPath()).add(L"]").get());
+			VFS_THROW(_BS(L"Could not open 7z archive [") << m_libraryFile->getPath() << L"]" << _BS::wget);
 		}
 
 		vfs::TDirectory<ILibrary::tWriteType>* pLD = NULL;
 		vfs::Path oDir, oFile;
 		vfs::Path oDirPath;
 
+		const size_t FBUFFER_SIZE = 1024;
+		std::vector<vfs::UInt16> fname_buffer;
+		fname_buffer.resize(FBUFFER_SIZE);
 		for(vfs::UInt32 i = 0; i < db.db.NumFiles; i++)
 		{
 			sz::CSzFileItem *f = db.db.Files + i;
@@ -173,7 +203,14 @@ bool vfs::CUncompressed7zLibrary::init()
 			{
 				continue;
 			}
-			vfs::Path sPath(f->Name);
+			size_t fsize = SzArEx_GetFileNameUtf16(&db, i, NULL);
+			if(fsize >= fname_buffer.size())
+			{
+				fname_buffer.resize(fsize + 32);
+			}
+			fsize = SzArEx_GetFileNameUtf16(&db, i, &fname_buffer[0]);
+			fname_buffer[fsize] = 0;
+			vfs::Path sPath((wchar_t*)&fname_buffer[0]);
 			sPath.splitLast(oDir,oFile);
 			oDirPath = m_mountPoint;
 			if(!oDir.empty())
@@ -215,17 +252,18 @@ bool vfs::CUncompressed7zLibrary::init()
 			// create file
 			vfs::CLibFile *pFile = vfs::CLibFile::create(oFile,pLD,this,_allocator);
 			// add file to directory
-			THROWIFFALSE( pLD->addFile(pFile), L"" );
+			VFS_THROW_IFF( pLD->addFile(pFile), L"" );
 
 			// link file data struct to file object
 			m_fileData.insert(std::make_pair(pFile,SFileData(unpackSize, (vfs::size_t)startOffset)));
 		}
 		return true;
 	}
-	catch(CBasicException& ex)
+	catch(std::exception& ex)
 	{
-		logException(ex);
+		VFS_LOG_ERROR(ex.what());
 		return false;
 	}
 }
 
+#endif // VFS_WITH_7ZIP

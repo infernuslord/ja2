@@ -1967,7 +1967,7 @@ void CreateGlobalSummary()
 	vfs::COpenWriteFile wfile(L"DevInfo\\readme.txt",true,true);
 	std::string str = "This information is used in conjunction with the editor.\n";
 	str += "This directory or it's contents shouldn't be included with final release.\n";
-	TRYCATCH_RETHROW( wfile->write(str.c_str(), str.length()), L"" );
+	SGP_TRYCATCH_RETHROW( wfile->write(str.c_str(), str.length()), L"" );
 #endif
 
 	// Snap: Restore the data directory once we are finished.
@@ -2642,11 +2642,11 @@ void GenerateSummaryList()
 		vfs::COpenWriteFile wfile(L"DevInfo/readme.txt",true,true);
 		std::string str = "This information is used in conjunction with the editor.\n";
 		str += "This directory or it's contents shouldn't be included with final release.\n";
-		TRYCATCH_RETHROW( wfile->write(str.c_str(), str.length()), L"");
+		SGP_TRYCATCH_RETHROW( wfile->write(str.c_str(), str.length()), L"");
 	}
-	catch(CBasicException &ex)
+	catch(std::exception &ex)
 	{
-		RETHROWEXCEPTION(L"Could not create readme.txt",&ex);
+		SGP_RETHROW(L"Could not create readme.txt", ex);
 	}
 #endif
 }

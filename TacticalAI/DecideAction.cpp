@@ -36,6 +36,11 @@
 #include "connect.h"
 #include "Text.h"
 
+//////////////////////////////////////////////////////////////////////////////
+// SANDRO - In this file, all APBPConstants[AP_CROUCH] and APBPConstants[AP_PRONE] were changed to GetAPsCrouch() and GetAPsProne()
+//			On the bottom here, there are these functions made
+//////////////////////////////////////////////////////////////////////
+
 extern BOOLEAN gfHiddenInterrupt;
 extern BOOLEAN gfUseAlternateQueenPosition;
 
@@ -2311,7 +2316,7 @@ INT8 DecideActionRed(SOLDIERTYPE *pSoldier, UINT8 ubUnconsciousOK)
 			OBJECTTYPE * gun = &pSoldier->inv[BestShot.bWeaponIn];
 			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("decideactionred: men in sector %d, ubspotters called by %d, nobody %d",gTacticalStatus.Team[pSoldier->bTeam].bMenInSector,gTacticalStatus.ubSpottersCalledForBy,NOBODY ));
 			//if ( ( ( IsScoped(gun) && GunRange(gun) > pSoldier->GetMaxDistanceVisible(BestShot.sTarget, BestShot.bTargetLevel) ) || pSoldier->aiData.bOrders == SNIPER ) &&
-			if ( ( ( IsScoped(gun) && GunRange(gun) > MaxNormalDistanceVisible() ) || pSoldier->aiData.bOrders == SNIPER ) &&
+			if ( ( ( IsScoped(gun) && GunRange(gun, pSoldier) > MaxNormalDistanceVisible() ) || pSoldier->aiData.bOrders == SNIPER ) && // SANDRO - added argument
 				(gTacticalStatus.Team[pSoldier->bTeam].bMenInSector > 1) &&
 				(gTacticalStatus.ubSpottersCalledForBy == NOBODY))
 
@@ -2687,12 +2692,12 @@ INT8 DecideActionRed(SOLDIERTYPE *pSoldier, UINT8 ubUnconsciousOK)
 			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"decideactionred: stop flanking");
 			if (PythSpacesAway ( pSoldier->sGridNo, tempGridNo ) > MIN_FLANK_DIST_RED * 2 )
 			{
-				pSoldier->aiData.usActionData = InternalGoAsFarAsPossibleTowards(pSoldier,tempGridNo,APBPConstants[AP_PRONE],AI_ACTION_SEEK_OPPONENT,0);
+				pSoldier->aiData.usActionData = InternalGoAsFarAsPossibleTowards(pSoldier,tempGridNo,GetAPsProne( pSoldier, TRUE),AI_ACTION_SEEK_OPPONENT,0);
 
 				if ( LocationToLocationLineOfSightTest( pSoldier->aiData.usActionData, pSoldier->pathing.bLevel, tempGridNo, pSoldier->pathing.bLevel, TRUE) )
 				{
 					// reserve APs for a possible crouch plus a shot
-					pSoldier->aiData.usActionData = InternalGoAsFarAsPossibleTowards(pSoldier, tempGridNo, (INT8) (MinAPsToAttack( pSoldier, tempGridNo, ADDTURNCOST) + APBPConstants[AP_CROUCH]), AI_ACTION_SEEK_OPPONENT, FLAG_CAUTIOUS );
+					pSoldier->aiData.usActionData = InternalGoAsFarAsPossibleTowards(pSoldier, tempGridNo, (INT8) (MinAPsToAttack( pSoldier, tempGridNo, ADDTURNCOST) + GetAPsCrouch( pSoldier, TRUE)), AI_ACTION_SEEK_OPPONENT, FLAG_CAUTIOUS );
 					
 					if (!TileIsOutOfBounds(pSoldier->aiData.usActionData))
 					{
@@ -2815,7 +2820,7 @@ INT8 DecideActionRed(SOLDIERTYPE *pSoldier, UINT8 ubUnconsciousOK)
 						//////////////////////////////////////////////////////////////////////
 
 						// try to move towards him
-						pSoldier->aiData.usActionData = InternalGoAsFarAsPossibleTowards(pSoldier,sClosestDisturbance,APBPConstants[AP_CROUCH],AI_ACTION_SEEK_OPPONENT,0);
+						pSoldier->aiData.usActionData = InternalGoAsFarAsPossibleTowards(pSoldier,sClosestDisturbance,GetAPsCrouch( pSoldier, TRUE),AI_ACTION_SEEK_OPPONENT,0);
 						
 						if (!TileIsOutOfBounds(pSoldier->aiData.usActionData))
 						{
@@ -2917,12 +2922,12 @@ INT8 DecideActionRed(SOLDIERTYPE *pSoldier, UINT8 ubUnconsciousOK)
 								
 								if (TileIsOutOfBounds(pSoldier->aiData.usActionData) || pSoldier->numFlanks >= MAX_FLANKS_RED )
 								{
-									pSoldier->aiData.usActionData = InternalGoAsFarAsPossibleTowards(pSoldier,sClosestDisturbance,APBPConstants[AP_CROUCH], AI_ACTION_SEEK_OPPONENT,0);
+									pSoldier->aiData.usActionData = InternalGoAsFarAsPossibleTowards(pSoldier,sClosestDisturbance,GetAPsCrouch( pSoldier, TRUE), AI_ACTION_SEEK_OPPONENT,0);
 									//pSoldier->numFlanks = 0;
 									if ( PythSpacesAway( pSoldier->aiData.usActionData, sClosestDisturbance ) < 5 || LocationToLocationLineOfSightTest( pSoldier->aiData.usActionData, pSoldier->pathing.bLevel, sClosestDisturbance, pSoldier->pathing.bLevel, TRUE ) )
 									{
 										// reserve APs for a possible crouch plus a shot
-										pSoldier->aiData.usActionData = InternalGoAsFarAsPossibleTowards(pSoldier, sClosestDisturbance, (INT8) (MinAPsToAttack( pSoldier, sClosestDisturbance, ADDTURNCOST) + APBPConstants[AP_CROUCH]), AI_ACTION_SEEK_OPPONENT, FLAG_CAUTIOUS );
+										pSoldier->aiData.usActionData = InternalGoAsFarAsPossibleTowards(pSoldier, sClosestDisturbance, (INT8) (MinAPsToAttack( pSoldier, sClosestDisturbance, ADDTURNCOST) + GetAPsCrouch( pSoldier, TRUE)), AI_ACTION_SEEK_OPPONENT, FLAG_CAUTIOUS );
 										
 										if (!TileIsOutOfBounds(pSoldier->aiData.usActionData))
 										{
@@ -2960,7 +2965,7 @@ INT8 DecideActionRed(SOLDIERTYPE *pSoldier, UINT8 ubUnconsciousOK)
 								if ( PythSpacesAway( pSoldier->aiData.usActionData, sClosestDisturbance ) < 5 || LocationToLocationLineOfSightTest( pSoldier->aiData.usActionData, pSoldier->pathing.bLevel, sClosestDisturbance, pSoldier->pathing.bLevel, TRUE ) )
 								{
 									// reserve APs for a possible crouch plus a shot
-									pSoldier->aiData.usActionData = InternalGoAsFarAsPossibleTowards(pSoldier, sClosestDisturbance, (INT8) (MinAPsToAttack( pSoldier, sClosestDisturbance, ADDTURNCOST) + APBPConstants[AP_CROUCH]), AI_ACTION_SEEK_OPPONENT, FLAG_CAUTIOUS );
+									pSoldier->aiData.usActionData = InternalGoAsFarAsPossibleTowards(pSoldier, sClosestDisturbance, (INT8) (MinAPsToAttack( pSoldier, sClosestDisturbance, ADDTURNCOST) + GetAPsCrouch( pSoldier, TRUE)), AI_ACTION_SEEK_OPPONENT, FLAG_CAUTIOUS );
 									
 									if (!TileIsOutOfBounds(pSoldier->aiData.usActionData))
 									{
@@ -3058,7 +3063,7 @@ INT8 DecideActionRed(SOLDIERTYPE *pSoldier, UINT8 ubUnconsciousOK)
 						//////////////////////////////////////////////////////////////////////
 						// GO DIRECTLY TOWARDS CLOSEST FRIEND UNDER FIRE OR WHO LAST RADIOED
 						//////////////////////////////////////////////////////////////////////
-						pSoldier->aiData.usActionData = InternalGoAsFarAsPossibleTowards(pSoldier,sClosestFriend,APBPConstants[AP_CROUCH], AI_ACTION_SEEK_OPPONENT,0);
+						pSoldier->aiData.usActionData = InternalGoAsFarAsPossibleTowards(pSoldier,sClosestFriend,GetAPsCrouch( pSoldier, TRUE), AI_ACTION_SEEK_OPPONENT,0);
 						
 						if (!TileIsOutOfBounds(pSoldier->aiData.usActionData))
 						{
@@ -3148,7 +3153,7 @@ INT8 DecideActionRed(SOLDIERTYPE *pSoldier, UINT8 ubUnconsciousOK)
 							{
 								// either moving significantly closer or into very close range
 								// ensure will we have enough APs for a possible crouch plus a shot
-								if ( InternalGoAsFarAsPossibleTowards( pSoldier, pSoldier->aiData.usActionData, (INT8) (MinAPsToAttack( pSoldier, sClosestOpponent, ADDTURNCOST) + APBPConstants[AP_CROUCH]), AI_ACTION_TAKE_COVER, 0 ) == pSoldier->aiData.usActionData )
+								if ( InternalGoAsFarAsPossibleTowards( pSoldier, pSoldier->aiData.usActionData, (INT8) (MinAPsToAttack( pSoldier, sClosestOpponent, ADDTURNCOST) + GetAPsCrouch( pSoldier, TRUE)), AI_ACTION_TAKE_COVER, 0 ) == pSoldier->aiData.usActionData )
 								{
 									return(AI_ACTION_TAKE_COVER);
 								}
@@ -3425,7 +3430,7 @@ INT8 DecideActionRed(SOLDIERTYPE *pSoldier, UINT8 ubUnconsciousOK)
 		if ( pSoldier->bBleeding > MIN_BLEEDING_THRESHOLD )
 		{
 			// reduce bleeding by 1 point per AP (in RT, APs will get recalculated so it's okay)
-			pSoldier->bBleeding = __max( 0, pSoldier->bBleeding - pSoldier->bActionPoints );
+			pSoldier->bBleeding = __max( 0, pSoldier->bBleeding - (pSoldier->bActionPoints/2) );
 			return( AI_ACTION_NONE ); // will end-turn/wait depending on whether we're in TB or realtime
 		}
 #ifdef RECORDNET
@@ -4125,6 +4130,107 @@ INT16 ubMinAPCost;
 				RearrangePocket(pSoldier,HANDPOS,bWeaponIn,TEMPORARILY);
 			}
 		}
+		/////////////////////////////////////////////////////////////////////////////////////////////////////
+		// SANDRO - even if we don't have any blade, calculate how much damage we could do unarmed
+		else if ( !TANK( pSoldier) )
+		{
+			bWeaponIn = FindAIUsableObjClass( pSoldier, IC_PUNCH );
+			if (bWeaponIn == NO_SLOT) // if no punch-type weapon found, just calculate it with empty hands
+			{
+				bWeaponIn = FindEmptySlotWithin( pSoldier, HANDPOS, NUM_INV_SLOTS );
+			}
+			if (bWeaponIn != NO_SLOT)
+			{
+				DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"try to punch");
+				BestStab.bWeaponIn = bWeaponIn;
+				// if it's in his holster, swap it into his hand temporarily
+				if (bWeaponIn != HANDPOS)
+				{
+					DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"decideactionblack: about to rearrange pocket before punch check");
+					RearrangePocket(pSoldier,HANDPOS,bWeaponIn,TEMPORARILY);
+				}
+
+				// get the minimum cost to attack with punch
+				ubMinAPCost = MinAPsToAttack(pSoldier,pSoldier->sLastTarget,DONTADDTURNCOST);
+				// if we can afford the minimum AP cost to punch
+				if (pSoldier->bActionPoints >= ubMinAPCost)
+				{
+					// then look around for a worthy target (which sets BestStab.ubPossible)
+					CalcBestStab(pSoldier,&BestStab, FALSE);
+
+					if (BestStab.ubPossible)
+					{
+						// if we have not enough APs to deal at least two or three punches, 
+						// reduce the attack value as one punch ain't much
+						if( gGameOptions.fNewTraitSystem )
+						{
+							// if we are not specialized, reduce the attack attractiveness generaly
+							if ( !HAS_SKILL_TRAIT( pSoldier, MARTIAL_ARTS_NT ) )
+							{
+								BestStab.iAttackValue /= 4; 
+								// if too far and not having APs for at least 3 hits no way to attack
+								if (((CalcTotalAPsToAttack( pSoldier,BestStab.sTarget,ADDTURNCOST, 0 ) + (2 * (ApsToPunch( pSoldier )))) > pSoldier->bActionPoints) && !(PythSpacesAway(pSoldier->sGridNo, BestStab.sTarget) <= 1) ) 
+								{
+									BestStab.ubPossible = 0; 
+									BestStab.iAttackValue = 0; 
+								}
+							}
+							else
+							{
+								if (PythSpacesAway(pSoldier->sGridNo, BestStab.sTarget) <= 1)
+								{
+									BestStab.iAttackValue = (BestStab.iAttackValue * 2); 
+								}
+								// if too far and not having APs for at least 2 hits
+								else if (((CalcTotalAPsToAttack( pSoldier,BestStab.sTarget,ADDTURNCOST, 0 ) + ApsToPunch( pSoldier )) > pSoldier->bActionPoints) && !(PythSpacesAway(pSoldier->sGridNo, BestStab.sTarget) <= 1))
+								{
+									BestStab.iAttackValue /= 3; 
+								}
+							}
+						}
+						else 
+						{
+							if ( !HAS_SKILL_TRAIT( pSoldier, MARTIALARTS_OT ) && !HAS_SKILL_TRAIT( pSoldier, HANDTOHAND_OT ) )
+							{
+								// if we are not specialized, reduce the attack attractiveness generaly
+								BestStab.iAttackValue /= 4; 
+								// if too far and not having APs for at least 3 hits
+								if (((CalcTotalAPsToAttack( pSoldier,BestStab.sTarget,ADDTURNCOST, 0 ) + (2 * (ApsToPunch( pSoldier )))) > pSoldier->bActionPoints) && !(PythSpacesAway(pSoldier->sGridNo, BestStab.sTarget <= 1)) )
+								{
+									BestStab.ubPossible = 0; 
+									BestStab.iAttackValue = 0; 
+								}
+							}
+							else
+							{
+								BestStab.iAttackValue = ((BestStab.iAttackValue * 3)/2); 
+
+								if (PythSpacesAway(pSoldier->sGridNo, BestStab.sTarget) <= 1)
+								{
+									BestStab.iAttackValue = ((BestStab.iAttackValue * 3)/2); 
+								}
+								// if too far and not having APs for at least 2 hits
+								else if (((CalcTotalAPsToAttack( pSoldier,BestStab.sTarget,ADDTURNCOST, 0 ) + ApsToPunch( pSoldier )) > pSoldier->bActionPoints) && !(PythSpacesAway(pSoldier->sGridNo, BestStab.sTarget <= 1)) )
+								{
+									BestStab.iAttackValue /= 3;
+								}
+							}
+						}
+						// now we KNOW FOR SURE that we will do something (stab, at least)
+						NPCDoesAct(pSoldier);
+						DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"NPC decided to punch");
+					}
+
+				}	
+				// if it was in his holster, swap it back into his holster for now
+				if (bWeaponIn != HANDPOS)
+				{
+					DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"about to rearrange pocket after punch check");
+					RearrangePocket(pSoldier,HANDPOS,bWeaponIn,TEMPORARILY);
+				}		
+			}
+		}
+		/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//////////////////////////////////////////////////////////////////////////
 		// CHOOSE THE BEST TYPE OF ATTACK OUT OF THOSE FOUND TO BE POSSIBLE
@@ -4148,11 +4254,27 @@ INT16 ubMinAPCost;
 				ubBestAttackAction = AI_ACTION_THROW_KNIFE;
 				DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"best action = throw knife");
 			}
-			else
+			else if ( Item[ pSoldier->inv[BestStab.bWeaponIn].usItem ].usItemClass & IC_BLADE ) // SANDRO - check specifically for blade attack
 			{
 				ubBestAttackAction = AI_ACTION_KNIFE_MOVE;
 				DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"best action = move to stab");
 			}
+			////////////////////////////////////////////////////////////////////////////////////
+			// SANDRO - added a chance to try to steal merc's gun from hands
+			else
+			{
+				if (AIDetermineStealingWeaponAttempt( pSoldier, MercPtrs[BestStab.ubOpponent] ) == TRUE)
+				{
+					ubBestAttackAction = AI_ACTION_STEAL_MOVE;
+					DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"best action = move to steal weapon");
+				}
+				else
+				{
+					ubBestAttackAction = AI_ACTION_KNIFE_MOVE;
+					DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"best action = move to punch");
+				}
+			}
+			////////////////////////////////////////////////////////////////////////////////////
 		}
 		if (BestThrow.ubPossible && ((BestThrow.iAttackValue > BestAttack.iAttackValue) || (ubBestAttackAction == AI_ACTION_NONE)))
 		{
@@ -4223,6 +4345,10 @@ INT16 ubMinAPCost;
 			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"DecideActionBlack: best attack = stab with a knife");
 			memcpy(&BestAttack,&BestStab,sizeof(BestAttack));
 			break;
+		case AI_ACTION_STEAL_MOVE: // added by SANDRO
+			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"DecideActionBlack: best attack = try to steal weapon");
+			memcpy(&BestAttack,&BestStab,sizeof(BestAttack));
+			break;
 
 		default:
 			// set to empty
@@ -4233,12 +4359,14 @@ INT16 ubMinAPCost;
 	}
 
 	// NB a desire of 4 or more is only achievable by brave/aggressive guys with high morale
+	UINT16 usRange = GetModifiedGunRange(pSoldier->inv[ BestAttack.bWeaponIn ].usItem);
+
 	if ( (pSoldier->bActionPoints == pSoldier->bInitialActionPoints) &&
 		 (ubBestAttackAction == AI_ACTION_FIRE_GUN) && 
 		 (pSoldier->aiData.bShock == 0) && 
 		 (pSoldier->stats.bLife >= pSoldier->stats.bLifeMax / 2) && 
 		 (BestAttack.ubChanceToReallyHit < 30) && 
-		 (PythSpacesAway( pSoldier->sGridNo, BestAttack.sTarget ) > Weapon[ pSoldier->inv[ BestAttack.bWeaponIn ].usItem ].usRange / CELL_X_SIZE ) && 
+		 (PythSpacesAway( pSoldier->sGridNo, BestAttack.sTarget ) > usRange / CELL_X_SIZE ) && 
 		 (RangeChangeDesire( pSoldier ) >= 4) )
 	{
 		// okay, really got to wonder about this... could taking cover be an option?
@@ -4383,7 +4511,7 @@ INT16 ubMinAPCost;
 		if (ubBestAttackAction == AI_ACTION_FIRE_GUN)
 		{
 			// Do we need to change stance?  NB We'll have to ready our gun again
-			if ( !TANK( pSoldier ) && ( pSoldier->bActionPoints >= BestAttack.ubAPCost + APBPConstants[AP_CROUCH] + MinAPsToAttack( pSoldier, BestAttack.sTarget, ADDTURNCOST, 1 ) ) )
+			if ( !TANK( pSoldier ) && ( pSoldier->bActionPoints >= BestAttack.ubAPCost + GetAPsCrouch( pSoldier, TRUE) + MinAPsToAttack( pSoldier, BestAttack.sTarget, ADDTURNCOST, 1 ) ) )
 			{
 				// since the AI considers shooting chance from standing primarily, if we are not
 				// standing we should always consider a stance change
@@ -4669,6 +4797,32 @@ INT16 ubMinAPCost;
 			}
 
 		}
+		// SANDRO - chance to make aimed punch/stab for martial arts/melee 
+		else if (ubBestAttackAction == AI_ACTION_KNIFE_MOVE && gGameOptions.fNewTraitSystem)
+		{
+			pSoldier->aiData.bAimTime = 0;
+
+			if (Item[pSoldier->inv[BestAttack.bWeaponIn].usItem].usItemClass == IC_PUNCH)
+			{
+				if (HAS_SKILL_TRAIT( pSoldier, MARTIAL_ARTS_NT))
+				{
+					if( PreRandom( (gGameExternalOptions.fEnhancedCloseCombatSystem ? 2 : 0) + 2 * NUM_SKILL_TRAITS( pSoldier, MARTIAL_ARTS_NT) ) > 2 )
+					{
+						pSoldier->aiData.bAimTime = (gGameExternalOptions.fEnhancedCloseCombatSystem ? gSkillTraitValues.ubModifierForAPsAddedOnAimedPunches : 6);
+					}
+				}
+			}
+			else
+			{
+				if (HAS_SKILL_TRAIT( pSoldier, MELEE_NT))
+				{
+					if( PreRandom( gGameExternalOptions.fEnhancedCloseCombatSystem ? 3 : 1 ) > 0 )
+					{
+						pSoldier->aiData.bAimTime = (gGameExternalOptions.fEnhancedCloseCombatSystem ? gSkillTraitValues.ubModifierForAPsAddedOnAimedBladedAttackes : 6);
+					}
+				}
+			}
+		}
 
 		//////////////////////////////////////////////////////////////////////////
 		// OTHERWISE, JUST GO AHEAD & ATTACK!
@@ -4889,59 +5043,63 @@ INT16 ubMinAPCost;
 	// if not in water and not already crouched, try to crouch down first
 	if (!gfTurnBasedAI || GetAPsToChangeStance( pSoldier, ANIM_CROUCH ) <= pSoldier->bActionPoints)
 	{
-		if ( !fCivilian && !gfHiddenInterrupt && IsValidStance( pSoldier, ANIM_CROUCH ) )
+		if ( !fCivilian && !gfHiddenInterrupt && IsValidStance( pSoldier, ANIM_CROUCH ) && ubBestAttackAction != AI_ACTION_KNIFE_MOVE && ubBestAttackAction != AI_ACTION_KNIFE_STAB && ubBestAttackAction != AI_ACTION_STEAL_MOVE) // SANDRO - if knife attack don't crouch
 		{
-			pSoldier->aiData.usActionData = StanceChange( pSoldier, BestAttack.ubAPCost );
-			if (pSoldier->aiData.usActionData != 0)
+			// determine the location of the known closest opponent
+			// (don't care if he's conscious, don't care if he's reachable at all)
+
+			sClosestOpponent = ClosestSeenOpponent(pSoldier, NULL, NULL);
+			// SANDRO - don't crouch if in close combat distance (we got penalties that way)
+			if (PythSpacesAway(pSoldier->sGridNo, sClosestOpponent) > 1 )
 			{
-				if (pSoldier->aiData.usActionData == ANIM_PRONE)
+				pSoldier->aiData.usActionData = StanceChange( pSoldier, BestAttack.ubAPCost );
+				if (pSoldier->aiData.usActionData != 0)
 				{
-					// we might want to turn before lying down!
-					if ( (!gfTurnBasedAI || GetAPsToLook( pSoldier ) <= pSoldier->bActionPoints - GetAPsToChangeStance( pSoldier, (INT8) pSoldier->aiData.usActionData )) &&
-						(((pSoldier->aiData.bAIMorale > MORALE_HOPELESS) || ubCanMove) && !AimingGun(pSoldier)) )
+					if (pSoldier->aiData.usActionData == ANIM_PRONE)
 					{
-						// determine the location of the known closest opponent
-						// (don't care if he's conscious, don't care if he's reachable at all)
-
-						sClosestOpponent = ClosestSeenOpponent(pSoldier, NULL, NULL);
-						// if we have a closest seen opponent						
-						if (!TileIsOutOfBounds(sClosestOpponent))
+						// we might want to turn before lying down!
+						if ( (!gfTurnBasedAI || GetAPsToLook( pSoldier ) <= pSoldier->bActionPoints - GetAPsToChangeStance( pSoldier, (INT8) pSoldier->aiData.usActionData )) &&
+							(((pSoldier->aiData.bAIMorale > MORALE_HOPELESS) || ubCanMove) && !AimingGun(pSoldier)) )
 						{
-							bDirection = atan8(CenterX(pSoldier->sGridNo),CenterY(pSoldier->sGridNo),CenterX(sClosestOpponent),CenterY(sClosestOpponent));
-
-							// if we're not facing towards him
-							if (pSoldier->ubDirection != bDirection)
+							// if we have a closest seen opponent						
+							if (!TileIsOutOfBounds(sClosestOpponent))
 							{
-								if ( pSoldier->InternalIsValidStance( bDirection, (INT8) pSoldier->aiData.usActionData) )
+								bDirection = atan8(CenterX(pSoldier->sGridNo),CenterY(pSoldier->sGridNo),CenterX(sClosestOpponent),CenterY(sClosestOpponent));
+
+								// if we're not facing towards him
+								if (pSoldier->ubDirection != bDirection)
 								{
-									// change direction, THEN change stance!
-									pSoldier->aiData.bNextAction = AI_ACTION_CHANGE_STANCE;
-									pSoldier->aiData.usNextActionData = pSoldier->aiData.usActionData;
-									pSoldier->aiData.usActionData = bDirection;
+									if ( pSoldier->InternalIsValidStance( bDirection, (INT8) pSoldier->aiData.usActionData) )
+									{
+										// change direction, THEN change stance!
+										pSoldier->aiData.bNextAction = AI_ACTION_CHANGE_STANCE;
+										pSoldier->aiData.usNextActionData = pSoldier->aiData.usActionData;
+										pSoldier->aiData.usActionData = bDirection;
 #ifdef DEBUGDECISIONS
-									sprintf(tempstr,"%s - TURNS to face CLOSEST OPPONENT in direction %d",pSoldier->name,pSoldier->aiData.usActionData);
-									AIPopMessage(tempstr);
+										sprintf(tempstr,"%s - TURNS to face CLOSEST OPPONENT in direction %d",pSoldier->name,pSoldier->aiData.usActionData);
+										AIPopMessage(tempstr);
 #endif
-									return(AI_ACTION_CHANGE_FACING);
+										return(AI_ACTION_CHANGE_FACING);
+									}
+									else if ( (pSoldier->aiData.usActionData == ANIM_PRONE) && (pSoldier->InternalIsValidStance( bDirection, ANIM_CROUCH) ) )
+									{
+										// we shouldn't go prone, since we can't turn to shoot
+										pSoldier->aiData.usActionData = ANIM_CROUCH;
+										pSoldier->aiData.bNextAction = AI_ACTION_END_TURN;
+										return( AI_ACTION_CHANGE_STANCE );
+									}
 								}
-								else if ( (pSoldier->aiData.usActionData == ANIM_PRONE) && (pSoldier->InternalIsValidStance( bDirection, ANIM_CROUCH) ) )
-								{
-									// we shouldn't go prone, since we can't turn to shoot
-									pSoldier->aiData.usActionData = ANIM_CROUCH;
-									pSoldier->aiData.bNextAction = AI_ACTION_END_TURN;
-									return( AI_ACTION_CHANGE_STANCE );
-								}
+								// else we are facing in the right direction
+
 							}
-							// else we are facing in the right direction
-
+							// else we don't know any enemies
 						}
-						// else we don't know any enemies
-					}
 
-					// we don't want to turn
+						// we don't want to turn
+					}
+					pSoldier->aiData.bNextAction = AI_ACTION_END_TURN;
+					return( AI_ACTION_CHANGE_STANCE );
 				}
-				pSoldier->aiData.bNextAction = AI_ACTION_END_TURN;
-				return( AI_ACTION_CHANGE_STANCE );
 			}
 		}
 	}

@@ -134,7 +134,6 @@ void		SetLastTimePlayerWasInSector();
 
 extern void InitLoadedWorld( );
 extern void ReduceAmmoDroppedByNonPlayerSoldiers( SOLDIERTYPE *pSoldier, INT32 iInvSlot );
-extern void ReduceAttachmentsOnGunForNonPlayerChars(SOLDIERTYPE *pSoldier, OBJECTTYPE * pObj);
 
 extern void StripEnemyDetailedPlacementsIfSectorWasPlayerLiberated();
 
@@ -2698,6 +2697,16 @@ BOOLEAN SetSectorFlag( INT16 sMapX, INT16 sMapY, UINT8 bMapZ, UINT32 uiFlagToSet
 				// visited enough to count as an active day
 				UpdateLastDayOfPlayerActivity( (UINT16) GetWorldDay() );
 			}
+
+			for ( UINT8 i = gTacticalStatus.Team[ gbPlayerNum ].bFirstID; i <= gTacticalStatus.Team[ gbPlayerNum ].bLastID; i++ )
+			{
+				if( MercPtrs[ i ]->bActive && MercPtrs[ i ]->stats.bLife && !(MercPtrs[ i ]->flags.uiStatusFlags & SOLDIER_VEHICLE) && MercPtrs[ i ]->ubProfile != NO_PROFILE &&
+					MercPtrs[ i ]->sSectorX == sMapX && MercPtrs[ i ]->sSectorY == sMapY && MercPtrs[ i ]->bSectorZ == bMapZ && !MercPtrs[ i ]->flags.fBetweenSectors &&
+					MercPtrs[ i ]->bAssignment != IN_TRANSIT && MercPtrs[ i ]->bAssignment != ASSIGNMENT_DEAD )
+				{
+					gMercProfiles[ MercPtrs[ i ]->ubProfile ].records.usSectorsDiscovered++;
+				}
+			}
 		}
 	}
 
@@ -2830,9 +2839,6 @@ BOOLEAN AddDeadSoldierToUnLoadedSector( INT16 sMapX, INT16 sMapY, UINT8 bMapZ, S
 					{
 						pSoldier->inv[i][0]->data.objectStatus -= (gGameOptions.ubDifficultyLevel - 1) * Random(20);
 						pSoldier->inv[i][0]->data.objectStatus = max(pSoldier->inv[i][0]->data.objectStatus,1); // never below 1%
-					}
-					if(gGameExternalOptions.fNewAttachmentSystem){
-						ReduceAttachmentsOnGunForNonPlayerChars(pSoldier, &(pSoldier->inv[i]));
 					}
 					pWorldItems[ bCount ].object = pSoldier->inv[i];
 					bCount++;

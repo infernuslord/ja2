@@ -849,7 +849,7 @@ void MapInvenPoolSlots(MOUSE_REGION * pRegion, INT32 iReason )
 			//CHRISL: Make it possible to right click and pull up stack popup and/or item description boxes
 			WORLDITEM	* twItem = &(pInventoryPoolList[ ( iCurrentInventoryPoolPage * MAP_INVENTORY_POOL_SLOT_COUNT ) + iCounter ]);
 			bool	fValidPointer = false;
-			if ( !InSectorStackPopup( ) && !InItemStackPopup( ) && !InItemDescriptionBox( ) && !InKeyRingPopup( ) && twItem->object.exists() == true && (bSelectedInfoChar != -1 && gCharactersList[bSelectedInfoChar].fValid))
+			if ( !InSectorStackPopup( ) && !InItemStackPopup( ) /*&& !InItemDescriptionBox( ) */ && !InKeyRingPopup( ) && twItem->object.exists() == true && (bSelectedInfoChar != -1 && gCharactersList[bSelectedInfoChar].fValid))
 			{
 				if(OK_CONTROL_MERC( MercPtrs[gCharactersList[bSelectedInfoChar].usSolID] ))
 				{
@@ -863,7 +863,7 @@ void MapInvenPoolSlots(MOUSE_REGION * pRegion, INT32 iReason )
 					{
 						if(gpItemPointer->usItem == twItem->object.usItem)
 							fValidPointer = true;
-						if(NASValidAttachment(gpItemPointer->usItem, twItem->object.usItem) == TRUE)
+						if(ValidAttachment(gpItemPointer->usItem, &(twItem->object)) == TRUE)
 							fValidPointer = true;
 						if(ValidAmmoType(twItem->object.usItem, gpItemPointer->usItem) == TRUE)
 							fValidPointer = true;
@@ -871,6 +871,12 @@ void MapInvenPoolSlots(MOUSE_REGION * pRegion, INT32 iReason )
 					if(twItem->object.ubNumberOfObjects == 1 && fValidPointer)
 					{
 						fShowInventoryFlag = TRUE;
+
+						if (InItemDescriptionBox( ))
+						{
+							DeleteItemDescriptionBox();
+						}
+
 						MAPInternalInitItemDescriptionBox( &twItem->object, 0, MercPtrs[gCharactersList[bSelectedInfoChar].usSolID] );
 					}
 					else if(fValidPointer)

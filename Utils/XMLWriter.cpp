@@ -1,4 +1,5 @@
 #include "XMLWriter.h"
+#include "sgp_logger.h"
 
 #include <vfs/Core/vfs_file_raii.h>
 #include <vfs/Core/File/vfs_file.h>
@@ -57,9 +58,9 @@ bool XMLWriter::writeToFile(vfs::Path const& sFileName)
 		vfs::COpenWriteFile file(sFileName,true,true);
 		return writeToFile( &file.file() );
 	}
-	catch(CBasicException& ex)
+	catch(vfs::Exception& ex)
 	{
-		logException(ex);
+		SGP_ERROR(ex.what());
 		vfs::CFile file(sFileName);
 		if(file.openWrite(true,true))
 		{
@@ -78,9 +79,9 @@ bool XMLWriter::writeToFile(vfs::tWritableFile* pFile)
 		pFile->write(str.c_str(), str.length() * sizeof(std::string::value_type));
 		return true;
 	}
-	catch(CBasicException& ex)
+	catch(vfs::Exception& ex)
 	{
-		logException(ex);
+		SGP_ERROR(ex.what());
 		return false;
 	}
 }

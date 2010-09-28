@@ -1380,31 +1380,30 @@ void GetPolledKeyboardInput( UINT32 *puiNewEvent )
 
 	}
 
-	if( _KeyDown( DEL ) )
+	if( _KeyDown( DEL ) && !fDeleteDown)
 	{
-		DisplayCover(TRUE);
+		SwitchToEnemyView();
 
 		fDeleteDown = TRUE;
 	}
 
 	if( !_KeyDown( DEL ) && fDeleteDown )
 	{
-		//EMPTY
+		SwitchViewOff();
 
 		fDeleteDown = FALSE;
 	}
 
-	if( _KeyDown( END ) )
+	if( _KeyDown( END ) && !fEndDown)
 	{
-		//EMPTY
+		SwitchToMercView();
 
 		fEndDown = TRUE;
 	}
 
 	if( !_KeyDown( END ) && fEndDown )
 	{
-		//EMPTY
-		SwitchCoverDrawMode();
+		SwitchViewOff();
 
 		fEndDown = FALSE;
 	}
@@ -2372,7 +2371,7 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 					if (!is_networked)
 					{
 						// ctrl-x: enter turn based while sneaking - check if RT sneak is on, iw we're not already in combat and if we actually see any enemies
-						if (gGameExternalOptions.fAllowRealTimeSneak)
+						if (gGameSettings.fOptions[TOPTION_ALLOW_REAL_TIME_SNEAK]) // changed by SANDRO
 						{
 							BOOLEAN fSneakingInRealTime = true;
 
@@ -2402,9 +2401,10 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 				{
 					if (!is_networked)
 					{
-						if (gGameExternalOptions.fAllowRealTimeSneak)
+						// SANDRO - changed the real time sneak switch to be in the preferences
+						if (gGameSettings.fOptions[TOPTION_ALLOW_REAL_TIME_SNEAK])
 						{
-							gGameExternalOptions.fAllowRealTimeSneak = false;
+							gGameSettings.fOptions[TOPTION_ALLOW_REAL_TIME_SNEAK] = false;
 							ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, New113Message[MSG113_RTM_SNEAKING_OFF]);
 							
 							if( !WeSeeNoOne() )	// if we're sneaking up on someone, enter turn-based
@@ -2412,7 +2412,7 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 						}
 						else
 						{
-							gGameExternalOptions.fAllowRealTimeSneak = true;
+							gGameSettings.fOptions[TOPTION_ALLOW_REAL_TIME_SNEAK] = true;
 							ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, New113Message[MSG113_RTM_SNEAKING_ON]);
 						}
 					}
@@ -2585,22 +2585,21 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 			case 'j':
 				if ( fShift )
 				{
-				BOOLEAN						fNearLowerLevelOkno;
-				BOOLEAN						fNearHeigherLevelOkno;
 				INT8	bDirection;
 
 				if (gGameExternalOptions.fCanJumpThroughWindows == TRUE )
 				{
-					SOLDIERTYPE *lSoldier;
-					if ( GetSoldier( &lSoldier, gusSelectedSoldier ) )
+				       	SOLDIERTYPE *lSoldier;
+
+                                	if ( GetSoldier( &lSoldier, gusSelectedSoldier ) )
 					{
-						GetMercOknoDirection( lSoldier->ubID, &fNearLowerLevelOkno, &fNearHeigherLevelOkno ); //Legion by JAzz
-							if ( FindOknoDirection( lSoldier, lSoldier->sGridNo, lSoldier->ubDirection, &bDirection )  && lSoldier->pathing.bLevel == 0)
-								{
-									lSoldier->BeginSoldierOkno(  );
-									
-								}
-					}		
+				 	 if ( FindWindowJumpDirection( lSoldier, lSoldier->sGridNo, lSoldier->ubDirection, &bDirection ) )
+					 {
+							lSoldier->BeginSoldierClimbWindow(	);
+	   	                         }
+					
+					}
+
 				}
 			 }
 				else if( fAlt )
@@ -2764,6 +2763,9 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 				}
 				break;
 
+			case 'C':
+				ToggleEnemyView();
+				break;
 			case 'd':
 				if( gTacticalStatus.uiFlags & TURNBASED && gTacticalStatus.uiFlags & INCOMBAT )
 				{
@@ -2940,16 +2942,27 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 				break;
 
 			case 'D':
-				if ( gGameSettings.fOptions[TOPTION_DROP_ALL] )
+				// SANDRO - changed from drop all to enable soldier tooltips
+				if ( gGameSettings.fOptions[ TOPTION_ALLOW_SOLDIER_TOOLTIPS ] )
 				{
-					gGameSettings.fOptions[TOPTION_DROP_ALL] = FALSE;
-					ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, pMessageStrings[ MSG_DROP_ALL_OFF ] );
+					gGameSettings.fOptions[ TOPTION_ALLOW_SOLDIER_TOOLTIPS ] = FALSE;
+					ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, pMessageStrings[ MSG_SOLDIER_TOOLTIPS_OFF ] );
 				}
 				else
 				{
-					gGameSettings.fOptions[TOPTION_DROP_ALL] = TRUE;
-					ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, pMessageStrings[ MSG_DROP_ALL_ON ] );
+					gGameSettings.fOptions[ TOPTION_ALLOW_SOLDIER_TOOLTIPS ] = TRUE;
+					ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, pMessageStrings[ MSG_SOLDIER_TOOLTIPS_ON ] );
 				}
+			//	if ( gGameSettings.fOptions[TOPTION_DROP_ALL] )
+			//	{
+			//		gGameSettings.fOptions[TOPTION_DROP_ALL] = FALSE;
+			//		ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, pMessageStrings[ MSG_DROP_ALL_OFF ] );
+			//	}
+			//	else
+			//	{
+			//		gGameSettings.fOptions[TOPTION_DROP_ALL] = TRUE;
+			//		ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, pMessageStrings[ MSG_DROP_ALL_ON ] );
+			//	}
 				break;
 			case 'q':
 				if ( gGameSettings.fOptions[TOPTION_GL_HIGH_ANGLE] )
@@ -3901,6 +3914,8 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 								// Get life back
 								pSoldier->stats.bLife									= pSoldier->stats.bLifeMax;
 								pSoldier->bBleeding							= 0;
+								// SANDRO - erase insta-healable injury 
+								pSoldier->iHealableInjury = 0; 
 
 								fInterfacePanelDirty = DIRTYLEVEL2;
 							}
@@ -3934,6 +3949,10 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 				else
 					DisplayGameSettings( );
 
+				break;
+
+			case 'V':
+				ToggleMercView();
 				break;
 
 			case 'w':
@@ -5128,7 +5147,7 @@ void HandleHandCursorClick( INT32 usMapPos, UINT32 *puiNewEvent )
 				}
 
 				// Steal!
-				sAPCost = GetAPsToStealItem( pSoldier, sActionGridNo );
+				sAPCost = GetAPsToStealItem( pSoldier, MercPtrs[ gusUIFullTargetID ], sActionGridNo ); // SANDRO - added target variable
 
 				if ( EnoughPoints( pSoldier, sAPCost, 0, TRUE ) )
 				{
@@ -5728,35 +5747,40 @@ void PopupMilitiaControlMenu( SOLDIERTYPE *pSoldier )
 
 INT32 PickPocket(MERCPROFILESTRUCT *pProfile, UINT8 ppStart, UINT8 ppStop, UINT16 usItem, UINT8 iNumber, UINT8 * cap);
 
-bool BadGoggles(SOLDIERTYPE *pTeamSoldier) {
+bool BadGoggles(SOLDIERTYPE *pTeamSoldier)
+{
     // WDS - Smart goggle switching
 	// NOTE: Investigate using GetItemVisionRangeBonus from Items.cpp???
-	if (!gGameExternalOptions.smartGoggleSwitch) {
+	if (!gGameExternalOptions.smartGoggleSwitch)
 		return false;
-	} else {
+	else
+	{
 		// Look through the head slots and find any sort of goggle.  Check if it is bad for this time of day.
-		for (int headSlot = HEAD1POS; headSlot <= HEAD2POS; ++headSlot) {
-			if ( (Item[pTeamSoldier->inv[headSlot].usItem].brightlightvisionrangebonus > 0) && !DayTime() ) {
-				return true;
-			} else if ( (Item[pTeamSoldier->inv[headSlot].usItem].nightvisionrangebonus > 0) && DayTime() ) {
-				return true;
+		// silversurfer: also check if we are underground, sun goggles and night vision bonus are useless underground
+		for (int headSlot = HEAD1POS; headSlot <= HEAD2POS; ++headSlot)
+		{
+			// check if we are below ground
+			if ( pTeamSoldier->bSectorZ > 0 )
+			{
+				// we don't want a cave vision penalty
+				if ( Item[pTeamSoldier->inv[headSlot].usItem].cavevisionrangebonus < 0 )
+					return true;
 			}
-		}
-
-		// Find the best goggles for the current time of day anywhere in inventory
-		OBJECTTYPE * pGoggles = 0;
-		if (DayTime()) {
-			pGoggles = FindSunGogglesInInv( pTeamSoldier, TRUE );
-		} else {
-			pGoggles = FindNightGogglesInInv( pTeamSoldier, TRUE );
-		}
-
-		if (pGoggles) {
-			// Check that the player is actually wearing them
-			for (int headSlot = HEAD1POS; headSlot <= HEAD2POS; ++headSlot) {
-				if (!(pTeamSoldier->inv[headSlot] == *pGoggles)) {
-//					return true;
+			
+			// if we are above ground
+			else
+			{
+				// at night we don't want a night vision penalty
+				if ( NightTime() )
+				{
+					if ( Item[pTeamSoldier->inv[headSlot].usItem].nightvisionrangebonus < 0 )
+						return true;
 				}
+				// at daytime we don't want a day vision penalty
+				// also if we have a bright light penalty make sure that is doesn't exceed the day vision bonus
+				else if ( Item[pTeamSoldier->inv[headSlot].usItem].dayvisionrangebonus < 0 || 
+					( Item[pTeamSoldier->inv[headSlot].usItem].dayvisionrangebonus + Item[pTeamSoldier->inv[headSlot].usItem].brightlightvisionrangebonus ) < 0 )
+					return true;
 			}
 		}
 	}
@@ -5774,12 +5798,22 @@ void SwapGoggles(SOLDIERTYPE *pTeamSoldier)
 
 		for (int headSlot = HEAD1POS; headSlot <= HEAD2POS; ++headSlot) 
 		{
-			if ( (Item[pTeamSoldier->inv[headSlot].usItem].brightlightvisionrangebonus > 0) ) 
+			if ( (Item[pTeamSoldier->inv[headSlot].usItem].brightlightvisionrangebonus != 0) ) 
 			{
 				slotToUse = headSlot;
 				break;
 			} 
-			else if ( (Item[pTeamSoldier->inv[headSlot].usItem].nightvisionrangebonus > 0) ) 
+			if ( (Item[pTeamSoldier->inv[headSlot].usItem].dayvisionrangebonus != 0) ) 
+			{
+				slotToUse = headSlot;
+				break;
+			} 
+			else if ( (Item[pTeamSoldier->inv[headSlot].usItem].nightvisionrangebonus != 0) ) 
+			{
+				slotToUse = headSlot;
+				break;
+			} 
+			else if ( (Item[pTeamSoldier->inv[headSlot].usItem].cavevisionrangebonus != 0) ) 
 			{
 				slotToUse = headSlot;
 				break;
@@ -5797,8 +5831,9 @@ void SwapGoggles(SOLDIERTYPE *pTeamSoldier)
 		}
 
 		// Find the best goggles for the current time of day anywhere in inventory
+		// silversurfer: also check if underground
 		OBJECTTYPE * pGoggles = 0;
-		if (DayTime()) 
+		if (DayTime() && pTeamSoldier->bSectorZ == 0) 
 		{
 			pGoggles = FindSunGogglesInInv( pTeamSoldier, TRUE );
 		} 
@@ -5824,8 +5859,8 @@ void SwapGoggles(SOLDIERTYPE *pTeamSoldier)
 			// No goggles to equip, should the current ones be unequiped?
 			if (pTeamSoldier->inv[slotToUse].exists()) 
 			{
-				if ((DayTime() && (Item[pTeamSoldier->inv[slotToUse].usItem].nightvisionrangebonus > 0)) ||
-				    (!DayTime() && (Item[pTeamSoldier->inv[slotToUse].usItem].brightlightvisionrangebonus > 0))) 
+				if ((DayTime() && Item[pTeamSoldier->inv[slotToUse].usItem].nightvisionrangebonus > 0 && pTeamSoldier->bSectorZ == 0) ||
+				    ((!DayTime() || pTeamSoldier->bSectorZ > 0) && (Item[pTeamSoldier->inv[slotToUse].usItem].brightlightvisionrangebonus > 0))) 
 				{
 					// It's day and we're wearing night goggles (or vice-versa), find a place to stash them
 					if (pTeamSoldier->inv[ HELMETPOS ].exists()) 

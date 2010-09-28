@@ -356,6 +356,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\lua_class_interface.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lua_function.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lua_state.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lua_table.h"
+				>
+			</File>
+			<File
 				RelativePath="luaconf.h"
 				>
 			</File>
@@ -376,11 +392,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\lua_class_interface.cpp"
+				>
+			</File>
+			<File
 				RelativePath="lua_env.cpp"
 				>
 			</File>
 			<File
+				RelativePath=".\lua_function.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lua_state.cpp"
+				>
+			</File>
+			<File
 				RelativePath="lua_strategic.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lua_table.cpp"
 				>
 			</File>
 			<File

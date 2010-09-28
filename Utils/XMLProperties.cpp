@@ -8,6 +8,7 @@
 
 #include "XML_Parser.h"
 #include "XMLWriter.h"
+#include "Debug.h"
 
 vfs::PropertyContainer::TagMap::TagMap()
 {
@@ -199,7 +200,7 @@ bool vfs::PropertyContainer::initFromXMLFile(vfs::Path const& sFileName, vfs::Pr
 
 	std::vector<vfs::Byte> buffer(size+1);
 
-	TRYCATCH_RETHROW( file->read(&buffer[0],size), L"" );
+	SGP_TRYCATCH_RETHROW( file->read(&buffer[0],size), L"" );
 	buffer[size] = 0;
 
 	file->close();
@@ -217,7 +218,7 @@ bool vfs::PropertyContainer::initFromXMLFile(vfs::Path const& sFileName, vfs::Pr
 			<< vfs::String::as_utf16(XML_ErrorString(XML_GetErrorCode(parser))) 
 			<< L" at line "
 			<< XML_GetCurrentLineNumber(parser);
-		THROWEXCEPTION(wss.str().c_str());
+		SGP_THROW(wss.str().c_str());
 		//return false;
 	}
 

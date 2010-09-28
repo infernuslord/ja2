@@ -18,6 +18,7 @@
 #include "Fileman.h"
 #include "Input.h"
 #include "GameSettings.h"
+#include "sgp_logger.h"
 #endif
 
 #include "resource.h"
@@ -2017,7 +2018,7 @@ void RefreshScreen(void *DummyVariable)
 		{
 			vfs::COpenWriteFile wfile(FileName,true,true);
 			char head[] = {0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, LOBYTE(SCREEN_WIDTH), HIBYTE(SCREEN_WIDTH), LOBYTE(SCREEN_HEIGHT), HIBYTE(SCREEN_HEIGHT), 0x10, 0};
-			TRYCATCH_RETHROW(wfile->write(head,18), L"");
+			SGP_TRYCATCH_RETHROW(wfile->write(head,18), L"");
 #endif
 
 			//
@@ -2058,7 +2059,7 @@ void RefreshScreen(void *DummyVariable)
 #ifndef USE_VFS
 					fwrite( p16BPPData, SCREEN_WIDTH * 2, 1, OutputFile);
 #else
-					TRYCATCH_RETHROW(wfile->write((vfs::Byte*)p16BPPData, SCREEN_WIDTH * 2), L"");
+					SGP_TRYCATCH_RETHROW(wfile->write((vfs::Byte*)p16BPPData, SCREEN_WIDTH * 2), L"");
 #endif
 				}
 				else
@@ -2066,7 +2067,7 @@ void RefreshScreen(void *DummyVariable)
 #ifndef USE_VFS
 					fwrite((void *)(((UINT8 *)SurfaceDescription.lpSurface) + (iIndex * SCREEN_WIDTH * 2)), SCREEN_WIDTH * 2, 1, OutputFile);
 #else
-					TRYCATCH_RETHROW(wfile->write((vfs::Byte*)(((UINT8 *)SurfaceDescription.lpSurface) + (iIndex * SCREEN_WIDTH * 2)), SCREEN_WIDTH * 2), L"");
+					SGP_TRYCATCH_RETHROW(wfile->write((vfs::Byte*)(((UINT8 *)SurfaceDescription.lpSurface) + (iIndex * SCREEN_WIDTH * 2)), SCREEN_WIDTH * 2), L"");
 #endif
 				}
 			}
@@ -2093,9 +2094,9 @@ void RefreshScreen(void *DummyVariable)
 		}
 
 #ifdef USE_VFS
-		catch(CBasicException& ex)
+		catch(std::exception& ex)
 		{
-			RETHROWEXCEPTION(L"",&ex);
+			SGP_RETHROW(L"", ex);
 		}
 #endif
 
@@ -3411,7 +3412,7 @@ void RefreshMovieCache( )
 #ifndef USE_VFS
 		fwrite(&Header, sizeof(TARGA_HEADER), 1, disk);
 #else
-		TRYCATCH_RETHROW(wfile->write((vfs::Byte*)&Header, sizeof(TARGA_HEADER)), L"");
+		SGP_TRYCATCH_RETHROW(wfile->write((vfs::Byte*)&Header, sizeof(TARGA_HEADER)), L"");
 #endif
 		pDest = gpFrameData[ cnt ];
 
@@ -3422,7 +3423,7 @@ void RefreshMovieCache( )
 #ifndef USE_VFS
 				fwrite( ( pDest + ( iCountY * SCREEN_WIDTH ) + iCountX ), sizeof(UINT16), 1, disk);
 #else
-				TRYCATCH_RETHROW(wfile->write( (vfs::Byte*)( pDest + ( iCountY * SCREEN_WIDTH ) + iCountX ), sizeof(UINT16)), L"");
+				SGP_TRYCATCH_RETHROW(wfile->write( (vfs::Byte*)( pDest + ( iCountY * SCREEN_WIDTH ) + iCountX ), sizeof(UINT16)), L"");
 #endif
 			}
 
@@ -3442,9 +3443,9 @@ void RefreshMovieCache( )
 	//SetFileManCurrentDirectory( ExecDir );
 #else
 	}
-	catch(CBasicException& ex)
+	catch(std::exception& ex)
 	{
-		logException(ex);
+		SGP_ERROR(ex.what());
 	}
 #endif
 }

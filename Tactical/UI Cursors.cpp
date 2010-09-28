@@ -29,6 +29,7 @@
 	#include "GameSettings.h"
 	#include "Interactive Tiles.h"
 	#include "PATHAI.H"
+	#include "SkillCheck.h" // added by SANDRO
 #endif
 
 //forward declarations of common classes to eliminate includes
@@ -706,7 +707,15 @@ UINT8 HandleActivatedTargetCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos, BOOLEA
 				pSoldier->bTargetLevel = (INT8) gsInterfaceLevel;
 
 				UINT32 uiHitChance;
-				uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, (INT8)(pSoldier->aiData.bShownAimTime ), pSoldier->bAimShotLocation );
+				// SANDRO - precise calculation for throwing knives added
+				if ( Item[ usInHand ].usItemClass == IC_THROWING_KNIFE )
+				{
+					uiHitChance = CalcThrownChanceToHit( pSoldier, usMapPos, (INT8)(pSoldier->aiData.bShownAimTime ), pSoldier->bAimShotLocation );
+				}
+				else
+				{
+					uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, (INT8)(pSoldier->aiData.bShownAimTime ), pSoldier->bAimShotLocation );
+				}
 				// HEADROCK HAM B2.7: CTH approximation?
 				if (gGameExternalOptions.fApproximateCTH)
 				{	
@@ -1512,7 +1521,8 @@ UINT8 HandleKnifeCursor( SOLDIERTYPE *pSoldier, INT32 sGridNo, BOOLEAN fActivate
 				}
 			}
 
-			bFutureAim = (INT8)( REFINE_KNIFE_2 );
+			// SANDRO - changed this
+			bFutureAim = (INT8)( gGameExternalOptions.fEnhancedCloseCombatSystem ? gSkillTraitValues.ubModifierForAPsAddedOnAimedBladedAttackes : REFINE_KNIFE_2 );
 
 			sAPCosts = CalcTotalAPsToAttack( pSoldier, sGridNo, TRUE, (INT8)(bFutureAim / 2) );
 
@@ -1545,46 +1555,45 @@ UINT8 HandleKnifeCursor( SOLDIERTYPE *pSoldier, INT32 sGridNo, BOOLEAN fActivate
 		}
 
 
-		switch( pSoldier->aiData.bShownAimTime )
+		//////////////////////////////////////////////////////////////
+		// SANDRO - slightly changed the formula here
+		if( pSoldier->aiData.bShownAimTime == REFINE_KNIFE_1 )
 		{
-			case REFINE_KNIFE_1:
-
-				if ( gfDisplayFullCountRing )
-				{
-					return( KNIFE_YELLOW_AIM1_UICURSOR );
-				}
-				else if ( fEnoughPoints )
-				{
-					return( KNIFE_HIT_AIM1_UICURSOR );
-				}
-				else
-				{
-					return( KNIFE_NOGO_AIM1_UICURSOR );
-				}
-				break;
-
-			case REFINE_KNIFE_2:
-
-				if ( gfDisplayFullCountRing )
-				{
-					return( KNIFE_YELLOW_AIM2_UICURSOR );
-				}
-				else if ( fEnoughPoints )
-				{
-					return( KNIFE_HIT_AIM2_UICURSOR );
-				}
-				else
-				{
-					return( KNIFE_NOGO_AIM2_UICURSOR );
-				}
-				break;
-
-			default:
-				Assert( FALSE );
-				// no return value!
-				return(0);
-				break;
+			if ( gfDisplayFullCountRing )
+			{
+				return( KNIFE_YELLOW_AIM1_UICURSOR );
+			}
+			else if ( fEnoughPoints )
+			{
+				return( KNIFE_HIT_AIM1_UICURSOR );
+			}
+			else
+			{
+				return( KNIFE_NOGO_AIM1_UICURSOR );
+			}
 		}
+		else if( pSoldier->aiData.bShownAimTime == ( gGameExternalOptions.fEnhancedCloseCombatSystem ? gSkillTraitValues.ubModifierForAPsAddedOnAimedBladedAttackes : REFINE_KNIFE_2 ) )
+		{
+			if ( gfDisplayFullCountRing )
+			{
+				return( KNIFE_YELLOW_AIM2_UICURSOR );
+			}
+			else if ( fEnoughPoints )
+			{
+				return( KNIFE_HIT_AIM2_UICURSOR );
+			}
+			else
+			{
+				return( KNIFE_NOGO_AIM2_UICURSOR );
+			}
+		}
+		else
+		{
+			Assert( FALSE );
+			// no return value!
+			return(0);
+		}
+		//////////////////////////////////////////////////////////////
 	}
 	else
 	{
@@ -1666,52 +1675,52 @@ UINT8 HandlePunchCursor( SOLDIERTYPE *pSoldier, INT32 sGridNo, BOOLEAN fActivate
 						PlayJA2Sample( TARG_REFINE_BEEP, RATE_11025, MIDVOLUME, 1, MIDDLEPAN );
 					}
 
-					pSoldier->aiData.bShownAimTime = REFINE_PUNCH_2;
+					// SANDRO - make aimed punch less expensive for APS
+					pSoldier->aiData.bShownAimTime = (gGameExternalOptions.fEnhancedCloseCombatSystem ? gSkillTraitValues.ubModifierForAPsAddedOnAimedPunches : REFINE_PUNCH_2);
 
 				}
 			}
 		}
 
-		switch( pSoldier->aiData.bShownAimTime )
+		//////////////////////////////////////////////////////////////
+		// SANDRO - slightly changed the formula here
+		if( pSoldier->aiData.bShownAimTime == REFINE_PUNCH_1)
 		{
-			case REFINE_PUNCH_1:
-
-				if ( gfDisplayFullCountRing )
-				{
-					return( ACTION_PUNCH_YELLOW_AIM1_UICURSOR );
-				}
-				else if ( fEnoughPoints )
-				{
-					return( ACTION_PUNCH_RED_AIM1_UICURSOR );
-				}
-				else
-				{
-					return( ACTION_PUNCH_NOGO_AIM1_UICURSOR );
-				}
-				break;
-
-			case REFINE_PUNCH_2:
-
-				if ( gfDisplayFullCountRing )
-				{
-					return( ACTION_PUNCH_YELLOW_AIM2_UICURSOR );
-				}
-				else if ( fEnoughPoints )
-				{
-					return( ACTION_PUNCH_RED_AIM2_UICURSOR );
-				}
-				else
-				{
-					return( ACTION_PUNCH_NOGO_AIM2_UICURSOR );
-				}
-				break;
-
-			default:
-				Assert( FALSE );
-				// no return value!
-				return(0);
-				break;
+			if ( gfDisplayFullCountRing )
+			{
+				return( ACTION_PUNCH_YELLOW_AIM1_UICURSOR );
+			}
+			else if ( fEnoughPoints )
+			{
+				return( ACTION_PUNCH_RED_AIM1_UICURSOR );
+			}
+			else
+			{
+				return( ACTION_PUNCH_NOGO_AIM1_UICURSOR );
+			}
 		}
+		else if ( pSoldier->aiData.bShownAimTime == (gGameExternalOptions.fEnhancedCloseCombatSystem ? gSkillTraitValues.ubModifierForAPsAddedOnAimedPunches : REFINE_PUNCH_2) )
+		{
+			if ( gfDisplayFullCountRing )
+			{
+				return( ACTION_PUNCH_YELLOW_AIM2_UICURSOR );
+			}
+			else if ( fEnoughPoints )
+			{
+				return( ACTION_PUNCH_RED_AIM2_UICURSOR );
+			}
+			else
+			{
+				return( ACTION_PUNCH_NOGO_AIM2_UICURSOR );
+			}
+		}
+		else
+		{
+			Assert( FALSE );
+			// no return value!
+			return(0);
+		}
+		//////////////////////////////////////////////////////////////
 	}
 	else
 	{
@@ -2156,8 +2165,11 @@ void HandleRightClickAdjustCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos )
 	INT8					bFutureAim;
 	UINT8					ubCursor;
 	SOLDIERTYPE				*pTSoldier;
-	INT32 sGridNo;
+	INT32					sGridNo;
 	INT8					bTargetLevel;
+	// SANDRO - added these two
+	INT8 bAimTimeAddedForPunch = 2;
+	INT8 bAimTimeAddedForKnife = 2;
 
 
 	usInHand = pSoldier->inv[HANDPOS].usItem;
@@ -2298,20 +2310,23 @@ void HandleRightClickAdjustCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos )
 
 		case PUNCHCURS:
 
-			bFutureAim = (INT8)( pSoldier->aiData.bShownAimTime + REFINE_PUNCH_2 );
+			// SANDRO - changed the formula here to make aimed punch less expensive for APS
+			bAimTimeAddedForPunch = (gGameExternalOptions.fEnhancedCloseCombatSystem ? gSkillTraitValues.ubModifierForAPsAddedOnAimedPunches : REFINE_PUNCH_2);
 
-			if ( bFutureAim <= REFINE_PUNCH_2 )
+			bFutureAim = (INT8)( pSoldier->aiData.bShownAimTime + bAimTimeAddedForPunch );
+
+			if ( bFutureAim <= bAimTimeAddedForPunch )
 			{
 				sAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, (INT8)(bFutureAim / 2) );
 
 				// Determine if we can afford!
 				if ( EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
 				{
-					pSoldier->aiData.bShownAimTime+= REFINE_PUNCH_2;
+					pSoldier->aiData.bShownAimTime+= bAimTimeAddedForPunch;
 
-					if ( pSoldier->aiData.bShownAimTime > REFINE_PUNCH_2 )
+					if ( pSoldier->aiData.bShownAimTime > bAimTimeAddedForPunch )
 					{
-						pSoldier->aiData.bShownAimTime = REFINE_PUNCH_2;
+						pSoldier->aiData.bShownAimTime = bAimTimeAddedForPunch;
 					}
 				}
 				// Else - goto first level!
@@ -2345,20 +2360,23 @@ void HandleRightClickAdjustCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos )
 
 		case KNIFECURS:
 
-			bFutureAim = (INT8)( pSoldier->aiData.bShownAimTime + REFINE_KNIFE_2 );
+			// SANDRO - changed the formula here to make aimed blade attack less expensive for APS
+			bAimTimeAddedForKnife = (gGameExternalOptions.fEnhancedCloseCombatSystem ? gSkillTraitValues.ubModifierForAPsAddedOnAimedBladedAttackes : REFINE_KNIFE_2);
 
-			if ( bFutureAim <= REFINE_KNIFE_2 )
+			bFutureAim = (INT8)( pSoldier->aiData.bShownAimTime + bAimTimeAddedForKnife );
+
+			if ( bFutureAim <= bAimTimeAddedForKnife )
 			{
 				sAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, (INT8)(bFutureAim / 2) );
 
 				// Determine if we can afford!
 				if ( EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
 				{
-					pSoldier->aiData.bShownAimTime+= REFINE_KNIFE_2;
+					pSoldier->aiData.bShownAimTime+= bAimTimeAddedForKnife;
 
-					if ( pSoldier->aiData.bShownAimTime > REFINE_KNIFE_2 )
+					if ( pSoldier->aiData.bShownAimTime > bAimTimeAddedForKnife )
 					{
-						pSoldier->aiData.bShownAimTime = REFINE_KNIFE_2;
+						pSoldier->aiData.bShownAimTime = bAimTimeAddedForKnife;
 					}
 				}
 				// Else - goto first level!
@@ -2529,7 +2547,7 @@ void HandleUICursorRTFeedback( SOLDIERTYPE *pSoldier )
 
 UINT32 ChanceToHitApproximation( SOLDIERTYPE * pSoldier, UINT32 uiChance )
 {
-	UINT16 bExpLevel = pSoldier->stats.bExpLevel;
+	UINT16 bExpLevelValue = EffectiveExpLevel(pSoldier); // SANDRO - changed to effective level calc
 	UINT16 bMarksmanship = pSoldier->stats.bMarksmanship;
 	UINT16 bWisdom = pSoldier->stats.bWisdom;
 	UINT16 iNumStages, iNumStagesBase, StageSize, SubStageSize;
@@ -2539,7 +2557,10 @@ UINT32 ChanceToHitApproximation( SOLDIERTYPE * pSoldier, UINT32 uiChance )
 
 	if ( pSoldier->ubProfile != NO_PROFILE )
 	{
-		iSniper = NUM_SKILL_TRAITS( pSoldier, PROF_SNIPER );
+		if ( gGameOptions.fNewTraitSystem ) // old/new traits - SANDRO
+			iSniper = NUM_SKILL_TRAITS( pSoldier, SNIPER_NT );
+		else
+			iSniper = NUM_SKILL_TRAITS( pSoldier, PROF_SNIPER_OT );
 	}
 	else
 	{
@@ -2561,7 +2582,7 @@ UINT32 ChanceToHitApproximation( SOLDIERTYPE * pSoldier, UINT32 uiChance )
 	}
 
 	uiNewChance = uiChance;
-	iNumStagesBase = __min(165,__max(0, ((bExpLevel * 10) - 30) + (bMarksmanship - 25) + (bWisdom - 50)));
+	iNumStagesBase = __min(165,__max(0, ((bExpLevelValue * 10) - 30) + (bMarksmanship - 25) + (bWisdom - 50)));
 	//iNumStagesBase = __max(255, iNumStagesBase);
 	
 	iNumStagesBase = __min(165, iNumStagesBase + (10 * iSniper));

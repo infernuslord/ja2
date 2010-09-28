@@ -47,6 +47,7 @@
 	#include "Scheduling.h"
 	#include "Tactical Save.h"
 	#include "Campaign Types.h"
+	#include "GameSettings.h" // added by SANDRO
 #endif
 
 //forward declarations of common classes to eliminate includes
@@ -730,6 +731,12 @@ INT32 CalcThreateningEffectiveness( UINT8 ubMerc )
 		iDeadliness = -30;
 	}
 
+	// SANDRO - bonus for threatening for assertive people
+	if ( gGameOptions.fNewTraitSystem && gMercProfiles[pSoldier->ubProfile].bCharacterTrait == CHAR_TRAIT_ASSERTIVE )
+	{
+		iDeadliness += 50;
+	}
+
 	return( (EffectiveLeadership( pSoldier ) + iStrength + iDeadliness) / 3 ); //Trail minor bug fix.
 }
 
@@ -747,6 +754,15 @@ UINT8 CalcDesireToTalk( UINT8 ubNPC, UINT8 ubMerc, INT8 bApproach )
 	iPersonalVal = 50; /* + pNPCProfile->bMercTownReputation[ pNPCProfile->bTown ] */;
 	if (OKToCheckOpinion(ubMerc)) {
 		iPersonalVal += pNPCProfile->bMercOpinion[ubMerc];
+	}
+
+	// SANDRO - bonus for communication with people for assertive people
+	if ( gGameOptions.fNewTraitSystem && bApproach != APPROACH_THREATEN)
+	{
+		if ( pMercProfile->bCharacterTrait == CHAR_TRAIT_ASSERTIVE )
+			iPersonalVal += 50;
+		else if ( pMercProfile->bCharacterTrait == CHAR_TRAIT_MALICIOUS )
+			iPersonalVal -= 50;
 	}
 
 	// ARM: NOTE - for towns which don't use loyalty (San Mona, Estoni, Tixa, Orta )
@@ -1788,11 +1804,11 @@ void Converse( UINT8 ubNPC, UINT8 ubMerc, INT8 bApproach, UINT32 uiApproachData 
 	}
 	pNPCQuoteInfoArray = gpNPCQuoteInfoArray[ubNPC];
 	
-				//Legion jazz
-				if (zPokaznazwe[ubNPC].Hidden == TRUE) 
-				{
-				zPokaznazwe[ubNPC].Hidden = FALSE;
-				}
+	//Legion jazz
+	if (zHiddenNames[ubNPC].Hidden == TRUE) 
+	{
+		zHiddenNames[ubNPC].Hidden = FALSE;
+	}
 
 
 	pProfile = &(gMercProfiles[ubNPC]);
@@ -1947,7 +1963,7 @@ void Converse( UINT8 ubNPC, UINT8 ubMerc, INT8 bApproach, UINT32 uiApproachData 
 					break;
 				case TRIGGER_NPC:
 					// if triggering, pass in the approach data as the record to consider
-					DebugMsg( TOPIC_JA2, DBG_LEVEL_0, String( "Handling trigger %S/%d at %ld", gMercProfiles[ ubNPC ].zNickname, (UINT8)uiApproachData, GetJA2Clock() ) );
+					DebugMsg( TOPIC_JA2, DBG_LEVEL_0, String( "Handling trigger %S/%d at %lu", gMercProfiles[ ubNPC ].zNickname, (UINT8)uiApproachData, GetJA2Clock() ) );
 					NPCConsiderTalking( ubNPC, ubMerc, bApproach, (UINT8)uiApproachData, pNPCQuoteInfoArray, &pQuotePtr, &ubRecordNum );
 					break;
 				default:
@@ -2340,6 +2356,11 @@ void Converse( UINT8 ubNPC, UINT8 ubMerc, INT8 bApproach, UINT32 uiApproachData 
 		case APPROACH_DECLARATION_OF_HOSTILITY:
 		case APPROACH_INITIAL_QUOTE:
 		case APPROACH_GIVINGITEM:
+			// SANDRO - new records - NPCs discovered
+			if ( pProfile->ubLastDateSpokenTo == 0 && FindSoldierByProfileID( ubMerc, TRUE ) != NULL )
+			{
+				gMercProfiles[ubMerc].records.usNPCsDiscovered++;
+			}
 			pProfile->ubLastDateSpokenTo = (UINT8) GetWorldDay();
 			break;
 		default:

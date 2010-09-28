@@ -221,7 +221,7 @@ BloodcatsEndElementHandle(void *userData, const XML_Char *name)
 				pData->sCurSectorX	= x;
 				pData->sCurSectorY  = y;
 			}
-			THROWIFFALSE( (SECTOR(x,y) >= 0 && SECTOR(x,y) < 256) , L"Illegal sector number in BloodcatPlacements.XML" );
+			SGP_THROW_IFFALSE( (SECTOR(x,y) >= 0 && SECTOR(x,y) < 256) , L"Illegal sector number in BloodcatPlacements.XML" );
 		}
 		else if(strcmp(name, "ubPlacementType") == 0 )
 		{

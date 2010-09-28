@@ -8,7 +8,7 @@
 #include "debug.h"
 #include "MemMan.h"
 #include "Overhead Types.h"
-//#include "Soldier Control.h"
+#include "Soldier Control.h" // I need this here - SANDRO
 #include "Animation Cache.h"
 #include "Animation Data.h"
 #include "Animation Control.h"
@@ -1181,11 +1181,22 @@ BOOLEAN AdjustToNextAnimationFrame( SOLDIERTYPE *pSoldier )
 					{
 						BOOLEAN fMartialArtist = FALSE;
 
-						if ( pSoldier->ubProfile != NO_PROFILE )
+						if ( pSoldier->ubProfile != NO_PROFILE && pSoldier->ubBodyType == REGMALE ) // SANDRO - added check for body type
 						{
-							if ( gMercProfiles[ pSoldier->ubProfile ].bSkillTrait == MARTIALARTS || gMercProfiles[ pSoldier->ubProfile ].bSkillTrait2 == MARTIALARTS )
+							// SANDRO - old/new traits
+							if (gGameOptions.fNewTraitSystem)
 							{
-								fMartialArtist = TRUE;
+								if ( NUM_SKILL_TRAITS( pSoldier, MARTIAL_ARTS_NT ) >= ((gSkillTraitValues.fPermitExtraAnimationsOnlyToMA) ? 2 : 1 ) )
+								{
+									fMartialArtist = TRUE;
+								}
+							}
+							else
+							{
+								if ( gMercProfiles[ pSoldier->ubProfile ].bSkillTrait == MARTIALARTS_OT || gMercProfiles[ pSoldier->ubProfile ].bSkillTrait2 == MARTIALARTS_OT )
+								{
+									fMartialArtist = TRUE;
+								}
 							}
 						}
 
@@ -1766,6 +1777,27 @@ BOOLEAN AdjustToNextAnimationFrame( SOLDIERTYPE *pSoldier )
 
 									// PLAY SOLDIER'S DODGE ANIMATION
 									pTSoldier->ChangeSoldierState( DODGE_ONE, 0 , FALSE );
+
+									// SANDRO - after dodging melee attack go to apropriate stance
+									if ( (gAnimControl[ pTSoldier->usAnimState ].ubHeight == ANIM_STAND) && (Item[pTSoldier->inv[HANDPOS].usItem].usItemClass == IC_PUNCH))
+									{
+										if ((((NUM_SKILL_TRAITS( pTSoldier, MARTIAL_ARTS_NT ) >= ((gSkillTraitValues.fPermitExtraAnimationsOnlyToMA) ? 2 : 1 )) && gGameOptions.fNewTraitSystem ) ||
+											(HAS_SKILL_TRAIT( pTSoldier, MARTIALARTS_OT ) && !gGameOptions.fNewTraitSystem ) ) &&
+											 pTSoldier->ubBodyType == REGMALE )
+										{
+											//pTSoldier->usPendingAnimation = NINJA_GOTOBREATH;
+											pTSoldier->usPendingAnimation = NINJA_BREATH ;
+										}
+										else
+										{
+											pTSoldier->usPendingAnimation = PUNCH_BREATH ;
+										}
+									}
+									else if ( (gAnimControl[ pTSoldier->usAnimState ].ubHeight == ANIM_STAND) && (Item[pTSoldier->inv[HANDPOS].usItem].usItemClass == IC_BLADE))
+									{
+										//pTSoldier->usPendingAnimation = KNIFE_GOTOBREATH;
+										pTSoldier->usPendingAnimation = KNIFE_BREATH ;
+									}
 								}
 							}
 						}
@@ -3287,10 +3319,35 @@ BOOLEAN HandleSoldierDeath( SOLDIERTYPE *pSoldier , BOOLEAN *pfMadeCorpse )
 		}
 		else
 		{
-			UINT8	ubAssister;
+			//////////////////////////////////////////////////////////////
+			// SANDRO - some changes here
+			UINT8   ubAttacker = pSoldier->ubAttackerID; 
+			UINT8	ubAssister = pSoldier->ubPreviousAttackerID;
+			// If attacker is nobody, and we died, then set the last attacker(if exists) as our killer 
+			if ( ubAttacker == NOBODY )
+			{
+				if ( ubAssister != NOBODY )
+				{
+					ubAttacker = pSoldier->ubPreviousAttackerID;
+					ubAssister = pSoldier->ubNextToPreviousAttackerID;
+				}
+				else if ( pSoldier->ubNextToPreviousAttackerID != NOBODY )
+				{
+					ubAttacker = pSoldier->ubNextToPreviousAttackerID;
+					ubAssister = NOBODY;
+				}
+			}
+			else
+			{
+				if ( ubAssister == NOBODY )
+				{
+					ubAssister = pSoldier->ubNextToPreviousAttackerID;
+				}
+			}
+			//////////////////////////////////////////////////////////////
 
 			// IF this guy has an attacker and he's a good guy, play sound
-			if ( pSoldier->ubAttackerID != NOBODY )
+			if ( ubAttacker != NOBODY )
 			{
 				if ( MercPtrs[ pSoldier->ubAttackerID ]->bTeam == gbPlayerNum && gTacticalStatus.ubAttackBusyCount > 0 )
 				{
@@ -3298,7 +3355,7 @@ BOOLEAN HandleSoldierDeath( SOLDIERTYPE *pSoldier , BOOLEAN *pfMadeCorpse )
 					gTacticalStatus.ubEnemyKilledOnAttack = pSoldier->ubID;
 					gTacticalStatus.ubEnemyKilledOnAttackLocation = pSoldier->sGridNo;
 					gTacticalStatus.bEnemyKilledOnAttackLevel = pSoldier->pathing.bLevel;
-					gTacticalStatus.ubEnemyKilledOnAttackKiller = pSoldier->ubAttackerID;
+					gTacticalStatus.ubEnemyKilledOnAttackKiller = ubAttacker;
 
 					// also check if we are in mapscreen, if so update soldier's list
 					if( guiCurrentScreen == MAP_SCREEN )
@@ -3309,9 +3366,9 @@ BOOLEAN HandleSoldierDeath( SOLDIERTYPE *pSoldier , BOOLEAN *pfMadeCorpse )
 				else if ( pSoldier->bVisible == TRUE )
 				{
 					// We were a visible enemy, say laugh!
-					if ( Random(3) == 0 && !CREATURE_OR_BLOODCAT( MercPtrs[ pSoldier->ubAttackerID ] ) )
+					if ( Random(3) == 0 && !CREATURE_OR_BLOODCAT( MercPtrs[ ubAttacker ] ) )
 					{
-						MercPtrs[ pSoldier->ubAttackerID ]->DoMercBattleSound( BATTLE_SOUND_LAUGH1 );
+						MercPtrs[ ubAttacker ]->DoMercBattleSound( BATTLE_SOUND_LAUGH1 );
 					}
 				}
 			}
@@ -3321,37 +3378,72 @@ BOOLEAN HandleSoldierDeath( SOLDIERTYPE *pSoldier , BOOLEAN *pfMadeCorpse )
 
 			// if a friendly with a profile, increment kills
 			// militia also now track kills...
-			if ( pSoldier->ubAttackerID != NOBODY )
+			if ( ubAttacker != NOBODY )
 			{
-				if ( MercPtrs[ pSoldier->ubAttackerID ]->bTeam == gbPlayerNum )
+				if ( MercPtrs[ ubAttacker ]->bTeam == gbPlayerNum )
 				{
 					// increment kills
-					gMercProfiles[ MercPtrs[ pSoldier->ubAttackerID ]->ubProfile ].usKills++;
+					/////////////////////////////////////////////////////////////////////////////////////
+					// SANDRO - experimental - more specific statistics of mercs
+					switch(pSoldier->ubSoldierClass)
+					{
+						case SOLDIER_CLASS_ELITE :
+							gMercProfiles[ MercPtrs[ ubAttacker ]->ubProfile ].records.usKillsElites++;
+							break;
+						case SOLDIER_CLASS_ARMY :
+							gMercProfiles[ MercPtrs[ ubAttacker ]->ubProfile ].records.usKillsRegulars++;
+							break;
+						case SOLDIER_CLASS_ADMINISTRATOR :
+							gMercProfiles[ MercPtrs[ ubAttacker ]->ubProfile ].records.usKillsAdmins++;
+							break;
+						case SOLDIER_CLASS_CREATURE :
+							gMercProfiles[ MercPtrs[ ubAttacker ]->ubProfile ].records.usKillsCreatures++;
+							break;
+						default :
+							if ( CREATURE_OR_BLOODCAT( pSoldier ) )
+								gMercProfiles[ MercPtrs[ ubAttacker ]->ubProfile ].records.usKillsCreatures++;
+							else if ( TANK( pSoldier ) )
+								gMercProfiles[ MercPtrs[ ubAttacker ]->ubProfile ].records.usKillsTanks++;
+							else if ( pSoldier->bTeam == CIV_TEAM && !pSoldier->aiData.bNeutral && pSoldier->bSide != gbPlayerNum )
+								gMercProfiles[ MercPtrs[ ubAttacker ]->ubProfile ].records.usKillsHostiles++;
+							else
+								gMercProfiles[ MercPtrs[ ubAttacker ]->ubProfile ].records.usKillsOthers++;
+							break;
+					}
+					//gMercProfiles[ MercPtrs[ pSoldier->ubAttackerID ]->ubProfile ].usKills++;
+					/////////////////////////////////////////////////////////////////////////////////////
 					gStrategicStatus.usPlayerKills++;
 				}
-				else if ( MercPtrs[ pSoldier->ubAttackerID ]->bTeam == MILITIA_TEAM )
+				else if ( MercPtrs[ ubAttacker ]->bTeam == MILITIA_TEAM )
 				{
 					// get a kill! 2 points!
-					MercPtrs[ pSoldier->ubAttackerID ]->ubMilitiaKills += 2;
+					MercPtrs[ ubAttacker ]->ubMilitiaKills += 2;
 				}
 
 			}
 
-			// JA2 Gold: if previous and current attackers are the same, the next-to-previous attacker gets the assist
-			if (pSoldier->ubPreviousAttackerID == pSoldier->ubAttackerID)
-			{
-				ubAssister = pSoldier->ubNextToPreviousAttackerID;
-			}
-			else
-			{
-				ubAssister = pSoldier->ubPreviousAttackerID;
-			}
 
-			if ( ubAssister != NOBODY && ubAssister != pSoldier->ubAttackerID )
+			if ( ubAssister != NOBODY && ubAssister != ubAttacker )
 			{
 				if ( MercPtrs[ ubAssister ]->bTeam == gbPlayerNum )
 				{
-					gMercProfiles[ MercPtrs[ ubAssister ]->ubProfile ].usAssists++;
+					/////////////////////////////////////////////////////////////////////////////////////
+					// SANDRO - new mercs' records
+					if( MercPtrs[ ubAttacker ] != NULL )
+					{
+						if( MercPtrs[ ubAttacker ]->bTeam == gbPlayerNum )
+							gMercProfiles[ MercPtrs[ ubAssister ]->ubProfile ].records.usAssistsMercs++;
+						else if ( MercPtrs[ ubAttacker ]->bTeam == MILITIA_TEAM )
+							gMercProfiles[ MercPtrs[ ubAssister ]->ubProfile ].records.usAssistsMilitia++;
+						else
+							gMercProfiles[ MercPtrs[ ubAssister ]->ubProfile ].records.usAssistsOthers++;
+					}
+					else
+					{
+						gMercProfiles[ MercPtrs[ ubAssister ]->ubProfile ].records.usAssistsOthers++;
+					}
+					//gMercProfiles[ MercPtrs[ ubAssister ]->ubProfile ].usAssists++;
+					/////////////////////////////////////////////////////////////////////////////////////
 				}
 				else if ( MercPtrs[ ubAssister ]->bTeam == MILITIA_TEAM )
 				{
@@ -3574,6 +3666,7 @@ void CheckForAndHandleSoldierIncompacitated( SOLDIERTYPE *pSoldier )
 			INT8		bTestDirection	= pSoldier->ubDirection;
 			BOOLEAN		fForceDirection = FALSE;
 			BOOLEAN		fDoFallback		= FALSE;
+			BOOLEAN		fAlwaysFallBack = FALSE; // added by SANDRO
 
 
 			// Lesh: lets fix dead humans fallback through obstacles
@@ -3584,7 +3677,15 @@ void CheckForAndHandleSoldierIncompacitated( SOLDIERTYPE *pSoldier )
 #elif defined ( TESTFALLFORWARD )
 			if ( 0 )
 #else
-			if ( Random(100 ) > 40 && IS_MERC_BODY_TYPE( pSoldier ) && !IsProfileATerrorist( pSoldier->ubProfile ) )
+			// SANDRO - if Martial Artist took someone down, always fall back if possible (for the fun)
+			if ( pSoldier->ubAttackerID != NOBODY && gGameOptions.fNewTraitSystem )
+			{ 
+				if ( HAS_SKILL_TRAIT( MercPtrs[ pSoldier->ubAttackerID ], MARTIAL_ARTS_NT ) && (!MercPtrs[ pSoldier->ubAttackerID ]->usAttackingWeapon || Item[MercPtrs[ pSoldier->ubAttackerID ]->inv[HANDPOS].usItem].brassknuckles ) )
+				{
+					fAlwaysFallBack = TRUE;
+				}
+			}
+			if ( (Random(100 ) > 40 || fAlwaysFallBack) && IS_MERC_BODY_TYPE( pSoldier ) && !IsProfileATerrorist( pSoldier->ubProfile ) )
 #endif
 			{
 				// CHECK IF WE HAVE AN ATTACKER, TAKE OPPOSITE DIRECTION!

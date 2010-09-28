@@ -58,9 +58,6 @@
     <ClInclude Include="..\include\vfs\Ext\slf\vfs_slf_library.h">
       <Filter>Ext</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\vfs\Aspects\vfs_debugging.h">
-      <Filter>Aspects</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\vfs\Aspects\vfs_logging.h">
       <Filter>Aspects</Filter>
     </ClInclude>
@@ -69,9 +66,6 @@
     </ClInclude>
     <ClInclude Include="..\include\vfs\Aspects\vfs_synchronization.h">
       <Filter>Aspects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\vfs\Core\os_functions.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\include\vfs\Core\vfs.h">
       <Filter>Core</Filter>
@@ -112,9 +106,6 @@
     <ClInclude Include="..\include\vfs\Core\File\vfs_lib_file.h">
       <Filter>Core\File</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\vfs\Core\File\vfs_memory_file.h">
-      <Filter>Core\File</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\vfs\Core\Interface\vfs_directory_interface.h">
       <Filter>Core\Interface</Filter>
     </ClInclude>
@@ -138,6 +129,12 @@
     </ClInclude>
     <ClInclude Include="..\include\vfs\Core\Location\vfs_uncompressed_lib_base.h">
       <Filter>Core\Location</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vfs\Core\vfs_os_functions.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vfs\Core\File\vfs_buffer_file.h">
+      <Filter>Core\File</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -174,9 +171,6 @@
     <ClCompile Include="..\src\Ext\7z\vfs_create_7z_library.cpp">
       <Filter>Ext</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Aspects\vfs_debugging.cpp">
-      <Filter>Aspects</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Aspects\vfs_logging.cpp">
       <Filter>Aspects</Filter>
     </ClCompile>
@@ -185,9 +179,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Aspects\vfs_synchronization.cpp">
       <Filter>Aspects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Core\os_functions.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\vfs.cpp">
       <Filter>Core</Filter>
@@ -240,7 +231,10 @@
     <ClCompile Include="..\src\Core\File\vfs_lib_file.cpp">
       <Filter>Core\File</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Core\File\vfs_memory_file.cpp">
+    <ClCompile Include="..\src\Core\vfs_os_functions.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\File\vfs_buffer_file.cpp">
       <Filter>Core\File</Filter>
     </ClCompile>
   </ItemGroup>

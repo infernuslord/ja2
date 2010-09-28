@@ -457,13 +457,13 @@ HVOBJECT CreateVideoObject( VOBJECT_DESC *VObjectDesc )
 
 			if(hImage->ubBitDepth == 32)
 			{
-				THROWIFFALSE(hImage->usNumberOfObjects > 0, L"bad himage");
+				SGP_THROW_IFFALSE(hImage->usNumberOfObjects > 0, L"bad himage");
 				
 				// create one 16bpp object (that contains 32bpp data)
 				hVObject->p16BPPObject = (SixteenBPPObjectInfo*)MemAlloc(sizeof(SixteenBPPObjectInfo));
 				if(!hVObject->p16BPPObject)
 				{
-					THROWEXCEPTION(L"bad alloc");
+					SGP_THROW(L"bad alloc");
 				}
 				memset(hVObject->p16BPPObject, 0, sizeof(SixteenBPPObjectInfo));
 
@@ -472,7 +472,7 @@ HVOBJECT CreateVideoObject( VOBJECT_DESC *VObjectDesc )
 				if(!hVObject->p16BPPObject->p16BPPData)
 				{
 					MemFree(hVObject->p16BPPObject);
-					THROWEXCEPTION(L"bad alloc");
+					SGP_THROW(L"bad alloc");
 				}
 				memcpy(hVObject->p16BPPObject->p16BPPData, hImage->p32BPPData, SIZE);
 
@@ -495,13 +495,13 @@ HVOBJECT CreateVideoObject( VOBJECT_DESC *VObjectDesc )
 			}
 			else if(hImage->ubBitDepth == 16)
 			{
-				THROWIFFALSE(hImage->usNumberOfObjects > 0, L"bad himage");
+				SGP_THROW_IFFALSE(hImage->usNumberOfObjects > 0, L"bad himage");
 
 				// create one 16bpp object (that contains 32bpp data)
 				hVObject->p16BPPObject = (SixteenBPPObjectInfo*)MemAlloc(sizeof(SixteenBPPObjectInfo));
 				if(!hVObject->p16BPPObject)
 				{
-					THROWEXCEPTION(L"bad alloc");
+					SGP_THROW(L"bad alloc");
 				}
 				memset(hVObject->p16BPPObject, 0, sizeof(SixteenBPPObjectInfo));
 
@@ -510,7 +510,7 @@ HVOBJECT CreateVideoObject( VOBJECT_DESC *VObjectDesc )
 				if(!hVObject->p16BPPObject->p16BPPData)
 				{
 					MemFree(hVObject->p16BPPObject);
-					THROWEXCEPTION(L"bad alloc");
+					SGP_THROW(L"bad alloc");
 				}
 				memcpy(hVObject->p16BPPObject->p16BPPData, hImage->p16BPPData, SIZE);
 
@@ -797,11 +797,11 @@ UINT32 count;
 BOOLEAN BltVideoObjectToBuffer( UINT16 *pBuffer, UINT32 uiDestPitchBYTES, HVOBJECT hSrcVObject, UINT16 usIndex, INT32 iDestX, INT32 iDestY, INT32 fBltFlags, blt_fx *pBltFx )
 {
 	// Sometimes an exception is thrown in that method.
-	__try
+//BF	__try
 	{
 	// Assertions
 	//Assert( pBuffer != NULL );
-	THROWIFFALSE( pBuffer != NULL, L"No Destination Buffer" );
+	SGP_THROW_IFFALSE( pBuffer != NULL, L"No Destination Buffer" );
 
 	if ( hSrcVObject == NULL )
 	{
@@ -809,14 +809,14 @@ BOOLEAN BltVideoObjectToBuffer( UINT16 *pBuffer, UINT32 uiDestPitchBYTES, HVOBJE
 	}
 
 	//Assert( hSrcVObject != NULL );
-	THROWIFFALSE( hSrcVObject != NULL, L"No Source Object" )
+	SGP_THROW_IFFALSE( hSrcVObject != NULL, L"No Source Object" )
 
 	SixteenBPPObjectInfo *image = NULL;
 	// Check For Flags and bit depths
 	switch( hSrcVObject->ubBitDepth )
 	{
 			case 32:
-				THROWIFFALSE(usIndex < hSrcVObject->usNumberOf16BPPObjects, L"index larger that number images");
+				SGP_THROW_IFFALSE(usIndex < hSrcVObject->usNumberOf16BPPObjects, L"index larger that number images");
 				image = &hSrcVObject->p16BPPObject[usIndex];
 #if 0
 				Blt16BPPTo16BPPTrans( pBuffer, uiDestPitchBYTES, 
@@ -833,7 +833,7 @@ BOOLEAN BltVideoObjectToBuffer( UINT16 *pBuffer, UINT32 uiDestPitchBYTES, HVOBJE
 				break;
 
 			case 16:
-				THROWIFFALSE(usIndex < hSrcVObject->usNumberOf16BPPObjects, L"index larger that number images");
+				SGP_THROW_IFFALSE(usIndex < hSrcVObject->usNumberOf16BPPObjects, L"index larger that number images");
 				image = &hSrcVObject->p16BPPObject[usIndex];
 				if ( fBltFlags & VO_BLT_SRCTRANSPARENCY	)
 				{
@@ -854,7 +854,7 @@ BOOLEAN BltVideoObjectToBuffer( UINT16 *pBuffer, UINT32 uiDestPitchBYTES, HVOBJE
 
 			case 8:
 
-				THROWIFFALSE( hSrcVObject->usNumberOfObjects > usIndex, L"Video object index is larger than the number of subimages");
+				SGP_THROW_IFFALSE( hSrcVObject->usNumberOfObjects > usIndex, L"Video object index is larger than the number of subimages");
 				// Switch based on flags given
 				do
 				{
@@ -918,10 +918,11 @@ BOOLEAN BltVideoObjectToBuffer( UINT16 *pBuffer, UINT32 uiDestPitchBYTES, HVOBJE
 
 	return( TRUE );
 	}
-	__except(filter(GetExceptionCode(), GetExceptionInformation()))
-	{
-		return ( TRUE );
-	}
+	//BF
+	//__except(filter(GetExceptionCode(), GetExceptionInformation()))
+	//{
+	//	return ( TRUE );
+	//}
 }
 
 BOOLEAN PixelateVideoObjectRect(	UINT32	uiDestVSurface, INT32 X1, INT32 Y1, INT32 X2, INT32 Y2)
@@ -1506,14 +1507,14 @@ BOOLEAN BltVideoObjectOutlineShadowFromIndex(UINT32 uiDestVSurface, UINT32 uiSrc
 	}
 	else if(hSrcVObject->ubBitDepth == 16)
 	{
-		THROWIFFALSE(usIndex < hSrcVObject->usNumberOf16BPPObjects, L"index larger that number images");
+		SGP_THROW_IFFALSE(usIndex < hSrcVObject->usNumberOf16BPPObjects, L"index larger that number images");
 		SixteenBPPObjectInfo &image = hSrcVObject->p16BPPObject[0];
 		Blt16BPPTo16BPPTransShadow(pBuffer, uiPitch, image.p16BPPData, image.usWidth * sizeof(UINT16),
 			iDestX, iDestY, 0, 0, image.usWidth, image.usHeight, 0x1F);
 	}
 	else if(hSrcVObject->ubBitDepth == 32)
 	{
-		THROWIFFALSE(usIndex < hSrcVObject->usNumberOf16BPPObjects, L"index larger that number images");
+		SGP_THROW_IFFALSE(usIndex < hSrcVObject->usNumberOf16BPPObjects, L"index larger that number images");
 		SixteenBPPObjectInfo &image = hSrcVObject->p16BPPObject[0];
 		Blt32BPPTo16BPPTransShadow(pBuffer, uiPitch, (UINT32*)image.p16BPPData, image.usWidth * sizeof(UINT32),
 			iDestX, iDestY, 0, 0, image.usWidth, image.usHeight);

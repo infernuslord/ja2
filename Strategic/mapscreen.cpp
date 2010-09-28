@@ -2129,7 +2129,8 @@ void GlowItem( void )
 
 		if( fOldItemGlow == TRUE )
 		{
-			RestoreExternBackgroundRect( 3, 80, ( UINT16 )( 65 - 3 ), ( UINT16 )( 105 - 80 ) );
+			// this caused the attachment/burst/grenade star to disappear behind the item image
+			//RestoreExternBackgroundRect( 3, 80, ( UINT16 )( 65 - 3 ), ( UINT16 )( 105 - 80 ) );
 		}
 
 		fOldItemGlow = FALSE;
@@ -2444,11 +2445,15 @@ void DrawCharStats( INT16 sCharNum )
 	SetFontForeground(CHAR_TEXT_FONT_COLOR);
 	SetFontBackground(FONT_BLACK);
 
-
 	// strength
 	swprintf( sString, L"%d", pSoldier->stats.bStrength);
 
-	if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeStrengthTime)&& ( pSoldier->timeChanges.uiChangeStrengthTime != 0 ) )
+	// SANDRO - if damaged stat we could regain, show in red until repaired
+	if( gGameOptions.fNewTraitSystem && ( pSoldier->ubCriticalStatDamage[DAMAGED_STAT_STRENGTH] > 0 ))
+	{
+		SetFontForeground( FONT_RED );
+	}
+	else if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeStrengthTime)&& ( pSoldier->timeChanges.uiChangeStrengthTime != 0 ) )
 	{
 		if( pSoldier->usValueGoneUp & STRENGTH_INCREASE )
 		{
@@ -2471,7 +2476,12 @@ void DrawCharStats( INT16 sCharNum )
 	// dexterity
 	swprintf( sString, L"%d", pSoldier->stats.bDexterity );
 
-	if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeDexterityTime ) && ( pSoldier->timeChanges.uiChangeDexterityTime != 0 ) )
+	// SANDRO - if damaged stat we could regain, show in red until repaired
+	if( gGameOptions.fNewTraitSystem && ( pSoldier->ubCriticalStatDamage[DAMAGED_STAT_DEXTERITY] > 0 ))
+	{
+		SetFontForeground( FONT_RED );
+	}
+	else if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeDexterityTime ) && ( pSoldier->timeChanges.uiChangeDexterityTime != 0 ) )
 	{
 		if( pSoldier->usValueGoneUp & DEX_INCREASE )
 		{
@@ -2493,8 +2503,13 @@ void DrawCharStats( INT16 sCharNum )
 
 	// agility
 	swprintf( sString, L"%d", pSoldier->stats.bAgility );
-
-	if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeAgilityTime)&& ( pSoldier->timeChanges.uiChangeAgilityTime != 0 ) )
+	
+	// SANDRO - if damaged stat we could regain, show in red until repaired
+	if( gGameOptions.fNewTraitSystem && ( pSoldier->ubCriticalStatDamage[DAMAGED_STAT_AGILITY] > 0 ))
+	{
+		SetFontForeground( FONT_RED );
+	}
+	else if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeAgilityTime)&& ( pSoldier->timeChanges.uiChangeAgilityTime != 0 ) )
 	{
 		if( pSoldier->usValueGoneUp & AGIL_INCREASE )
 		{
@@ -2516,8 +2531,13 @@ void DrawCharStats( INT16 sCharNum )
 
 	// wisdom
 	swprintf( sString, L"%d", pSoldier->stats.bWisdom );
-
-	if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeWisdomTime )&&( pSoldier->timeChanges.uiChangeWisdomTime != 0 ))
+	
+	// SANDRO - if damaged stat we could regain, show in red until repaired
+	if( gGameOptions.fNewTraitSystem && ( pSoldier->ubCriticalStatDamage[DAMAGED_STAT_WISDOM] > 0 ))
+	{
+		SetFontForeground( FONT_RED );
+	}
+	else if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeWisdomTime )&&( pSoldier->timeChanges.uiChangeWisdomTime != 0 ))
 	{
 		if( pSoldier->usValueGoneUp & WIS_INCREASE )
 		{
@@ -2539,8 +2559,13 @@ void DrawCharStats( INT16 sCharNum )
 
 	// leadership
 	swprintf( sString, L"%d", pSoldier->stats.bLeadership );
-
-	if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeLeadershipTime ) && ( pSoldier->timeChanges.uiChangeLeadershipTime != 0 ) )
+	
+	// SANDRO - if damaged stat we could regain, show in red until repaired
+	if( gGameOptions.fNewTraitSystem && ( pSoldier->ubCriticalStatDamage[DAMAGED_STAT_LEADERSHIP] > 0 ))
+	{
+		SetFontForeground( FONT_RED );
+	}
+	else if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeLeadershipTime ) && ( pSoldier->timeChanges.uiChangeLeadershipTime != 0 ) )
 	{
 		if( pSoldier->usValueGoneUp & LDR_INCREASE )
 		{
@@ -2586,7 +2611,12 @@ void DrawCharStats( INT16 sCharNum )
 	// marksmanship
 	swprintf( sString, L"%d", pSoldier->stats.bMarksmanship );
 
-	if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeMarksmanshipTime) && ( pSoldier->timeChanges.uiChangeMarksmanshipTime != 0 ) )
+	// SANDRO - if damaged stat we could regain, show in red until repaired
+	if( gGameOptions.fNewTraitSystem && ( pSoldier->ubCriticalStatDamage[DAMAGED_STAT_MARKSMANSHIP] > 0 ))
+	{
+		SetFontForeground( FONT_RED );
+	}
+	else if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeMarksmanshipTime) && ( pSoldier->timeChanges.uiChangeMarksmanshipTime != 0 ) )
 	{
 		if( pSoldier->usValueGoneUp & MRK_INCREASE )
 		{
@@ -2608,8 +2638,13 @@ void DrawCharStats( INT16 sCharNum )
 
 	// explosives
 	swprintf( sString, L"%d", pSoldier->stats.bExplosive );
-
-	if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeExplosivesTime)&& ( pSoldier->timeChanges.uiChangeExplosivesTime != 0 ) )
+	
+	// SANDRO - if damaged stat we could regain, show in red until repaired
+	if( gGameOptions.fNewTraitSystem && ( pSoldier->ubCriticalStatDamage[DAMAGED_STAT_EXPLOSIVES] > 0 ))
+	{
+		SetFontForeground( FONT_RED );
+	}
+	else if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeExplosivesTime)&& ( pSoldier->timeChanges.uiChangeExplosivesTime != 0 ) )
 	{
 		if( pSoldier->usValueGoneUp & EXP_INCREASE )
 		{
@@ -2631,8 +2666,13 @@ void DrawCharStats( INT16 sCharNum )
 
 	// mechanical
 	swprintf( sString, L"%d", pSoldier->stats.bMechanical );
-
-	if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeMechanicalTime )&& ( pSoldier->timeChanges.uiChangeMechanicalTime != 0 ) )
+	
+	// SANDRO - if damaged stat we could regain, show in red until repaired
+	if( gGameOptions.fNewTraitSystem && ( pSoldier->ubCriticalStatDamage[DAMAGED_STAT_MECHANICAL] > 0 ))
+	{
+		SetFontForeground( FONT_RED );
+	}
+	else if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeMechanicalTime )&& ( pSoldier->timeChanges.uiChangeMechanicalTime != 0 ) )
 	{
 		if( pSoldier->usValueGoneUp & MECH_INCREASE )
 		{
@@ -2655,7 +2695,12 @@ void DrawCharStats( INT16 sCharNum )
 	// medical
 	swprintf( sString, L"%d", pSoldier->stats.bMedical );
 
-	if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeMedicalTime)&& ( pSoldier->timeChanges.uiChangeMedicalTime != 0 ) )
+	// SANDRO - if damaged stat we could regain, show in red until repaired
+	if( gGameOptions.fNewTraitSystem && ( pSoldier->ubCriticalStatDamage[DAMAGED_STAT_MEDICAL] > 0 ))
+	{
+		SetFontForeground( FONT_RED );
+	}
+	else if( ( GetJA2Clock() < CHANGE_STAT_RECENTLY_DURATION + pSoldier->timeChanges.uiChangeMedicalTime)&& ( pSoldier->timeChanges.uiChangeMedicalTime != 0 ) )
 	{
 		if( pSoldier->usValueGoneUp & MED_INCREASE )
 		{
@@ -7914,6 +7959,49 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 					}
 					break;
 				case 'W':
+					if(bSelectedInfoChar != -1)
+					{
+						SOLDIERTYPE *pSoldier = MercPtrs[ gCharactersList[ bSelectedInfoChar ].usSolID ];
+						if(OK_CONTROLLABLE_MERC( pSoldier ))
+						{
+						if(!fShowMapInventoryPool)
+						{
+							fShowMapInventoryPool = TRUE;
+							CreateDestroyMapInventoryPoolButtons( TRUE );
+						}
+						if(!fShowInventoryFlag)
+						{
+							fShowInventoryFlag = TRUE;
+						}
+							//tais: borrowed the drop all items code from CHRISL to make it drop EVERYTHING!
+							if ( bSelectedInfoChar != -1 && fShowInventoryFlag && fShowMapInventoryPool && !(gTacticalStatus.fEnemyInSector) )
+							{
+								for(int i = BODYPOSFINAL; i<NUM_INV_SLOTS; i++)
+								{
+									if(pSoldier->inv[i].exists() == true)
+									{
+										AutoPlaceObjectInInventoryStash(&pSoldier->inv[i], pSoldier->sGridNo);
+										DeleteObj(&pSoldier->inv[i]);
+									}
+									fTeamPanelDirty = TRUE;
+									fMapPanelDirty = TRUE;
+									fInterfacePanelDirty = DIRTYLEVEL2;
+								}
+								for(int i = HELMETPOS; i<BODYPOSFINAL; i++)
+								{
+									if(pSoldier->inv[i].exists() == true)
+									{
+										AutoPlaceObjectInInventoryStash(&pSoldier->inv[i], pSoldier->sGridNo);
+										DeleteObj(&pSoldier->inv[i]);
+									}
+									fTeamPanelDirty = TRUE;
+									fMapPanelDirty = TRUE;
+									fInterfacePanelDirty = DIRTYLEVEL2;
+								}
+							}
+						}
+					}
+					break;
 				case 'w':
 					if( fAlt )
 					{
@@ -9222,7 +9310,7 @@ void MAPInvClickCallback( MOUSE_REGION *pRegion, INT32 iReason )
 				{
 				}
 				//if ( ValidAttachmentClass( usNewItemIndex, usOldItemIndex ) )
-				else if ( NASValidAttachment( usNewItemIndex, usOldItemIndex ) )
+				else if ( ValidAttachment( usNewItemIndex, usOldItemIndex ) )
 				{
 					// it's an attempt to attach; bring up the inventory panel
 					if ( !InItemDescriptionBox( ) )

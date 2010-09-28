@@ -956,6 +956,7 @@ void AddSoldierInitListEnemyDefenceSoldiers( UINT8 ubTotalAdmin, UINT8 ubTotalTr
 	DebugMsg(TOPIC_JA2,DBG_LEVEL_3,String("AddSoldierInitListEnemyDefenceSoldiers"));
 
 	ResetMortarsOnTeamCount();
+	ResetNumSquadleadersInArmyGroup(); // added by SANDRO
 
 	//Specs call for only one profiled enemy can be in a sector at a time due to flavor reasons.
 	gfProfiledEnemyAdded = FALSE;

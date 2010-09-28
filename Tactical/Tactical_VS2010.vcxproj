@@ -184,12 +184,12 @@
     <ClCompile Include="Vehicles.cpp" />
     <ClCompile Include="Weapons.cpp" />
     <ClCompile Include="World Items.cpp" />
+    <ClCompile Include="XML_AlteringAttachments.cpp" />
     <ClCompile Include="XML_AmmoStrings.cpp" />
     <ClCompile Include="XML_AmmoTypes.cpp" />
     <ClCompile Include="XML_Armour.cpp" />
     <ClCompile Include="XML_AttachmentInfo.cpp" />
     <ClCompile Include="XML_Attachments.cpp" />
-    <ClCompile Include="XML_AttachmentSlotAssign.cpp" />
     <ClCompile Include="XML_AttachmentSlots.cpp" />
     <ClCompile Include="XML_BurstSounds.cpp" />
     <ClCompile Include="XML_CivGroupNames.cpp" />

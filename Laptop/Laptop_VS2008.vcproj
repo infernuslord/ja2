@@ -508,6 +508,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\IMP Minor Trait.h"
+				>
+			</File>
+			<File
 				RelativePath="IMP Personality Entrance.h"
 				>
 			</File>
@@ -777,6 +781,10 @@
 			</File>
 			<File
 				RelativePath="IMP MainPage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\IMP Minor Trait.cpp"
 				>
 			</File>
 			<File

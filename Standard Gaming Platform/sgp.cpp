@@ -40,12 +40,13 @@
 #include <vfs/Aspects/vfs_settings.h>
 #include <vfs/Core/vfs.h>
 #include <vfs/Core/vfs_init.h>
-#include <vfs/Core/os_functions.h>
+#include <vfs/Core/vfs_os_functions.h>
 #include <vfs/Core/File/vfs_file.h>
 #include <vfs/Tools/vfs_log.h>
 #include <vfs/Tools/vfs_parser_tools.h>
 #include <vfs/Tools/vfs_file_logger.h>
 
+#include "sgp_logger.h"
 #include "Text.h"
 #include "LocalizedStrings.h"
 #include "ExportStrings.h"
@@ -85,32 +86,47 @@ static vfs::Path	s_CodePage;
 
 static vfs::FileLogger *vfslog = NULL;
 
-void SHOWEXCEPTION(CBasicException& ex)
+void SHOWEXCEPTION(sgp::Exception& ex)
 {
 	try {
 		_ExceptionMessage(ex);
 	}
-	catch(CBasicException &ex2) {
-		logException(ex2);
+	catch(sgp::Exception &ex2) {
+		SGP_ERROR(ex2.what());
+		exit(0);
+	}
+}
+
+void SHOWEXCEPTION(vfs::Exception& ex)
+{
+	try {
+		_ExceptionMessage(ex);
+	}
+	catch(vfs::Exception &ex2) {
+		SGP_ERROR(ex2.what());
 		exit(0);
 	}
 }
 
 #define HANDLE_FATAL_ERROR \
-	catch(CBasicException &ex){ \
-		logException(ex); \
+	catch(sgp::Exception &ex){ \
+		SGP_ERROR(ex.what()); \
+		FatalError((const STR8)ex.what()); \
+		exit(0); } \
+	catch(vfs::Exception &ex){ \
+		SGP_ERROR(ex.what()); \
 		FatalError((const STR8)ex.getExceptionString().utf8().c_str()); \
 		exit(0); } \
 	catch(std::exception &ex){ \
-		logException(ex); \
+		SGP_ERROR(ex.what()); \
 		FatalError((const STR8)ex.what()); \
 		exit(0); } \
 	catch(const char* msg){ \
-		logException(msg); \
+		SGP_ERROR(msg); \
 		FatalError((const STR8)msg); \
 		exit(0); } \
 	catch(...){ \
-		logException("Caught undefined exception"); \
+		SGP_ERROR("Caught undefined exception"); \
 		FatalError("Caught undefined exception"); \
 		exit(0); }
 
@@ -713,7 +729,8 @@ BOOLEAN InitializeStandardGamingPlatform(HINSTANCE hInstance, int sCommandShow)
 	//// set current directory to exe's directory 
 	//os::setCurrectDirectory(exe_dir);
 
-	THROWIFFALSE( vfs_init::initVirtualFileSystem( vfs_config_ini ), L"Initializing Virtual File System failed");
+	SGP_THROW_IFFALSE( vfs_init::initVirtualFileSystem( vfs_config_ini ), L"Initializing Virtual File System failed");
+
 
 	s_VfsIsInitialized = true;
 
@@ -729,9 +746,9 @@ BOOLEAN InitializeStandardGamingPlatform(HINSTANCE hInstance, int sCommandShow)
 			std::string filename = vfs::String::as_utf8(sp_force_load_jsd_xml_file());
 			STRUCTURE_FILE_REF *pStructureFileRef = LoadStructureFile((STR8)filename.c_str());
 		}
-		catch(CBasicException &ex)
+		catch(std::exception &ex)
 		{
-			RETHROWEXCEPTION(BuildString(L"failed to load and/or process file : ").add(sp_force_load_jsd_xml_file).get(), &ex);
+			SGP_RETHROW(_BS(L"failed to load and/or process file : ") << sp_force_load_jsd_xml_file << _BS::wget, ex);
 		}
 	}
 
@@ -745,11 +762,11 @@ BOOLEAN InitializeStandardGamingPlatform(HINSTANCE hInstance, int sCommandShow)
 			CodePageReader cpr;
 			cpr.ReadCodePage(s_CodePage);
 		}
-		catch(CBasicException& ex)
+		catch(std::exception& ex)
 		{
 			std::wstringstream wss;
 			wss << L"Could not process codepage file \"" << s_CodePage() << L"\"";
-			RETHROWEXCEPTION(wss.str().c_str(), &ex);
+			SGP_RETHROW(wss.str().c_str(), ex);
 		}
 	}
 #endif // USE_CODE_PAGE
@@ -921,7 +938,8 @@ void ShutdownStandardGamingPlatform(void)
 
 	ShutdownDebugManager();
 
-	vfs::Log::flushDelete();
+	sgp::Logger::instance().shutdown();
+	vfs::Log::flushDeleteAll();
 	if(vfslog) delete vfslog;
 	vfs::CVirtualFileSystem::shutdownVFS();
 	vfs::ObjectAllocator::clear();
@@ -944,14 +962,32 @@ vfs::String getGameID()
 #endif
 
 #include "debug_util.h"
-#include <vfs/Aspects/vfs_debugging.h>
-class VfsDebugCallback : public vfs::Aspects::IDebugCallback
+#include <vfs/Aspects/vfs_logging.h>
+
+class VfsLogAdapter : public vfs::Aspects::ILogger
 {
 public:
-	virtual void onError(const wchar_t* error_str)
+	VfsLogAdapter(sgp::Logger_ID ID, bool stacktrace = false) : _id(ID), _trace(stacktrace) {};
+
+	virtual void Msg(const wchar_t* msg)
 	{
-		sgp::dumpStackTrace(error_str);
+		SGP_LOG(_id, msg);
+		if(_trace)
+		{
+			sgp::dumpStackTrace(msg);
+		}
 	}
+	virtual void Msg(const char* msg)
+	{
+		SGP_LOG(_id, msg);
+		if(_trace)
+		{
+			sgp::dumpStackTrace(msg);
+		}
+	}
+private:
+	sgp::Logger_ID	_id;
+	bool			_trace;
 };
 
 //#include <vfs/Aspects/vfs_synchronization.h>
@@ -1017,21 +1053,18 @@ int PASCAL HandledWinMain(HINSTANCE hInstance,	HINSTANCE hPrevInstance, LPSTR pC
 #ifdef USE_VFS
 	vfs::Log::setSharedString( getGameID() );
 #endif
-
 	//if(!vfs::Aspects::getMutexFactory())
 	//{
 	//	vfs::Aspects::setMutexFactory( new VfsMutexFactory() );
 	//}
-	if(!vfs::Aspects::getDebugCallback())
-	{
-		vfs::Aspects::setDebugCallback( new VfsDebugCallback() );
-	}
+	sgp::Logger_ID VFS_LOG = sgp::Logger::instance().createLogger();
 
-	vfslog = new vfs::FileLogger(L"vfs_init.log",false,vfs::Log::FLUSH_ON_DELETE);
-	if(!vfs::Aspects::getLogger())
-	{
-		vfs::Aspects::setLogger(vfslog);
-	}
+	sgp::Logger::instance().connectFile(VFS_LOG, L"vfs.log", false, sgp::Logger::FLUSH_ON_DELETE);
+
+	VfsLogAdapter* vfslog = new VfsLogAdapter(VFS_LOG, false);
+	VfsLogAdapter* vfslog_error = new VfsLogAdapter(VFS_LOG, true);
+
+	vfs::Aspects::setLogger(vfslog, vfslog, vfslog_error, NULL /* vfslog */);
 
 	// Make sure that only one instance of this application is running at once
 	// // Look for prev instance by searching for the window
@@ -1127,7 +1160,7 @@ int PASCAL HandledWinMain(HINSTANCE hInstance,	HINSTANCE hPrevInstance, LPSTR pC
 	HANDLE_FATAL_ERROR;
 
 #ifdef USE_VFS
-	vfs::Log::flushRelease();
+	vfs::Log::flushReleaseAll();
 #endif
 
 #ifdef LUACONSOLE
@@ -1170,27 +1203,32 @@ int PASCAL HandledWinMain(HINSTANCE hInstance,	HINSTANCE hPrevInstance, LPSTR pC
 			DispatchMessage(&Message);
 		}
 	}
-	catch(CBasicException &ex)
+	catch(sgp::Exception &ex)
 	{
-		logException(ex);
+		SGP_ERROR(ex.what());
+		SHOWEXCEPTION(ex);
+	}
+	catch(vfs::Exception &ex)
+	{
+		SGP_ERROR(ex.what());
 		SHOWEXCEPTION(ex);
 	}
 	catch(std::exception &ex)
 	{
-		CBasicException nex(ex.what(),_FUNCTION_FORMAT_,__LINE__,__FILE__);
-		logException(nex);
+		sgp::Exception nex(ex.what());
+		SGP_ERROR(nex.what());
 		SHOWEXCEPTION(nex);
 	}
 	catch(const char* msg)
 	{
-		CBasicException ex(msg,_FUNCTION_FORMAT_,__LINE__,__FILE__);
-		logException(ex);
+		sgp::Exception ex(msg);
+		SGP_ERROR(ex.what());
 		SHOWEXCEPTION(ex);
 	}
 	catch(...)
 	{
-		CBasicException ex("Caught undefined exception", _FUNCTION_FORMAT_, __LINE__, __FILE__);
-		logException( ex );
+		sgp::Exception ex("Caught undefined exception");
+		SGP_ERROR( ex.what() );
 		SHOWEXCEPTION(ex);
 	}
 
@@ -1299,7 +1337,7 @@ void GetRuntimeSettings( )
 	vfs::String loc = oProps.getStringProperty("Ja2 Settings", L"LOCALE");
 	if(!loc.empty())
 	{
-		THROWIFFALSE( setlocale(LC_ALL, loc.utf8().c_str()), BuildString().add(L"invalid locale : ").add(loc).get());
+		SGP_THROW_IFFALSE( setlocale(LC_ALL, loc.utf8().c_str()), _BS(L"invalid locale : ") << loc << _BS::wget );
 	}
 
 	iResolution = (int)oProps.getIntProperty(L"Ja2 Settings", L"SCREEN_RESOLUTION", -1);
@@ -1330,6 +1368,14 @@ void GetRuntimeSettings( )
 	else
 	{
 		vfs_config_ini.push_back(L"vfs_config.ini");
+	}
+	std::list<vfs::String> merge_list;
+	if(oProps.getStringListProperty(L"Ja2 Settings", L"MERGE_INI_FILES", merge_list, L""))
+	{
+		for(std::list<vfs::String>::iterator it = merge_list.begin(); it != merge_list.end(); ++it)
+		{
+			CIniReader::RegisterFileForMerging(*it);
+		}
 	}
 #endif
 

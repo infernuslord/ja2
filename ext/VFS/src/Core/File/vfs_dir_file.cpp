@@ -1,6 +1,29 @@
+/* 
+ * bfVFS : vfs/Core/File/vfs_dir_file.cpp
+ *  - read/read-write files for usage in vfs locations (directories)
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include <vfs/Core/File/vfs_dir_file.h>
 #include <vfs/Core/Interface/vfs_directory_interface.h>
-#include <vfs/Core/os_functions.h>
+#include <vfs/Core/vfs_os_functions.h>
 
 #include <vfs/Aspects/vfs_settings.h>
 
@@ -86,7 +109,7 @@ bool vfs::CDirFile::deleteFile()
 	vfs::Path fname;
 	if(_getRealPath(fname))
 	{
-		return os::deleteRealFile(fname);
+		return vfs::OS::deleteRealFile(fname);
 	}
 	return false;
 }

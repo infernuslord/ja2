@@ -65,7 +65,6 @@ void SetFactTrue( UINT16 usFact )
 	// and code is more readable that way
 
 	// must intercept when Jake is first trigered to start selling fuel
-
 	if ( ( usFact == FACT_ESTONI_REFUELLING_POSSIBLE ) && ( CheckFact( usFact, 0 ) == FALSE ) )
 	{
 		// give him some gas...
@@ -1018,7 +1017,8 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 #ifdef JA2UB
 //UB
 #else
-			gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() == 3 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
+			gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() == gGameExternalOptions.ubEarlyRebelsRecruitment[1] || gGameExternalOptions.ubEarlyRebelsRecruitment[0] == 1 
+								|| ( gubQuest[QUEST_FOOD_ROUTE] == QUESTDONE && gGameExternalOptions.ubEarlyRebelsRecruitment[0] == 4 ) ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
 #endif
 			break;
 
@@ -1026,7 +1026,8 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 #ifdef JA2UB
 //UB
 #else
-			gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() == 5 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
+			gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() == gGameExternalOptions.ubEarlyRebelsRecruitment[2] || gGameExternalOptions.ubEarlyRebelsRecruitment[0] == 1 
+								|| ( gubQuest[QUEST_FOOD_ROUTE] == QUESTDONE && gGameExternalOptions.ubEarlyRebelsRecruitment[0] == 4 ) ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
 #endif
 			break;
 
@@ -1034,7 +1035,11 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 #ifdef JA2UB
 //UB
 #else
-			gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() >= 6 ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
+			gubFact[usFact] = ( ( GetNumberOfWholeTownsUnderControl() >= gGameExternalOptions.ubEarlyRebelsRecruitment[3] || gGameExternalOptions.ubEarlyRebelsRecruitment[0] == 1 
+								|| ( gubQuest[QUEST_FOOD_ROUTE] == QUESTDONE && gGameExternalOptions.ubEarlyRebelsRecruitment[0] == 4 ) ) && IsTownUnderCompleteControlByPlayer( OMERTA ) );
+			// silversurfer: this is the highest requirement and therefore we will automatically enable recruitment of Miguel
+			if ( gubFact[usFact] )
+				SetFactTrue(40); // Miguel will now be willing to join and so will the other RPC
 #endif
 			break;
 
@@ -1259,8 +1264,8 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 			gubFact[usFact] = !BoxerExists();
 			break;
 
-		case 245: // Can dimitri be recruited? should be true if already true, OR if Miguel has been recruited already
-			gubFact[usFact] = ( gubFact[usFact] || FindSoldierByProfileID( MIGUEL, TRUE ) );
+		case 245: // Can dimitri be recruited? should be true if already true, OR if Miguel has been recruited already OR is available for recruitment
+			gubFact[usFact] = ( gubFact[usFact] || FindSoldierByProfileID( MIGUEL, TRUE ) || gubFact[40] );
 /*
 		case FACT_:
 			gubFact[usFact] = ;
@@ -1304,8 +1309,67 @@ void EndQuest( UINT8 ubQuest, INT16 sSectorX, INT16 sSectorY )
 
 void InternalEndQuest( UINT8 ubQuest, INT16 sSectorX, INT16 sSectorY, BOOLEAN fUpdateHistory )
 {
-	if ( gubQuest[ubQuest ] == QUESTINPROGRESS )
+	// SANDRO merc records - quests handled counter
+	if ( gubQuest[ubQuest] != QUESTDONE && fUpdateHistory ) // only public quests
 	{
+		switch (ubQuest)
+		{
+			case QUEST_FOOD_ROUTE :
+				// food quest is handled differently (completing when spoken to father Walker)
+				break;
+			case QUEST_DELIVER_LETTER :
+			case QUEST_LEATHER_SHOP_DREAM :
+				GiveQuestRewardPoint( sSectorX, sSectorY, 3, NO_PROFILE );
+				break;
+			case QUEST_ESCORT_SKYRIDER :
+			case QUEST_CHOPPER_PILOT :
+			case QUEST_FREE_CHILDREN :
+			case QUEST_RESCUE_MARIA :
+			case QUEST_FIND_SCIENTIST :
+			case QUEST_DELIVER_VIDEO_CAMERA :
+			case QUEST_FIND_HERMIT :
+				GiveQuestRewardPoint( sSectorX, sSectorY, 4, NO_PROFILE );
+				break;
+			case QUEST_FREE_DYNAMO :
+				// don't give Dynamo reward for himself
+				if( gMercProfiles[ DYNAMO ].bMercStatus != MERC_IS_DEAD )
+					GiveQuestRewardPoint( sSectorX, sSectorY, 4, DYNAMO );
+				break;
+			case QUEST_KINGPIN_IDOL :
+			case QUEST_CHITZENA_IDOL :
+			case QUEST_HELD_IN_ALMA :
+			case QUEST_RUNAWAY_JOEY :
+			case QUEST_ESCORT_TOURISTS :
+				GiveQuestRewardPoint( sSectorX, sSectorY, 5, NO_PROFILE );
+				break;
+			case QUEST_ARMY_FARM :
+			case QUEST_KINGPIN_MONEY :
+				GiveQuestRewardPoint( sSectorX, sSectorY, 6, NO_PROFILE );
+				break;
+			case QUEST_BLOODCATS :
+				GiveQuestRewardPoint( sSectorX, sSectorY, 7, NO_PROFILE );
+				break;
+			case QUEST_INTERROGATION : // we get here only if wiped out enemies after interrogation
+			case QUEST_CREATURES :
+				GiveQuestRewardPoint( sSectorX, sSectorY, 8, NO_PROFILE );
+				break;
+			case QUEST_KILL_TERRORISTS :  // only reduced experiences if we chosen Slay over Carmen
+				if( gMercProfiles[ CARMEN ].bMercStatus == MERC_IS_DEAD )
+					GiveQuestRewardPoint( sSectorX, sSectorY, 5, NO_PROFILE );
+				else
+					GiveQuestRewardPoint( sSectorX, sSectorY, 9, NO_PROFILE );
+				break;
+//			case QUEST_KILL_DEIDRANNA :
+//				GiveQuestRewardPoint( sSectorX, sSectorY, 25, NO_PROFILE );
+//				break;
+			default :
+				GiveQuestRewardPoint( sSectorX, sSectorY, 4, NO_PROFILE );
+				break;
+		}
+	}
+
+	if ( gubQuest[ubQuest ] == QUESTINPROGRESS )
+	{	
 		gubQuest[ubQuest] = QUESTDONE;
 
 	if ( fUpdateHistory )
@@ -1491,6 +1555,27 @@ BOOLEAN LoadQuestInfoFromSavedGameFile( HWFILE hFile )
 	return( TRUE );
 }
 
+// SANDRO - a function to add quest-done point to merc records, and award some exp possibly
+void GiveQuestRewardPoint( INT16 sQuestSectorX, INT16 sQuestsSectorY, INT8 bExpReward, UINT8 bException )
+{
+	ScreenMsg( FONT_MCOLOR_LTBLUE, MSG_TESTVERSION, L"QUEST COMPLETED - Adding to merc records and awarding experiences (%d).", (bExpReward * gGameExternalOptions.usAwardSpecialExpForQuests) );
+
+	for ( UINT8 i = gTacticalStatus.Team[ gbPlayerNum ].bFirstID; i <= gTacticalStatus.Team[ gbPlayerNum ].bLastID; i++ )
+	{
+		if( MercPtrs[ i ]->bActive && MercPtrs[ i ]->stats.bLife >= CONSCIOUSNESS && !(MercPtrs[ i ]->flags.uiStatusFlags & SOLDIER_VEHICLE) && MercPtrs[ i ]->ubProfile != NO_PROFILE &&
+			MercPtrs[ i ]->sSectorX == sQuestSectorX && MercPtrs[ i ]->sSectorY == sQuestsSectorY && !MercPtrs[ i ]->flags.fBetweenSectors && MercPtrs[ i ]->bTeam == gbPlayerNum &&
+			MercPtrs[ i ]->bAssignment != IN_TRANSIT && MercPtrs[ i ]->bAssignment != ASSIGNMENT_DEAD && gMercProfiles[ MercPtrs[ i ]->ubProfile ].ubBodyType != 21 ) // != ROBOTNOWEAPON )
+		{
+			if ( MercPtrs[ i ]->ubProfile != bException )
+			{
+				gMercProfiles[ MercPtrs[ i ]->ubProfile ].records.ubQuestsHandled++;
+
+				if ( bExpReward > 0 && gGameExternalOptions.usAwardSpecialExpForQuests > 0 )
+					StatChange( MercPtrs[ i ], EXPERAMT, (bExpReward * gGameExternalOptions.usAwardSpecialExpForQuests), FALSE );
+			}
+		}
+	}	
+}
 
 
 

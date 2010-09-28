@@ -685,7 +685,7 @@ void SetupGunGUI()
 	//for a particular weapon.	Show only the ones that we can apply to this gun.
 	yp = 2 * iScreenHeightOffset + 383;
 	guiAttachmentButton[ SILENCER_ATTACHMENT_BUTTON ] = -1;
-	if( NASValidAttachment( SILENCER, gpItem->usItem ) )
+	if( ValidAttachment( SILENCER, gpItem ) )
 	{
 		guiAttachmentButton[ SILENCER_ATTACHMENT_BUTTON ] =
 			CreateTextButton( L"SILENCER", SMALLCOMPFONT, FONT_YELLOW, FONT_BLACK, BUTTON_USE_DEFAULT,
@@ -698,7 +698,7 @@ void SetupGunGUI()
 		}
 	}
 	guiAttachmentButton[ SNIPERSCOPE_ATTACHMENT_BUTTON ] = -1;
-	if( NASValidAttachment( SNIPERSCOPE, gpItem->usItem ) )
+	if( ValidAttachment( SNIPERSCOPE, gpItem ) )
 	{
 		guiAttachmentButton[ SNIPERSCOPE_ATTACHMENT_BUTTON ] =
 			CreateTextButton( L"SNIPERSCOPE", SMALLCOMPFONT, FONT_YELLOW, FONT_BLACK, BUTTON_USE_DEFAULT,
@@ -711,7 +711,7 @@ void SetupGunGUI()
 		}
 	}
 	guiAttachmentButton[ LASERSCOPE_ATTACHMENT_BUTTON ] = -1;
-	if( NASValidAttachment( LASERSCOPE, gpItem->usItem ) )
+	if( ValidAttachment( LASERSCOPE, gpItem ) )
 	{
 		guiAttachmentButton[ LASERSCOPE_ATTACHMENT_BUTTON ] =
 			CreateTextButton( L"LASERSCOPE", SMALLCOMPFONT, FONT_YELLOW, FONT_BLACK, BUTTON_USE_DEFAULT,
@@ -724,7 +724,7 @@ void SetupGunGUI()
 		}
 	}
 	guiAttachmentButton[ BIPOD_ATTACHMENT_BUTTON ] = -1;
-	if( NASValidAttachment( BIPOD, gpItem->usItem ) )
+	if( ValidAttachment( BIPOD, gpItem ) )
 	{
 		guiAttachmentButton[ BIPOD_ATTACHMENT_BUTTON ] =
 			CreateTextButton( L"BIPOD", SMALLCOMPFONT, FONT_YELLOW, FONT_BLACK, BUTTON_USE_DEFAULT,
@@ -737,7 +737,7 @@ void SetupGunGUI()
 		}
 	}
 	guiAttachmentButton[ DUCKBILL_ATTACHMENT_BUTTON ] = -1;
-	if( NASValidAttachment( DUCKBILL, gpItem->usItem ) )
+	if( ValidAttachment( DUCKBILL, gpItem ) )
 	{
 		guiAttachmentButton[ DUCKBILL_ATTACHMENT_BUTTON ] =
 			CreateTextButton( L"DUCKBILL", SMALLCOMPFONT, FONT_YELLOW, FONT_BLACK, BUTTON_USE_DEFAULT,
@@ -750,7 +750,7 @@ void SetupGunGUI()
 		}
 	}
 	guiAttachmentButton[ GLAUNCHER_ATTACHMENT_BUTTON ] = -1;
-	if( NASValidAttachment( UNDER_GLAUNCHER, gpItem->usItem ) )
+	if( ValidAttachment( UNDER_GLAUNCHER, gpItem ) )
 	{
 		guiAttachmentButton[ GLAUNCHER_ATTACHMENT_BUTTON ] =
 			CreateTextButton( L"G-LAUNCHER", SMALLCOMPFONT, FONT_YELLOW, FONT_BLACK, BUTTON_USE_DEFAULT,
@@ -869,7 +869,7 @@ void SetupArmourGUI()
 	}
 
 	guiCeramicPlatesButton = -1;
-	if( NASValidAttachment( CERAMIC_PLATES, gpItem->usItem ) )
+	if( ValidAttachment( CERAMIC_PLATES, gpItem ) )
 	{
 		guiCeramicPlatesButton =
 			CreateTextButton( L"CERAMIC PLATES", SMALLCOMPFONT, FONT_YELLOW, FONT_BLACK, BUTTON_USE_DEFAULT,
@@ -1026,7 +1026,7 @@ void SetupExplosivesGUI()
 	yp = 375;
 	gfDetonator = FALSE;
 	guiDetonatorButton = -1;
-	if( NASValidAttachment( DETONATOR, gpItem->usItem ) )
+	if( ValidAttachment( DETONATOR, gpItem ) )
 	{
 		guiDetonatorButton =
 			CreateTextButton( L"DETONATOR", SMALLCOMPFONT, FONT_YELLOW, FONT_BLACK, BUTTON_USE_DEFAULT,

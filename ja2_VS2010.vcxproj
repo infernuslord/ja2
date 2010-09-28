@@ -99,11 +99,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>bin\VS2010\$(Configuration)\</OutDir>
     <IntDir>build\VS2010\$(ProjectName)_$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MapEditorD|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>bin\VS2010\$(Configuration)\</OutDir>
     <IntDir>build\VS2010\$(ProjectName)_$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName) Map Editor Debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

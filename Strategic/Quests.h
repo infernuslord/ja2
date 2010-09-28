@@ -600,10 +600,13 @@ void InitQuestEngine();
 BOOLEAN LoadQuestInfoFromSavedGameFile( HWFILE hFile );
 BOOLEAN SaveQuestInfoToSavedGameFile( HWFILE hFile );
 
+// added by SANDRO
+void GiveQuestRewardPoint( INT16 sQuestSectorX, INT16 sQuestsSectorY, INT8 bExpReward, UINT8 bException );
 
 #endif
 
 
 
  
+
 

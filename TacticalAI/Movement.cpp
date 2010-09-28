@@ -720,7 +720,7 @@ INT32 InternalGoAsFarAsPossibleTowards(SOLDIERTYPE *pSoldier, INT32 sDesGrid, IN
 
 			if (pSoldier->usUIMovementMode == RUNNING)
 			{
-				sAPCost += APBPConstants[AP_START_RUN_COST];
+				sAPCost += GetAPsStartRun( pSoldier ); // changed by SANDRO
 			}
 			}
 

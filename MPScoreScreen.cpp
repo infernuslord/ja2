@@ -329,7 +329,6 @@ void			HandleMPSScreen()
 		switch( gubMPSScreenHandler )
 		{
 			case MPS_CANCEL:
-				// TODO.RW: Exit game, disconnect
 
 				if (is_server)
 					server_disconnect();

@@ -43,11 +43,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "ext\libpng\projec
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "ext\libpng\projects\visualc71\zlib_VS2008.vcproj", "{A67922A0-0A3F-497F-A724-19B513EFC078}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "7z", "ext\7z\Archive\7z\7z_VS2008.vcproj", "{9AD14886-DB5C-4EFF-AE17-35F9BD684692}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VFS", "ext\VFS\build\VFS_VS2008.vcproj", "{C63466D6-49B5-4C54-AA0D-864F6171FD9B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ja2export", "ext\export\ja2export_VS2008.vcproj", "{3E43B70D-A22F-4240-B00D-32BD14523335}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "7z", "ext\VFS\build\7z_VS2008.vcproj", "{9AD14886-DB5C-4EFF-AE17-35F9BD684692}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -188,16 +188,6 @@ Global
 		{A67922A0-0A3F-497F-A724-19B513EFC078}.Release_WithDebugInfo|Win32.Build.0 = Release_WithDebugInfo|Win32
 		{A67922A0-0A3F-497F-A724-19B513EFC078}.Release|Win32.ActiveCfg = Release|Win32
 		{A67922A0-0A3F-497F-A724-19B513EFC078}.Release|Win32.Build.0 = Release|Win32
-		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.Debug|Win32.ActiveCfg = Debug|Win32
-		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.Debug|Win32.Build.0 = Debug|Win32
-		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.MapEditor|Win32.ActiveCfg = MapEditor|Win32
-		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.MapEditor|Win32.Build.0 = MapEditor|Win32
-		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.MapEditorD|Win32.ActiveCfg = MapEditorD|Win32
-		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.MapEditorD|Win32.Build.0 = MapEditorD|Win32
-		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.Release_WithDebugInfo|Win32.ActiveCfg = Release_WithDebugInfo|Win32
-		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.Release_WithDebugInfo|Win32.Build.0 = Release_WithDebugInfo|Win32
-		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.Release|Win32.ActiveCfg = Release|Win32
-		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.Release|Win32.Build.0 = Release|Win32
 		{C63466D6-49B5-4C54-AA0D-864F6171FD9B}.Debug|Win32.ActiveCfg = Debug|Win32
 		{C63466D6-49B5-4C54-AA0D-864F6171FD9B}.Debug|Win32.Build.0 = Debug|Win32
 		{C63466D6-49B5-4C54-AA0D-864F6171FD9B}.MapEditor|Win32.ActiveCfg = MapEditor|Win32
@@ -218,6 +208,16 @@ Global
 		{3E43B70D-A22F-4240-B00D-32BD14523335}.Release_WithDebugInfo|Win32.Build.0 = Release|Win32
 		{3E43B70D-A22F-4240-B00D-32BD14523335}.Release|Win32.ActiveCfg = Release|Win32
 		{3E43B70D-A22F-4240-B00D-32BD14523335}.Release|Win32.Build.0 = Release|Win32
+		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.Debug|Win32.Build.0 = Debug|Win32
+		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.MapEditor|Win32.ActiveCfg = MapEditor|Win32
+		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.MapEditor|Win32.Build.0 = MapEditor|Win32
+		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.MapEditorD|Win32.ActiveCfg = MapEditorD|Win32
+		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.MapEditorD|Win32.Build.0 = MapEditorD|Win32
+		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.Release_WithDebugInfo|Win32.ActiveCfg = Release_WithDebugInfo|Win32
+		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.Release_WithDebugInfo|Win32.Build.0 = Release_WithDebugInfo|Win32
+		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.Release|Win32.ActiveCfg = Release|Win32
+		{9AD14886-DB5C-4EFF-AE17-35F9BD684692}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

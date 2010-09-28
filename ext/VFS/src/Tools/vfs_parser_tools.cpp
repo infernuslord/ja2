@@ -1,3 +1,28 @@
+/* 
+ * bfVFS : vfs/Tools/vfs_parser_tools.cpp
+ *  - read file line-wise,
+ *  - split string into tokens,
+ *  - simple pattern matching
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include <vfs/Core/vfs.h>
 #include <vfs/Core/File/vfs_file.h>
 #include <vfs/Core/vfs_file_raii.h>
@@ -45,12 +70,12 @@ bool vfs::CReadLine::fillBuffer()
 		vfs::COpenReadFile rfile(&_file);
 
 		// fill the buffer from the start, BUFFER_SIZE charactes at max (_buffer has BUFFER_SIZE+1 elements)
-		THROWIFFALSE(bytesRead == _file.read(&_buffer[0], bytesRead), L"");
+		VFS_THROW_IFF(bytesRead == _file.read(&_buffer[0], bytesRead), L"");
 		rfile.release();
 	}
-	catch(CBasicException& ex)
+	catch(std::exception& ex)
 	{
-		RETHROWEXCEPTION(L"", &ex);
+		VFS_RETHROW(L"", ex);
 	}
 
 	_bytes_left -= bytesRead;
@@ -219,213 +244,6 @@ bool vfs::matchPattern(vfs::String const& sPattern, vfs::String::str_t const& sS
 		return matchPattern( pat.substr(star,pat.length()-star), sStr.substr(star,sStr.length()-star) );
 	}
 }
-
-/*************************************************************************************/
-/*************************************************************************************/
-
-#ifdef USE_CODE_PAGE
-
-typedef vfs::UInt16 UINT16;
-extern UINT16 gsKeyTranslationTable[1024];
-
-CodePageReader::EMode CodePageReader::extractMode(std::string const &readStr, size_t startPos)
-{
-	vfs::Int32 iEqual = readStr.find_first_of("=",startPos);
-	if(iEqual < 0)
-	{
-		return Error;
-	}
-	// extract keyword
-	std::string key = vfs::trimString(readStr,0,iEqual-1);
-	if(!StrCmp::Equal(key, "mode"))
-	{
-		return Error;
-	}
-	// extract mode
-	EMode mode = Error;
-	std::string sMode = vfs::trimString(readStr,iEqual+1,readStr.size());
-	if(StrCmp::Equal(sMode, "normal"))
-	{
-		mode = Normal;
-	}
-	else if(StrCmp::Equal(sMode, "shift"))
-	{
-		mode = Shift;
-	}
-	else if(StrCmp::Equal(sMode, "ctrl"))
-	{
-		mode = Ctrl;
-	}
-	else if(StrCmp::Equal(sMode, "alt"))
-	{
-		mode = Alt;
-	}
-	return mode;
-}
-
-bool CodePageReader::extractCode(std::string const& str, int iStart, vfs::UInt32& rInsertPoint, vfs::String::str_t& u8s)
-{
-	vfs::Int32 iEqual = str.find_first_of("=",iStart);
-	if(iEqual < 0)
-	{
-		return false;
-	}
-	// extract insert point
-	std::string sip = vfs::TrimString(str,0,iEqual-1);
-	if(!ConvertTo<vfs::UInt32>(sip, rInsertPoint))
-	{
-		return false;
-	}
-	vfs::String::str_t u8temp;
-	IGNOREEXCEPTION(vfs::String::as_utf16(str.substr(iEqual, str.length()-iEqual), u8temp));
-
-	vfs::Int32 iCodeStart, iCodeEnd;
-	iCodeStart = u8temp.find_first_of(L"{", 0);
-	if(iCodeStart < 0)
-	{
-		return false;
-	}
-	iCodeEnd = u8temp.find_last_of(L"}");
-	if(iCodeEnd < 0)
-	{
-		return false;
-	}
-	u8s = u8temp.substr(iCodeStart+1, iCodeEnd-iCodeStart-1);
-	return true;
-}
-
-void CodePageReader::readCodePage(vfs::Path const& codepagefile)
-{
-	if(!GetVFS()->fileExists(codepagefile))
-	{
-		return;
-	}
-	vfs::COpenReadFile rfile(codepagefile);
-	CReadLine rline(rfile.file());
-	std::string sBuffer;
-	vfs::UInt32 line_counter = 0;
-	EMode mode = Normal;
-	while(rline.GetLine(sBuffer))
-	{
-		line_counter++;
-		// very simple parsing : key = value
-		if(!sBuffer.empty())
-		{
-			// remove leading white spaces
-			int iStart = sBuffer.find_first_not_of(" \t",0);
-			char first = sBuffer.at(iStart);
-			switch(first)
-			{
-			case '!':
-			case ';':
-			case '#':
-				// comment -> do nothing
-				break;
-			case 'm':
-				mode = ExtractMode(sBuffer,iStart);
-				if(mode == Error)
-				{
-					vfs::String::str_t u8s;
-					IGNOREEXCEPTION(vfs::String::as_utf16(sBuffer, u8s));
-					std::wstringstream wss;
-					wss << L"Could not determine mode from line [" << line_counter << L"] : " << u8s;
-					THROWEXCEPTION(wss.str().c_str());
-				}
-				break;
-			default:
-				vfs::String::str_t u8s;
-				vfs::UInt32 uiInsertPoint;
-				if(!ExtractCode(sBuffer, iStart,uiInsertPoint,u8s))
-				{
-					continue;
-				}
-				if(mode == Shift) uiInsertPoint += 256;
-				else if(mode == Ctrl) uiInsertPoint += 512;
-				else if(mode == Alt) uiInsertPoint += 768;
-
-				if(uiInsertPoint >= 1023)
-				{
-					continue;
-				}
-				for(unsigned int i=0; i < u8s.length(); ++i)
-				{
-					if(uiInsertPoint+i < 1024)
-					{
-						gsKeyTranslationTable[uiInsertPoint+i] = u8s.at(i);
-					}
-				}
-			}
-		}
-	}
-}
-
-/*************************************************************************************/
-/*************************************************************************************/
-
-#include <set>
-
-namespace charSet
-{
-	static std::map<ECharSet,std::set<wchar_t> > _sets;
-};
-
-inline bool testSet(int char_set, charSet::ECharSet es, wchar_t wc)
-{
-	if(char_set & es)
-	{
-		std::set<wchar_t>& wcset = charSet::_sets[es];
-		return wcset.find(wc) !=  wcset.end();
-	}
-	return false;
-}
-
-bool charSet::isFromSet(char wc, unsigned int char_set)
-{
-	return charSet::isFromSet((wchar_t)wc, char_set);
-}
-bool charSet::isFromSet(int wc, unsigned int char_set)
-{
-	return charSet::IsFromSet((wchar_t)wc, char_set);
-}
-bool charSet::isFromSet(unsigned int wc, unsigned int char_set)
-{
-	return charSet::IsFromSet((wchar_t)wc, char_set);
-}
-
-bool charSet::isFromSet(wchar_t wc, unsigned int char_set)
-{
-	bool inSet = false;
-	if( inSet |= TestSet(char_set, charSet::CS_SPACE, wc)) return true; 
-	if( inSet |= TestSet(char_set, charSet::CS_ALPHA_LC, wc)) return true; 
-	if( inSet |= TestSet(char_set, charSet::CS_ALPHA_UC, wc)) return true; 
-	if( inSet |= TestSet(char_set, charSet::CS_NUMERIC, wc)) return true; 
-	if( inSet |= TestSet(char_set, charSet::CS_SPECIAL_ALPHA_LC, wc)) return true; 
-	if( inSet |= TestSet(char_set, charSet::CS_SPECIAL_ALPHA_UC, wc)) return true; 
-	if( inSet |= TestSet(char_set, charSet::CS_SPECIAL_NON_CHAR, wc)) return true; 
-	return false;
-}
-
-void charSet::addToCharSet(ECharSet eset, std::wstring cset)
-{
-	std::set<wchar_t>& wcset = charSet::_sets[eset];
-	for(unsigned int i = 0; i < cset.length(); ++i)
-	{
-		wcset.insert(cset.at(i));
-	}
-}
-
-void charSet::initializeCharSets()
-{
-	charSet::AddToCharSet(charSet::CS_SPACE,			L" ");
-	charSet::AddToCharSet(charSet::CS_ALPHA_LC,			L"abcdefghijklmnopqrstuvwxyz");
-	charSet::AddToCharSet(charSet::CS_ALPHA_UC,			L"ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-	charSet::AddToCharSet(charSet::CS_NUMERIC,			L"0123456789");
-	charSet::AddToCharSet(charSet::CS_SPECIAL_ALPHA_LC,	L"äöüßáàâéèêóòôúùô");
-	charSet::AddToCharSet(charSet::CS_SPECIAL_ALPHA_UC,	L"ÄÖÜÁÀÂÉÈÊÓÒÔÚÙÛ");
-	charSet::AddToCharSet(charSet::CS_SPECIAL_NON_CHAR,	L"~*+-_.,:;'´`#°^!\"§$%&/()=?\\{}[]");
-}
-
-#endif // USE_CODE_PAGE
 
 /*************************************************************************************/
 /*************************************************************************************/

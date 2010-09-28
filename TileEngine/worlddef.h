@@ -33,8 +33,10 @@ extern INT32 guiWorldRows;
 #define WORLD_MAX					(WORLD_COLS*WORLD_ROWS)
 
 // WANNE - BMP: The maximum value WORLD_MAX can have. DONE!
-#define MAX_ALLOWED_WORLD_MAX		4000000 // (1000 cols x 1000 rows)
-
+// CptMoore - DC: added MAX values here so it is known that display cover depends on them
+#define WORLD_COLS_MAX			2000
+#define WORLD_ROWS_MAX			2000
+#define MAX_ALLOWED_WORLD_MAX		WORLD_COLS_MAX*WORLD_ROWS_MAX // (2000 cols x 2000 rows)
 
 //</SB>
 

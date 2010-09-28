@@ -109,7 +109,7 @@ civGroupNamesEndElementHandle(void *userData, const XML_Char *name)
 		else if(strcmp(name, "Enabled") == 0)
 		{
 			pData->curElement = ELEMENT;
-			pData->curCivGroupNames.Enabled	= (UINT16) atol(pData->szCharData);
+			pData->curCivGroupNames.Enabled	= (BOOLEAN) atol(pData->szCharData);
 		}
 		else if(strcmp(name, "szGroup") == 0 )
 		{

@@ -969,7 +969,7 @@ void AddFilesToSendList()
 	CTransferRules transferRules;
 	transferRules.initFromTxtFile("transfer_rules.txt");
 	vfs::IBaseLocation* loc = prof->getLocation("");
-	THROWIFFALSE(loc != NULL, "MP profile was successfully created, but the root directory is not included");
+	SGP_THROW_IFFALSE(loc != NULL, "MP profile was successfully created, but the root directory is not included");
 	vfs::IBaseLocation::Iterator it = loc->begin();
 	int i=0;
 	for(; !it.end(); it.next(), i++)

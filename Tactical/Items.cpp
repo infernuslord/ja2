@@ -545,9 +545,10 @@ AttachmentInfoStruct AttachmentInfo[MAXITEMS+1];// =
 
 //WarmSteel - For the New Attachment System
 AttachmentSlotStruct AttachmentSlots[MAXITEMS+1];
-AttachmentSlotAssignStruct AttachmentSlotAssign[MAXATTACHMENTS];
 ItemSlotAssignStruct ItemSlotAssign[MAXITEMS+1];
+AlteringAttachmentStruct AlteringAttachments[MAXITEMS+1];
 UINT16 NASIncompatibleAttachments[MAXATTACHMENTS][2];
+
 UINT16 Attachment[MAXATTACHMENTS][3];// =
 //{
 //	{SILENCER, GLOCK_17},
@@ -1265,9 +1266,9 @@ BOOLEAN ItemIsLegal( UINT16 usItemIndex )
 			return FALSE;
 	}
 
-	if(gGameExternalOptions.fNewAttachmentSystem && Item[usItemIndex].ubAttachmentSystem == 1){
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW && Item[usItemIndex].ubAttachmentSystem == 1){
 		return FALSE;
-	} else if(!gGameExternalOptions.fNewAttachmentSystem && Item[usItemIndex].ubAttachmentSystem == 2){
+	} else if(gGameOptions.ubAttachmentSystem == ATTACHMENT_OLD && Item[usItemIndex].ubAttachmentSystem == 2){
 		return FALSE;
 	}
 	return(TRUE);
@@ -1489,7 +1490,7 @@ UINT32 MoneySlotLimit( INT8 bSlot )
 INT8 FindBestWeaponIfCurrentIsOutOfRange(SOLDIERTYPE * pSoldier, INT8 bCurrentWeaponIndex, UINT16 bWantedRange)
 {
 	//assuming current weapon is in the handpos
-	if (GunRange(&pSoldier->inv[bCurrentWeaponIndex]) >= bWantedRange)
+	if (GunRange(&pSoldier->inv[bCurrentWeaponIndex], pSoldier) >= bWantedRange)  // SANDRO - added argument
 	{
 		//our current weapon is good enough
 		return( bCurrentWeaponIndex );
@@ -1506,7 +1507,7 @@ INT8 FindBestWeaponIfCurrentIsOutOfRange(SOLDIERTYPE * pSoldier, INT8 bCurrentWe
 		//if this is a weapon
 		if (Item[pSoldier->inv[bLoop].usItem].usItemClass & (IC_WEAPON | IC_THROWN) && pSoldier->inv[bLoop].exists() == true)
 		{
-			range = GunRange(&pSoldier->inv[bLoop]);
+			range = GunRange(&pSoldier->inv[bLoop], pSoldier);  // SANDRO - added argument
 			if (range >= bWantedRange)
 			{
 				if (bestWeaponThatMeetsRange == 0)
@@ -1987,66 +1988,205 @@ INT8 GetAttachmentInfoIndex( UINT16 usItem )
 //WarmSteel - Determine if it is possible to add this attachment to ANY of the slots.
 //This function does not take into account any changes to the gun slots that have been made. It cannot without receiving an item object.
 //I do not want to give it an item object, because it's supposed to be used when you don't actually have an object.
-BOOLEAN ValidAttachmentSlot( UINT16 usAttachment, UINT16 usItem, UINT8 * pubAPCost )
+BOOLEAN NASValidAttachment( UINT16 usAttachment, UINT16 usItem, UINT8 * pubAPCost )
 {
 	UINT16 usItemXmlIndex = 0;
+	UINT16 usSlotIndex = 0;
 	INT32 iLoop2 = 0;
-	BOOLEAN foundItem = FALSE;
-
 
 	if (pubAPCost) {
 		*pubAPCost = (UINT8)APBPConstants[AP_RELOAD_GUN]; //default value
 	}
 
-	for(usItemXmlIndex = 0; ItemSlotAssign[usItemXmlIndex].itemIndex != 0; usItemXmlIndex++)
-	{
-		//WarmSteel - Found the item. Storing the index for later.
-		if (ItemSlotAssign[usItemXmlIndex].itemIndex == usItem){
-			foundItem = TRUE;
-			break;
-		}
-	}
+	//Find the right entry of ItemSlotAssign and save it's index.
+	for(usItemXmlIndex = 0; ItemSlotAssign[usItemXmlIndex].usItemIndex != 0 && ItemSlotAssign[usItemXmlIndex].usItemIndex != usItem; usItemXmlIndex++){}
 
-	if(!foundItem)
+	if( ItemSlotAssign[usItemXmlIndex].usItemIndex == 0 )
 		return( FALSE );
 
+	//Lots of for loops, but short ones so that's ok.
 	// now look through this section for the item in question
-	while( 1 )
+	for(UINT16 slotCount = 0; slotCount < ItemSlotAssign[usItemXmlIndex].itemSlots.size(); slotCount++)
 	{
-		for(INT32 slotCount = 0; slotCount < (INT32)ItemSlotAssign[usItemXmlIndex].itemSlots.size(); slotCount++)
+		usSlotIndex = ItemSlotAssign[usItemXmlIndex].itemSlots[slotCount];
+
+		//Search for any valid attachments in this slot
+		for(UINT16 usLoop = 0; usLoop < AttachmentSlots[usSlotIndex].AttachmentAssignVector.size(); usLoop++)
 		{
-			if ((AttachmentSlotAssign[iLoop2].usAttachmentSlotIndexAssign == ItemSlotAssign[usItemXmlIndex].itemSlots[slotCount]) && AttachmentSlotAssign[iLoop2].uiAttachmentIndex == usAttachment)
+			if(usAttachment == AttachmentSlots[usSlotIndex].AttachmentAssignVector[usLoop].usAttachmentIndex)
 			{
+				//Yup, fits here, check AP costs.
 				if (pubAPCost) {
-					*pubAPCost = (UINT8)AttachmentSlotAssign[iLoop2].usAPCost; //get ap cost of attaching items :)
+					*pubAPCost = (UINT8)AttachmentSlots[usSlotIndex].AttachmentAssignVector[usLoop].usAPCost;
 				}
 				return( TRUE );
 			}
 		}
-		iLoop2++;
-		if (AttachmentSlotAssign[iLoop2].uiAttachmentIndex == 0)
+	}
+
+	return( FALSE );
+}
+
+//A more correct method, but it needs an object
+BOOLEAN NASValidAttachment( UINT16 usAttachment, OBJECTTYPE * pObj, UINT8 * pubAPCost )
+{
+	UINT16 usSlotIndex = 0;
+	BOOLEAN foundValidAttachment = FALSE;
+	UINT16 usLoop = 0;
+
+	if (pubAPCost) {
+		*pubAPCost = (UINT8)APBPConstants[AP_RELOAD_GUN]; //default value
+	}
+
+	if (pObj->exists() == false) {
+		return FALSE;
+	}
+
+	//No slots means nothing will ever be valid, also a slotCount outside this vector will never be valid either.
+	if(pObj->usAttachmentSlotIndexVector.empty())
+		return FALSE;
+
+	//Loop through all slots
+	for(UINT8 curSlot = 0; curSlot < pObj->usAttachmentSlotIndexVector.size() && !foundValidAttachment; curSlot++){
+
+		usSlotIndex = pObj->usAttachmentSlotIndexVector[curSlot];
+
+		//Search for any valid attachments in this slot
+		for(usLoop = 0; usLoop < AttachmentSlots[usSlotIndex].AttachmentAssignVector.size() && !foundValidAttachment; usLoop++)
 		{
-			// the proposed item cannot be attached to this weapon.
-			return( FALSE );
+			if(usAttachment == AttachmentSlots[usSlotIndex].AttachmentAssignVector[usLoop].usAttachmentIndex)
+			{
+				//Yup, fits here.
+				foundValidAttachment = TRUE;
+
+				if(pubAPCost){
+					//Charge AP costs.
+					*pubAPCost = (UINT8)AttachmentSlots[usSlotIndex].AttachmentAssignVector[usLoop].usAPCost;
+				}
+			}
+		}
+			
+		// check for an underslung grenade launcher attached to the gun and see if the gun has a grenade slot
+		if (AttachmentSlots[usSlotIndex].fLauncherSlot && (ValidLaunchable(usAttachment, GetAttachedGrenadeLauncher(pObj) ) || ValidLaunchable(usAttachment, pObj->usItem)) )
+		{
+			//is the current slot a grenade slot?
+			foundValidAttachment = TRUE;
 		}
 	}
 
+	return( foundValidAttachment );
+}
+
+//Determine if it is possible to add this attachment to the item.
+BOOLEAN OASValidAttachment( UINT16 usAttachment, UINT16 usItem, UINT8 * pubAPCost )
+{
+	INT32 iLoop = 0;
+	if (pubAPCost) {
+		*pubAPCost = (UINT8)APBPConstants[AP_RELOAD_GUN]; //default value
+	}
+
+	// look for the section of the array pertaining to this attachment...
+	while( 1 )
+	{
+		if (Attachment[iLoop][0] == usAttachment)
+		{
+			break;
+		}
+		iLoop++;
+		if (Attachment[iLoop][0] == 0)
+		{
+			// the proposed item cannot be attached to anything!
+			return( FALSE );
+		}
+	}
+	// now look through this section for the item in question
+	while( 1 )
+	{
+		if (Attachment[iLoop][1] == usItem)
+		{
+			if (pubAPCost) {
+				*pubAPCost = (UINT8)Attachment[iLoop][2]; //Madd: get ap cost of attaching items :)
+			}
+			break;
+		}
+		iLoop++;
+		if (Attachment[iLoop][0] != usAttachment)
+		{
+			// the proposed item cannot be attached to the item in question
+			return( FALSE );
+		}
+	}
 	return( TRUE );
 }
 
 //WarmSteel - a simple switch between the old and new function, you can pretty much always use this instead of the old function.
-BOOLEAN NASValidAttachment( UINT16 usAttachment, UINT16 usItem, UINT8 * pubAPCost ){
-	if(gGameExternalOptions.fNewAttachmentSystem){
-		return ValidAttachmentSlot(usAttachment, usItem, pubAPCost);
+//It still always works for items without slot altering attachments though.
+BOOLEAN ValidAttachment( UINT16 usAttachment, UINT16 usItem, UINT8 * pubAPCost ){
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
+		return NASValidAttachment(usAttachment, usItem, pubAPCost);
 	} else {
-		return ValidAttachment(usAttachment, usItem, pubAPCost);
+		return OASValidAttachment(usAttachment, usItem, pubAPCost);
 	}
+}
+
+//WarmSteel - The same simple switch, but it's actually correct in NAS.
+BOOLEAN ValidAttachment( UINT16 usAttachment, OBJECTTYPE * pObj, UINT8 * pubAPCost ){
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
+		return NASValidAttachment(usAttachment, pObj, pubAPCost);
+	} else {
+		return OASValidAttachment(usAttachment, pObj->usItem, pubAPCost);
+	}
+}
+
+UINT8 AttachmentAPCost( UINT16 usAttachment, UINT16 usItem, SOLDIERTYPE * pSoldier ) // SANDRO - added argument
+{
+	UINT8 ubAPCost;
+
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
+		NASValidAttachment(usAttachment, usItem, &ubAPCost);
+	} else {
+		OASValidAttachment(usAttachment, usItem, &ubAPCost);
+	}
+
+	// SANDRO - STOMP traits - Ambidextrous attaching objects speed bonus
+	if ( pSoldier != NULL )
+	{
+		if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, AMBIDEXTROUS_NT ) )
+		{
+			ubAPCost = (UINT8)((ubAPCost * (100 - gSkillTraitValues.ubAMAttachingItemsAPsReduction) / 100) + 0.5);
+		}
+	}
+
+	return ubAPCost;
+}
+
+//Also need one with pObj, for the one with usItem is not always correct.
+UINT8 AttachmentAPCost( UINT16 usAttachment, OBJECTTYPE * pObj, SOLDIERTYPE * pSoldier )
+{
+	UINT8 ubAPCost;
+
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
+		NASValidAttachment(usAttachment, pObj, &ubAPCost);
+	} else {
+		OASValidAttachment(usAttachment, pObj->usItem, &ubAPCost);
+	}
+
+	// SANDRO - STOMP traits - Ambidextrous attaching objects speed bonus
+	if ( pSoldier != NULL )
+	{
+		if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, AMBIDEXTROUS_NT ) )
+		{
+			ubAPCost = (UINT8)((ubAPCost * (100 - gSkillTraitValues.ubAMAttachingItemsAPsReduction) / 100) + 0.5);
+		}
+	}
+
+	return ubAPCost;
 }
 
 //Determine if this slot can receive this attachment.  This is different, in that it may
 //be possible to have this attachment on this item, but may already have an attachment
 //in the slot we're trying to attach to.
-BOOLEAN ValidItemAttachmentSlot( OBJECTTYPE * pObj, UINT16 usAttachment, BOOLEAN fAttemptingAttachment, BOOLEAN fDisplayMessage, UINT8 subObject, INT16 slotCount, OBJECTTYPE ** ppAttachInSlot)
+BOOLEAN ValidItemAttachmentSlot( OBJECTTYPE * pObj, UINT16 usAttachment, BOOLEAN fAttemptingAttachment, BOOLEAN fDisplayMessage, UINT8 subObject, INT16 slotCount, BOOLEAN fIgnoreAttachmentInSlot, OBJECTTYPE ** ppAttachInSlot)
 {
 	BOOLEAN		fSimilarItems = FALSE;
 	UINT16		usSimilarItem = NOTHING;
@@ -2054,20 +2194,20 @@ BOOLEAN ValidItemAttachmentSlot( OBJECTTYPE * pObj, UINT16 usAttachment, BOOLEAN
 	INT32		iLoop2 = 0;
 	INT16		sTimesToRun = 0;
 	UINT8		curSlot = 0;
-	BOOLEAN		foundValidAttachment = TRUE;
+	BOOLEAN		foundValidAttachment = FALSE;
 
 	if (pObj->exists() == false) {
 		return FALSE;
 	}
 
-	//No slots means nothing will ever be valid.
-	if(pObj->usAttachmentSlotIndexVector.empty())
+	//No slots means nothing will ever be valid, also a slotCount outside this vector will never be valid either.
+	if(pObj->usAttachmentSlotIndexVector.empty() || (INT16)pObj->usAttachmentSlotIndexVector.size() <= slotCount)
 		return FALSE;
 
 	//Do we want to check all attachment slots or just the one in slotcount?
 	if(slotCount == -1){
 		//Loop through all slots
-		for(UINT8 curSlot = 0; curSlot < pObj->usAttachmentSlotIndexVector.size(); curSlot++){
+		for(UINT8 curSlot = 0; curSlot < pObj->usAttachmentSlotIndexVector.size() && !foundValidAttachment; curSlot++){
 			//Any attachment that is already in this slot will go here.
 			OBJECTTYPE * pAttachment;
 
@@ -2083,21 +2223,15 @@ BOOLEAN ValidItemAttachmentSlot( OBJECTTYPE * pObj, UINT16 usAttachment, BOOLEAN
 			}
 
 			// now look through this section for the item in question
-			foundValidAttachment = TRUE;
-			iLoop2 = 0;
-			while( 1 )
+			foundValidAttachment = FALSE;
+
+			//Search for any valid attachments in this slot
+			for(UINT16 usLoop = 0; usLoop < AttachmentSlots[ubSlotIndex].AttachmentAssignVector.size() && !foundValidAttachment; usLoop++)
 			{
-				if (AttachmentSlotAssign[iLoop2].usAttachmentSlotIndexAssign == ubSlotIndex && AttachmentSlotAssign[iLoop2].uiAttachmentIndex == usAttachment)
+				if(usAttachment == AttachmentSlots[ubSlotIndex].AttachmentAssignVector[usLoop].usAttachmentIndex)
 				{
-					//this attachment fits onto this item
-					break;
-				}
-				iLoop2++;
-				if (AttachmentSlotAssign[iLoop2].uiAttachmentIndex == 0)
-				{
-					// the proposed item cannot be attached to the slot in question
-					foundValidAttachment = FALSE;
-					break;
+					//Yup, fits here.
+					foundValidAttachment = TRUE;
 				}
 			}
 			
@@ -2122,10 +2256,6 @@ BOOLEAN ValidItemAttachmentSlot( OBJECTTYPE * pObj, UINT16 usAttachment, BOOLEAN
 					}
 				}
 			}
-			//If we've found a slot, break out of this loop, because theres no need to look further.
-			if(foundValidAttachment)
-				break;
-			
 		}
 	} else {
 
@@ -2136,7 +2266,7 @@ BOOLEAN ValidItemAttachmentSlot( OBJECTTYPE * pObj, UINT16 usAttachment, BOOLEAN
 		ubSlotIndex = pObj->usAttachmentSlotIndexVector[slotCount];
 
 		//WarmSteel - does this particular slot already hold an item? :( If we have a pAttachInSlot we're trying to switch, so then it doesn't matter.
-		if(pAttachment->exists() && fAttemptingAttachment && (!ppAttachInSlot || Item[pAttachment->usItem].inseparable)){
+		if(!fIgnoreAttachmentInSlot && pAttachment->exists() && fAttemptingAttachment && (!ppAttachInSlot || Item[pAttachment->usItem].inseparable)){
 			//If we have a parameter to return pAttachment to, store it, else the item does not attach to this slot.
 			fSimilarItems = TRUE;
 			usSimilarItem = pAttachment->usItem;
@@ -2146,21 +2276,13 @@ BOOLEAN ValidItemAttachmentSlot( OBJECTTYPE * pObj, UINT16 usAttachment, BOOLEAN
 			if(ppAttachInSlot && pAttachment->exists())
 				*ppAttachInSlot = pAttachment;
 
-			// now look through this section for the item in question
-			iLoop2 = 0;
-			while( 1 )
+			//Search for any valid attachments in this slot
+			for(UINT16 usLoop = 0; usLoop < AttachmentSlots[ubSlotIndex].AttachmentAssignVector.size() && !foundValidAttachment; usLoop++)
 			{
-				if (AttachmentSlotAssign[iLoop2].usAttachmentSlotIndexAssign == ubSlotIndex && AttachmentSlotAssign[iLoop2].uiAttachmentIndex == usAttachment)
+				if(usAttachment == AttachmentSlots[ubSlotIndex].AttachmentAssignVector[usLoop].usAttachmentIndex)
 				{
-					//this attachment fits onto this item
-					break;
-				}
-				iLoop2++;
-				if (AttachmentSlotAssign[iLoop2].uiAttachmentIndex == 0)
-				{
-					// the proposed item cannot be attached to the slot in question
-					foundValidAttachment = FALSE;
-					break;
+					//Yup, fits here.
+					foundValidAttachment = TRUE;
 				}
 			}
 			
@@ -2225,59 +2347,6 @@ BOOLEAN ValidItemAttachmentSlot( OBJECTTYPE * pObj, UINT16 usAttachment, BOOLEAN
 
 	return( foundValidAttachment );
 }
-//Determine if it is possible to add this attachment to the item.
-BOOLEAN ValidAttachment( UINT16 usAttachment, UINT16 usItem, UINT8 * pubAPCost )
-{
-	INT32 iLoop = 0;
-	if (pubAPCost) {
-		*pubAPCost = (UINT8)APBPConstants[AP_RELOAD_GUN]; //default value
-	}
-
-	// look for the section of the array pertaining to this attachment...
-	while( 1 )
-	{
-		if (Attachment[iLoop][0] == usAttachment)
-		{
-			break;
-		}
-		iLoop++;
-		if (Attachment[iLoop][0] == 0)
-		{
-			// the proposed item cannot be attached to anything!
-			return( FALSE );
-		}
-	}
-	// now look through this section for the item in question
-	while( 1 )
-	{
-		if (Attachment[iLoop][1] == usItem)
-		{
-			if (pubAPCost) {
-				*pubAPCost = (UINT8)Attachment[iLoop][2]; //Madd: get ap cost of attaching items :)
-			}
-			break;
-		}
-		iLoop++;
-		if (Attachment[iLoop][0] != usAttachment)
-		{
-			// the proposed item cannot be attached to the item in question
-			return( FALSE );
-		}
-	}
-	return( TRUE );
-}
-
-UINT8 AttachmentAPCost( UINT16 usAttachment, UINT16 usItem )
-{
-	UINT8 ubAPCost;
-
-	if(gGameExternalOptions.fNewAttachmentSystem){
-		ValidAttachmentSlot(usAttachment, usItem, &ubAPCost);
-	} else {
-		ValidAttachment(usAttachment, usItem, &ubAPCost);
-	}
-	return ubAPCost;
-}
 
 //Determine if this item can receive this attachment.  This is different, in that it may
 //be possible to have this attachment on this item, but may already have an attachment on
@@ -2290,7 +2359,7 @@ BOOLEAN ValidItemAttachment( OBJECTTYPE * pObj, UINT16 usAttachment, BOOLEAN fAt
 	if (pObj->exists() == false) {
 		return FALSE;
 	}
-	if ( !ValidAttachment( usAttachment, pObj->usItem ) )
+	if ( !ValidAttachment( usAttachment, pObj ) )
 	{
 		// check for an underslung grenade launcher attached to the gun
 		if ( (IsGrenadeLauncherAttached ( pObj ) ) && ValidLaunchable( usAttachment, GetAttachedGrenadeLauncher( pObj ) ) )
@@ -2968,6 +3037,12 @@ UINT32 CalculateCarriedWeight( SOLDIERTYPE * pSoldier )
 		ubStrengthForCarrying += (ubStrengthForCarrying - 80);
 	}
 
+	// SANDRO - STOMP traits - Bodybuilding carry weight bonus
+	if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, BODYBUILDING_NT ) )
+	{
+		ubStrengthForCarrying = (ubStrengthForCarrying * (100 + gSkillTraitValues.ubBBCarryWeightBonus) / 100); // plus one third
+	}
+
 	// for now, assume soldiers can carry 1/2 their strength in KGs without penalty.
 	// instead of multiplying by 100 for percent, and then dividing by 10 to account
 	// for weight units being in 10ths of kilos, not kilos... we just start with 10 instead of 100!
@@ -3329,7 +3404,7 @@ BOOLEAN ReloadGun( SOLDIERTYPE * pSoldier, OBJECTTYPE * pGun, OBJECTTYPE * pAmmo
 					// (suppose his inventory is full!)
 
 					//ADB copying the old ammo to the cursor at any time will screw it up if the cursor ammo is a stack!
-					if ( (gTacticalStatus.uiFlags & TURNBASED) && (gTacticalStatus.uiFlags & INCOMBAT) && !EnoughPoints( pSoldier, (INT8) (bAPs + APBPConstants[AP_PICKUP_ITEM]), 0, FALSE )
+					if ( (gTacticalStatus.uiFlags & TURNBASED) && (gTacticalStatus.uiFlags & INCOMBAT) && !EnoughPoints( pSoldier, (INT8) (bAPs + GetBasicAPsToPickupItem( pSoldier )), 0, FALSE ) // SANDRO
 						|| pAmmo->ubNumberOfObjects > 1)
 					{
 						// try autoplace
@@ -3625,7 +3700,24 @@ BOOLEAN AutoReload( SOLDIERTYPE * pSoldier )
 		(*pObj)[0]->data.gun.ubGunState |= GS_CARTRIDGE_IN_CHAMBER;
 		(*pObj)[0]->data.gun.ubGunState &= ~GS_WEAPON_BEING_RELOADED;
 
-		DeductPoints(pSoldier, Weapon[Item[(pObj)->usItem].ubClassIndex].APsToReloadManually, 0);
+		////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// STOMP traits - SANDRO
+		if ( gGameOptions.fNewTraitSystem )
+		{
+			// Sniper trait makes chambering a round faster
+			if (( Weapon[Item[(pObj)->usItem].ubClassIndex].ubWeaponType == GUN_SN_RIFLE || Weapon[Item[(pObj)->usItem].ubClassIndex].ubWeaponType == GUN_RIFLE ) && HAS_SKILL_TRAIT( pSoldier, SNIPER_NT ))
+				DeductPoints(pSoldier, ((Weapon[Item[(pObj)->usItem].ubClassIndex].APsToReloadManually * (100 - gSkillTraitValues.ubSNChamberRoundAPsReduction * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT )))/100), 0);
+			// Ranger trait makes pumping shotguns faster
+			else if (( Weapon[Item[(pObj)->usItem].ubClassIndex].ubWeaponType == GUN_SHOTGUN ) && HAS_SKILL_TRAIT( pSoldier, RANGER_NT ))
+				DeductPoints(pSoldier, ((Weapon[Item[(pObj)->usItem].ubClassIndex].APsToReloadManually * (100 - gSkillTraitValues.ubRAPumpShotgunsAPsReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT )))/100), 0);
+			else
+				DeductPoints(pSoldier, Weapon[Item[(pObj)->usItem].ubClassIndex].APsToReloadManually, 0);
+		}
+		else
+		{
+			DeductPoints(pSoldier, Weapon[Item[(pObj)->usItem].ubClassIndex].APsToReloadManually, 0);
+		}
+		////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		PlayJA2Sample( Weapon[ Item[pObj->usItem].ubClassIndex ].ManualReloadSound, RATE_11025, SoundVolume( HIGHVOLUME, pSoldier->sGridNo ), 1, SoundDir( pSoldier->sGridNo ) );
 
@@ -3652,7 +3744,24 @@ BOOLEAN AutoReload( SOLDIERTYPE * pSoldier )
 			{
 				(*pObj2)[0]->data.gun.ubGunState |= GS_CARTRIDGE_IN_CHAMBER;
 
-				DeductPoints(pSoldier, Weapon[Item[(pObj2)->usItem].ubClassIndex].APsToReloadManually, 0);
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				// STOMP traits - SANDRO
+				if ( gGameOptions.fNewTraitSystem )
+				{
+					// Sniper trait makes chambering a round faster
+					if (( Weapon[Item[(pObj2)->usItem].ubClassIndex].ubWeaponType == GUN_SN_RIFLE || Weapon[Item[(pObj2)->usItem].ubClassIndex].ubWeaponType == GUN_RIFLE ) && HAS_SKILL_TRAIT( pSoldier, SNIPER_NT ))
+						DeductPoints(pSoldier, ((Weapon[Item[(pObj2)->usItem].ubClassIndex].APsToReloadManually * (100 - gSkillTraitValues.ubSNChamberRoundAPsReduction * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT )))/100), 0);
+					// Ranger trait makes pumping shotguns faster
+					else if (( Weapon[Item[(pObj2)->usItem].ubClassIndex].ubWeaponType == GUN_SHOTGUN ) && HAS_SKILL_TRAIT( pSoldier, RANGER_NT ))
+						DeductPoints(pSoldier, ((Weapon[Item[(pObj2)->usItem].ubClassIndex].APsToReloadManually * (100 - gSkillTraitValues.ubRAPumpShotgunsAPsReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT )))/100), 0);
+					else
+						DeductPoints(pSoldier, Weapon[Item[(pObj2)->usItem].ubClassIndex].APsToReloadManually, 0);
+				}
+				else
+				{
+					DeductPoints(pSoldier, Weapon[Item[(pObj2)->usItem].ubClassIndex].APsToReloadManually, 0);
+				}
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 				PlayJA2Sample( Weapon[ Item[pObj2->usItem].ubClassIndex ].ManualReloadSound, RATE_11025, SoundVolume( HIGHVOLUME, pSoldier->sGridNo ), 1, SoundDir( pSoldier->sGridNo ) );
 
@@ -3801,12 +3910,12 @@ BOOLEAN OBJECTTYPE::AttachObjectOAS( SOLDIERTYPE * pSoldier, OBJECTTYPE * pAttac
 	if (pAttachment->exists() == false) {
 		return FALSE;
 	}
-	if ((*this)[subObject]->attachments.size() >= MAX_ATTACHMENTS) {
+	if ((*this)[subObject]->attachments.size() >= OLD_MAX_ATTACHMENTS_101) {
 		return FALSE;
 	}
 	//CHRISL: If we're adding a loaded UGL, then we have to make sure there are actually 2 open attachment slots instead of 1
 	if(Item[pAttachment->usItem].grenadelauncher && (*pAttachment)[0]->attachments.size() > 0) {
-		if ((*this)[subObject]->attachments.size() >= (MAX_ATTACHMENTS-1))
+		if ((*this)[subObject]->attachments.size() >= (OLD_MAX_ATTACHMENTS_101-1))
 			return FALSE;
 	}
 
@@ -3960,6 +4069,15 @@ BOOLEAN OBJECTTYPE::AttachObjectOAS( SOLDIERTYPE * pSoldier, OBJECTTYPE * pAttac
 			}
 		}
 
+		//Ammo might have changed after adding an attachment.
+		if ( Item[this->usItem].usItemClass == IC_GUN && (*this)[0]->data.gun.usGunAmmoItem != NONE && (*this)[0]->data.gun.ubGunShotsLeft > 0 )
+		{
+			if ( (*this)[0]->data.gun.ubGunShotsLeft > GetMagSize(this) )
+			{ //Too many rounds, eject ammo
+				EjectAmmoAndPlace(pSoldier, this);
+			}
+		}
+
 
 		// Check for attachment merge combos here
 		//CHRISL: Only do this if we're looking at a single item.  Don't try a combo merge when dealing with a stack
@@ -4045,8 +4163,11 @@ BOOLEAN OBJECTTYPE::AttachObjectOAS( SOLDIERTYPE * pSoldier, OBJECTTYPE * pAttac
 						}
 						StatChange( pSoldier, MECHANAMT, 25, FALSE );
 						StatChange( pSoldier, WISDOMAMT, 5, FALSE );
-					}
 
+						// SANDRO - merc records - merging items
+						if ( pSoldier->ubProfile != NO_PROFILE )
+							gMercProfiles[ pSoldier->ubProfile ].records.usItemsCombined++;
+					}
 
 					//Madd: note that use_item cannot produce two different items!!! so it doesn't use usResult2
 
@@ -4158,7 +4279,13 @@ BOOLEAN OBJECTTYPE::AttachObjectOAS( SOLDIERTYPE * pSoldier, OBJECTTYPE * pAttac
 						pSoldier->DoMercBattleSound( BATTLE_SOUND_CURSE1 );
 						return( FALSE );
 					}
-					// grant experience!
+					// grant experience! ... SANDRO - so what?! Grant them already!
+					StatChange( pSoldier, MECHANAMT, 30, FALSE );
+					StatChange( pSoldier, WISDOMAMT, 10, FALSE );
+					
+					// SANDRO - merc records - merging items
+					if ( pSoldier->ubProfile != NO_PROFILE )
+						gMercProfiles[ pSoldier->ubProfile ].records.usItemsCombined++;
 				}
 				// fall through
 			case EXPLOSIVE:
@@ -4179,6 +4306,10 @@ BOOLEAN OBJECTTYPE::AttachObjectOAS( SOLDIERTYPE * pSoldier, OBJECTTYPE * pAttac
 						}
 						StatChange( pSoldier, EXPLODEAMT, 25, FALSE );
 						StatChange( pSoldier, WISDOMAMT, 5, FALSE );
+
+						// SANDRO - merc records - merging items
+						if ( pSoldier->ubProfile != NO_PROFILE )
+							gMercProfiles[ pSoldier->ubProfile ].records.usItemsCombined++;
 					}
 				}
 				// fall through
@@ -4247,7 +4378,7 @@ BOOLEAN OBJECTTYPE::AttachObjectOAS( SOLDIERTYPE * pSoldier, OBJECTTYPE * pAttac
 
 BOOLEAN OBJECTTYPE::AttachObject( SOLDIERTYPE * pSoldier, OBJECTTYPE * pAttachment, BOOLEAN playSound, UINT8 subObject, INT32 iItemPos, BOOLEAN fRemoveProhibited )
 {	
-	if(gGameExternalOptions.fNewAttachmentSystem){
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
 		return( this->AttachObjectNAS(pSoldier, pAttachment, playSound, subObject, iItemPos, fRemoveProhibited ) );
 	} else {
 		return( this->AttachObjectOAS( pSoldier, pAttachment, playSound, subObject) );
@@ -4303,7 +4434,7 @@ BOOLEAN OBJECTTYPE::AttachObjectNAS( SOLDIERTYPE * pSoldier, OBJECTTYPE * pAttac
 	} else {
 		//WarmSteel - We know in what slot we're trying to put this, so lets see if we can.
 		curSlot = iItemPos;
-		fValidItemAttachment = ValidItemAttachmentSlot( this, pAttachment->usItem, TRUE, playSound, subObject, curSlot, &pAttachmentPosition);
+		fValidItemAttachment = ValidItemAttachmentSlot( this, pAttachment->usItem, TRUE, playSound, subObject, curSlot, FALSE, &pAttachmentPosition);
 		//pAttachmentPosition = pAttachInSlot;
 		// try replacing if possible
 	}
@@ -4383,7 +4514,7 @@ BOOLEAN OBJECTTYPE::AttachObjectNAS( SOLDIERTYPE * pSoldier, OBJECTTYPE * pAttac
 
 		/* //WarmSteel - splice won't work with attachments anymore, because of the null attachments. Replaced this function somewhere lower, because it needs to be done after the attaching of the GL.
 		//Unfortunately this must come before any attachment swap
-		if (Item[pAttachment->usItem].grenadelauncher && !gGameExternalOptions.fNewAttachmentSystem)
+		if (Item[pAttachment->usItem].grenadelauncher && gGameOptions.ubAttachmentSystem == ATTACHMENT_OLD)
 		{
 			// transfer any attachments from the grenade launcher to the gun
 			(*this)[subObject]->attachments.splice((*this)[subObject]->attachments.begin(), (*pAttachment)[0]->attachments,
@@ -4435,6 +4566,16 @@ BOOLEAN OBJECTTYPE::AttachObjectNAS( SOLDIERTYPE * pSoldier, OBJECTTYPE * pAttac
 				//WarmSteel - Because we want every attachment to stay in place in NAS, we must first delete the "null" attachment, then insert the new one.
 				//We know this attachment slot has a non-null object, otherwise ValidItemAttachmentSlot would not have returned true and we would not be here.
 				(*this)[subObject]->AddAttachmentAtIndex(curSlot, attachmentObject);
+			}
+		}
+
+
+		//Ammo might have changed after adding an attachment.
+		if ( Item[this->usItem].usItemClass == IC_GUN && (*this)[0]->data.gun.usGunAmmoItem != NONE && (*this)[0]->data.gun.ubGunShotsLeft > 0 )
+		{
+			if ( (*this)[0]->data.gun.ubGunShotsLeft > GetMagSize(this) )
+			{ //Too many rounds, eject ammo
+				EjectAmmoAndPlace(pSoldier, this);
 			}
 		}
 
@@ -4765,53 +4906,79 @@ std::vector<UINT16> GetItemSlots(OBJECTTYPE* pObj){
 	UINT16				usItemXmlIndex = 0;
 	std::vector<UINT16> tempItemSlots;
 	std::vector<UINT16> ItemSlotsToRemove;
-	//See if we can find this item in ItemSlotAssign
-	for(usItemXmlIndex = 0; ItemSlotAssign[usItemXmlIndex].itemIndex != 0; usItemXmlIndex++)
-	{
-		//WarmSteel - Found the item. Storing the index for later.
-		if (ItemSlotAssign[usItemXmlIndex].itemIndex == pObj->usItem){
-			break;
-		}
-	}
+	//See if we can find this item in ItemSlotAssign and store the index of this entry.
+	for(usItemXmlIndex = 0; ItemSlotAssign[usItemXmlIndex].usItemIndex != 0 && ItemSlotAssign[usItemXmlIndex].usItemIndex != pObj->usItem; usItemXmlIndex++){}
 
 	//No need to check empty ones.
 	if(!ItemSlotAssign[usItemXmlIndex].itemSlots.empty()){
 		tempItemSlots = ItemSlotAssign[usItemXmlIndex].itemSlots;
+
 		//First, determine this items slots.
 		for (std::list<OBJECTTYPE>::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); ++iter){
-			UINT32 attachmentIndex;
-			BOOLEAN found = FALSE;
-			//Get the AttachmentSlotAssign for this attachment to this slot, so we can check later if it alters the amount of slots.
-			for(attachmentIndex = 0; AttachmentSlotAssign[attachmentIndex].uiAttachmentIndex != 0; attachmentIndex++){
-				//if this attachment matches the index of the entry in the xml
-				if(AttachmentSlotAssign[attachmentIndex].uiAttachmentIndex == iter->usItem){
+			UINT16 usAttachmentIndex;
+			BOOLEAN fValidEntry = FALSE;
 
-					//Don't check attachments that don't altar slots anyway.
-					if(!AttachmentSlotAssign[attachmentIndex].usAddsSlots.empty() || !AttachmentSlotAssign[attachmentIndex].usRemovesSlots.empty()){
-						//Check if attachment slot we found matches any of the slots we found on the BASIC gun. 
-						//This means that if the gun has an added slot from other attachments, that this attachment would fit on, it still won't add a slot.
-						for(UINT8 slotCount1 = 0; slotCount1 < ItemSlotAssign[usItemXmlIndex].itemSlots.size(); slotCount1++){
-							if(ItemSlotAssign[usItemXmlIndex].itemSlots[slotCount1] == AttachmentSlotAssign[attachmentIndex].usAttachmentSlotIndexAssign){
-								found = TRUE;
-								break;
-							}
+			//Get the AlteringAttachments index for this attachment.
+			for(usAttachmentIndex = 0; AlteringAttachments[usAttachmentIndex].usAttachmentIndex != 0 && AlteringAttachments[usAttachmentIndex].usAttachmentIndex != iter->usItem; usAttachmentIndex++){}
+
+			for(UINT16 usAltCnt = 0; usAltCnt < AlteringAttachments[usAttachmentIndex].Alterations.size(); usAltCnt++){
+
+				//If these two aren't entered, every entry is valid for every item that is not explicitly excluded.
+				//We don't care about ubWeaponClass if it's not a weapon.
+				if(AlteringAttachments[usAttachmentIndex].Alterations[usAltCnt].usItemInclude.empty() && AlteringAttachments[usAttachmentIndex].Alterations[usAltCnt].ubWeaponClass.empty() )
+				{
+					fValidEntry = TRUE;
+				} else {
+					//At least one of these wasn't empty, so the item has to meet that requirement or this is not a valid entry for it.
+					fValidEntry = FALSE;
+				}
+
+				//It's a weapon class, so this goes only for weapons.
+				if(Item[pObj->usItem].usItemClass & IC_WEAPON){
+
+					//The following 3 for loops check if this entry was meant for this item.
+					//Is this the right ubWeaponClass?
+					for(UINT16 cnt = 0; cnt < AlteringAttachments[usAttachmentIndex].Alterations[usAltCnt].ubWeaponClass.size(); cnt++)
+					{
+						if(Weapon[Item[pObj->usItem].ubClassIndex].ubWeaponClass == AlteringAttachments[usAttachmentIndex].Alterations[usAltCnt].ubWeaponClass[cnt]){
+							fValidEntry = TRUE;
+							break;
 						}
 					}
 				}
-				if(found)
-					break;
-			}
-			//save the slots this attachment removes, we want it to remove ALL the slots with this index later.
-			if(!AttachmentSlotAssign[attachmentIndex].usRemovesSlots.empty()){
-				for(UINT16 removesSlotCount = 0; removesSlotCount < AttachmentSlotAssign[attachmentIndex].usRemovesSlots.size(); removesSlotCount++){
-					ItemSlotsToRemove.push_back(AttachmentSlotAssign[attachmentIndex].usRemovesSlots[removesSlotCount]);
+				//If usItemExclude contains this items ID, then this is not a valid entry for this item.
+				for(UINT16 cnt = 0; cnt < AlteringAttachments[usAttachmentIndex].Alterations[usAltCnt].usItemExclude.size(); cnt++)
+				{
+					if(pObj->usItem == AlteringAttachments[usAttachmentIndex].Alterations[usAltCnt].usItemExclude[cnt]){
+						fValidEntry = FALSE;
+						break;
+					}
 				}
-			}
-			//add any slot this attachment adds.
-			if(!AttachmentSlotAssign[attachmentIndex].usAddsSlots.empty()){
-				//remove any slots this attachment removes. Its currently possible to have more than one slot of the same type, might not be smart though.
-				for(UINT16 addsSlotCount = 0; addsSlotCount < AttachmentSlotAssign[attachmentIndex].usAddsSlots.size(); addsSlotCount++){
-					tempItemSlots.push_back(AttachmentSlotAssign[attachmentIndex].usAddsSlots[addsSlotCount]);
+				//If usItemInclude contains this items ID, then this is a valid entry for this item.
+				for(UINT16 cnt = 0; cnt < AlteringAttachments[usAttachmentIndex].Alterations[usAltCnt].usItemInclude.size(); cnt++)
+				{
+					if(pObj->usItem == AlteringAttachments[usAttachmentIndex].Alterations[usAltCnt].usItemInclude[cnt]){
+						fValidEntry = TRUE;
+						break;
+					}
+				}
+
+				//Only if we passed the requirements, check wether this removes or adds slots.
+				if(fValidEntry){
+					//save the slots this attachment removes, we want it to remove ALL the slots with this index later.
+					if(!AlteringAttachments[usAttachmentIndex].Alterations[usAltCnt].usRemovesSlots.empty()){
+						for(UINT16 removesSlotCount = 0; removesSlotCount < AlteringAttachments[usAttachmentIndex].Alterations[usAltCnt].usRemovesSlots.size(); removesSlotCount++){
+							ItemSlotsToRemove.push_back(AlteringAttachments[usAttachmentIndex].Alterations[usAltCnt].usRemovesSlots[removesSlotCount]);
+						}
+					}
+					//add any slot this attachment adds.
+					if(!AlteringAttachments[usAttachmentIndex].Alterations[usAltCnt].usAddsSlots.empty()){
+						//remove any slots this attachment removes. Its currently possible to have more than one slot of the same type, might not be smart though.
+						for(UINT16 addsSlotCount = 0; addsSlotCount < AlteringAttachments[usAttachmentIndex].Alterations[usAltCnt].usAddsSlots.size(); addsSlotCount++){
+							tempItemSlots.push_back(AlteringAttachments[usAttachmentIndex].Alterations[usAltCnt].usAddsSlots[addsSlotCount]);
+						}
+					}
+					break;
 				}
 			}
 		}
@@ -4832,6 +4999,15 @@ std::vector<UINT16> GetItemSlots(OBJECTTYPE* pObj){
 	}
 	return tempItemSlots;
 }
+
+void InitItemAttachments(OBJECTTYPE* pObj){
+
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_OLD)
+		return;
+
+	pObj->usAttachmentSlotIndexVector = GetItemSlots(pObj);
+	(*pObj)[0]->attachments.resize(pObj->usAttachmentSlotIndexVector.size());
+}
 /*
 //WarmSteel - Changed this function for NAS, because when the slots change many items will become invalid IN THAT SLOT, but not on the weapon.
 To fix this we re-attach all invalid attachments. It also checks the slots that are on the gun.
@@ -4842,16 +5018,13 @@ void RemoveProhibitedAttachments(SOLDIERTYPE* pSoldier, OBJECTTYPE* pObj, UINT16
 	if(!pObj->exists())
 		return;
 
-	if(gGameExternalOptions.fNewAttachmentSystem){
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
 		UINT32				curSlot = 0;
 		BOOLEAN				fCanAttach = FALSE;
 		BOOLEAN				fRemoveProhibitedAttachments = TRUE;
+		BOOLEAN				fDoneRemovingProhibited = FALSE;
 		attachmentList		tempAttachList;
 		std::vector<UINT16> tempItemSlots;
-		std::vector<UINT16> beginItemSlots;
-
-		//Save for later
-		beginItemSlots = pObj->usAttachmentSlotIndexVector;
 
 		//Get the item slots this item SHOULD have (but may not have right now), also counting any slots that were added or removed.
 		tempItemSlots = GetItemSlots(pObj);
@@ -4859,13 +5032,13 @@ void RemoveProhibitedAttachments(SOLDIERTYPE* pSoldier, OBJECTTYPE* pObj, UINT16
 		//Check if the slots have changed.
 		if(fOnlyRemoveWhenSlotsChange){
 			fRemoveProhibitedAttachments = FALSE;
-			if(tempItemSlots.size() != beginItemSlots.size() || (*pObj)[0]->attachments.size() != tempItemSlots.size()){
+			if(tempItemSlots.size() != pObj->usAttachmentSlotIndexVector.size() || (*pObj)[0]->attachments.size() != tempItemSlots.size()){
 				//If the amount of slots changed, we have to check the attachments for sure.
 				fRemoveProhibitedAttachments = TRUE;
 			} else if(!tempItemSlots.empty()){
 				for (UINT16 cnt = 0; cnt < tempItemSlots.size(); ++cnt) {
 					//If slots have changed, remember to remove prohibited attachments later.
-					if(tempItemSlots[cnt] != beginItemSlots[cnt]){
+					if(tempItemSlots[cnt] != pObj->usAttachmentSlotIndexVector[cnt]){
 						fRemoveProhibitedAttachments = TRUE;
 						break;
 					}
@@ -4874,105 +5047,94 @@ void RemoveProhibitedAttachments(SOLDIERTYPE* pSoldier, OBJECTTYPE* pObj, UINT16
 		}
 
 		if(fRemoveProhibitedAttachments){
-			if((*pObj)[0]->attachments.size() < tempItemSlots.size()){
-				//Apparently the original object had less slots than what we want it to have now.
-				//Resize it.
-				(*pObj)[0]->attachments.resize(tempItemSlots.size());
-			}
-			if(pObj->usAttachmentSlotIndexVector.size() < tempItemSlots.size()){
-				//Apparently the original slots vector had less slots than what we want it to have now.
-				//Resize it.
-				pObj->usAttachmentSlotIndexVector.resize(tempItemSlots.size());
-			}
+			UINT16 usInfiniteLoopCount = 0;
+			pObj->usAttachmentSlotIndexVector = tempItemSlots;
+			//Keep checking till slots stop changing.
+			while(!fDoneRemovingProhibited){
+				//Surely 500 tries is enough to fix ANY item...
+				AssertMsg(usInfiniteLoopCount < 500, "There was an inifinite loop while removing prohibited attachments");
 
-			UINT8 slotCount = 0;
-			for (attachmentList::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); ++iter, ++slotCount) {
-				if(slotCount < tempItemSlots.size()){
-					if(!iter->exists()){
-						//If the object is there, but doesn't exist, it's just a placeholder object.
-						pObj->usAttachmentSlotIndexVector[slotCount] = tempItemSlots[slotCount];
-					} else {
-						//If the slot index of this attachment doesn't match the actual index
-						if(pObj->usAttachmentSlotIndexVector[slotCount] != tempItemSlots[slotCount]){
-							//This attachment is not valid in this slot, correct this slot index on pObj
-							pObj->usAttachmentSlotIndexVector[slotCount] = tempItemSlots[slotCount];
-							//Save this item for later, we'll try to re-attach it.
+				INT16 slotCount = 0;
+				for (attachmentList::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); ++iter, ++slotCount) {
+					if(iter->exists()){
+						if( !ValidItemAttachmentSlot(pObj, iter->usItem, TRUE, FALSE, 0, slotCount, TRUE) ){
 							tempAttachList.push_back((*iter));
-							//This will swap the attachment at the index with a null object.
-							(*pObj)[0]->RemoveAttachmentAtIndex(slotCount);
-							//Fix the iter, we probably broke it.
-							iter = (*pObj)[0]->attachments.begin();
-							advance(iter, slotCount);
-						} else if (!ValidItemAttachmentSlot(pObj, iter->usItem, FALSE, 0, 0, slotCount, NULL)){
-							//This attachment is not valid in this slot, correct this slot index on pObj
-							pObj->usAttachmentSlotIndexVector[slotCount] = tempItemSlots[slotCount];
-							//Save this item for later, we'll try to re-attach it.
-							tempAttachList.push_back((*iter));
-							//This will swap the attachment at the index with a null object.
-							(*pObj)[0]->RemoveAttachmentAtIndex(slotCount);
-							//Fix the iter, we probably broke it.
-							iter = (*pObj)[0]->attachments.begin();
-							advance(iter, slotCount);
+							iter = (*pObj)[0]->RemoveAttachmentAtIter(iter);
 						}
 					}
-				} else if(iter->exists()){
-					//If we're here there are more attachment slots on the object than we have determined that the object should have now.
-					//This automatically makes the rest of the attachments invalid.
-					//Save this item for later, we'll try to re-attach it.
-					tempAttachList.push_back((*iter));
 				}
-			}
-			//Resize the object to the correct size, this will delete objects it had too much, but don't worry we saved those before.
-			//Because we resized the item before it it had too few slots, it will not have too little here, so we're just making sure it doesn't have too much.
-			//This means we don't have to think of changing the usAttachmentSlotIndex.
-			(*pObj)[0]->attachments.resize(tempItemSlots.size());
-			pObj->usAttachmentSlotIndexVector.resize(tempItemSlots.size());
 
-			//First try to re-attach the grenade launcher. Otherwise the grenade will refuse to attach.
-			//I'm assuming there can only be one on every gun.
-			//If not it's probably still not a real big deal.
-			for (attachmentList::iterator iter = tempAttachList.begin(); iter != tempAttachList.end();) {
-				if(Item[iter->usItem].grenadelauncher){
+				//Resize the object to the correct size, this will delete objects it had too much, but don't worry we saved those before.
+				//Because we resized the item before it it had too few slots, it will not have too little here, so we're just making sure it doesn't have too much.
+				//This means we don't have to think of changing the usAttachmentSlotIndex.
+				(*pObj)[0]->attachments.resize(tempItemSlots.size());
+
+				//First try to re-attach the grenade launcher. Otherwise the grenade will refuse to attach.
+				//I'm assuming there can only be one on every gun.
+				//If not it's probably still not a real big deal.
+				for (attachmentList::iterator iter = tempAttachList.begin(); iter != tempAttachList.end();) {
+					if(Item[iter->usItem].grenadelauncher){
+						if(ValidItemAttachmentSlot(pObj, iter->usItem, TRUE, FALSE, 0, -1)){
+							//This seems to be rather valid. Can't be 100% sure though.
+							if(pObj->AttachObject(NULL, &(*iter), FALSE, FALSE, -1, FALSE)){
+								//Ok now we can be sure, lets remove this object so we don't try to drop it later.
+								iter = tempAttachList.erase(iter);
+								continue;
+							}
+						}
+					}
+					iter++;
+				}
+
+				//Try to attach all the other attachments that didn't fit their current slot.
+				for (attachmentList::iterator iter = tempAttachList.begin(); iter != tempAttachList.end();) {
 					if(ValidItemAttachmentSlot(pObj, iter->usItem, TRUE, FALSE, 0, -1)){
 						//This seems to be rather valid. Can't be 100% sure though.
-						if(pObj->AttachObject(NULL, &(*iter), FALSE, FALSE, -1, FALSE)){
+						if(pObj->AttachObject(NULL, &(*iter), FALSE, 0, -1, FALSE)){
 							//Ok now we can be sure, lets remove this object so we don't try to drop it later.
 							iter = tempAttachList.erase(iter);
-							continue;
+						} else {
+							 ++iter;
 						}
-					}
-				}
-				iter++;
-			}
-
-			//Try to attach all the other attachments that didn't fit their current slot.
-			for (attachmentList::iterator iter = tempAttachList.begin(); iter != tempAttachList.end();) {
-				if(ValidItemAttachmentSlot(pObj, iter->usItem, TRUE, FALSE, 0, -1)){
-					//This seems to be rather valid. Can't be 100% sure though.
-					if(pObj->AttachObject(NULL, &(*iter), FALSE, 0, -1, FALSE)){
-						//Ok now we can be sure, lets remove this object so we don't try to drop it later.
-						iter = tempAttachList.erase(iter);
 					} else {
-						 ++iter;
+						++iter;
 					}
-				} else {
-					++iter;
 				}
-			}
 
-			//Anything that's still in our tempAttachList couldn't be attached, and should be dropped.
-			for (attachmentList::iterator iter = tempAttachList.begin(); iter != tempAttachList.end(); ++iter) {
-				if ( !Item[iter->usItem].inseparable )
-				{//WarmSteel - Couldn't re-attach this item, try to drop it.
-					if (pSoldier) {
-						if ( !AutoPlaceObject( pSoldier, &(*iter), FALSE ) )
-						{   // put it on the ground
-							AddItemToPool( pSoldier->sGridNo, &(*iter), 1, pSoldier->pathing.bLevel, 0 , -1 );
+				//Anything that's still in our tempAttachList couldn't be attached, and should be dropped.
+				for (attachmentList::iterator iter = tempAttachList.begin(); iter != tempAttachList.end(); ++iter) {
+					if ( !Item[iter->usItem].inseparable )
+					{//WarmSteel - Couldn't re-attach this item, try to drop it.
+						if (pSoldier) {
+							if ( !AutoPlaceObject( pSoldier, &(*iter), FALSE ) )
+							{   // put it on the ground
+								AddItemToPool( pSoldier->sGridNo, &(*iter), 1, pSoldier->pathing.bLevel, 0 , -1 );
+							}
+						}
+					}
+					//We already removed this.
+					//pObj->RemoveAttachment(&(*iter),0 ,0 , pSoldier, TRUE, 0);
+				}
+
+				tempItemSlots = GetItemSlots(pObj);
+
+				fDoneRemovingProhibited = TRUE;
+
+				//Check if the slots have changed after possibly removing attachments.
+				if(tempItemSlots.size() != pObj->usAttachmentSlotIndexVector.size()){
+					//Changed, we need to correct again.
+					fDoneRemovingProhibited = FALSE;
+				} else if(!tempItemSlots.empty()){
+					for (UINT16 cnt = 0; cnt < tempItemSlots.size(); ++cnt) {
+						//If these slots don't match, something has changed, keep checking.
+						if(tempItemSlots[cnt] != pObj->usAttachmentSlotIndexVector[cnt]){
+							fDoneRemovingProhibited = FALSE;
+							break;
 						}
 					}
 				}
-				//We already removed this.
-				//pObj->RemoveAttachment(&(*iter),0 ,0 , pSoldier, TRUE, 0);
+				pObj->usAttachmentSlotIndexVector = tempItemSlots;
+				usInfiniteLoopCount++;
 			}
 		}
 	} else {
@@ -4982,7 +5144,7 @@ void RemoveProhibitedAttachments(SOLDIERTYPE* pSoldier, OBJECTTYPE* pObj, UINT16
 				//WarmSteel - erase null objects, we don't need them without the NAS.
 				iter = (*pObj)[0]->attachments.erase(iter);
 			} else {
-				if ((!ValidAttachment(iter->usItem, usItem) && !ValidLaunchable(iter->usItem, usItem)) || x >= OLD_MAX_ATTACHMENTS_101)
+				if ((!ValidAttachment(iter->usItem, pObj) && !ValidLaunchable(iter->usItem, usItem)) || x >= OLD_MAX_ATTACHMENTS_101)
 				{
 					if ( !Item[iter->usItem].inseparable )
 					{
@@ -5034,22 +5196,20 @@ void ReInitMergedItem(SOLDIERTYPE* pSoldier, OBJECTTYPE* pObj, UINT16 usOldItem)
 			}
 		}
 		slotCount = 0;
-		BOOLEAN fSlotChanging;
 		//Put all other attachments into a temporary storage, so we can try to re-attach later.
 		for(attachmentList::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); iter++, slotCount++) {
 			if(iter->exists()){
-				fSlotChanging = FALSE;
-				//Look up if this is a slot changing attachment
-				for(UINT16 cnt = 0; cnt < MAXATTACHMENTS && AttachmentSlotAssign[cnt].uiAttachmentIndex != 0; cnt++){
-					if(AttachmentSlotAssign[cnt].uiAttachmentIndex == iter->usItem && AttachmentSlotAssign[cnt].usAttachmentSlotIndexAssign == pObj->usAttachmentSlotIndexVector[slotCount]){
-						//this is apparently a slot changing attachment.
-						tempSlotChangingAttachList.push_back((*iter));
-						fSlotChanging = TRUE;
-					}
-				}
-				//If it wasn't slot changing, add it to this list instead.
-				if(!fSlotChanging)
+				UINT16 cnt = 0;
+				//Look up if this attachment
+				for(cnt = 0; AlteringAttachments[cnt].usAttachmentIndex != 0 && AlteringAttachments[cnt].usAttachmentIndex != iter->usItem; cnt++){}
+				
+				if(AlteringAttachments[cnt].usAttachmentIndex != 0){
+					//this is apparently a slot changing attachment.
+					tempSlotChangingAttachList.push_back((*iter));
+				} else {
+					//normal attachment.
 					tempAttachList.push_back((*iter));
+				}
 			}
 		}
 	}
@@ -5062,17 +5222,12 @@ void ReInitMergedItem(SOLDIERTYPE* pSoldier, OBJECTTYPE* pObj, UINT16 usOldItem)
 	pObj->usAttachmentSlotIndexVector = tempItemSlots;
 
 	//Now add all default attachments, but add them with the same status as the gun. We don't want to make repairing guns easy :)
-	for(UINT16 cnt = 0; cnt < MAX_DEFAULT_ATTACHMENTS; cnt++){
-		if(Item[pObj->usItem].defaultattachments[cnt] != 0){
-			//Only add inseparable default attachments, because they are likely "part" of the gun.
-			if(Item[Item[pObj->usItem].defaultattachments[cnt]].inseparable){
-				static OBJECTTYPE defaultAttachment;
-				CreateItem(Item [ pObj->usItem ].defaultattachments[cnt],(*pObj)[0]->data.objectStatus,&defaultAttachment);
-				AssertMsg(pObj->AttachObject(NULL,&defaultAttachment, FALSE, 0, -1, FALSE), "A default attachment could not be attached after merging, this should not be possible.");
-			}
-		} else {
-			//Apparently there are no more default attachments.
-			break;
+	for(UINT16 cnt = 0; cnt < MAX_DEFAULT_ATTACHMENTS && Item[pObj->usItem].defaultattachments[cnt] != 0; cnt++){
+		//Only add inseparable default attachments, because they are likely "part" of the gun.
+		if(Item[Item[pObj->usItem].defaultattachments[cnt]].inseparable){
+			static OBJECTTYPE defaultAttachment;
+			CreateItem(Item [ pObj->usItem ].defaultattachments[cnt],(*pObj)[0]->data.objectStatus,&defaultAttachment);
+			AssertMsg(pObj->AttachObject(NULL,&defaultAttachment, FALSE, 0, -1, FALSE), "A default attachment could not be attached after merging, this should not be possible.");
 		}
 	}
 
@@ -5309,7 +5464,7 @@ BOOLEAN CanItemFitInPosition( SOLDIERTYPE *pSoldier, OBJECTTYPE *pObj, INT8 bPos
 			if(pObj->usItem == MONEY)
 				return( FALSE );
 			if(Item[pObj->usItem].usItemClass == IC_AMMO || Item[pObj->usItem].usItemClass == IC_GRENADE)
-				return(CompatibleAmmoForGun(pObj, &pSoldier->inv[GUNSLINGPOCKPOS]) || NASValidAttachment(pObj->usItem, pSoldier->inv[GUNSLINGPOCKPOS].usItem) || ValidLaunchable(pObj->usItem, pSoldier->inv[GUNSLINGPOCKPOS].usItem));
+				return(CompatibleAmmoForGun(pObj, &pSoldier->inv[GUNSLINGPOCKPOS]) || ValidAttachment(pObj->usItem, &(pSoldier->inv[GUNSLINGPOCKPOS]) ) || ValidLaunchable(pObj->usItem, pSoldier->inv[GUNSLINGPOCKPOS].usItem));
 			//recalc slot limit to exclude ItemSize attachment modifiers
 			ubSlotLimit = ItemSlotLimit( pObj, bPos, pSoldier, FALSE );
 			// Removed backpack/gunsling restrictions
@@ -5320,7 +5475,7 @@ BOOLEAN CanItemFitInPosition( SOLDIERTYPE *pSoldier, OBJECTTYPE *pObj, INT8 bPos
 			if(pObj->usItem == MONEY)
 				return( FALSE );
 			if (Item[pObj->usItem].usItemClass != IC_BLADE && Item[pObj->usItem].usItemClass != IC_THROWING_KNIFE )
-				return(CompatibleAmmoForGun(pObj, &pSoldier->inv[KNIFEPOCKPOS]) || NASValidAttachment(pObj->usItem, pSoldier->inv[KNIFEPOCKPOS].usItem) || ValidLaunchable(pObj->usItem, pSoldier->inv[KNIFEPOCKPOS].usItem));
+				return(CompatibleAmmoForGun(pObj, &pSoldier->inv[KNIFEPOCKPOS]) || ValidAttachment(pObj->usItem, &(pSoldier->inv[KNIFEPOCKPOS]) ) || ValidLaunchable(pObj->usItem, pSoldier->inv[KNIFEPOCKPOS].usItem));
 			break;
 		// IC Pockets
 		case BIGPOCK1POS:
@@ -5390,11 +5545,11 @@ BOOLEAN CanItemFitInPosition( SOLDIERTYPE *pSoldier, OBJECTTYPE *pObj, INT8 bPos
 	{
 		// CHRISL: lbePocket==0 means pocket disabled.  ubSlotLimit==0 means pocket can't hold item
 		if ( lbePocket == 0 || ubSlotLimit == 0 )
-			return ( CompatibleAmmoForGun(pObj, &pSoldier->inv[bPos]) || NASValidAttachment(pObj->usItem, pSoldier->inv[bPos].usItem) || ValidLaunchable(pObj->usItem, pSoldier->inv[bPos].usItem) );
+			return ( CompatibleAmmoForGun(pObj, &pSoldier->inv[bPos]) || ValidAttachment(pObj->usItem, &(pSoldier->inv[bPos]) ) || ValidLaunchable(pObj->usItem, pSoldier->inv[bPos].usItem) );
 
 		// CHRISL: Adjust parameters to include the new inventory system
 		if (ubSlotLimit == 0 && bPos >= BIGPOCKFINAL )
-			return( CompatibleAmmoForGun(pObj, &pSoldier->inv[bPos]) || NASValidAttachment(pObj->usItem, pSoldier->inv[bPos].usItem) || ValidLaunchable(pObj->usItem, pSoldier->inv[bPos].usItem) );
+			return( CompatibleAmmoForGun(pObj, &pSoldier->inv[bPos]) || ValidAttachment(pObj->usItem, &(pSoldier->inv[bPos]) ) || ValidLaunchable(pObj->usItem, pSoldier->inv[bPos].usItem) );
 	}
 
 	return( TRUE );
@@ -5538,9 +5693,6 @@ BOOLEAN PlaceObject( SOLDIERTYPE * pSoldier, INT8 bPos, OBJECTTYPE * pObj )
 			KeyTable[ (*pObj)[0]->data.key.ubKeyID ].usSectorFound = SECTOR( pSoldier->sSectorX, pSoldier->sSectorY );
 		}
 	}
-	
-	
-
 
     // Lesh: bugfix - replacing weapon in auto with another weapon w/o auto-mode
     if (bPos == HANDPOS && Item[ pObj->usItem ].usItemClass == IC_GUN)
@@ -6420,6 +6572,22 @@ UINT16 UseKitPoints( OBJECTTYPE * pObj, UINT16 usPoints, SOLDIERTYPE *pSoldier )
 
 	for (bLoop = pObj->ubNumberOfObjects - 1; bLoop >= 0; bLoop--)
 	{
+		// SANDRO - revisited this code, make the percentstatusdrainreduction count always
+		if( (usPoints * (max( 0, (100 - Item[pObj->usItem].percentstatusdrainreduction)))/100) < (*pObj)[bLoop]->data.objectStatus )
+		{
+			(*pObj)[bLoop]->data.objectStatus -= (INT8)(usPoints * (max( 0, (100 - Item[pObj->usItem].percentstatusdrainreduction) ) )/100);
+			return( usOriginalPoints );
+		}
+		else
+		{
+			// consume this kit totally
+			usPoints -= (((*pObj)[bLoop]->data.objectStatus) / (max( 0, (100 - Item[pObj->usItem].percentstatusdrainreduction))) /100);
+			(*pObj)[bLoop]->data.objectStatus = 0;
+
+			pObj->ubNumberOfObjects--;
+		}
+		/*
+		// SANDRO - heh, this is not very right solution.. in second case, the percentstatusdrainreduction should be taken into account too
 		if (Item[pObj->usItem].percentstatusdrainreduction  > 0 && ((usPoints * (100 - Item[pObj->usItem].percentstatusdrainreduction))/100) < (*pObj)[bLoop]->data.objectStatus )
 		{
 			(*pObj)[bLoop]->data.objectStatus -= (INT8) ((usPoints * (100 - Item[pObj->usItem].percentstatusdrainreduction ) )/100);
@@ -6437,7 +6605,7 @@ UINT16 UseKitPoints( OBJECTTYPE * pObj, UINT16 usPoints, SOLDIERTYPE *pSoldier )
 			(*pObj)[bLoop]->data.objectStatus = 0;
 
 			pObj->ubNumberOfObjects--;
-		}
+		}*/
 	}
 
 	// check if pocket/hand emptied..update inventory, then update panel
@@ -6813,8 +6981,10 @@ BOOLEAN CreateGun( UINT16 usItem, INT16 bStatus, OBJECTTYPE * pObj )
 		}
 	}
 
-	//WarmSteel - This will also init any slots that should be on the gun if it's empty.
-	RemoveProhibitedAttachments(NULL, pObj, usItem);
+	//WarmSteel - Init item slots.
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW)
+		InitItemAttachments(pObj);
+
 	//ADB ubWeight has been removed, see comments in OBJECTTYPE
 	//pObj->ubWeight = CalculateObjectWeight( pObj );
 	DebugMsg(TOPIC_JA2,DBG_LEVEL_3,String("CreateGun: Done"));
@@ -6838,8 +7008,10 @@ BOOLEAN CreateAmmo( UINT16 usItem, OBJECTTYPE * pObj, INT16 ubShotsLeft )
 	else {
 		(*pObj)[0]->data.ubShotsLeft = (UINT8)ubShotsLeft;
 	}
-	//WarmSteel - This will also init any slots that should be on the item if it's empty.
-	RemoveProhibitedAttachments(NULL, pObj, usItem);
+	//WarmSteel - Init attachment slots.
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW)
+		InitItemAttachments(pObj);
+
 	//ADB ubWeight has been removed, see comments in OBJECTTYPE
 	//pObj->ubWeight = CalculateObjectWeight( pObj );
 	DebugMsg(TOPIC_JA2,DBG_LEVEL_3,String("CreateAmmo: done"));
@@ -6885,8 +7057,10 @@ BOOLEAN CreateItem( UINT16 usItem, INT16 bStatus, OBJECTTYPE * pObj )
 		//ADB ubWeight has been removed, see comments in OBJECTTYPE
 		//pObj->ubWeight = CalculateObjectWeight( pObj );
 		fRet = TRUE;
-		//WarmSteel - This will also init any slots that should be on the  item if it's empty.
-		RemoveProhibitedAttachments(NULL, pObj, usItem);
+		//WarmSteel - Init attachment slots.
+		if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW)
+			InitItemAttachments(pObj);
+
 	}
 	if (fRet)
 	{
@@ -7037,7 +7211,7 @@ BOOLEAN OBJECTTYPE::RemoveAttachment( OBJECTTYPE* pAttachment, OBJECTTYPE * pNew
 {
 	BOOLEAN		objDeleted = FALSE;
 
-	if ( pAttachment->exists() == false )
+	if ( pAttachment->exists() == false || this->exists() == false)
 	{
 		return( FALSE );
 	}
@@ -7048,39 +7222,59 @@ BOOLEAN OBJECTTYPE::RemoveAttachment( OBJECTTYPE* pAttachment, OBJECTTYPE * pNew
 		return( FALSE );
 	}
 
-	if (Item[ pAttachment->usItem ].magsizebonus > 0 && (*this)[0]->data.gun.ubGunShotsLeft > Weapon[Item[this->usItem].ubClassIndex].ubMagSize && (*this)[0]->data.gun.usGunAmmoItem != NONE && (*this)[0]->data.gun.ubGunShotsLeft > 0)
-	{
-		// Need to empty this weapon, because the magsize is changing.
-		EjectAmmoAndPlace(pSoldier, this);
-	}
-
 	//CHRISL: I know this FOR loop is basically redundant to what the remove() function already does, but
 	//	this setup includes a failsafe.  Now we'll only copy the attachment to our cursor (pNewObj) if
 	//	iter and pAttachment are the same.  This should stop attachment duplication though it doesn't resolve
 	//	the initial cause of the attachment duplication issue.
 
+	//First look for attachment with the exact same memory adress.
+	//This is so that you can click to remove an attachment and it will take off THAT attachment and not the first one that just "looks" like it.
 	for (std::list<OBJECTTYPE>::iterator iter = (*this)[subObject]->attachments.begin();
 		iter != (*this)[subObject]->attachments.end(); ++iter){
-			if(*iter == *pAttachment)
+			//Compare the adress
+			if(&(*iter) == pAttachment)
 			{
 				if(pNewObj != NULL)
 				{
 					*pNewObj = *pAttachment;
 				}
-				if(gGameExternalOptions.fNewAttachmentSystem){
-					OBJECTTYPE null;
-					iter = (*this)[subObject]->attachments.erase(iter);
-					iter = (*this)[subObject]->attachments.insert(iter, null);
-				} else {
-					iter = (*this)[subObject]->attachments.erase(iter);
-				}
+
+				iter = (*this)[subObject]->RemoveAttachmentAtIter(iter);
 
 				objDeleted = TRUE;
 				break;
 			}
 	}
+	//It is possible that the previous loop did not find the EXACT attachment we wanted to delete, look if there is one that is at least equal in data.
+	if(!objDeleted){
+		for (std::list<OBJECTTYPE>::iterator iter = (*this)[subObject]->attachments.begin();
+			iter != (*this)[subObject]->attachments.end(); ++iter){
+				//This compares the internal data of the objects.
+				if(*iter == *pAttachment)
+				{
+					if(pNewObj != NULL)
+					{
+						*pNewObj = *pAttachment;
+					}
+
+					iter = (*this)[subObject]->RemoveAttachmentAtIter(iter);
+
+					objDeleted = TRUE;
+					break;
+				}
+		}
+	}
 	if(!objDeleted)
 		return( FALSE );
+
+	//After removing an attachment, the ammo capacity might have changed.
+	if ( Item[this->usItem].usItemClass == IC_GUN && (*this)[0]->data.gun.usGunAmmoItem != NONE && (*this)[0]->data.gun.ubGunShotsLeft > 0 )
+	{
+		if ( (*this)[0]->data.gun.ubGunShotsLeft > GetMagSize(this) )
+		{ //Too many rounds, eject ammo
+			EjectAmmoAndPlace(pSoldier, this);
+		}
+	}
 
 	if (pNewObj->exists() && Item[pNewObj->usItem].grenadelauncher )//UNDER_GLAUNCHER)
 	{
@@ -7095,7 +7289,8 @@ BOOLEAN OBJECTTYPE::RemoveAttachment( OBJECTTYPE* pAttachment, OBJECTTYPE * pNew
 			this->RemoveAttachment(pGrenade, NULL, 0, NULL, 1, 0);
 		}
 	}
-	if(gGameExternalOptions.fNewAttachmentSystem && fRemoveProhibited){
+	//Removing an attachment can alter slots, check them.
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW && fRemoveProhibited){
 		RemoveProhibitedAttachments(pSoldier, this, this->usItem);
 	}
 
@@ -7355,6 +7550,11 @@ BOOLEAN CheckForChainReaction( UINT16 usItem, INT16 bStatus, INT16 bDamage, BOOL
 			// improve chance to make it practical to blow up explosives on the ground
 			iChance = 50 + (iChance - 1) * 10;
 		}
+		// SANDRO - experimental - increased chance to chain reactions of carried explosives a bit
+		else
+		{
+			iChance = 3 + (iChance - 1) * 3;
+		}
 
 		iChance = iChance * ( 100 + ( (100 - bStatus) + bDamage ) / 2 ) / 100;
 		if ((INT32) PreRandom( 100 ) < iChance)
@@ -7443,15 +7643,11 @@ BOOLEAN DamageItem( OBJECTTYPE * pObject, INT32 iDamage, BOOLEAN fOnGround )
 					if (iter->exists() == true) {
 						++iter;
 					}
-					else {
-						if(gGameExternalOptions.fNewAttachmentSystem){
-							OBJECTTYPE null;
-							iter = (*pObject)[bLoop]->attachments.erase(iter);
-							iter = (*pObject)[bLoop]->attachments.insert(iter, null);
+					else {				
+						iter = (*pObject)[bLoop]->RemoveAttachmentAtIter(iter);
+
+						if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW)
 							++iter;
-						} else {
-							iter = (*pObject)[bLoop]->attachments.erase(iter);
-						}
 					}
 				}
 			}
@@ -7554,6 +7750,13 @@ BOOLEAN DamageItemOnGround( OBJECTTYPE * pObject, INT32 sGridNo, INT8 bLevel, IN
 	{
 		// OK, Ignite this explosion!
 		IgniteExplosion( ubOwner, CenterX( sGridNo ), CenterY( sGridNo ), 0, sGridNo, pObject->usItem, bLevel );
+
+		// SANDRO - merc records
+		if ( (pObject->fFlags & OBJECT_ARMED_BOMB) && ((*pObject)[0]->data.misc.ubBombOwner > 1) )
+		{
+			if ( MercPtrs[ ((*pObject)[0]->data.misc.ubBombOwner - 2) ]->ubProfile != NO_PROFILE && MercPtrs[ ((*pObject)[0]->data.misc.ubBombOwner - 2) ]->bTeam == gbPlayerNum ) 
+				gMercProfiles[ MercPtrs[ ((*pObject)[0]->data.misc.ubBombOwner - 2) ]->ubProfile ].records.usExpDetonated++;
+		}
 
 		// Remove item!
 		return( TRUE );
@@ -7680,57 +7883,173 @@ void WaterDamage( SOLDIERTYPE *pSoldier )
 		}
 	}
 	BOOLEAN camoWoreOff = FALSE;
-	if (pSoldier->bCamo > 0 && !HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED ) )
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// ADDED BY SANDRO - Ranger trait makes camouflage reduction lesser
+	// I've messed this part a little to be more clean, the different camouflaged traits have been merged into one
+	if ( gGameOptions.fNewTraitSystem)
 	{
 		// reduce camouflage by 2% per tile of deep water
 		// and 1% for medium water
-		if ( pSoldier->MercInDeepWater( ) )
-			pSoldier->bCamo = __max( 0, pSoldier->bCamo - 2 );
-		else
-			pSoldier->bCamo = __max( 0, pSoldier->bCamo - 1 );
+		if ( pSoldier->bCamo > 0 )
+		{
+			if ( HAS_SKILL_TRAIT( pSoldier, RANGER_NT ) )
+			{
+				if ( pSoldier->MercInDeepWater( ) )
+				{
+					pSoldier->bCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+					pSoldier->bCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+				}
+				else
+				{
+					pSoldier->bCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+				}
+			}
+			else
+			{
+				if ( pSoldier->MercInDeepWater( ) )
+					pSoldier->bCamo = __max( 0, pSoldier->bCamo - 2 );
+				else
+					pSoldier->bCamo = __max( 0, pSoldier->bCamo - 1 );
+			}
 
-		if ( (pSoldier->bCamo)== 0)
-			camoWoreOff = TRUE;
+			if ( pSoldier->bCamo <= 0 )
+			{
+				pSoldier->bCamo = 0;
+				camoWoreOff = TRUE;
+			}
+		}
+		if ( pSoldier->urbanCamo > 0 )
+		{
+			if ( HAS_SKILL_TRAIT( pSoldier, RANGER_NT ) )
+			{
+				if ( pSoldier->MercInDeepWater( ) )
+				{
+					pSoldier->urbanCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+					pSoldier->urbanCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+				}
+				else
+				{
+					pSoldier->urbanCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+				}
+			}
+			else
+			{
+				if ( pSoldier->MercInDeepWater( ) )
+					pSoldier->urbanCamo = __max( 0, pSoldier->urbanCamo - 2);
+				else
+					pSoldier->urbanCamo = __max( 0, pSoldier->urbanCamo - 1);
+			}
+
+			if ( pSoldier->urbanCamo <= 0 )
+			{
+				pSoldier->urbanCamo = 0;
+				camoWoreOff = TRUE;
+			}
+		}
+		if ( pSoldier->desertCamo > 0 )
+		{
+			if ( HAS_SKILL_TRAIT( pSoldier, RANGER_NT ) )
+			{
+				if ( pSoldier->MercInDeepWater( ) )
+				{
+					pSoldier->desertCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+					pSoldier->desertCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+				}
+				else
+				{
+					pSoldier->desertCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+				}
+			}
+			else
+			{
+				if ( pSoldier->MercInDeepWater( ) )
+					pSoldier->desertCamo = __max( 0, pSoldier->desertCamo - 2);
+				else
+					pSoldier->desertCamo = __max( 0, pSoldier->desertCamo - 1);
+			}
+
+			if ( pSoldier->desertCamo <= 0 )
+			{
+				pSoldier->desertCamo = 0;
+				camoWoreOff = TRUE;
+			}
+		}
+		if ( pSoldier->snowCamo > 0 )
+		{
+			if ( HAS_SKILL_TRAIT( pSoldier, RANGER_NT ) )
+			{
+				if ( pSoldier->MercInDeepWater( ) )
+				{
+					pSoldier->snowCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+					pSoldier->snowCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+				}
+				else
+				{
+					pSoldier->snowCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+				}
+			}
+			else
+			{
+				if ( pSoldier->MercInDeepWater( ) )
+					pSoldier->snowCamo = __max( 0, pSoldier->snowCamo - 2);
+				else
+					pSoldier->snowCamo = __max( 0, pSoldier->snowCamo - 1);
+			}
+
+			if ( pSoldier->snowCamo <= 0 )
+			{
+				pSoldier->snowCamo = 0;
+				camoWoreOff = TRUE;
+			}
+		}
 	}
-
-	if (pSoldier->urbanCamo > 0 && !HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_URBAN ) )
+	else if ( !HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_OT ) ) // Old Camouflaged trait
 	{
 		// reduce camouflage by 2% per tile of deep water
 		// and 1% for medium water
-		if ( pSoldier->MercInDeepWater( ) )
-			pSoldier->urbanCamo = __max( 0, pSoldier->urbanCamo - 2 );
-		else
-			pSoldier->urbanCamo = __max( 0, pSoldier->urbanCamo - 1 );
+		if ( pSoldier->bCamo > 0 )
+		{
+			if ( pSoldier->MercInDeepWater( ) )
+				pSoldier->bCamo = __max( 0, pSoldier->bCamo - 2 );
+			else
+				pSoldier->bCamo = __max( 0, pSoldier->bCamo - 1 );
 
-		if ( (pSoldier->urbanCamo)== 0)
-			camoWoreOff = TRUE;
+			if ( (pSoldier->bCamo)== 0)
+				camoWoreOff = TRUE;
+		}
+		if ( pSoldier->urbanCamo > 0 )
+		{
+			if ( pSoldier->MercInDeepWater( ) )
+				pSoldier->urbanCamo = __max( 0, pSoldier->urbanCamo - 2);
+			else
+				pSoldier->urbanCamo = __max( 0, pSoldier->urbanCamo - 1);
+			
+			if ( (pSoldier->urbanCamo)== 0)
+				camoWoreOff = TRUE;
+		}
+		if ( pSoldier->desertCamo > 0 )
+		{
+			if ( pSoldier->MercInDeepWater( ) )
+				pSoldier->desertCamo = __max( 0, pSoldier->desertCamo - 2);
+			else
+				pSoldier->desertCamo = __max( 0, pSoldier->desertCamo - 1);
+			
+			if ( (pSoldier->desertCamo)== 0)
+				camoWoreOff = TRUE;
+		}
+		if ( pSoldier->snowCamo > 0 )
+		{
+			if ( pSoldier->MercInDeepWater( ) )
+				pSoldier->snowCamo = __max( 0, pSoldier->snowCamo - 2);
+			else
+				pSoldier->snowCamo = __max( 0, pSoldier->snowCamo - 1);
+			
+			if ( (pSoldier->snowCamo)== 0)
+				camoWoreOff = TRUE;
+		}	
 	}
-
-	if (pSoldier->desertCamo > 0 && !HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_DESERT ) )
-	{
-		// reduce camouflage by 2% per tile of deep water
-		// and 1% for medium water
-		if ( pSoldier->MercInDeepWater( ) )
-			pSoldier->desertCamo = __max( 0, pSoldier->desertCamo - 2 );
-		else
-			pSoldier->desertCamo = __max( 0, pSoldier->desertCamo - 1 );
-
-		if ( (pSoldier->desertCamo)== 0)
-			camoWoreOff = TRUE;
-	}
-
-	if (pSoldier->snowCamo > 0 && !HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_SNOW ) )
-	{
-		// reduce camouflage by 2% per tile of deep water
-		// and 1% for medium water
-		if ( pSoldier->MercInDeepWater( ) )
-			pSoldier->snowCamo = __max( 0, pSoldier->snowCamo - 2 );
-		else
-			pSoldier->snowCamo = __max( 0, pSoldier->snowCamo - 1 );
-
-		if ( (pSoldier->snowCamo)== 0)
-			camoWoreOff = TRUE;
-	}
+	/////////////////////////////////////////////////////////////////////////////////////
 
 	if ( camoWoreOff )
 	{
@@ -7785,15 +8104,45 @@ void WaterDamage( SOLDIERTYPE *pSoldier )
 
 BOOLEAN ApplyCammo( SOLDIERTYPE * pSoldier, OBJECTTYPE * pObj, BOOLEAN *pfGoodAPs )
 {
+	// Added - SANDRO
 	INT8		bPointsToUse;
 	UINT16	usTotalKitPoints;
+	UINT16 iRemainingCamoAfterRemoving; 
 
 	(*pfGoodAPs) = TRUE;
 
-	if (!Item[pObj->usItem].camouflagekit || pObj->exists() == false)
+	if (pObj->exists() == false)
+		return( FALSE );
+
+	//////////////////////////////////////////////////////////////////////////////
+	// added possibility to remove all camo by using a rag on self - SANDRO
+	if (pObj->usItem == 1022 && gGameExternalOptions.fCamoRemoving)
+	{
+		if (!EnoughPoints( pSoldier, (APBPConstants[AP_CAMOFLAGE]/2), 0, TRUE ) )
+		{
+			(*pfGoodAPs) = FALSE;
+			return( TRUE );
+		}
+		// 100 should be enough. The third value "0" means we will remove all types of camo
+		ReduceCamoFromSoldier( pSoldier, 100, 0 );
+
+		// damage the rag :) - actually you would need to flag it damagable in the items.XML
+		DamageItem( pObj, 22, FALSE );
+
+		DeductPoints( pSoldier, (APBPConstants[AP_CAMOFLAGE] / 2), 0 );
+
+		// Reload palettes....
+		if ( pSoldier->bInSector )
+		{
+			pSoldier->CreateSoldierPalettes( );
+		}
+		return( TRUE );
+	}
+	else if ( !Item[pObj->usItem].camouflagekit )
 	{
 		return( FALSE );
 	}
+	//////////////////////////////////////////////////////////////////////////////
 
 	if (!EnoughPoints( pSoldier, APBPConstants[AP_CAMOFLAGE], 0, TRUE ) )
 	{
@@ -7808,31 +8157,213 @@ BOOLEAN ApplyCammo( SOLDIERTYPE * pSoldier, OBJECTTYPE * pObj, BOOLEAN *pfGoodAP
 		return( FALSE );
 	}
 
-	//get total camo bonus for kit -- note that camo kits now require the camobonus tag to be set
-	//int itemCamo = Item[pObj->usItem].camobonus + Item[pObj->usItem].urbanCamobonus + Item[pObj->usItem].desertCamobonus + Item[pObj->usItem].snowCamobonus;
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	// SANDRO - Added a feature to determine which type of camo we use								//
+	// and procedure able to reduce different type of camo											//
+	// ******************************************************************************************** //
 
-	int totalCamo = pSoldier->bCamo + pSoldier->wornCamo + pSoldier->urbanCamo+pSoldier->wornUrbanCamo+pSoldier->desertCamo+pSoldier->wornDesertCamo+pSoldier->snowCamo+pSoldier->wornSnowCamo;
-	if ((totalCamo) >= 100)
+	if (gGameExternalOptions.fCamoRemoving)
 	{
-		// nothing more to add
-		return( FALSE );
+		int iJungleCamoTotal = pSoldier->bCamo + pSoldier->wornCamo;
+		int iUrbanCamoTotal = pSoldier->urbanCamo + pSoldier->wornUrbanCamo;
+		int iDesertCamoTotal = pSoldier->desertCamo + pSoldier->wornDesertCamo;
+		int iSnowCamoTotal = pSoldier->snowCamo + pSoldier->wornSnowCamo;
+
+		int totalCamo = iJungleCamoTotal + iUrbanCamoTotal + iDesertCamoTotal + iSnowCamoTotal;
+
+		// First, check if we have an item with major JUNGLE camobonus
+		if ( (Item[pObj->usItem].camobonus > Item[pObj->usItem].urbanCamobonus) && 
+			 (Item[pObj->usItem].camobonus > Item[pObj->usItem].desertCamobonus) &&
+			 (Item[pObj->usItem].camobonus > Item[pObj->usItem].snowCamobonus) )
+		{
+			if (iJungleCamoTotal >= 100)
+				return( FALSE );
+
+			// determine how much we can add
+			bPointsToUse = (100 - (iJungleCamoTotal) + 1 ) / 2;
+			bPointsToUse = __min( bPointsToUse, usTotalKitPoints );
+
+			// determine how much we will add
+			int iJungleCamoAdded = (int)(Item[pObj->usItem].camobonus * bPointsToUse * 2 / 100 );
+
+			// if we have already too much different camo on ourselves, reduce some or all
+			if ( (totalCamo + iJungleCamoAdded) > 100 )
+			{
+				// first, determine how much we actually want to remove
+				int iCamoToRemove = (totalCamo + iJungleCamoAdded) - 100;
+
+				// reduce camo.. IMPORTANT - third value is type of camo to skip (0=skip-none, 1=jungle, 2=urban, 3=desert,4=snow)
+				iRemainingCamoAfterRemoving = ReduceCamoFromSoldier( pSoldier, iCamoToRemove, 1 ); // "1" - we want to keep the JUNGLE camo
+
+				// if some camo haven't been reduced from us, the camo to add will be lessened by that value
+				if (iRemainingCamoAfterRemoving > 0)
+					iJungleCamoAdded = max(0, (iJungleCamoAdded - iRemainingCamoAfterRemoving));
+
+				if (iJungleCamoAdded <= 0) // if we have nothing to add now, return
+					return( FALSE );
+				else // otherwise apply the camo
+				{
+					pSoldier->bCamo = __min( 100, pSoldier->bCamo + iJungleCamoAdded );
+				}
+			}
+			else // everything's fine, apply!!
+			{
+				pSoldier->bCamo = __min( 100, pSoldier->bCamo + iJungleCamoAdded );
+			}
+		}
+		// Second, check if we have an item with major URBAN camobonus
+		else if ( (Item[pObj->usItem].urbanCamobonus > Item[pObj->usItem].camobonus) && 
+			 (Item[pObj->usItem].urbanCamobonus > Item[pObj->usItem].desertCamobonus) &&
+			 (Item[pObj->usItem].urbanCamobonus > Item[pObj->usItem].snowCamobonus) )
+		{
+			if (iUrbanCamoTotal >= 100)
+				return( FALSE );
+
+			// determine how much we can add
+			bPointsToUse = (100 - (iUrbanCamoTotal) + 1 ) / 2;
+			bPointsToUse = __min( bPointsToUse, usTotalKitPoints );
+
+			// determine how much we will add
+			int iUrbanCamoAdded = (int)(Item[pObj->usItem].urbanCamobonus * bPointsToUse * 2 / 100 );
+
+			// if we have already too much different camo on ourselves, reduce some or all
+			if ( (totalCamo + iUrbanCamoAdded) > 100 )
+			{
+				// first, determine how much we actually want to remove
+				int iCamoToRemove = (totalCamo + iUrbanCamoAdded) - 100;
+
+				// reduce camo.. IMPORTANT - third value is type of camo to skip (0=skip-none, 1=jungle, 2=urban, 3=desert,4=snow)
+				iRemainingCamoAfterRemoving = ReduceCamoFromSoldier( pSoldier, iCamoToRemove, 2 ); // "2" - we want to keep the URBAN camo
+
+				// if some camo haven't been reduced from us, the camo to add will be lessened by that value
+				if (iRemainingCamoAfterRemoving > 0)
+					iUrbanCamoAdded = max(0, (iUrbanCamoAdded - iRemainingCamoAfterRemoving));
+
+				if (iUrbanCamoAdded <= 0) // if we have nothing to add now, return
+					return( FALSE );
+				else // otherwise apply the camo
+				{
+					pSoldier->urbanCamo = __min( 100, pSoldier->urbanCamo + iUrbanCamoAdded );
+				}
+			}
+			else // everything's fine, apply!!
+			{
+				pSoldier->urbanCamo = __min( 100, pSoldier->urbanCamo + iUrbanCamoAdded );
+			}
+		}
+		// Third, check if we have an item with major DESERT camobonus
+		else if ( (Item[pObj->usItem].desertCamobonus > Item[pObj->usItem].camobonus) && 
+			 (Item[pObj->usItem].desertCamobonus > Item[pObj->usItem].urbanCamobonus) &&
+			 (Item[pObj->usItem].desertCamobonus > Item[pObj->usItem].snowCamobonus) )
+		{
+			if (iDesertCamoTotal >= 100)
+				return( FALSE );
+
+			// determine how much we can add
+			bPointsToUse = (100 - (iDesertCamoTotal) + 1 ) / 2;
+			bPointsToUse = __min( bPointsToUse, usTotalKitPoints );
+
+			// determine how much we will add
+			int iDesertCamoAdded = (int)(Item[pObj->usItem].desertCamobonus * bPointsToUse * 2 / 100 );
+
+			// if we have already too much different camo on ourselves, reduce some or all
+			if ( (totalCamo + iDesertCamoAdded) > 100 )
+			{
+				// first, determine how much we actually want to remove
+				int iCamoToRemove = (totalCamo + iDesertCamoAdded) - 100;
+
+				// reduce camo.. IMPORTANT - third value is type of camo to skip (0=skip-none, 1=jungle, 2=urban, 3=desert,4=snow)
+				iRemainingCamoAfterRemoving = ReduceCamoFromSoldier( pSoldier, iCamoToRemove, 3 ); // "3" - we want to keep the DESERT camo
+
+				// if some camo haven't been reduced from us, the camo to add will be lessened by that value
+				if (iRemainingCamoAfterRemoving > 0)
+					iDesertCamoAdded = max(0, (iDesertCamoAdded - iRemainingCamoAfterRemoving));
+
+				if (iDesertCamoAdded <= 0) // if we have nothing to add now, return
+					return( FALSE );
+				else // otherwise apply the camo
+				{
+					pSoldier->desertCamo = __min( 100, pSoldier->desertCamo + iDesertCamoAdded );
+				}
+			}
+			else // everything's fine, apply!!
+			{
+				pSoldier->desertCamo = __min( 100, pSoldier->desertCamo + iDesertCamoAdded );
+			}
+		}
+		// Fourth, check if we have an item with major SNOW camobonus
+		else if ( (Item[pObj->usItem].snowCamobonus > Item[pObj->usItem].camobonus) && 
+			 (Item[pObj->usItem].snowCamobonus > Item[pObj->usItem].urbanCamobonus) &&
+			 (Item[pObj->usItem].snowCamobonus > Item[pObj->usItem].desertCamobonus) )
+		{
+			if (iSnowCamoTotal >= 100)
+				return( FALSE );
+
+			// determine how much we can add
+			bPointsToUse = (100 - (iSnowCamoTotal) + 1 ) / 2;
+			bPointsToUse = __min( bPointsToUse, usTotalKitPoints );
+
+			// determine how much we will add
+			int iSnowCamoAdded = (int)(Item[pObj->usItem].snowCamobonus * bPointsToUse * 2 / 100 );
+
+			// if we have already too much different camo on ourselves, reduce some or all
+			if ( (totalCamo + iSnowCamoAdded) > 100 )
+			{
+				// first, determine how much we actually want to remove
+				int iCamoToRemove = (totalCamo + iSnowCamoAdded) - 100;
+
+				// reduce camo.. IMPORTANT - third value is type of camo to skip (0=skip-none, 1=jungle, 2=urban, 3=desert,4=snow)
+				iRemainingCamoAfterRemoving = ReduceCamoFromSoldier( pSoldier, iCamoToRemove, 4 ); // "4" - we want to keep the SNOW camo
+
+				// if some camo haven't been reduced from us, the camo to add will be lessened by that value
+				if (iRemainingCamoAfterRemoving > 0)
+					iSnowCamoAdded = max(0, (iSnowCamoAdded - iRemainingCamoAfterRemoving));
+
+				if (iSnowCamoAdded <= 0) // if we have nothing to add now, return
+					return( FALSE );
+				else // otherwise apply the camo
+				{
+					pSoldier->snowCamo = __min( 100, pSoldier->snowCamo + iSnowCamoAdded );
+				}
+			}
+			else // everything's fine, apply!!
+			{
+				pSoldier->snowCamo = __min( 100, pSoldier->snowCamo + iSnowCamoAdded );
+			}
+		}
+		else // the item has no major camo, return
+			return( FALSE );
+	// ****************************************************************************************** //
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	}
+	else
+	{
+		//get total camo bonus for kit -- note that camo kits now require the camobonus tag to be set
+		//int itemCamo = Item[pObj->usItem].camobonus + Item[pObj->usItem].urbanCamobonus + Item[pObj->usItem].desertCamobonus + Item[pObj->usItem].snowCamobonus;
 
-	// points are used up at a rate of 50% kit = 100% cammo on guy
-	// add 1 to round off
-	bPointsToUse = (100 - (totalCamo) + 1 ) / 2;
-	bPointsToUse = __min( bPointsToUse, usTotalKitPoints );
+		int totalCamo = pSoldier->bCamo + pSoldier->wornCamo + pSoldier->urbanCamo+pSoldier->wornUrbanCamo+pSoldier->desertCamo+pSoldier->wornDesertCamo+pSoldier->snowCamo+pSoldier->wornSnowCamo;
+		if ((totalCamo) >= 100)
+		{
+			// nothing more to add
+			return( FALSE );
+		}
 
-	//figure out proportions of each to be applied, one item can theoretically have more than one camouflage type this way
-	int urban = (int)(Item[pObj->usItem].urbanCamobonus * bPointsToUse * 2 / 100 );
-	int jungle = (int)(Item[pObj->usItem].camobonus * bPointsToUse * 2 / 100 );
-	int desert = (int)(Item[pObj->usItem].desertCamobonus * bPointsToUse * 2 / 100 );
-	int snow = (int)(Item[pObj->usItem].snowCamobonus * bPointsToUse * 2 / 100 );
+		// points are used up at a rate of 50% kit = 100% cammo on guy
+		// add 1 to round off
+		bPointsToUse = (100 - (totalCamo) + 1 ) / 2;
+		bPointsToUse = __min( bPointsToUse, usTotalKitPoints );
 
-	pSoldier->bCamo = __min( 100, pSoldier->bCamo + jungle );
-	pSoldier->urbanCamo = __min( 100, pSoldier->urbanCamo + urban );
-	pSoldier->desertCamo = __min( 100, pSoldier->desertCamo + desert );
-	pSoldier->snowCamo = __min( 100, pSoldier->snowCamo + snow );
+		//figure out proportions of each to be applied, one item can theoretically have more than one camouflage type this way
+		int urban = (int)(Item[pObj->usItem].urbanCamobonus * bPointsToUse * 2 / 100 );
+		int jungle = (int)(Item[pObj->usItem].camobonus * bPointsToUse * 2 / 100 );
+		int desert = (int)(Item[pObj->usItem].desertCamobonus * bPointsToUse * 2 / 100 );
+		int snow = (int)(Item[pObj->usItem].snowCamobonus * bPointsToUse * 2 / 100 );
+
+		pSoldier->bCamo = __min( 100, pSoldier->bCamo + jungle );
+		pSoldier->urbanCamo = __min( 100, pSoldier->urbanCamo + urban );
+		pSoldier->desertCamo = __min( 100, pSoldier->desertCamo + desert );
+		pSoldier->snowCamo = __min( 100, pSoldier->snowCamo + snow );
+	}
 
 	UseKitPoints( pObj, bPointsToUse, pSoldier );
 
@@ -8633,14 +9164,21 @@ INT16 GetVisionRangeBonus( SOLDIERTYPE * pSoldier )
 	//AXP 28.03.2007: CtH bug fix: We also want to check on a firing weapon, "raised" alone is not enough ;)
 	if ( usingGunScope == true )
 	{
+		// SANDRO - added scouting check
+		INT16 sScopebonus = 0;
 		pObj = &( pSoldier->inv[HANDPOS]);
 		if (pObj->exists() == true) {
 			for (attachmentList::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); ++iter) {
 				if(iter->exists()){
-					bonus += BonusReduceMore( Item[iter->usItem].visionrangebonus, (*iter)[0]->data.objectStatus );
+					sScopebonus += BonusReduceMore( Item[iter->usItem].visionrangebonus, (*iter)[0]->data.objectStatus );
 				}
 			}
 		}
+		if( sScopebonus > 0 && HAS_SKILL_TRAIT( pSoldier, SCOUTING_NT ) && gGameOptions.fNewTraitSystem)
+		{
+			sScopebonus += gSkillTraitValues.ubSCSightRangebonusWithScopes;
+		}
+		bonus += sScopebonus;
 	}
 
 	return( bonus );
@@ -8696,16 +9234,23 @@ INT16 GetNightVisionRangeBonus( SOLDIERTYPE * pSoldier, UINT8 bLightLevel )
 	// Snap: check only attachments on a raised weapon!
 	if ( usingGunScope == true )
 	{
+		// SANDRO - added scouting check
+		INT16 sScopebonus = 0;
 		pObj = &( pSoldier->inv[HANDPOS]);
 		if (pObj->exists() == true) {
 			for (attachmentList::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); ++iter) {
 				if(iter->exists()){
-					bonus += BonusReduceMore(
+					sScopebonus += BonusReduceMore(
 						NightBonusScale( Item[iter->usItem].nightvisionrangebonus, bLightLevel ),
 						(*iter)[0]->data.objectStatus );
 				}
 			}
 		}
+		if( sScopebonus > 0 && HAS_SKILL_TRAIT( pSoldier, SCOUTING_NT ) && gGameOptions.fNewTraitSystem)
+		{
+			sScopebonus += gSkillTraitValues.ubSCSightRangebonusWithScopes;
+		}
+		bonus += sScopebonus;
 	}
 
 	return( bonus );
@@ -8748,16 +9293,23 @@ INT16 GetCaveVisionRangeBonus( SOLDIERTYPE * pSoldier, UINT8 bLightLevel )
 	// Snap: check only attachments on a raised weapon!
 	if ( usingGunScope == true )
 	{
+		// SANDRO - added scouting check
+		INT16 sScopebonus = 0;
 		pObj = &( pSoldier->inv[HANDPOS]);
 		if (pObj->exists() == true) {
 			for (attachmentList::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); ++iter) {
 				if(iter->exists()){
-					bonus += BonusReduceMore(
+					sScopebonus += BonusReduceMore(
 						NightBonusScale( Item[iter->usItem].cavevisionrangebonus, bLightLevel ),
 						(*iter)[0]->data.objectStatus );
 				}
 			}
 		}
+		if( sScopebonus > 0 && HAS_SKILL_TRAIT( pSoldier, SCOUTING_NT ) && gGameOptions.fNewTraitSystem)
+		{
+			sScopebonus += gSkillTraitValues.ubSCSightRangebonusWithScopes;
+		}
+		bonus += sScopebonus;
 	}
 
 	return( bonus );
@@ -8805,16 +9357,23 @@ INT16 GetDayVisionRangeBonus( SOLDIERTYPE * pSoldier, UINT8 bLightLevel )
 	//	difference between NORMAL_LIGHTLEVEL_NIGHT and 0, which represent bright light.
 	if ( usingGunScope == true )
 	{
+		// SANDRO - added scouting check
+		INT16 sScopebonus = 0;
 		pObj = &( pSoldier->inv[HANDPOS]);
 		if (pObj->exists() == true) {
 			for (attachmentList::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); ++iter) {
 				if(iter->exists()){
-					bonus += BonusReduceMore( idiv( Item[iter->usItem].dayvisionrangebonus
+					sScopebonus += BonusReduceMore( idiv( Item[iter->usItem].dayvisionrangebonus
 						* (NORMAL_LIGHTLEVEL_NIGHT - __max(bLightLevel,NORMAL_LIGHTLEVEL_DAY)), (NORMAL_LIGHTLEVEL_NIGHT-NORMAL_LIGHTLEVEL_DAY) ),
 						(*iter)[0]->data.objectStatus );
 				}
 			}
 		}
+		if( sScopebonus > 0 && HAS_SKILL_TRAIT( pSoldier, SCOUTING_NT ) && gGameOptions.fNewTraitSystem)
+		{
+			sScopebonus += gSkillTraitValues.ubSCSightRangebonusWithScopes;
+		}
+		bonus += sScopebonus;
 	}
 
 	return( bonus );
@@ -8859,16 +9418,23 @@ INT16 GetBrightLightVisionRangeBonus( SOLDIERTYPE * pSoldier, UINT8 bLightLevel 
 	// Snap: check only attachments on a raised weapon!
 	if ( usingGunScope == true )
 	{
+		// SANDRO - added scouting check
+		INT16 sScopebonus = 0;
 		pObj = &( pSoldier->inv[HANDPOS]);
 		if (pObj->exists() == true) {
 			for (attachmentList::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); ++iter) {
 				if(iter->exists()){
-					bonus += BonusReduceMore( idiv( Item[iter->usItem].brightlightvisionrangebonus
+					sScopebonus += BonusReduceMore( idiv( Item[iter->usItem].brightlightvisionrangebonus
 						* (NORMAL_LIGHTLEVEL_DAY - bLightLevel), NORMAL_LIGHTLEVEL_DAY ),
 						(*iter)[0]->data.objectStatus );
 				}
 			}
 		}
+		if( sScopebonus > 0 && HAS_SKILL_TRAIT( pSoldier, SCOUTING_NT ) && gGameOptions.fNewTraitSystem)
+		{
+			sScopebonus += gSkillTraitValues.ubSCSightRangebonusWithScopes;
+		}
+		bonus += sScopebonus;
 	}
 
 	return( bonus );
@@ -8898,6 +9464,21 @@ INT16 GetTotalVisionRangeBonus( SOLDIERTYPE * pSoldier, UINT8 bLightLevel )
 	if ( bLightLevel < NORMAL_LIGHTLEVEL_DAY )
 	{
 		bonus += GetBrightLightVisionRangeBonus(pSoldier, bLightLevel);
+	}
+
+	// SANDRO - STOMP traits - Scouting bonus for sight range with binoculars and similar
+	if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, SCOUTING_NT ) && pSoldier->pathing.bLevel == 0 )
+	{
+		OBJECTTYPE *pObj = &( pSoldier->inv[HANDPOS]);
+		if (pObj->exists() == true) 
+		{
+			// we have no pointer to binoculars, so just check any misc items in hands which have some vision bonus
+			if ( Item[pObj->usItem].usItemClass & IC_MISC && (Item[pObj->usItem].brightlightvisionrangebonus > 0 ||
+				Item[pObj->usItem].dayvisionrangebonus > 0 || Item[pObj->usItem].nightvisionrangebonus > 0 || Item[pObj->usItem].visionrangebonus > 0 )) 
+			{
+				bonus += gSkillTraitValues.usSCSightRangebonusWithBinoculars;
+			}
+		}
 	}
 
 	return bonus;
@@ -8949,8 +9530,24 @@ UINT8 GetPercentTunnelVision( SOLDIERTYPE * pSoldier )
 		}
 	}
 
+	// SANDRO - STOMP traits - Scouting tunnel vision reduction with binoculars and similar
+	if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, SCOUTING_NT ) && pSoldier->pathing.bLevel == 0 )
+	{
+		OBJECTTYPE *pObj = &( pSoldier->inv[HANDPOS]);
+		if (pObj->exists() == true) 
+		{
+			// we have no pointer to binoculars, so just check any misc items in hands which have some vision bonus
+			if ( Item[pObj->usItem].usItemClass & IC_MISC && (Item[pObj->usItem].brightlightvisionrangebonus > 0 ||
+				Item[pObj->usItem].dayvisionrangebonus > 0 || Item[pObj->usItem].nightvisionrangebonus > 0 || Item[pObj->usItem].visionrangebonus > 0 )) 
+			{
+				bonus = max( 0, (bonus - gSkillTraitValues.ubSCTunnelVisionReducedWithBinoculars));
+			}
+		}
+	}
 	// HEADROCK HAM 3.2: Further increase tunnel-vision for cowering characters.
-	if (gGameExternalOptions.ubCoweringReducesSightRange == 1 || gGameExternalOptions.ubCoweringReducesSightRange == 3)
+	// SANDRO - this calls many sub-functions over and over, we should at least skip this for civilians and such  
+	if ((gGameExternalOptions.ubCoweringReducesSightRange == 1 || gGameExternalOptions.ubCoweringReducesSightRange == 3) &&
+		IS_MERC_BODY_TYPE(pSoldier) && (pSoldier->bTeam == ENEMY_TEAM || pSoldier->bTeam == MILITIA_TEAM || pSoldier->bTeam == gbPlayerNum) )
 	{
 		INT8 bTolerance = CalcSuppressionTolerance( pSoldier );
 
@@ -9757,18 +10354,24 @@ OBJECTTYPE* FindSunGogglesInInv( SOLDIERTYPE * pSoldier, BOOLEAN searchAllInvent
 	INT16	bonusToBeat = 0;
 	OBJECTTYPE*	pGoggles = 0;
 	// CHRISL:
+	// silversurfer: use the sum of day vision bonus and bright light bonus because both help at daytime
+	// but make sure that day vision bonus is > 0 because we are not always looking at bright lights
 	for (bLoop = (searchAllInventory ? HELMETPOS : HANDPOS); bLoop < NUM_INV_SLOTS; bLoop++) {
 		if ( pSoldier->inv[bLoop].exists() == true ) {
-			if (Item[pSoldier->inv[bLoop].usItem].brightlightvisionrangebonus > bonusToBeat && Item[pSoldier->inv[bLoop].usItem].usItemClass == IC_FACE ) {
+			if ( Item[pSoldier->inv[bLoop].usItem].dayvisionrangebonus > 0 && 
+					( Item[pSoldier->inv[bLoop].usItem].dayvisionrangebonus + Item[pSoldier->inv[bLoop].usItem].brightlightvisionrangebonus ) > bonusToBeat && 
+					  Item[pSoldier->inv[bLoop].usItem].usItemClass == IC_FACE ) {
 				pGoggles = &(pSoldier->inv[bLoop]);
-				bonusToBeat = Item[pSoldier->inv[bLoop].usItem].brightlightvisionrangebonus;
+				bonusToBeat = Item[pSoldier->inv[bLoop].usItem].dayvisionrangebonus + Item[pSoldier->inv[bLoop].usItem].brightlightvisionrangebonus;
 			}
 			if (searchAllInventory) {
 				OBJECTTYPE* pObj = &(pSoldier->inv[bLoop]);
 				for (attachmentList::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); ++iter) {
-					if ( Item[ iter->usItem ].brightlightvisionrangebonus > bonusToBeat && Item[ iter->usItem ].usItemClass == IC_FACE && iter->exists() ) {
+					if ( Item[ iter->usItem ].dayvisionrangebonus > 0 &&
+						( Item[ iter->usItem ].dayvisionrangebonus + Item[ iter->usItem ].brightlightvisionrangebonus ) > bonusToBeat &&
+						   Item[ iter->usItem ].usItemClass == IC_FACE && iter->exists() ) {
 						pGoggles = &(*iter);
-						bonusToBeat = Item[ iter->usItem ].brightlightvisionrangebonus;
+						bonusToBeat = Item[ iter->usItem ].dayvisionrangebonus + Item[ iter->usItem ].brightlightvisionrangebonus;
 					}
 				}
 			}
@@ -9783,23 +10386,49 @@ OBJECTTYPE* FindNightGogglesInInv( SOLDIERTYPE * pSoldier, BOOLEAN searchAllInve
 	INT16	bonusToBeat = 0;
 	OBJECTTYPE*	pGoggles = 0;
 	// CHRISL:
-	for (bLoop = (searchAllInventory ? HELMETPOS : HANDPOS); bLoop < NUM_INV_SLOTS; bLoop++) {
-		if ( pSoldier->inv[bLoop].exists() == true ) {
-			if (Item[pSoldier->inv[bLoop].usItem].nightvisionrangebonus > bonusToBeat && Item[pSoldier->inv[bLoop].usItem].usItemClass == IC_FACE ) {
-				pGoggles = &(pSoldier->inv[bLoop]);
-				bonusToBeat = Item[pSoldier->inv[bLoop].usItem].nightvisionrangebonus;
-			}
-			if (searchAllInventory) {
-				OBJECTTYPE* pObj = &(pSoldier->inv[bLoop]);
-				for (attachmentList::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); ++iter) {
-					if ( Item[ iter->usItem ].nightvisionrangebonus > bonusToBeat && Item[ iter->usItem ].usItemClass == IC_FACE && iter->exists() ) {
-						pGoggles = &(*iter);
-						bonusToBeat = Item[ iter->usItem ].nightvisionrangebonus;
+	// silversurfer: check if we are above ground, night vision is only useful there
+	if ( pSoldier->bSectorZ == 0 )
+	{
+		for (bLoop = (searchAllInventory ? HELMETPOS : HANDPOS); bLoop < NUM_INV_SLOTS; bLoop++) {
+			if ( pSoldier->inv[bLoop].exists() == true ) {
+				if (Item[pSoldier->inv[bLoop].usItem].nightvisionrangebonus > bonusToBeat && Item[pSoldier->inv[bLoop].usItem].usItemClass == IC_FACE ) {
+					pGoggles = &(pSoldier->inv[bLoop]);
+					bonusToBeat = Item[pSoldier->inv[bLoop].usItem].nightvisionrangebonus;
+				}
+				if (searchAllInventory) {
+					OBJECTTYPE* pObj = &(pSoldier->inv[bLoop]);
+					for (attachmentList::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); ++iter) {
+						if ( Item[ iter->usItem ].nightvisionrangebonus > bonusToBeat && Item[ iter->usItem ].usItemClass == IC_FACE && iter->exists() ) {
+							pGoggles = &(*iter);
+							bonusToBeat = Item[ iter->usItem ].nightvisionrangebonus;
+						}
 					}
 				}
 			}
 		}
 	}
+	// below ground we need cave vision
+	else
+	{
+		for (bLoop = (searchAllInventory ? HELMETPOS : HANDPOS); bLoop < NUM_INV_SLOTS; bLoop++) {
+			if ( pSoldier->inv[bLoop].exists() == true ) {
+				if (Item[pSoldier->inv[bLoop].usItem].cavevisionrangebonus > bonusToBeat && Item[pSoldier->inv[bLoop].usItem].usItemClass == IC_FACE ) {
+					pGoggles = &(pSoldier->inv[bLoop]);
+					bonusToBeat = Item[pSoldier->inv[bLoop].usItem].cavevisionrangebonus;
+				}
+				if (searchAllInventory) {
+					OBJECTTYPE* pObj = &(pSoldier->inv[bLoop]);
+					for (attachmentList::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); ++iter) {
+						if ( Item[ iter->usItem ].cavevisionrangebonus > bonusToBeat && Item[ iter->usItem ].usItemClass == IC_FACE && iter->exists() ) {
+							pGoggles = &(*iter);
+							bonusToBeat = Item[ iter->usItem ].cavevisionrangebonus;
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return( pGoggles );
 }
 
@@ -9821,37 +10450,75 @@ INT16 GetMinRangeForAimBonus( OBJECTTYPE * pObj )
 
 UINT8 AllowedAimingLevels(SOLDIERTYPE * pSoldier, INT32 iRange)
 {
+	// SANDRO was here - changed a few things around
+
 	UINT8 aimLevels = 4;
 	UINT16 sScopeBonus = 0;
 	BOOLEAN allowed = TRUE;
+	UINT8 weaponType;
 
+	weaponType = Weapon[pSoldier->inv[pSoldier->ubAttackingHand].usItem].ubWeaponType;
 
-	if ( gGameSettings.fOptions[TOPTION_AIM_LEVEL_RESTRICTION] ) // Options Menu setting.
+	if ( gGameExternalOptions.fAimLevelRestriction ) // Extra aiming on/off 
 	{
 		// HEADROCK HAM B2.6: Dynamic aiming level restrictions based on gun type and attachments.
 		// HEADROCK HAM 3.5: Revamped this - it was illogically constructed.
 		if ( gGameExternalOptions.fDynamicAimingTime )
 		{
+			// SANDRO - throwing knives are a special case, allow two aiming clicks for them
+			if( weaponType == NOT_GUN ) 
+			{
+				if ( Item[pSoldier->inv[pSoldier->ubAttackingHand].usItem].usItemClass == IC_THROWING_KNIFE )
+				{
+					aimLevels = 2;
+					if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, THROWING_NT ) )
+					{
+						aimLevels += gSkillTraitValues.ubTHBladesAimClicksAdded;
+					}
+					return ( min(6, aimLevels) );
+				}
+				else
+				{
+					return ( 2 );
+				}
+			}
+
 			UINT16 weaponRange;
-			UINT8 weaponType, maxAimForType, maxAimWithoutBipod;
+			UINT8 maxAimForType, maxAimWithoutBipod;
 			BOOLEAN fTwoHanded, fUsingBipod;
-		
+			
 			// Read weapon data
 			fTwoHanded = Item[pSoldier->inv[pSoldier->ubAttackingHand].usItem].twohanded;
-			weaponRange = Weapon[pSoldier->inv[pSoldier->ubAttackingHand].usItem].usRange + GetRangeBonus(&pSoldier->inv[pSoldier->ubAttackingHand]);
-			weaponType = Weapon[pSoldier->inv[pSoldier->ubAttackingHand].usItem].ubWeaponType;
+
+			UINT16 usRange = GetModifiedGunRange(pSoldier->inv[pSoldier->ubAttackingHand].usItem);
+
+			weaponRange = usRange + GetRangeBonus(&pSoldier->inv[pSoldier->ubAttackingHand]);
 			fUsingBipod = FALSE;
 
 			maxAimWithoutBipod = 4;
-		
+			
 			// Define basic (no attachments), and absolute maximums
-			if (weaponType == GUN_PISTOL || weaponType == GUN_M_PISTOL || fTwoHanded == 0)
+			if (weaponType == GUN_PISTOL || weaponType == GUN_M_PISTOL )
+			{
+				maxAimForType = 2;
+				aimLevels = 1;
+				maxAimWithoutBipod = 2;
+
+				// SANDRO - STOMP traits - Gunslinger bonus aim clicks
+				if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, GUNSLINGER_NT ) )
+				{
+					maxAimForType += (gSkillTraitValues.ubGSAimClicksAdded * NUM_SKILL_TRAITS( pSoldier, GUNSLINGER_NT ));
+					aimLevels += (gSkillTraitValues.ubGSAimClicksAdded * NUM_SKILL_TRAITS( pSoldier, GUNSLINGER_NT ));
+					maxAimWithoutBipod += (gSkillTraitValues.ubGSAimClicksAdded * NUM_SKILL_TRAITS( pSoldier, GUNSLINGER_NT ));
+				}
+			}
+			else if ((weaponType == GUN_SMG && fTwoHanded == 0) || fTwoHanded == 0)
 			{
 				maxAimForType = 2;
 				aimLevels = 1;
 				maxAimWithoutBipod = 2;
 			}
-			else if (weaponType == GUN_SHOTGUN || weaponType == GUN_LMG || weaponType == GUN_SMG)
+			else if (weaponType == GUN_SHOTGUN || weaponType == GUN_LMG || (weaponType == GUN_SMG && fTwoHanded == 1))
 			{
 				maxAimForType = 3;
 				aimLevels = 2;
@@ -9862,19 +10529,42 @@ UINT8 AllowedAimingLevels(SOLDIERTYPE * pSoldier, INT32 iRange)
 				maxAimForType = 4;
 				aimLevels = 2;
 				maxAimWithoutBipod = 3;
+
+				// SANDRO - STOMP traits - Sniper bonus aim clicks
+				if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, SNIPER_NT ) )
+				{
+					maxAimForType += (gSkillTraitValues.ubSNAimClicksAdded * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT ));
+					aimLevels += (gSkillTraitValues.ubSNAimClicksAdded * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT ));
+					maxAimWithoutBipod += (gSkillTraitValues.ubSNAimClicksAdded * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT ));
+				}
 			}
 			else if (((weaponType == GUN_AS_RIFLE || weaponType == GUN_RIFLE) && weaponRange > 500) || 
 							(weaponType == GUN_SN_RIFLE && weaponRange <= 500))
 			{
-					maxAimForType = 6;
+				maxAimForType = 6;
 				aimLevels = 3;
 				maxAimWithoutBipod = 4;
+				// SANDRO - STOMP traits - Sniper bonus aim clicks
+				if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, SNIPER_NT ) )
+				{
+					maxAimForType += (gSkillTraitValues.ubSNAimClicksAdded * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT ));
+					aimLevels += (gSkillTraitValues.ubSNAimClicksAdded * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT ));
+					maxAimWithoutBipod += (gSkillTraitValues.ubSNAimClicksAdded * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT ));
+				}
 			}
 			else if (weaponType == GUN_SN_RIFLE && weaponRange > 500)
 			{
 				maxAimForType = 8;
 				aimLevels = 4;
 				maxAimWithoutBipod = 3;
+
+				// SANDRO - STOMP traits - Sniper bonus aim clicks
+				if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, SNIPER_NT ) )
+				{
+					maxAimForType += (gSkillTraitValues.ubSNAimClicksAdded * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT ));
+					aimLevels += (gSkillTraitValues.ubSNAimClicksAdded * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT ));
+					maxAimWithoutBipod += (gSkillTraitValues.ubSNAimClicksAdded * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT ));
+				}
 			}
 			else
 			{
@@ -9887,31 +10577,34 @@ UINT8 AllowedAimingLevels(SOLDIERTYPE * pSoldier, INT32 iRange)
 				fUsingBipod = TRUE;
 			}
 
-			//WarmSteel - Using scope aimbonus instead, as it is used elsewhere like this too.
-			//Also, you won't get extra aimclicks anymore if you're too close to use your scope.
-			//I've externalized the scope types.
-			sScopeBonus = GetBaseScopeAimBonus( &pSoldier->inv[pSoldier->ubAttackingHand], iRange );
+			// don't break compatibility, let the users choose
+			sScopeBonus = gGameExternalOptions.fAimLevelsDependOnDistance ?
+				//WarmSteel - Using scope aimbonus instead, as it is used elsewhere like this too.
+				//Also, you won't get extra aimclicks anymore if you're too close to use your scope.
+				//I've externalized the scope types.
+				GetBaseScopeAimBonus( &pSoldier->inv[pSoldier->ubAttackingHand], iRange )
+				: GetMinRangeForAimBonus( &pSoldier->inv[pSoldier->ubAttackingHand]);
 
-			if ( sScopeBonus >= gGameExternalOptions.sVeryHighPowerScope ) 
-			{
-				aimLevels *= 2;
-			}
+				if ( sScopeBonus >= gGameExternalOptions.sVeryHighPowerScope ) 
+				{
+					aimLevels *= 2;
+				}
 
-			else if ( sScopeBonus >= gGameExternalOptions.sHighPowerScope ) 
-			{
-				aimLevels = (UINT8)((float)(aimLevels+1) * (float)1.5);
-			}
+				else if ( sScopeBonus >= gGameExternalOptions.sHighPowerScope ) 
+				{
+					aimLevels = (UINT8)((float)(aimLevels+1) * (float)1.5);
+				}
 
-			else if ( sScopeBonus >= gGameExternalOptions.sMediumPowerScope ) 
-			{
-				aimLevels = (UINT8)((float)(aimLevels+1) * (float)1.3);
-			}
+				else if ( sScopeBonus >= gGameExternalOptions.sMediumPowerScope ) 
+				{
+					aimLevels = (UINT8)((float)(aimLevels+1) * (float)1.3);
+				}
 
-			// Smaller scopes increase by one.
-			else if ( sScopeBonus > 0 )
-			{
-				aimLevels++;
-			}
+				// Smaller scopes increase by one.
+				else if ( sScopeBonus > 0 )
+				{
+					aimLevels++;
+				}
 
 			// Make sure not over maximum allowed for weapon type.
 			if (aimLevels > maxAimForType)
@@ -9926,13 +10619,17 @@ UINT8 AllowedAimingLevels(SOLDIERTYPE * pSoldier, INT32 iRange)
 		}
 		else // JA2 1.13 Basic aiming restrictions (8 levels for 10x scope, 6 levels for 7x scope)
 		{
-			if ( !IsScoped( &pSoldier->inv[pSoldier->ubAttackingHand] ) )
+			OBJECTTYPE* pAttackingWeapon = &pSoldier->inv[pSoldier->ubAttackingHand];
+			if ( !IsScoped( pAttackingWeapon ) )
 			{
 				// No scope. 4 Allowed.
 				return (4);
 			}
 			
-			sScopeBonus = GetBaseScopeAimBonus( &pSoldier->inv[pSoldier->ubAttackingHand], iRange );
+			// don't break compatibility, let the users choose
+			sScopeBonus = gGameExternalOptions.fAimLevelsDependOnDistance ?
+				GetBaseScopeAimBonus( pAttackingWeapon, iRange )
+				: GetMinRangeForAimBonus( pAttackingWeapon );
 		
 			if ( sScopeBonus >= gGameExternalOptions.sVeryHighPowerScope )
 			{
@@ -9941,6 +10638,18 @@ UINT8 AllowedAimingLevels(SOLDIERTYPE * pSoldier, INT32 iRange)
 			if ( sScopeBonus >= gGameExternalOptions.sHighPowerScope )
 			{
 				aimLevels += 2;
+			}
+			// SANDRO - STOMP traits - Sniper bonus aim clicks
+			if ((weaponType == GUN_AS_RIFLE || weaponType == GUN_RIFLE || weaponType == GUN_SN_RIFLE) &&
+				gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, SNIPER_NT ) )
+			{
+				aimLevels += (gSkillTraitValues.ubSNAimClicksAdded * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT ));
+			}
+			// SANDRO - STOMP traits - Gunslinger bonus aim clicks
+			if ((weaponType == GUN_PISTOL || weaponType == GUN_M_PISTOL) &&
+				gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, GUNSLINGER_NT ) )
+			{
+				aimLevels += (gSkillTraitValues.ubGSAimClicksAdded * NUM_SKILL_TRAITS( pSoldier, GUNSLINGER_NT ));
 			}
 		}
 	}
@@ -9975,6 +10684,10 @@ INT16 GetWornStealth( SOLDIERTYPE * pSoldier )
 		if ( pSoldier->inv[bLoop].exists() == true )
 			ttl += GetStealthBonus(&pSoldier->inv[bLoop]);
 	}
+
+	// Add some default stealth ability to mercs with STEALTHY trait - SANDRO 
+	if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, STEALTHY_NT ))
+		ttl += gSkillTraitValues.ubSTStealthBonus; 
 
 	return __min( ttl, 100 );
 }
@@ -10324,6 +11037,204 @@ UINT8 GetModifiedGunDamage( UINT16 sDamage )
 	sDamage = __min(255, sDamage);
 
 	return (UINT8)sDamage;
+}
+
+UINT16 GetModifiedGunRange(UINT16 usWeaponIndex)
+{
+	UINT16 ubRange = Weapon[usWeaponIndex].usRange;
+
+	if (ubRange == 0)
+	{
+	   return(0);
+	}
+
+	// Only apply range modifier on "real" guns!
+	if (Item[Weapon[usWeaponIndex].uiIndex].usItemClass == IC_GUN ||
+		Item[Weapon[usWeaponIndex].uiIndex].usItemClass == IC_LAUNCHER)
+	{
+		ubRange = (INT16)(( ubRange * gGameExternalOptions.iGunRangeModifier ) / 100);
+	}
+
+	return (UINT16)ubRange;
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// SANDRO - Added a procedure to reduce camo on soldier, used when applying camo kit
+INT16 ReduceCamoFromSoldier( SOLDIERTYPE * pSoldier, INT16 iCamoToRemove, INT16 iCamoToSkip )
+{
+	INT32 i;
+	UINT16 iCamoToRemovePart = 3;
+
+	if( iCamoToSkip > 0 ) // iCamoToSkip determines what camo type should not be reduced
+		iCamoToRemovePart = 2;
+
+	if ( (pSoldier->bCamo == 0) && (iCamoToSkip != 1) )
+		iCamoToRemovePart -= 1;
+	if ( (pSoldier->urbanCamo == 0) && (iCamoToSkip != 2) )
+		iCamoToRemovePart -= 1;
+	if ( (pSoldier->desertCamo == 0) && (iCamoToSkip != 3) )
+		iCamoToRemovePart -= 1;
+	if ( (pSoldier->snowCamo == 0) && (iCamoToSkip != 4) )
+		iCamoToRemovePart -= 1;
+
+	// this should never happen, but if, we still might try to go through the procedure below
+	if ( iCamoToRemovePart < 0 )
+		iCamoToRemovePart = 0;
+
+	for (i = 0; i < 4; i++ ) // 4 times should be enough, a little paranoya here
+	{
+		// first, try to reduce jungle camo
+		if ( ((iCamoToRemove / (1 + iCamoToRemovePart)) <= pSoldier->bCamo) && (pSoldier->bCamo > 0) && (iCamoToSkip != 1) )
+		{
+			// jungle camo enough to reduce
+			pSoldier->bCamo -= max(1,(iCamoToRemove / (1 + iCamoToRemovePart)));
+			iCamoToRemove -= max(1,(iCamoToRemove / (1 + iCamoToRemovePart)));
+			iCamoToRemovePart = max( 0,(iCamoToRemovePart - 1));
+			if( iCamoToRemove <= 0 )
+				break;
+		}
+		else if ((pSoldier->bCamo > 0) && (iCamoToSkip != 1))
+		{
+			// jungle camo not enough to reduce by intended value, reduce only by what we have
+			iCamoToRemove -= pSoldier->bCamo;
+			pSoldier->bCamo = 0;
+			iCamoToRemovePart = max( 0,(iCamoToRemovePart - 1));
+			if( iCamoToRemove <= 0 )
+				break;
+		}
+		// second, try to reduce urban camo
+		if ( ((iCamoToRemove / (1 + iCamoToRemovePart)) <= pSoldier->urbanCamo) && (pSoldier->urbanCamo > 0) && (iCamoToSkip != 2) )
+		{
+			// urban camo enough to reduce
+			pSoldier->urbanCamo -= max(1,(iCamoToRemove / (1 + iCamoToRemovePart)));
+			iCamoToRemove -= max(1,(iCamoToRemove / (1 + iCamoToRemovePart)));
+			iCamoToRemovePart = max( 0,(iCamoToRemovePart - 1));
+			if( iCamoToRemove <= 0 )
+				break;
+		}
+		else if ((pSoldier->urbanCamo > 0) && (iCamoToSkip != 2))
+		{
+			// urban camo not enough to reduce by intended value, reduce only by what we have
+			iCamoToRemove -= pSoldier->urbanCamo;
+			pSoldier->urbanCamo = 0;
+			iCamoToRemovePart = max( 0,(iCamoToRemovePart - 1));
+			if( iCamoToRemove <= 0 )
+				break;
+		}
+		// third, try to reduce desert camo
+		if ( ((iCamoToRemove / (1 + iCamoToRemovePart)) <= pSoldier->desertCamo) && (pSoldier->desertCamo > 0) && (iCamoToSkip != 3) )
+		{
+			// desert camo enough to reduce
+			pSoldier->desertCamo -= max(1,(iCamoToRemove / (1 + iCamoToRemovePart)));
+			iCamoToRemove -= max(1,(iCamoToRemove / (1 + iCamoToRemovePart)));
+			iCamoToRemovePart = max( 0,(iCamoToRemovePart - 1));
+			if( iCamoToRemove <= 0 )
+				break;
+		}
+		else if ((pSoldier->desertCamo > 0) && (iCamoToSkip != 3))
+		{
+			// desert camo not enough to reduce by intended value, reduce only by what we have
+			iCamoToRemove -= pSoldier->desertCamo;
+			pSoldier->desertCamo = 0;
+			iCamoToRemovePart = max( 0,(iCamoToRemovePart - 1));
+			if( iCamoToRemove <= 0 )
+				break;
+		}
+		// fourth, try to reduce snow camo
+		if ( ((iCamoToRemove / (1 + iCamoToRemovePart)) <= pSoldier->snowCamo) && (pSoldier->snowCamo > 0) && (iCamoToSkip != 4) )
+		{
+			// snow camo enough to reduce
+			pSoldier->snowCamo -= max(1,(iCamoToRemove / (1 + iCamoToRemovePart)));
+			iCamoToRemove -= max(1,(iCamoToRemove / (1 + iCamoToRemovePart)));
+			iCamoToRemovePart = max( 0,(iCamoToRemovePart - 1));
+			if( iCamoToRemove <= 0 )
+				break;
+		}
+		else if ((pSoldier->snowCamo > 0) && (iCamoToSkip != 4))
+		{
+			// snow camo not enough to reduce by intended value, reduce only by what we have
+			iCamoToRemove -= pSoldier->snowCamo;
+			pSoldier->snowCamo = 0;
+			if( iCamoToRemove <= 0 )
+				break;
+		}
+	}
+
+	// return remaining value or zero
+	return( max( 0, iCamoToRemove));
+}
+
+// SANDRO - added function to determine if we have Extended Ear on
+BOOLEAN HasExtendedEarOn( SOLDIERTYPE * pSoldier )
+{
+	// optimistically assume, that anything electronic with hearing range bonus serves as extended ear as well
+	if ( pSoldier->inv[HEAD1POS].exists() && (pSoldier->inv[HEAD1POS].usItem == EXTENDEDEAR ||
+		(Item[pSoldier->inv[HEAD1POS].usItem].hearingrangebonus > 0 && Item[pSoldier->inv[HEAD1POS].usItem].electronic)) )
+	{
+		return( TRUE );
+	}
+	else if ( pSoldier->inv[HEAD2POS].exists() && (pSoldier->inv[HEAD2POS].usItem == EXTENDEDEAR ||
+		(Item[pSoldier->inv[HEAD2POS].usItem].hearingrangebonus > 0 && Item[pSoldier->inv[HEAD2POS].usItem].electronic)) )
+	{
+		return( TRUE );
+	}
+	return( FALSE );
+}
+
+
+BOOLEAN UseTotalMedicalKitPoints( SOLDIERTYPE * pSoldier, UINT16 usPointsToConsume )
+{
+	OBJECTTYPE * pObj;
+	UINT8 ubPocket;
+	INT8 bLoop;
+
+	// add up kit points of all medkits
+	// CHRISL: Changed to dynamically determine max inventory locations.
+	for (ubPocket = HANDPOS; ubPocket < NUM_INV_SLOTS; ubPocket++)
+	{
+		if ( IsMedicalKitItem( &( pSoldier->inv[ ubPocket ] ) ) )
+		{
+			pObj = &(pSoldier->inv[ ubPocket ]);
+			// start consuming from the last kit in, so we end up with fewer fuller kits rather than
+			// lots of half-empty ones.
+			for (bLoop = pObj->ubNumberOfObjects - 1; bLoop >= 0; bLoop--)
+			{
+				if( (usPointsToConsume * (max( 0, (100 - Item[pObj->usItem].percentstatusdrainreduction)))/100) < (*pObj)[bLoop]->data.objectStatus )
+				{
+					(*pObj)[bLoop]->data.objectStatus -= (INT8)(usPointsToConsume * (max( 0, (100 - Item[pObj->usItem].percentstatusdrainreduction) ) )/100);
+					usPointsToConsume = 0;
+					break;
+				}
+				else
+				{
+					// consume this kit totally
+					usPointsToConsume -= (((*pObj)[bLoop]->data.objectStatus) / (max( 0, (100 - Item[pObj->usItem].percentstatusdrainreduction))) /100);
+					(*pObj)[bLoop]->data.objectStatus = 0;
+
+					pObj->ubNumberOfObjects--;
+				}
+			}
+			// check if pocket/hand emptied..update inventory, then update panel
+			if( pObj->exists() == false )
+			{
+				// Delete object
+				DeleteObj( pObj );
+
+				// dirty interface panel
+				DirtyMercPanelInterface(  pSoldier, DIRTYLEVEL2 );
+			}
+
+			if( usPointsToConsume <= 0 )
+				break;
+		}
+	}
+
+	if (usPointsToConsume > 0)
+		return( FALSE );
+	else
+		return( TRUE );
 }
 
 

@@ -317,7 +317,7 @@ void InitEDBCoords(OBJECTTYPE * pObject)
 {
 	if(UsingEDBSystem() == 0)
 		return;
-	if(gGameExternalOptions.fNewAttachmentSystem){
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
 		INT16 SHIFT_Y = sNASYCorrection(pObject);
 		INT16 SHIFT_X = sNASXCorrection(pObject);
 		if(guiCurrentScreen == MAP_SCREEN)
@@ -1180,7 +1180,7 @@ void InitDescStatCoords(OBJECTTYPE *pObject)
 	if( guiCurrentScreen == MAP_SCREEN )
 	{	
 		//WarmSteel - If we're using the new attachment system and the item in question does not have an empty attachment list.
-		if(gGameExternalOptions.fNewAttachmentSystem && !pObject->usAttachmentSlotIndexVector.empty() && UseNASDesc(pObject))
+		if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW && !pObject->usAttachmentSlotIndexVector.empty() && UseNASDesc(pObject))
 		{
 			//Loop throught the attachments and get their slot id's
 			for (UINT8 x = 0; x < pObject->usAttachmentSlotIndexVector.size(); x++){
@@ -1205,7 +1205,7 @@ void InitDescStatCoords(OBJECTTYPE *pObject)
 	else
 	{
 		//WarmSteel - If we're using the new attachment system and the item in question does not have an empty attachment list.
-		if(gGameExternalOptions.fNewAttachmentSystem && !pObject->usAttachmentSlotIndexVector.empty() && UseNASDesc(pObject))
+		if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW && !pObject->usAttachmentSlotIndexVector.empty() && UseNASDesc(pObject))
 		{
 			for (UINT8 x = 0; x < pObject->usAttachmentSlotIndexVector.size(); x++){
 				//WarmSteel - Tell this slot where it's supposed to be.
@@ -1226,7 +1226,7 @@ void InitDescStatCoords(OBJECTTYPE *pObject)
 			SetupItemDescAttachmentsXY(3, 167, 38, SM_INV_SLOT_HEIGHT, ATTACH_SLOT_WIDTH, INV_BAR_DX-8, INV_BAR_DY+1);
 		}
 	}
-	if(gGameExternalOptions.fNewAttachmentSystem){
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
 		INT16 SHIFT_Y = sNASYCorrection(pObject);
 		INT16 SHIFT_X = sNASXCorrection(pObject);
 		if(UsingEDBSystem() > 0)
@@ -2100,7 +2100,7 @@ void InitLBECoords()
 
 void InitItemDescriptionBoxOffsets(OBJECTTYPE * pObject)
 {
-	if(gGameExternalOptions.fNewAttachmentSystem){
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
 		INT16 sY = gsInvDescY + sNASYCorrection(pObject);
 		INT16 sX = gsInvDescX + sNASXCorrection(pObject);
 
@@ -2461,7 +2461,7 @@ void InitItemDescriptionBoxOffsets(OBJECTTYPE * pObject)
 					ITEMDESC_CALIBER_WIDTH	= 149;
 					ITEMDESC_NAME_X			= (  7 + sX);
 					ITEMDESC_NAME_Y			= ( 65 + sY);
-					ITEMDESC_ITEM_X			= ( 72 +sX); //WarmSteel - This function makes sure the item icon is in the right place in NAS.
+					ITEMDESC_ITEM_X			= ( 54 +sX);
 					ITEMDESC_ITEM_Y			= ( -51 +sY);
 					// END ICONS SEGMENT
 					ITEMDESC_DESC_START_X	= ( 23 + sX );
@@ -2471,10 +2471,10 @@ void InitItemDescriptionBoxOffsets(OBJECTTYPE * pObject)
 					ITEMDESC_CONS_START_X	= ( 23 + sX );
 					ITEMDESC_CONS_START_Y	= (300 + sY);
 					ITEMDESC_DESC_WIDTH		= 220;
-					ITEMDESC_ITEM_STATUS_X	= ( 65 + sX );
+					ITEMDESC_ITEM_STATUS_X	= ( 47 + sX );
 					ITEMDESC_ITEM_STATUS_Y	= ( -4 + sY );
 					ITEMDESC_ITEM_STATUS_HEIGHT	= 40;
-					ITEMDESC_AMMO_X = (75 + sX);
+					ITEMDESC_AMMO_X = (57 + sX);
 					ITEMDESC_AMMO_Y = (-13 + sY);
 					ITEMDESC_DONE_X = (199 + sX);
 					ITEMDESC_DONE_Y = (331 + sY);
@@ -2522,7 +2522,7 @@ void InitItemDescriptionBoxOffsets(OBJECTTYPE * pObject)
 					ITEMDESC_CALIBER_WIDTH	= 149;
 					ITEMDESC_NAME_X			= (  7 + sX);
 					ITEMDESC_NAME_Y			= ( 65 + sY);
-					ITEMDESC_ITEM_X			= ( 72 + sX);
+					ITEMDESC_ITEM_X			= ( 54 + sX);
 					ITEMDESC_ITEM_Y			= ( -51 + sY);
 					// END ICONS SEGMENT
 					ITEMDESC_DESC_START_X	= ( 23 + sX ); // Description Text Box, Strategic
@@ -2532,10 +2532,10 @@ void InitItemDescriptionBoxOffsets(OBJECTTYPE * pObject)
 					ITEMDESC_CONS_START_X	= ( 23 + sX ); // Cons, Strategic
 					ITEMDESC_CONS_START_Y	= (240 + sY);
 					ITEMDESC_DESC_WIDTH		= 220;
-					ITEMDESC_ITEM_STATUS_X	= ( 65 + sX );
+					ITEMDESC_ITEM_STATUS_X	= ( 47 + sX );
 					ITEMDESC_ITEM_STATUS_Y	= ( -4 + sY );
 					ITEMDESC_ITEM_STATUS_HEIGHT	= 40;
-					ITEMDESC_AMMO_X = (75 + sX);
+					ITEMDESC_AMMO_X = (57 + sX);
 					ITEMDESC_AMMO_Y = (-13 + sY);
 					ITEMDESC_DONE_X = (204 + sX);
 					ITEMDESC_DONE_Y = (107 + sY);
@@ -2885,7 +2885,7 @@ void InitItemDescriptionBoxOffsets(OBJECTTYPE * pObject)
 					ITEMDESC_CALIBER_WIDTH	= 240;
 					ITEMDESC_NAME_X			= (-180 + sX);
 					ITEMDESC_NAME_Y			= (180 + sY);
-					ITEMDESC_ITEM_X			= ( -115 + sX);
+					ITEMDESC_ITEM_X			= ( -133 + sX);
 					ITEMDESC_ITEM_Y			= ( 63 + sY);
 					ITEMDESC_DESC_START_X	= (79 + sX);
 					ITEMDESC_DESC_START_Y	= (14 + sY);
@@ -2894,10 +2894,10 @@ void InitItemDescriptionBoxOffsets(OBJECTTYPE * pObject)
 					ITEMDESC_CONS_START_X	= (79 + sX);
 					ITEMDESC_CONS_START_Y	= (176 + sY);
 					ITEMDESC_DESC_WIDTH		= 117;
-					ITEMDESC_ITEM_STATUS_X	= (  -125 + sX );
+					ITEMDESC_ITEM_STATUS_X	= (  -143 + sX );
 					ITEMDESC_ITEM_STATUS_Y	= ( 109 + sY );
 					ITEMDESC_ITEM_STATUS_HEIGHT	= 40;
-					ITEMDESC_AMMO_X = (-115 + sX);
+					ITEMDESC_AMMO_X = (-133 + sX);
 					ITEMDESC_AMMO_Y = (99 + sY);
 				}
 			}
@@ -3302,7 +3302,7 @@ void InitItemDescriptionBoxOffsets(OBJECTTYPE * pObject)
 					ITEMDESC_CALIBER_WIDTH	= 240;//142;
 					ITEMDESC_NAME_X			= (-80 + sX);
 					ITEMDESC_NAME_Y			= (180 + sY);
-					ITEMDESC_ITEM_X			= ( -15 + sX);
+					ITEMDESC_ITEM_X			= ( -33 + sX);
 					ITEMDESC_ITEM_Y			= ( 64 + sY);
 					ITEMDESC_DESC_START_X	= (175+ sX);// Item Desc Box offset, tactical
 					ITEMDESC_DESC_START_Y	= (69 + sY);
@@ -3311,10 +3311,10 @@ void InitItemDescriptionBoxOffsets(OBJECTTYPE * pObject)
 					ITEMDESC_CONS_START_X	= (175 + sX);// Cons, Tactical
 					ITEMDESC_CONS_START_Y	= (177 + sY);
 					ITEMDESC_DESC_WIDTH		= 155; // Text box width, Tactical
-					ITEMDESC_ITEM_STATUS_X	= (  -24 + sX );
+					ITEMDESC_ITEM_STATUS_X	= (  -42 + sX );
 					ITEMDESC_ITEM_STATUS_Y	= ( 109 + sY );
 					ITEMDESC_ITEM_STATUS_HEIGHT	= 40;
-					ITEMDESC_AMMO_X = -15 + sX;
+					ITEMDESC_AMMO_X = -33 + sX;
 					ITEMDESC_AMMO_Y = 99 + sY;
 				}
 			}

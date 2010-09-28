@@ -273,10 +273,54 @@ void GenerateRandomEquipment( SOLDIERCREATE_STRUCT *pp, INT8 bSoldierClass, INT8
 	// So in the same time when admins hold crappy weapons, elites get stuff up to nearly 6 level
 	// in Drassen counter-attack. In this situation it is very hard to make balanced xml-file(IMHO).
 	// Made in optional form
-	if ( gGameExternalOptions.fSlowProgressForEnemyItemsChoice )
-		bEquipmentModifier = ( CalcDifficultyModifier( bSoldierClass ) / 10 );
-	else
-		bEquipmentModifier = bEquipmentRating + ( ( CalcDifficultyModifier( bSoldierClass ) / 10 ) - 5 );
+
+	// SANDRO - new behaviour of progress setting
+	bEquipmentModifier = bEquipmentRating + ( ( CalcDifficultyModifier( bSoldierClass ) / 10 ) - 5 );
+	switch( gGameOptions.ubProgressSpeedOfItemsChoices )
+	{
+		case ITEM_PROGRESS_VERY_SLOW:
+			// On "Very Slow", at the beginning of the game, the modifier is -5 and goes up to -1 at +-100% game progress
+			bEquipmentModifier -= (1 + (4 - (HighestPlayerProgressPercentage() / 25) ));
+			break;
+		case ITEM_PROGRESS_SLOW:
+			// On "Slow", it's -3 until hit at least 10% game progress, then -2 till 40%, then -1 till 80%
+			if (HighestPlayerProgressPercentage() < 10 )
+				bEquipmentModifier -= 3;
+			else if (HighestPlayerProgressPercentage() < 40 )
+				bEquipmentModifier -= 2;
+			else if (HighestPlayerProgressPercentage() < 80 )
+				bEquipmentModifier -= 1;
+			break;
+		case ITEM_PROGRESS_NORMAL:
+			// Nothing needed here
+			break;
+		case ITEM_PROGRESS_FAST:
+			// On "Fast", it's just +1 at the beginning and rise up through out the game
+			if (HighestPlayerProgressPercentage() < 25 )
+				bEquipmentModifier += 1;
+			else if (HighestPlayerProgressPercentage() < 60 )
+				bEquipmentModifier += 2;
+			else if (HighestPlayerProgressPercentage() < 90 )
+				bEquipmentModifier += 3;
+			else
+				bEquipmentModifier += 4;
+			break;
+		case ITEM_PROGRESS_VERY_FAST:
+			// "Very Fast" just make everyone loaded with top gear quickly
+			if (HighestPlayerProgressPercentage() < 10 )
+				bEquipmentModifier += 2;
+			else if (HighestPlayerProgressPercentage() < 25 )
+				bEquipmentModifier += 3;
+			else if (HighestPlayerProgressPercentage() < 50 )
+				bEquipmentModifier += 4;
+			else if (HighestPlayerProgressPercentage() < 80 )
+				bEquipmentModifier += 5;
+			else
+				bEquipmentModifier += 6;
+			break;
+		default:
+			break;
+	}
 
 	switch( bSoldierClass )
 	{
@@ -287,12 +331,14 @@ void GenerateRandomEquipment( SOLDIERCREATE_STRUCT *pp, INT8 bSoldierClass, INT8
 			// civilians get nothing, anyone who should get something should be preassigned by Linda
 			break;
 
+		// SANDRO - I've split the item choosing below, so the item choices for militia can be
+		// handled differently than for enemies.
 		case SOLDIER_CLASS_ADMINISTRATOR:
-		case SOLDIER_CLASS_GREEN_MILITIA:
-			if ( gGameExternalOptions.fSlowProgressForEnemyItemsChoice )
-				bRating = bEquipmentModifier - ( bSoldierClass == SOLDIER_CLASS_GREEN_MILITIA );
-			else
-				bRating = BAD_ADMINISTRATOR_EQUIPMENT_RATING + bEquipmentModifier;
+			//if ( gGameOptions.fSlowProgressForEnemyItemsChoice )
+			//	bRating = bEquipmentModifier - ( bSoldierClass == SOLDIER_CLASS_ADMINISTRATOR );
+			//else
+			bRating = BAD_ADMINISTRATOR_EQUIPMENT_RATING + bEquipmentModifier;
+
 			bRating = (INT8)max( MIN_EQUIPMENT_CLASS, min( MAX_EQUIPMENT_CLASS, bRating ) );
 
 			bWeaponClass = bRating;
@@ -305,7 +351,7 @@ void GenerateRandomEquipment( SOLDIERCREATE_STRUCT *pp, INT8 bSoldierClass, INT8
 			bHelmetClass = bRating;
 			// no leggings
 
-			if( Random( 2 ) )
+			if( Chance( 30 ) )
 				bKnifeClass = bRating;
 
 			bAmmoClips = (INT8)(3 + Random( 2 ));
@@ -334,13 +380,59 @@ void GenerateRandomEquipment( SOLDIERCREATE_STRUCT *pp, INT8 bSoldierClass, INT8
 				}
 			}
 			break;
+		case SOLDIER_CLASS_GREEN_MILITIA:
+
+			bRating = BAD_ADMINISTRATOR_EQUIPMENT_RATING + bEquipmentModifier;
+
+			///////////////////////////////////////////////////////////////////////////////////////////
+			// SANDRO - Militia equipment quality bonus
+			if ( gGameExternalOptions.bGreenMilitiaEquipmentQualityModifier != 0 )
+				bRating += gGameExternalOptions.bGreenMilitiaEquipmentQualityModifier;
+			///////////////////////////////////////////////////////////////////////////////////////////
+
+			bRating = (INT8)max( MIN_EQUIPMENT_CLASS, min( MAX_EQUIPMENT_CLASS, bRating ) );
+
+			bWeaponClass = bRating;
+			//Headrocktest, remove for release
+			//bLBEClass = bRating;
+
+			//Note:  in some cases the class of armour and/or helmet won't be high enough to make
+			//			 the lowest level.
+			bVestClass = bRating;
+			bHelmetClass = bRating;
+
+			if( Chance( 15 ) )
+				bKnifeClass = bRating;
+
+			bAmmoClips = (INT8)(3 + Random( 2 ));
+
+			if( bRating >= GOOD_ADMINISTRATOR_EQUIPMENT_RATING )
+			{
+				bAmmoClips++;
+
+				bMiscClass = bRating;
+			}
+
+			if( bRating >= GREAT_ADMINISTRATOR_EQUIPMENT_RATING )
+			{
+				bGrenades = 1, bGrenadeClass = bRating;
+			}
+
+			if( ( bRating > MIN_EQUIPMENT_CLASS ) && bRating < MAX_EQUIPMENT_CLASS )
+			{ //Randomly decide if there is to be an upgrade of guns vs armour (one goes up, the other down)
+				switch( Random( 5 ) )
+				{
+					case 0:	bWeaponClass++, bVestClass--;					break;	//better gun, worse armour
+					case 1:	bWeaponClass--, bVestClass++;					break;	//worse gun, better armour
+				}
+			}
+			break;
 
 		case SOLDIER_CLASS_ARMY:
-		case SOLDIER_CLASS_REG_MILITIA:
 			//army guys tend to have a broad range of equipment
-			if ( gGameExternalOptions.fSlowProgressForEnemyItemsChoice )
-				bRating = bEquipmentModifier - ( bSoldierClass == SOLDIER_CLASS_REG_MILITIA );
-			else
+			//if ( gGameOptions.fSlowProgressForEnemyItemsChoice )
+			//	bRating = bEquipmentModifier - ( bSoldierClass == SOLDIER_CLASS_ARMY );
+			//else
 				bRating = BAD_ARMY_EQUIPMENT_RATING + bEquipmentModifier;
 			bRating = (INT8)max( MIN_EQUIPMENT_CLASS, min( MAX_EQUIPMENT_CLASS, bRating ) );
 
@@ -386,12 +478,12 @@ void GenerateRandomEquipment( SOLDIERCREATE_STRUCT *pp, INT8 bSoldierClass, INT8
 				}
 			}
 
-			if( Random( 2 ) )
+			if( Chance( 35 ) )
 				bKnifeClass = bRating;
 
 			// Headrock: Chance for soldier to carry better LBE
-			if( Chance( 50 ) )
-				bLBEClass++;
+			//if( Chance( 50 ) )
+			//	bLBEClass++;
 
 			if( ( bRating > MIN_EQUIPMENT_CLASS ) && bRating < MAX_EQUIPMENT_CLASS )
 			{
@@ -456,12 +548,115 @@ void GenerateRandomEquipment( SOLDIERCREATE_STRUCT *pp, INT8 bSoldierClass, INT8
 				}
 			}
 			break;
+		case SOLDIER_CLASS_REG_MILITIA:
+			
+			bRating = BAD_ARMY_EQUIPMENT_RATING + bEquipmentModifier;
+
+			///////////////////////////////////////////////////////////////////////////////////////////
+			// SANDRO - Militia equipment quality bonus
+			if ( gGameExternalOptions.bRegularMilitiaEquipmentQualityModifier != 0 )
+				bRating += gGameExternalOptions.bRegularMilitiaEquipmentQualityModifier;
+			///////////////////////////////////////////////////////////////////////////////////////////
+
+			bRating = (INT8)max( MIN_EQUIPMENT_CLASS, min( MAX_EQUIPMENT_CLASS, bRating ) );
+
+			bWeaponClass = bRating;
+			bVestClass = bRating;
+			bHelmetClass = bRating;
+			bGrenadeClass = bRating;
+			//WarmSteel - attachments don't need to be as high a class, controversional and might be better to externalize?
+			bAttachClass = bRating*3/8;
+
+
+			if( ( bRating >= GOOD_ARMY_EQUIPMENT_RATING ) && Chance(33) )
+			{
+				fAttachment = TRUE;
+				bAttachClass = bRating*5/8;
+			}
+
+			bAmmoClips = (INT8)(3 + Random( 2 ));
+
+			if( bRating >= AVERAGE_ARMY_EQUIPMENT_RATING )
+			{
+				bGrenades = (INT8)Random( 2 );
+				bKitClass = bRating;
+				bMiscClass = bRating;
+			}
+
+			if( bRating >= GOOD_ARMY_EQUIPMENT_RATING )
+			{
+				bGrenades++;
+			}
+
+			if( bRating >= GREAT_ARMY_EQUIPMENT_RATING )
+			{
+				bGrenades++;
+
+				bLeggingClass = bRating;
+
+				if ( Chance( 25 ) )
+				{
+					bBombClass = bRating;
+				}
+			}
+
+			if( Chance( 20 ) )
+				bKnifeClass = bRating;
+
+			if( ( bRating > MIN_EQUIPMENT_CLASS ) && bRating < MAX_EQUIPMENT_CLASS )
+			{
+				switch( Random( 7 ) )
+				{
+					case 3:	bWeaponClass++, bVestClass--;		break;	//better gun, worse armour
+					case 4: bWeaponClass--, bVestClass++;		break;	//worse gun, better armour
+					case 5: bVestClass++, bHelmetClass--;		break;	//better armour, worse helmet
+					case 6: bVestClass--, bHelmetClass++;		break;	//worse armour, better helmet
+				}
+			}
+
+			// if well-enough equipped, 1/5 chance of something really special
+			if( ( bRating >= GREAT_ARMY_EQUIPMENT_RATING ) && ( Random( 100 ) < 20 ) )
+			{
+				//give this man a special weapon!  No mortars if underground, however
+				ubMaxSpecialWeaponRoll = ( !IsAutoResolveActive() && ( gbWorldSectorZ != 0 ) ) ? 6 : 7;
+				switch ( Random ( ubMaxSpecialWeaponRoll ) )
+				{
+					case 0:
+					case 1:
+					case 2:
+						if ( pp->bExpLevel >= 3 )
+						{
+							//grenade launcher
+							fGrenadeLauncher = TRUE;
+							bGrenades = 3 + (INT8)(Random( 3 )); //3-5
+						}
+						break;
+
+					case 3:
+					case 4:
+						if ( pp->bExpLevel >= 4 )
+						{
+							// LAW rocket launcher
+							fLAW = TRUE;
+						}
+						break;
+					case 5:
+						if ( pp->bExpLevel >= 5 )
+						{
+							// RPG rocket launcher
+							fRPG = TRUE;
+							bGrenades = 2 + (INT8)(Random( 3 )); //2-4
+							bGrenadeClass = RPG_GRENADE_CLASS;
+						}
+						break;
+				}
+			}
+			break;
 
 		case SOLDIER_CLASS_ELITE:
-		case SOLDIER_CLASS_ELITE_MILITIA:
-			if ( gGameExternalOptions.fSlowProgressForEnemyItemsChoice )
-				bRating = bEquipmentModifier - ( bSoldierClass == SOLDIER_CLASS_ELITE_MILITIA );
-			else
+			//if ( gGameOptions.fSlowProgressForEnemyItemsChoice )
+			//	bRating = bEquipmentModifier - ( bSoldierClass == SOLDIER_CLASS_ELITE );
+			//else
 				bRating = BAD_ELITE_EQUIPMENT_RATING + bEquipmentModifier;
 			bRating = (INT8)max( MIN_EQUIPMENT_CLASS, min( MAX_EQUIPMENT_CLASS, bRating ) );
 
@@ -491,7 +686,7 @@ void GenerateRandomEquipment( SOLDIERCREATE_STRUCT *pp, INT8 bSoldierClass, INT8
 				bAttachClass = bRating;
 			}
 
-			if( Random( 2 ) )
+			if( Chance( 35 ) )
 				bKnifeClass = bRating;
 
 			if( ( bRating > MIN_EQUIPMENT_CLASS ) && bRating < MAX_EQUIPMENT_CLASS )
@@ -546,6 +741,106 @@ void GenerateRandomEquipment( SOLDIERCREATE_STRUCT *pp, INT8 bSoldierClass, INT8
 							// the grenades will actually represent mortar shells in this case
 							bGrenades = 3 + (INT8)(Random( 5 )); //3-7
 							bGrenadeClass = MORTAR_GRENADE_CLASS;
+						}
+						break;
+				}
+			}
+			break;
+		case SOLDIER_CLASS_ELITE_MILITIA:
+			
+			bRating = BAD_ELITE_EQUIPMENT_RATING + bEquipmentModifier;
+
+			///////////////////////////////////////////////////////////////////////////////////////////
+			// SANDRO - Militia equipment quality bonus
+			if ( gGameExternalOptions.bVeteranMilitiaEquipmentQualityModifier != 0 )
+				bRating += gGameExternalOptions.bVeteranMilitiaEquipmentQualityModifier;
+			///////////////////////////////////////////////////////////////////////////////////////////
+
+			bRating = (INT8)max( MIN_EQUIPMENT_CLASS, min( MAX_EQUIPMENT_CLASS, bRating ) );
+
+			bWeaponClass = bRating;
+			bHelmetClass = bRating;
+			bVestClass = bRating;
+			bLeggingClass = bRating;
+			bAttachClass = bRating*7/8;
+			bGrenadeClass = bRating;
+			bKitClass = bRating;
+			bMiscClass = bRating;
+
+			if ( Chance( 25 ) )
+			{
+				bBombClass = bRating;
+			}
+
+			bAmmoClips = (INT8)(3 + Random( 2 ));
+			bGrenades = (INT8)(2 + Random( 3 ));
+			
+			if( ( bRating >= AVERAGE_ELITE_EQUIPMENT_RATING ) && Chance(75) )
+			{
+				fAttachment = TRUE;
+				bAttachClass = bRating;
+			}
+
+			if( Chance( 25 ) )
+				bKnifeClass = bRating;
+
+			if( ( bRating > MIN_EQUIPMENT_CLASS ) && bRating < MAX_EQUIPMENT_CLASS )
+			{
+				UINT32 uiRange = ((UsingNewInventorySystem() == false)) ? Random(10) : Random(11);
+				switch( uiRange )
+				{
+					case 4:		bWeaponClass++, bVestClass--;		break;
+					case 5:		bWeaponClass--, bVestClass--;		break;
+					case 6:		bVestClass++, bHelmetClass--;		break;
+					case 7:		bGrenades += 2;						break;
+					case 8:		bHelmetClass++;						break;
+					case 9:		bVestClass++;						break;
+					case 10:	bWeaponClass++;						break;
+					//case 11:	bLBEClass++;						break;
+				}
+			}
+
+			// if well-enough equipped, 1/3 chance of something really special
+			if( ( bRating >= GOOD_ELITE_EQUIPMENT_RATING ) && ( Random( 100 ) < 60 ) )
+			{
+				//give this man a special weapon!  No mortars if underground, however
+				ubMaxSpecialWeaponRoll = ( !IsAutoResolveActive() && ( gbWorldSectorZ != 0 ) ) ? 4 : 5;
+				switch ( Random ( ubMaxSpecialWeaponRoll ) )
+				{
+					case 0:
+						//grenade launcher
+						fGrenadeLauncher = TRUE;
+						bGrenades = 4 + (INT8)(Random( 4 )); //4-7
+						break;
+					case 1:
+					case 2:
+						// LAW rocket launcher
+						fLAW = TRUE;
+						break;
+					case 3:
+						// RPG rocket launcher
+						fRPG = TRUE;
+						bGrenades = 3 + (INT8)(Random( 5 )); //3-7
+						bGrenadeClass = RPG_GRENADE_CLASS;
+						break;
+					case 4:
+						// one per team maximum!
+						if ( guiMortarsRolledByTeam < MAX_MORTARS_PER_TEAM )
+						{
+							//mortar
+							fMortar = TRUE;
+							guiMortarsRolledByTeam++;
+
+							// the grenades will actually represent mortar shells in this case
+							bGrenades = 3 + (INT8)(Random( 5 )); //3-7
+							bGrenadeClass = MORTAR_GRENADE_CLASS;
+						}
+						else
+						{
+							// RPG rocket launcher
+							fRPG = TRUE;
+							bGrenades = 3 + (INT8)(Random( 5 )); //3-7
+							bGrenadeClass = RPG_GRENADE_CLASS;
 						}
 						break;
 				}
@@ -640,17 +935,22 @@ void GenerateRandomEquipment( SOLDIERCREATE_STRUCT *pp, INT8 bSoldierClass, INT8
 	//Now actually choose the equipment!
 	ChooseWeaponForSoldierCreateStruct( pp, bWeaponClass, bAmmoClips, bAttachClass, fAttachment );
 	// Headrock: This is where the program calls LBE choosing
-	ChooseLBEsForSoldierCreateStruct( pp, bLBEClass );
+	if ( SOLDIER_CLASS_ENEMY( bSoldierClass )) // BUT ONLY FOR ENEMIES, NOT MILITIA - SANDRO
+	{
+		if (Chance(50))	// Make EDB gear rare
+			ChooseLBEsForSoldierCreateStruct( pp, bLBEClass );
+	}
 	ChooseSpecialWeaponsForSoldierCreateStruct( pp, bKnifeClass, fGrenadeLauncher, fLAW, fMortar, fRPG );
 	ChooseGrenadesForSoldierCreateStruct( pp, bGrenades, bGrenadeClass, fGrenadeLauncher );
 	ChooseArmourForSoldierCreateStruct( pp, bHelmetClass, bVestClass, bLeggingClass );
 	ChooseFaceGearForSoldierCreateStruct( pp );
-	ChooseKitsForSoldierCreateStruct( pp, bKitClass );
+	if (Chance(65))
+	{ ChooseKitsForSoldierCreateStruct( pp, bKitClass ); }	// Kits not so often - SANDRO
 	ChooseMiscGearForSoldierCreateStruct( pp, bMiscClass );
 	ChooseBombsForSoldierCreateStruct( pp, bBombClass );
 	//ADB why is this here twice?
 	// Headrock: This is where the program calls LBE choosing
-	ChooseLBEsForSoldierCreateStruct( pp, bLBEClass );
+	//ChooseLBEsForSoldierCreateStruct( pp, bLBEClass ); // SANDRO - removed duplicated 
 	ChooseLocationSpecificGearForSoldierCreateStruct( pp );
 	RandomlyChooseWhichItemsAreDroppable( pp, bSoldierClass );
 
@@ -772,7 +1072,7 @@ void ChooseWeaponForSoldierCreateStruct( SOLDIERCREATE_STRUCT *pp, INT8 bWeaponC
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"ChooseWeaponForSoldierCreateStruct: Gun Created");
 	if( !(pp->Inv[ HANDPOS ].fFlags & OBJECT_NO_OVERWRITE) )
 	{ //slot not locked, so add attachments to it
-		if(!gGameExternalOptions.fNewAttachmentSystem){
+		if(gGameOptions.ubAttachmentSystem == ATTACHMENT_OLD){
 			if ( Weapon[usGunIndex].ubWeaponType == GUN_SN_RIFLE )
 			{
 				usScopeIndex = PickARandomAttachment(SCOPE,usGunIndex,bAttachClass,TRUE);
@@ -882,11 +1182,6 @@ void ChooseWeaponForSoldierCreateStruct( SOLDIERCREATE_STRUCT *pp, INT8 bWeaponC
 					usAttachIndex = PickARandomAttachment(ATTACHMENTS,usGunIndex,bAttachClass,fGetMatchingCoolness);
 
 				if(!usAttachIndex){
-					continue;
-				}
-				//If the chosen item was inseperable, we have to drop it with the gun later, so for balance reasons make sure we just have less of them.
-				if(Item[usAttachIndex].inseparable && Chance(50)){				
-					//Don't mess with the chances too much, the enemy gets another try.
 					continue;
 				}
 
@@ -1277,25 +1572,67 @@ void ChooseArmourForSoldierCreateStruct( SOLDIERCREATE_STRUCT *pp, INT8 bHelmetC
 	//UINT16 i;
 	//INVTYPE *pItem;
 	//UINT16 usRandom;
-	UINT16 usItem = 0;
+	UINT16 usItem = 0, usHelmetItem = 0, usVestItem = 0, usLeggingsItem = 0;
 	//UINT16 usNumMatches;
-//	INT8 bOrigVestClass = bVestClass;
+	//INT8 bOrigVestClass = bVestClass;
+	INT8 i;
+
+	//tais: always get any armor... smeagol doesnt like naked people..
+	if(gGameExternalOptions.fSoldiersWearAnyArmour)
+	{
+		if(bHelmetClass < 1) bHelmetClass = 1;
+		//search for a non-empty class with items we need
+		for(i=bHelmetClass;i<=10;i++)
+		{
+			usHelmetItem = PickARandomItem(HELMET,i );
+			//if we find a non-empty class change to that and break
+			if(usHelmetItem > 0)
+			{
+				bHelmetClass = i;
+				break;
+			}
+		}
+		if(bVestClass < 1) bVestClass = 1;
+		//search for a non-empty class with items we need
+		for(i=bVestClass;i<=10;i++)
+		{
+			usVestItem = PickARandomItem(VEST,i );
+			//if we find a non-empty class change to that and break
+			if(usVestItem > 0)
+			{
+				bVestClass = i;
+				break;
+			}
+		}
+		if(bLeggingsClass < 1) bLeggingsClass = 1;
+		//search for a non-empty class with items we need
+		for(i=bLeggingsClass;i<=10;i++)
+		{
+			usLeggingsItem = PickARandomItem(LEGS,i );
+			//if we find a non-empty class change to that and break
+			if(usLeggingsItem > 0)
+			{
+				bLeggingsClass = i;
+				break;
+			}
+		}
+	}
 
 	//Madd: added minimum protection of 10 for armours to be used by enemies
 
 	//Choose helmet
 	if( bHelmetClass )
 	{
-		usItem = PickARandomItem(HELMET,bHelmetClass );
-		if ( usItem > 0 && Item[usItem].usItemClass == IC_ARMOUR && !(pp->Inv[ HELMETPOS ].fFlags & OBJECT_NO_OVERWRITE) && Armour[ Item[usItem].ubClassIndex ].ubArmourClass == ARMOURCLASS_HELMET )
+		if(!gGameExternalOptions.fSoldiersWearAnyArmour) usHelmetItem = PickARandomItem(HELMET,bHelmetClass );
+		if ( usHelmetItem > 0 && Item[usHelmetItem].usItemClass == IC_ARMOUR && !(pp->Inv[ HELMETPOS ].fFlags & OBJECT_NO_OVERWRITE) && Armour[ Item[usHelmetItem].ubClassIndex ].ubArmourClass == ARMOURCLASS_HELMET )
 		{
-			CreateItem( usItem, (INT8)(70+Random(31)), &(pp->Inv[ HELMETPOS ]) );
+			CreateItem( usHelmetItem, (INT8)(70+Random(31)), &(pp->Inv[ HELMETPOS ]) );
 			pp->Inv[ HELMETPOS ].fFlags |= OBJECT_UNDROPPABLE;
 
 			// roll to see if he gets an attachment, too.  Higher chance the higher his entitled helmet class is
-			if (( INT8 ) Random( 100 ) < ( 15 * ( bHelmetClass - Item[usItem].ubCoolness ) ) )
+			if (( INT8 ) Random( 100 ) < ( 15 * ( bHelmetClass - Item[usHelmetItem].ubCoolness ) ) )
 			{
-				UINT16 usAttachment = PickARandomAttachment(ARMOURATTACHMENT,usItem, bHelmetClass, FALSE);
+				UINT16 usAttachment = PickARandomAttachment(ARMOURATTACHMENT,usHelmetItem, bHelmetClass, FALSE);
 				if ( usAttachment > 0 )
 				{
 					CreateItem( usAttachment, (INT8)(70+Random(31)), &gTempObject );
@@ -1359,16 +1696,16 @@ void ChooseArmourForSoldierCreateStruct( SOLDIERCREATE_STRUCT *pp, INT8 bHelmetC
 	//Choose vest
 	if( bVestClass )
 	{
-		usItem = PickARandomItem(VEST,bVestClass );
-		if ( usItem > 0 && Item[usItem].usItemClass == IC_ARMOUR && !(pp->Inv[ VESTPOS ].fFlags & OBJECT_NO_OVERWRITE) && Armour[ Item[usItem].ubClassIndex ].ubArmourClass == ARMOURCLASS_VEST )
+		if(!gGameExternalOptions.fSoldiersWearAnyArmour) usVestItem = PickARandomItem(VEST,bVestClass );
+		if ( usVestItem > 0 && Item[usVestItem].usItemClass == IC_ARMOUR && !(pp->Inv[ VESTPOS ].fFlags & OBJECT_NO_OVERWRITE) && Armour[ Item[usVestItem].ubClassIndex ].ubArmourClass == ARMOURCLASS_VEST )
 		{
-			CreateItem( usItem, (INT8)(70+Random(31)), &(pp->Inv[ VESTPOS ]) );
+			CreateItem( usVestItem, (INT8)(70+Random(31)), &(pp->Inv[ VESTPOS ]) );
 			pp->Inv[ VESTPOS ].fFlags |= OBJECT_UNDROPPABLE;
 
 			// roll to see if he gets a CERAMIC PLATES, too.  Higher chance the higher his entitled vest class is
-			if (( INT8 ) Random( 100 ) < ( 15 * ( bVestClass - Item[usItem].ubCoolness ) ) )
+			if (( INT8 ) Random( 100 ) < ( 15 * ( bVestClass - Item[usVestItem].ubCoolness ) ) )
 			{
-				UINT16 usAttachment = PickARandomAttachment(ARMOURATTACHMENT,usItem, bVestClass, FALSE);
+				UINT16 usAttachment = PickARandomAttachment(ARMOURATTACHMENT,usVestItem, bVestClass, FALSE);
 				if ( usAttachment > 0 )
 				{
 					CreateItem( usAttachment, (INT8)(70+Random(31)), &gTempObject );
@@ -1453,16 +1790,16 @@ void ChooseArmourForSoldierCreateStruct( SOLDIERCREATE_STRUCT *pp, INT8 bHelmetC
 	//Choose Leggings
 	if( bLeggingsClass )
 	{
-		usItem = PickARandomItem(LEGS,bLeggingsClass);
-		if ( usItem > 0 && Item[usItem].usItemClass == IC_ARMOUR && !(pp->Inv[ LEGPOS ].fFlags & OBJECT_NO_OVERWRITE) && Armour[ Item[usItem].ubClassIndex ].ubArmourClass == ARMOURCLASS_LEGGINGS )
+		if(!gGameExternalOptions.fSoldiersWearAnyArmour) usLeggingsItem = PickARandomItem(LEGS,bLeggingsClass );
+		if ( usLeggingsItem > 0 && Item[usLeggingsItem].usItemClass == IC_ARMOUR && !(pp->Inv[ LEGPOS ].fFlags & OBJECT_NO_OVERWRITE) && Armour[ Item[usLeggingsItem].ubClassIndex ].ubArmourClass == ARMOURCLASS_LEGGINGS )
 		{
-			CreateItem( usItem, (INT8)(70+Random(31)), &(pp->Inv[ LEGPOS ]) );
+			CreateItem( usLeggingsItem, (INT8)(70+Random(31)), &(pp->Inv[ LEGPOS ]) );
 			pp->Inv[ LEGPOS ].fFlags |= OBJECT_UNDROPPABLE;
 
 			// roll to see if he gets an attachment, too.  Higher chance the higher his entitled Leggings class is
-			if (( INT8 ) Random( 100 ) < ( 15 * ( bLeggingsClass - Item[usItem].ubCoolness ) ) )
+			if (( INT8 ) Random( 100 ) < ( 15 * ( bLeggingsClass - Item[usLeggingsItem].ubCoolness ) ) )
 			{
-				UINT16 usAttachment = PickARandomAttachment(ARMOURATTACHMENT,usItem, bLeggingsClass, FALSE);
+				UINT16 usAttachment = PickARandomAttachment(ARMOURATTACHMENT,usLeggingsItem, bLeggingsClass, FALSE);
 				if ( usAttachment > 0 )
 				{
 					CreateItem( usAttachment, (INT8)(70+Random(31)), &gTempObject );
@@ -2105,7 +2442,8 @@ void RandomlyChooseWhichItemsAreDroppable( SOLDIERCREATE_STRUCT *pp, INT8 bSoldi
 	UINT32 uiRandomValue = 0;
 
 	//Madd
-if ( gGameSettings.fOptions[TOPTION_DROP_ALL] )
+//if ( gGameSettings.fOptions[TOPTION_DROP_ALL] ) // EXTERNILIZED TO THE INI INSTEAD - SANDRO
+if ( gGameOptions.fEnemiesDropAllItems )
 {
 	ENEMYAMMODROPRATE = 100;
 	ENEMYGRENADEDROPRATE = 100;
@@ -2221,7 +2559,8 @@ else
 			usItem = pp->Inv[ i ].usItem;
 //TODO: someday maybe 			pp->Inv[i].fFlags &= ~ITEM_REPAIRABLE;
 
-			if ( gGameSettings.fOptions[TOPTION_DROP_ALL]  )
+			//if ( gGameSettings.fOptions[TOPTION_DROP_ALL]  ) // EXTERNILIZED TO THE INI INSTEAD - SANDRO
+			if ( gGameOptions.fEnemiesDropAllItems )
 			{
 				// WANNE: "Drop all" should mean "Drop all"
 				/*
@@ -2262,7 +2601,8 @@ else
 		}
 	}
 
-	if ( gGameSettings.fOptions[TOPTION_DROP_ALL]  )
+	//if ( gGameSettings.fOptions[TOPTION_DROP_ALL]  ) // EXTERNILIZED TO THE INI INSTEAD - SANDRO
+	if ( gGameOptions.fEnemiesDropAllItems )
 		return;
 
 
@@ -2893,14 +3233,14 @@ void ReplaceExtendedGuns( SOLDIERCREATE_STRUCT *pp, INT8 bSoldierClass )
 				CreateItem( usNewGun, (*pObj)[0]->data.gun.bGunStatus, &gTempObject );
 				gTempObject.fFlags = (*pObj).fFlags;
 
+				//init attachments
+				InitItemAttachments(pObj);
+
 				for (attachmentList::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); ++iter) {
 					if(iter->exists()){
 						gTempObject.AttachObject(0, &(*iter), FALSE);
 					}
 				}
-
-				//for any old attachments that don't fit on the new gun, place or drop them
-				RemoveProhibitedAttachments(0, &gTempObject, usNewGun);
 
 				//copy it over
 				*pObj = gTempObject;
@@ -3161,7 +3501,7 @@ UINT16 PickARandomAttachment(UINT8 typeIndex, UINT16 usBaseItem, UINT8 maxCoolne
 				fDefaultAttachment = TRUE;
 			}
 		}
-		if ( usItem >= 0 && Item[usItem].ubCoolness <= maxCoolness && NASValidAttachment(usItem,usBaseItem) && !fDefaultAttachment)
+		if ( usItem >= 0 && Item[usItem].ubCoolness <= maxCoolness && ValidAttachment(usItem,usBaseItem) && !fDefaultAttachment)
 		{
 			// pick a default item in case we don't find anything with a matching coolness, but pick the coolest item we can find
 			if ( defaultItem == 0 || Item[usItem].ubCoolness > Item[defaultItem].ubCoolness )

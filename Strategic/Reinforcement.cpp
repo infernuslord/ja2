@@ -263,6 +263,7 @@ UINT8 DoReinforcementAsPendingEnemy( INT16 sMapX, INT16 sMapY )
 
 			gfPendingEnemies = TRUE;
 			ResetMortarsOnTeamCount();
+			ResetNumSquadleadersInArmyGroup(); // added by SANDRO
 		}
 	}
 

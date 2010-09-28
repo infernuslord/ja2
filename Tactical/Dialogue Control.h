@@ -3,6 +3,7 @@
 
 #include "faces.h"
 #include "gamescreen.h"
+#include "soldier profile type.h"
 #include <vector>
 
 // An enumeration for dialog quotes

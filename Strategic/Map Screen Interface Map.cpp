@@ -3887,8 +3887,6 @@ BOOLEAN IsTheCursorAllowedToHighLightThisSector( INT16 sSectorX, INT16 sSectorY 
 		// return cursor is allowed to highlight this sector
 		return ( TRUE );
 	}
-	
-	
 }
 
 
@@ -6473,7 +6471,7 @@ UINT32 WhatPlayerKnowsAboutEnemiesInSector( INT16 sSectorX, INT16 sSectorY )
 	// There's also a special case flag used when players encounter enemies in a sector, then retreat. You can only
 	// see the size of their force while the clock is paused. When unpaused, the flag is reset.
 	if ( CanMercsScoutThisSector( sSectorX, sSectorY, 0 ) ||
-			CanNearbyMilitiaScoutThisSector( sSectorX, sSectorY ) ||
+			CanSomeoneNearbyScoutThisSector( sSectorX, sSectorY, FALSE ) || // merged militia check with scouting check - SANDRO
 			( uiSectorFlags & SF_PLAYER_KNOWS_ENEMIES_ARE_HERE ) )
 	{
 		fDetection = TRUE;
@@ -6483,6 +6481,18 @@ UINT32 WhatPlayerKnowsAboutEnemiesInSector( INT16 sSectorX, INT16 sSectorY )
 		{
 			// They're also counted by default.
 			fCount = TRUE;
+		}
+	}
+	// SADNRO - Scouting trait check for detection of nearby enemies
+	if (CanSomeoneNearbyScoutThisSector( sSectorX, sSectorY, TRUE )) // scouting trait check
+	{
+		if (gSkillTraitValues.fSCCanDetectEnemyPresenseAround)
+		{
+			// show their presence
+			fDetection = TRUE;
+			// show their numbers
+			if (gSkillTraitValues.fSCCanDetermineEnemyNumbersAround)
+				fCount = TRUE;
 		}
 	}
 

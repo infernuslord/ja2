@@ -520,4 +520,7 @@ BOOLEAN TranslateArrayFields(void* out, const void* inp, int len, int cmd);
 #define CENTRAL_GRIDNO (MAPROWCOLTOPOS(WORLD_ROWS/2,WORLD_COLS/2))
 #define CENTRAL_RADIUS (min(WORLD_ROWS,WORLD_COLS)/5)
 
+void ResetNumSquadleadersInArmyGroup( void ); // added by SANDRO
+BOOLEAN AssignTraitsToSoldier( SOLDIERTYPE *pSoldier, SOLDIERCREATE_STRUCT *pCreateStruct ); // Added a function to add traits to soldiers - SANDRO
+
 #endif

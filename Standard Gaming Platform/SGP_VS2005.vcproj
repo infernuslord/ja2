@@ -499,6 +499,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\radbase.h"
+				>
+			</File>
+			<File
 				RelativePath=".\random.h"
 				>
 			</File>
@@ -516,6 +520,10 @@
 			</File>
 			<File
 				RelativePath=".\sgp_auto_memory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sgp_logger.h"
 				>
 			</File>
 			<File
@@ -742,6 +750,10 @@
 			</File>
 			<File
 				RelativePath=".\sgp.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\sgp_logger.cpp"
 				>
 			</File>
 			<File

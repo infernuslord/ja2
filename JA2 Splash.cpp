@@ -65,9 +65,9 @@ void InitJA2SplashScreen()
 			return;
 		}
 	}
-	catch(CBasicException &ex)
+	catch(std::exception &ex)
 	{
-		RETHROWEXCEPTION(L"Failed loading splash screen", &ex);
+		SGP_RETHROW(L"Failed loading splash screen", ex);
 	}
 
 	GetVideoSurface( &hVSurface, uiLogoID );

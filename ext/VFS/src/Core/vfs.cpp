@@ -1,3 +1,26 @@
+/* 
+ * bfVFS : vfs/Core/vfs.cpp
+ *  - primary interface for the using program, get files from the VFS internal storage
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include <vfs/Core/vfs_types.h>
 #include <vfs/Core/vfs.h>
 
@@ -14,6 +37,7 @@
 
 #include <stack>
 
+template class vfs::TIterator<vfs::tReadableFile>; // explicit instantiation
 
 /********************************************************************/
 /********************************************************************/
@@ -363,8 +387,8 @@ vfs::CVirtualFileSystem::Iterator vfs::CVirtualFileSystem::begin(vfs::Path const
 
 bool vfs::CVirtualFileSystem::addLocation(vfs::IBaseLocation* pLocation, vfs::CVirtualProfile *pProfile)
 {
-	THROWIFFALSE(pLocation != NULL, L"Invalid location object");
-	THROWIFFALSE(pProfile!= NULL, L"Invalid location object");
+	VFS_THROW_IFF(pLocation != NULL, L"Invalid location object");
+	VFS_THROW_IFF(pProfile!= NULL, L"Invalid location object");
 
 	std::list<vfs::Path> lSubDirs;
 	pLocation->getSubDirList(lSubDirs);
@@ -400,6 +424,7 @@ vfs::tWritableFile* vfs::CVirtualFileSystem::getWriteFile(vfs::Path const& rLoca
 
 vfs::IBaseFile* vfs::CVirtualFileSystem::getFile(vfs::Path const& rLocalFilePath, vfs::CVirtualFile::ESearchFile eSF)
 {
+	VFS_LOG_DEBUG( (L"Get file : " + rLocalFilePath()).c_str() );
 	vfs::Path sDir,sFile;
 	rLocalFilePath.splitLast(sDir,sFile);
 
@@ -416,6 +441,7 @@ vfs::IBaseFile* vfs::CVirtualFileSystem::getFile(vfs::Path const& rLocalFilePath
 			return pVFile->file(eSF);
 		}
 	}
+	VFS_LOG_DEBUG( _BS(L"Could not find file : ") << rLocalFilePath << _BS::wget );
 	return NULL;
 }
 
@@ -559,7 +585,7 @@ bool vfs::CVirtualFileSystem::createNewFile(vfs::Path const& sFilename)
 			}
 			//else
 			//{
-			//	THROWEXCEPTION(L"location (closest match) should exist");
+			//	VFS_THROW(L"location (closest match) should exist");
 			//}
 			bNewLocation = true;
 		}

@@ -139,7 +139,7 @@ bool Loc::ExportStrings()
 	ExportSection(props, L"PersonnelTitle",				Loc::pPersonnelTitle,				0,	1);
 	ExportSection(props, L"PersonnelScreen",			Loc::pPersonnelScreenStrings,		0,	TEXT_NUM_PRSNL);
 
-	ExportSection(props, L"MercSkill",					Loc::gzMercSkillText,				0,	NUM_SKILLTRAITS);
+	ExportSection(props, L"MercSkill",					Loc::gzMercSkillText,				0,	NUM_SKILLTRAITS_OT);
 	ExportSection(props, L"TacticalPopupButton",		Loc::pTacticalPopupButtonStrings,	0,	NUM_ICONS);
 	ExportSection(props, L"DoorTrap",					Loc::pDoorTrapStrings,				0,	NUM_DOOR_TRAPS);
 	ExportSection(props, L"ContractExtend",				Loc::pContractExtendStrings,		0,	NUM_CONTRACT_EXTEND);

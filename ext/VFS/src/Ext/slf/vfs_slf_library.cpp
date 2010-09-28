@@ -1,3 +1,28 @@
+/* 
+ * bfVFS : vfs/Ext/slf/vfs_slf_library.cpp
+ *  - implements Library interface, creates library object from SLF archive files
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#ifdef VFS_WITH_SLF
+
 #include <vfs/Ext/slf/vfs_slf_library.h>
 #include <vfs/Core/Location/vfs_lib_dir.h>
 #include <vfs/vfs_config.h>
@@ -74,7 +99,7 @@ bool vfs::CSLFLibrary::init()
 
 		slf::LIBHEADER LibFileHeader;
 		vfs::size_t bytesRead = m_libraryFile->read((vfs::Byte*)&LibFileHeader, sizeof( slf::LIBHEADER ));
-		THROWIFFALSE(bytesRead == sizeof( slf::LIBHEADER ), L"");
+		VFS_THROW_IFF(bytesRead == sizeof( slf::LIBHEADER ), L"");
 
 		vfs::Path oLibPath;
 		//if the library has a path
@@ -109,7 +134,7 @@ bool vfs::CSLFLibrary::init()
 			//read in the file header
 			//memset(&DirEntry,0,sizeof(DirEntry));
 			bytesRead = m_libraryFile->read((Byte*)&DirEntry, sizeof( slf::DIRENTRY ));
-			THROWIFFALSE(bytesRead == sizeof( slf::DIRENTRY ), L"");
+			VFS_THROW_IFF(bytesRead == sizeof( slf::DIRENTRY ), L"");
 
 			if( DirEntry.ubState == slf::FILE_OK )
 			{
@@ -136,7 +161,7 @@ bool vfs::CSLFLibrary::init()
 				// create file
 				vfs::CLibFile *pFile = vfs::CLibFile::create(oFile,pLD,this);
 				// add file to directory
-				THROWIFFALSE(pLD->addFile(pFile), L"");
+				VFS_THROW_IFF(pLD->addFile(pFile), L"");
 
 				// link file data struct to file object
 				m_fileData.insert(std::make_pair(pFile, SFileData(DirEntry.uiLength, DirEntry.uiOffset)));
@@ -144,10 +169,11 @@ bool vfs::CSLFLibrary::init()
 		} // end for
 		return true;
 	}
-	catch(CBasicException& ex)
+	catch(std::exception& ex)
 	{
-		logException(ex);
+		VFS_LOG_ERROR(ex.what());
 		return false;
 	}
 }
 
+#endif // VFS_WITH_SLF

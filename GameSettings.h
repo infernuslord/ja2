@@ -38,9 +38,9 @@ enum
 
 	//Madd:
 	TOPTION_GL_BURST_CURSOR,
-	TOPTION_DROP_ALL,
+	TOPTION_ALLOW_TAUNTS, // changed from drop all - SANDRO
 	TOPTION_GL_HIGH_ANGLE,
-	TOPTION_AIM_LEVEL_RESTRICTION,
+	TOPTION_ALLOW_REAL_TIME_SNEAK, // changed from aim levels restriction - SANDRO
 
 	//lalien
 	TOPTION_SPACE_SELECTS_NEXT_SQUAD,
@@ -49,7 +49,7 @@ enum
 	TOPTION_TRACERS_FOR_SINGLE_FIRE,
 	TOPTION_RAIN_SOUND,
 	TOPTION_ALLOW_CROWS,
-	TOPTION_ALLOW_SOLDIER_TOOLTIPS, // Changed from TOPTION_USE_RANDOM_PERSONALITY - SANDRO
+	TOPTION_ALLOW_SOLDIER_TOOLTIPS,
 	TOPTION_USE_AUTO_SAVE,
 	TOPTION_SILENT_SKYRIDER,
 	TOPTION_LOW_CPU_USAGE,
@@ -113,8 +113,8 @@ typedef struct
 #endif
 
 	UINT8				ubSizeOfDisplayCover;               // The number of grids the player designates thru "Delete + '=' or '-'"
-	UINT8
-				ubSizeOfLOS;                        // The number of grids the player designates thru "End    + '=' or '-'"
+	UINT8				ubSizeOfLOS;  
+                     // The number of grids the player designates thru "End    + '=' or '-'"
 #ifdef JA2UB
 	UINT8		ubFiller[17];
 #endif	
@@ -124,7 +124,13 @@ typedef struct
 enum
 {
 	INVENTORY_OLD = 0,
-	INVENTORY_NEW = 1
+	INVENTORY_NEW = 1,
+};
+
+enum
+{
+	ATTACHMENT_OLD = 0,
+	ATTACHMENT_NEW = 1,
 };
 
 
@@ -155,6 +161,16 @@ enum
 	BR_AWESOME = 10,
 };
 
+// Added by SANDRO
+enum
+{
+	ITEM_PROGRESS_VERY_SLOW = 0,
+	ITEM_PROGRESS_SLOW,
+	ITEM_PROGRESS_NORMAL,
+	ITEM_PROGRESS_FAST,
+	ITEM_PROGRESS_VERY_FAST,
+};
+
 typedef struct
 {
 	BOOLEAN fGunNut;
@@ -165,7 +181,15 @@ typedef struct
 	BOOLEAN	fIronManMode;
 	UINT8	ubBobbyRay;
 	UINT8	ubInventorySystem;
-	UINT8	ubFiller[6];
+	UINT8	ubAttachmentSystem;
+	// SANDRO - added variables
+	UINT8	ubMaxIMPCharacters;
+	BOOLEAN	fNewTraitSystem;
+	BOOLEAN fEnableAllTerrorists;
+	BOOLEAN	fEnemiesDropAllItems;
+	UINT8   ubProgressSpeedOfItemsChoices;
+	BOOLEAN fEnableAllWeaponCaches;
+	//UINT8	ubFiller[];
 
 } GAME_OPTIONS;
 
@@ -189,19 +213,20 @@ typedef struct
 	// WDS: Allow flexible numbers of IMPs of each sex
 	INT32 iIMPMaleCharacterCount;	// Count of how many there are
 	INT32 iIMPFemaleCharacterCount;
-	INT32 iMaxIMPCharacters;		// Limit of how many to allow
+	//INT32 iMaxIMPCharacters;		// Limit of how many to allow
 	//
 	// iaIMPSlots is an array of the slots (in prof.dat) to use for IMPs.
 	//
 	INT32 *iaIMPSlots;
 
+	// SANDRO was here - some changes done
+	INT32 iIMPProfileCost;
+	BOOLEAN fDynamicIMPProfileCost;
 	INT32 iMinAttribute;
 	INT32 iMaxAttribute;
 	INT32 iImpAttributePoints;
 	INT32 iMaxZeroBonus;
-	INT32 iStartAttribute;
 
-	// These 3 added - SANDRO
 	INT32 iIMPStartingLevelCostMultiplier;
 	INT32 iBonusPointsForDisability;
 	INT32 iBonusPointsPerSkillNotTaken;
@@ -237,25 +262,48 @@ typedef struct
 	BOOLEAN fMercDayOne;
 	BOOLEAN fAllMercsAvailable;
 	
-	// tais: Any AIM merc on assignment at game start?
-	BOOLEAN fMercsOnAssignmentAtStart;
-
-
-	//BOOLEAN fPers_att;
-
-	// These 2 removed - SANDRO
-	//INT8 iCustomPersonality;
-	//INT8 iCustomAttitude;
+	// tais: Any AIM merc on assignment?
+	UINT8 fMercsOnAssignment;
+	// tais: Soldiers wear any armour
+	UINT8 fSoldiersWearAnyArmour;
 
 	INT8 iEasyAPBonus;
 	INT8 iExperiencedAPBonus;
 	INT8 iExpertAPBonus;
 	INT8 iInsaneAPBonus;
 	INT8 iPlayerAPBonus;
+
+	////////////////////////////////////
+	// added by SANDRO
+	INT16 sEnemyAdminCtHBonusPercent;
+	INT16 sEnemyRegularCtHBonusPercent;
+	INT16 sEnemyEliteCtHBonusPercent;
+
+	INT8 sEnemyAdminDamageResistance;	
+	INT8 sEnemyRegularDamageResistance;
+	INT8 sEnemyEliteDamageResistance;
+
+	BOOLEAN fAssignTraitsToEnemy;
+	BOOLEAN fAssignTraitsToMilitia;
+	INT8 bAssignedTraitsRarity;
+
+	BOOLEAN fCamoRemoving;
+	BOOLEAN fEnhancedCloseCombatSystem;
+
+	UINT16 usAwardSpecialExpForQuests;
+	////////////////////////////////////
+
 	// Kaiden: Vehicle Inventory change - Added for INI Option
 	BOOLEAN fVehicleInventory;
 
-	BOOLEAN fEnableChanceOfEnemyAmbushesOnInsaneDifficult;
+	///////////////////////////////////////
+	// changed/added these - SANDRO
+	UINT8 sMercsAutoresolveOffenseBonus;
+	UINT8 sMercsAutoresolveDeffenseBonus;
+	BOOLEAN fEnableChanceOfEnemyAmbushes; 
+	INT8 bChanceModifierEnemyAmbushes;
+	UINT8 usSpecialNPCStronger;
+	///////////////////////////////////////
 
 	// System settings
 	UINT8 gubDeadLockDelay;
@@ -300,7 +348,22 @@ typedef struct
 	//UINT32	guiMaxMilitiaSquadSize;
 	//UINT32	guiMaxMilitiaSquadSizeBattle;
 
-	//BOOLEAN gfAllowSoldierToolTips; // moved to prefereces - SANDRO
+	// SANDRO - added some variables
+	INT16	sGreenMilitiaAutoresolveStrength;
+	INT16	sRegularMilitiaAutoresolveStrength;
+	INT16	sVeteranMilitiaAutoresolveStrength;
+	INT8	bGreenMilitiaAPsBonus;
+	INT8	bRegularMilitiaAPsBonus;
+	INT8	bVeteranMilitiaAPsBonus;
+	INT16	sGreenMilitiaCtHBonusPercent;	
+	INT16	sRegularMilitiaCtHBonusPercent;
+	INT16	sVeteranMilitiaCtHBonusPercent;
+	INT8	bGreenMilitiaDamageResistance;
+	INT8	bRegularMilitiaDamageResistance;
+	INT8	bVeteranMilitiaDamageResistance;
+	INT8	bGreenMilitiaEquipmentQualityModifier;
+	INT8	bRegularMilitiaEquipmentQualityModifier;
+	INT8	bVeteranMilitiaEquipmentQualityModifier;
 
 	// WDS - Improve Tony's and Devin's inventory like BR's
 	BOOLEAN tonyUsesBRSetting;
@@ -350,9 +413,6 @@ typedef struct
 	UINT32 ubGameProgressMinimum;
 	INT32 bGameProgressModifier;
 
-	// WDS - Advanced start 
-	//UINT32 ubIMPStartingLevel; // removed - SANDRO
-
 	// Event settings
 	UINT32 ubGameProgressStartMadlabQuest;
 	UINT32 ubGameProgressMikeAvailable;
@@ -372,6 +432,7 @@ typedef struct
 
 	INT32 iExplosivesDamageModifier;
 	INT32 iGunDamageModifier;
+	INT32 iGunRangeModifier;
 	INT32 iMeleeDamageModifier;
 
 	UINT32 ubEasyEnemyStartingAlertLevel;
@@ -429,6 +490,9 @@ typedef struct
 
 	BOOLEAN	gfUseExternalLoadscreens;
 
+	//tais: nsgi
+	BOOLEAN gfUseNewStartingGearInterface;
+
 	BOOLEAN gfUseAutoSave;
 
 	//Merc Assignment settings
@@ -463,8 +527,9 @@ typedef struct
 	//Misc settings
 	BOOLEAN fAmmoDynamicWeight; //Pulmu
 	BOOLEAN fEnableCrepitus;
-	BOOLEAN fEnableAllWeaponCaches;
-	BOOLEAN fEnableAllTerrorists;
+	// SANDRO was here - removed these two
+	//BOOLEAN fEnableAllWeaponCaches;
+	//BOOLEAN fEnableAllTerrorists;
 	BOOLEAN gfRevealItems;
 	BOOLEAN fEnableArmorCoverage; // ShadoWarrior for Captain J's armor coverage
 
@@ -480,6 +545,7 @@ typedef struct
 	BOOLEAN fEnableSoldierTooltipAttitude;
 	BOOLEAN fEnableSoldierTooltipActionPoints;
 	BOOLEAN fEnableSoldierTooltipHealth;
+	BOOLEAN fEnableSoldierTooltipTraits; // added by SANDRO
 	BOOLEAN fEnableSoldierTooltipHelmet;
 	BOOLEAN fEnableSoldierTooltipVest;
 	BOOLEAN fEnableSoldierTooltipLeggings;
@@ -526,8 +592,7 @@ typedef struct
 	// WANNE: Changed from BOOLEAN to INT32!
 	INT32 iEnhancedDescriptionBox;
 	
-	//WarmSteel - Use the New Attachment System?
-	BOOLEAN fNewAttachmentSystem;
+	//WarmSteel - New Attachment System?	
 	BOOLEAN fUseDefaultSlots;
 	UINT32	usAttachmentDropRate;
 	INT16   iMaxEnemyAttachments;
@@ -590,8 +655,14 @@ typedef struct
 	// HEADROCK HAM B2.6: Increased aiming costs?
 	BOOLEAN fIncreasedAimingCost;
 
+	// added by SANDRO
+	BOOLEAN fAimLevelRestriction;
+
 	// HEADROCK HAM B2.6: Dynamically determine Max-Aiming based also on weapon, bipod, etc?
 	BOOLEAN fDynamicAimingTime;
+
+	// allow old behaviour
+	BOOLEAN fAimLevelsDependOnDistance;
 
 	//WarmSteel - These determine in which group each scope belongs. Needed for dynamic aiming limits.
 	INT16 sVeryHighPowerScope;
@@ -826,9 +897,13 @@ typedef struct
 	// HEADROCK HAM 3.6: If activated, the game does not switch focus to a merc who spots an enemy in real-time mode. This fixes issues with Real-Time Sneak.
 	BOOLEAN fNoAutoFocusChangeInRealtimeSneak;
 
+	UINT8 ubEarlyRebelsRecruitment[4];	// early recruitment of Miguel and Carlos
+	// silversurfer: don't play quote when merc spots a mine? TRUE = shut up! FALSE = tell me that you found a mine!
+	BOOLEAN fMineSpottedNoTalk;
+
 	// The_Bob - real time sneaking code 01/06/09
 	// Suport disabling/silencing real time sneaking via external .ini file
-	BOOLEAN fAllowRealTimeSneak;
+	//BOOLEAN fAllowRealTimeSneak; // SANDRO - moved to preferences
 	BOOLEAN fQuietRealTimeSneak;
 
 	//legion by Jazz
@@ -841,7 +916,7 @@ typedef struct
 	//SAveGame Slot by Jazz
 	BOOLEAN fSaveGameSlot;
 
-//dnl ch51 081009 JA2 Debug Settings
+	//dnl ch51 081009 JA2 Debug Settings
 	BOOLEAN fEnableInventoryPoolQ;		
 	
 	//legion by Jazz
@@ -859,8 +934,251 @@ typedef struct
 	BOOLEAN fEnemyRank;
 	
 	BOOLEAN fShowCamouflageFaces;
+
+	FLOAT gMercLevelUpSalaryIncreasePercentage;
+
+	UINT8 ubChanceTonyAvailable; // silversurfer/SANDRO
 	
 } GAME_EXTERNAL_OPTIONS;
+
+typedef struct
+{
+	// GENERIC SETTINGS
+	INT8 bCtHModifierAssaultRifles;
+	INT8 bCtHModifierSniperRifles;
+	INT8 bCtHModifierRifles;
+	INT8 bCtHModifierSMGs;
+	INT8 bCtHModifierLMGs;
+	INT8 bCtHModifierShotguns;
+	INT8 bCtHModifierPistols;
+	INT8 bCtHModifierMachinePistols;
+	INT8 bCtHModifierRocketLaunchers;
+	INT8 bCtHModifierGrenadeLaunchers;
+	INT16 sCtHModifierMortar;
+	INT8 bCtHModifierThrowingKnives;
+	INT8 bCtHModifierThrowingGrenades;
+	INT8 bCtHModifierHtHAttack;
+	INT8 bModifierDodgeHtHChance;
+	INT8 bCtHModifierKnifeAttack;
+	INT8 bModifierDodgeKnifeChance;
+	INT8 bCtHModifierRobot;
+	UINT8 ubCtHPenaltyDualShot;
+	INT8 bPercentModifierHtHBreathLoss;
+	INT8 bPercentModifierBladesBreathLoss;
+	INT8 bPercentModifierBluntBreathLoss;
+	UINT8 ubModifierForAPsAddedOnAimedPunches;
+	UINT8 ubModifierForAPsAddedOnAimedBladedAttackes;
+	INT8 bSpeedModifierDoctoring;
+	INT8 bSpeedModifierBandaging;
+	INT8 bSpeedModifierRepairing;
+	INT8 bSpeedModifierTrainingMilitia;
+	INT8 bSpeedModifierTeachingOthers;
+	INT8 bCheckModifierLockpicking;
+	INT8 bCheckModifierAttachDetonators;
+	INT8 bCheckModifierSetExplosives;
+	INT8 bCheckModifierDisarmExplosiveTraps;
+	INT8 bCheckModifierDisarmElectronicTraps;
+	INT8 bCheckModifierAttachSpecialItems;
+	INT8 bTanksDamageResistanceModifier;
+	UINT8 ubDamageNeededToLoseStats;
+
+	// AUTO WEAPONS
+	UINT8 ubAWBonusCtHAssaultRifles;
+	UINT8 ubAWBonusCtHSMGs;
+	UINT8 ubAWBonusCtHLMGs;
+	UINT8 ubAWAutoFirePenaltyReduction;
+	UINT8 ubAWUnwantedBulletsReduction;
+	UINT8 ubAWFiringSpeedBonusLMGs;
+	UINT8 ubAWPercentReadyLMGReduction;
+
+	// HEAVY WEAPONS
+	UINT8 ubHWGrenadeLaunchersAPsReduction;
+	UINT8 ubHWRocketLaunchersAPsReduction;
+	UINT8 ubHWBonusCtHGrenadeLaunchers;
+	UINT8 ubHWBonusCtHRocketLaunchers;
+	UINT8 ubHWMortarAPsReduction;
+	UINT8 ubHWMortarCtHPenaltyReduction;
+	UINT8 ubHWDamageTanksBonusPercent;
+	UINT8 ubHWDamageBonusPercentForHW;
+
+	// SNIPER
+	UINT8 ubSNBonusCtHSniperRifles;
+	UINT8 ubSNEffRangeToTargetReduction;
+	UINT8 ubSNAimingBonusPerClick;
+	UINT8 ubSNDamageBonusPerClick;
+	UINT8 ubSNDamageBonusFromNumClicks;
+	UINT8 ubSNChamberRoundAPsReduction;
+	UINT8 ubSNAimClicksAdded;
+	
+	// RANGER
+	UINT8 ubRABonusCtHRifles;
+	UINT8 ubRABonusCtHShotguns;
+	UINT8 ubRAPumpShotgunsAPsReduction;
+	UINT8 ubRAGroupTimeSpentForTravellingFoot;
+	UINT8 ubRAGroupTimeSpentForTravellingVehicle;
+	UINT8 ubRAMaxBonusesToTravelSpeed;
+	UINT8 ubRABreathForTravellingReduction;
+	UINT8 ubRAWeatherPenaltiesReduction;
+	//UINT8 ubRACamoEffectivenessBonus;
+	UINT8 ubRACamoWornountSpeedReduction;
+
+	// GUNSLINGER
+	UINT8 ubGSFiringSpeedBonusPistols;
+	UINT8 ubGSEffectiveRangeBonusPistols;
+	UINT8 ubGSBonusCtHPistols;
+	UINT8 ubGSBonusCtHMachinePistols;
+	UINT8 ubGSCtHMPExcludeAuto;
+	UINT8 ubGSAimingBonusPerClick;
+	UINT8 ubGSPercentReadyPistolsReduction;
+	UINT8 ubGSRealoadSpeedHandgunsBonus;
+	UINT8 ubGSAimClicksAdded;
+
+	// MARTIAL ARTS
+	UINT8 ubMABonusCtHBareHands;
+	UINT8 ubMABonusCtHBrassKnuckles;
+	UINT8 ubMAPunchAPsReduction;
+	UINT8 ubMABonusDamageHandToHand;
+	UINT8 ubMABonusBreathDamageHandToHand;
+	UINT16 usMALostBreathRegainPenalty;
+	UINT16 usMAAimedPunchDamageBonus;
+	INT8 bMAAimedPunchCtHModifier;
+	UINT8 ubMAChanceToDodgeHtH;
+	UINT8 ubMAOnTopCTDHtHBareHanded;
+	UINT8 ubMAOnTopCTDHtHBrassKnuckles;
+	UINT8 ubMAChanceToDodgeMelee;
+	UINT8 ubMAReducedAPsToSteal;
+	UINT8 ubMAAPsChangeStanceReduction;
+	UINT8 ubMAApsTurnAroundReduction;
+	UINT8 ubMAAPsClimbOrJumpReduction;
+	UINT8 ubMAChanceToCkickDoors;
+	BOOLEAN fPermitExtraAnimationsOnlyToMA;
+
+	// SQUADLEADER
+	UINT16 usSLRadiusNormal;
+	UINT16 usSLRadiusExtendedEar;
+	UINT8 ubSLMaxBonuses;
+	UINT8 ubSLBonusAPsPercent;
+	UINT8 ubSLEffectiveLevelInRadius;
+	UINT8 ubSLEffectiveLevelAsStandby;
+	UINT8 ubSLOverallSuppresionBonusPercent;
+	UINT8 ubSLMoraleGainBonus;
+	UINT8 ubSLMoraleLossReduction;
+	UINT8 ubSLFearResistance;
+	UINT8 ubSLDeathMoralelossMultiplier;
+
+	// TECHNICIAN
+	UINT16 usTERepairSpeedBonus;
+	UINT16 usTELockpickingBonus;
+	UINT16 usTEDisarmElTrapBonus;
+	UINT16 usTEAttachingItemsBonus;
+	UINT8 ubTEUnjamGunBonus;
+	UINT8 ubTERepairElectronicsPenaltyReduction;
+	UINT8 ubTEChanceToDetectTrapsBonus;
+	UINT8 ubTECtHControlledRobotBonus;
+	UINT8 ubTERepairRobotPenaltyReduction;
+	UINT8 ubTETraitsNumToRepairRobot;
+
+	// DOCTOR
+	UINT8 ubDONumberTraitsNeededForSurgery;
+	UINT8 ubDOSurgeryHealPercentBase;
+	UINT8 ubDOSurgeryHealPercentOnTop;
+	UINT16 usDOSurgeryMedBagConsumption;
+	UINT16 usDOSurgeryMaxBreathLoss;
+	UINT16 usDORepairStatsRateBasic;
+	UINT16 usDORepairStatsRateOnTop;
+	UINT8 ubDORepStPenaltyIfAlsoHealing;
+	UINT8 ubDOHealingPenaltyIfAlsoStatRepair;
+	BOOLEAN fDORepStShouldThrowMessage;
+	UINT8 ubDOBandagingSpeedPercent;
+	UINT16 usDODoctorAssignmentBonus;
+	UINT8 ubDONaturalRegenBonus;
+	UINT8 ubDOMaxRegenBonuses;
+
+	// AMBIDEXTROUS
+	UINT8 ubAMPenaltyDoubleReduction;
+	UINT8 ubAMReloadSpeedMagazines;
+	UINT8 ubAMReloadSpeedLoose;
+	UINT8 ubAMPickItemsAPsReduction;
+	UINT8 ubAMWorkBackpackAPsReduction;
+	UINT8 ubAMHandleDoorsAPsReduction;
+	UINT8 ubAMHandleBombsAPsReduction;
+	UINT8 ubAMAttachingItemsAPsReduction;
+
+	// MELEE
+	UINT8 ubMEBladesAPsReduction;
+	UINT8 ubMECtHBladesBonus;
+	UINT8 ubMECtHBluntBonus;
+	UINT8 ubMEDamageBonusBlades;
+	UINT8 ubMEDamageBonusBlunt;
+	UINT16 usMEAimedMeleeAttackDamageBonus;
+	UINT8 ubMEDodgeBladesBonus;
+	UINT8 ubMECtDBladesOnTopWithBladeInHands;
+	UINT8 ubMEDodgeBluntBonus;
+	UINT8 ubMECtDBluntOnTopWithBladeInHands;
+
+	// THROWING
+	UINT8 ubTHBladesAPsReduction;
+	UINT8 ubTHBladesMaxRange;
+	UINT8 ubTHBladesCtHBonus;
+	UINT8 ubTHBladesCtHBonusPerClick;
+	UINT8 ubTHBladesDamageBonus;
+	UINT8 ubTHBladesDamageBonusPerClick;
+	UINT8 ubTHBladesSilentCriticalHitChance;
+	UINT8 ubTHBladesCriticalHitMultiplierBonus;
+	UINT8 ubTHBladesAimClicksAdded;
+
+	// NIGHT OPS
+	UINT8 ubNOeSightRangeBonusInDark;
+	UINT8 ubNOHearingRangeBonus;
+	UINT8 ubNOHearingRangeBonusInDark;
+	UINT8 ubNOIterruptsBonusInDark;
+	UINT8 ubNONeedForSleepReduction;
+
+	// STEALTHY
+	UINT8 ubSTStealthModeSpeedBonus;
+	UINT8 ubSTBonusToMoveQuietly;
+	UINT8 ubSTStealthBonus;
+	UINT8 ubSTStealthPenaltyForMovingReduction;
+
+	// ATHLETICS
+	UINT8 ubATAPsMovementReduction;
+	UINT8 ubATBPsMovementReduction;
+
+	// BODYBUILDING
+	UINT8 ubBBDamageResistance;
+	UINT8 ubBBCarryWeightBonus;
+	UINT8 ubBBBreathLossForHtHImpactReduction;
+	UINT16 usBBIncreasedNeededDamageToFallDown;
+
+	// DEMOLITIONS
+	UINT8 ubDEAPsNeededToThrowGrenadesReduction;
+	UINT8 ubDEMaxRangeToThrowGrenades;
+	UINT8 ubDECtHWhenThrowingGrenades;
+	UINT8 ubDEDamageOfBombsAndMines;
+	UINT8 ubDEAttachDetonatorCheckBonus;
+	UINT8 ubDEPlantAndRemoveBombCheckBonus;
+	UINT8 ubDEPlacedBombLevelBonus;
+	UINT8 ubDEShapedChargeDamageMultiplier;
+
+	// TEACHING
+	UINT8 ubTGBonusToTrainMilitia;
+	UINT8 ubTGEffectiveLDRToTrainMilitia;
+	UINT8 ubTGBonusToTeachOtherMercs;
+	UINT8 ubTGEffectiveSkillValueForTeaching;
+	UINT8 ubTGBonusOnPractising;
+
+	// SCOUTING
+	UINT8 ubSCSightRangebonusWithScopes;
+	UINT16 usSCSightRangebonusWithBinoculars;
+	UINT8 ubSCTunnelVisionReducedWithBinoculars;
+	BOOLEAN fSCCanDetectEnemyPresenseAround;
+	BOOLEAN fSCCanDetermineEnemyNumbersAround;
+	BOOLEAN fSCDetectionInDiagonalSectors;
+	BOOLEAN fSCPreventsTheEnemyToAmbushMercs;
+	BOOLEAN fSCPreventsBloodcatsAmbushes;
+	BOOLEAN fSCThrowMessageIfAmbushPrevented;
+
+} SKILL_TRAIT_VALUES;
 
 //This structure will contain general Ja2 settings	NOT individual game settings.
 extern GAME_SETTINGS		gGameSettings;
@@ -871,6 +1189,8 @@ extern GAME_OPTIONS		gGameOptions;
 // Snap: Options read from an INI file in the default of custom Data directory
 extern GAME_EXTERNAL_OPTIONS gGameExternalOptions; 
 
+extern SKILL_TRAIT_VALUES gSkillTraitValues;  // SANDRO - added this one
+
 // WDS - Automatically try to save when an assertion failure occurs
 extern bool alreadySaving;
 
@@ -878,6 +1198,7 @@ BOOLEAN	SaveGameSettings();
 BOOLEAN LoadGameSettings();
 // Snap: Read options from an INI file in the default of custom Data directory
 void LoadGameExternalOptions();
+void LoadSkillTraitsExternalSettings(); // SANDRO - added this one
 void LoadGameAPBPConstants();
 void FreeGameExternalOptions();
 

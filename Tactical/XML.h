@@ -25,6 +25,8 @@ enum
 	ELEMENT_LIST,
 	ELEMENT,
 	ELEMENT_PROPERTY,
+	ELEMENT_SUBLIST,
+	ELEMENT_SUBLIST_PROPERTY,
 
 	// For new merchant inventory
 	MERCHANT_CONTROL,
@@ -63,10 +65,10 @@ typedef PARSE_STAGE;
 #define	AMMOFILENAME							"AmmoStrings.xml"
 #define	AMMOTYPESFILENAME						"AmmoTypes.xml"
 #define	INCOMPATIBLEATTACHMENTSFILENAME			"IncompatibleAttachments.xml"
-#define	ATTACHMENTSLOTSFILENAME				"AttachmentSlots.xml"
-#define	ATTACHMENTSLOTASSIGNFILENAME		"AttachmentSlotAssign.xml"
-#define	ITEMSLOTASSIGNFILENAME				"ItemSlotAssign.xml"
+#define	ATTACHMENTSLOTSFILENAME					"AttachmentSlots.xml"
+#define	ITEMSLOTASSIGNFILENAME					"ItemSlotAssign.xml"
 #define	NASINCOMPATIBLEATTACHMENTS				"NASIncompatibleAttachments.xml"
+#define	ALTERINGATTACHMENTSFILENAME				"AlteringAttachments.xml"
 #define	ENEMYGUNCHOICESFILENAME					"EnemyGunChoices.xml"
 #define	ENEMYITEMCHOICESFILENAME				"EnemyItemChoices.xml"
 #define	IMPITEMCHOICESFILENAME					"IMPItemChoices.xml"
@@ -118,8 +120,8 @@ typedef PARSE_STAGE;
 #define ALTSECTORSFILENAME						"Map\\AltSectors.xml"
 #define SAMSITESFILENAME						"Map\\SamSites.xml"
 #define ROAMINGMILITIAFILENAME					"Map\\RestrictedRoamingMilitia.xml"
-#define EXTRAITEMSFILENAME						"Map\\A9_0_ExtraItems.xml"
-#define EXTRAITEMSFILENAME2						"Map\\A11_0_ExtraItems.xml"
+#define EXTRAITEMSFILENAME						"Map\\A9_0_ExtraItems"	// ".xml" will be added @runtime
+#define EXTRAITEMSFILENAME2						"Map\\A11_0_ExtraItems" // ".xml" will be added @runtime
 
 #define GARRISONFILENAME						"Army\\GarrisonGroups.xml"
 #define PATROLFILENAME							"Army\\PatrolGroups.xml"
@@ -265,14 +267,14 @@ extern BOOLEAN ReadInIncompatibleAttachmentStats(STR fileName);
 extern BOOLEAN WriteAttachmentSlotsStats();
 extern BOOLEAN ReadInAttachmentSlotsStats(STR fileName);
 
-extern BOOLEAN WriteAttachmentSlotAssignStats();
-extern BOOLEAN ReadInAttachmentSlotAssignStats(STR fileName);
-
 extern BOOLEAN WriteItemSlotAssignStats();
 extern BOOLEAN ReadInItemSlotAssignStats(STR fileName);
 
 extern BOOLEAN WriteNASIncompatibleAttachmentsStats();
 extern BOOLEAN ReadInNASIncompatibleAttachmentsStats(STR fileName);
+
+extern BOOLEAN WriteNASAlteringAttachmentsStats();
+extern BOOLEAN ReadInAlteringAttachmentsStats(STR fileName);
 
 extern BOOLEAN WriteExtendedArmyGunChoicesStats();
 extern BOOLEAN ReadInExtendedArmyGunChoicesStats(STR fileName);
@@ -404,8 +406,10 @@ extern BOOLEAN WriteEnemyRank( STR fileName);
 extern BOOLEAN ReadInIMPPortraits(STR fileName, BOOLEAN localizedVersion);
 extern void LoadIMPPortraitsTEMP();
 
-extern BOOLEAN ReadInSoundProfile(SOUND_PROFILE_VALUES *pSoundProfile, STR fileName);
-extern BOOLEAN WriteSoundProfile(SOUND_PROFILE_VALUES *pSoundProfile, STR fileName);
+//Enabled\Disabled profile sound by Jazz
+extern BOOLEAN ReadInSoundProfile( STR fileName );
+extern BOOLEAN WriteSoundProfile( STR fileName );
+
 
 extern BOOLEAN WriteRandomStats( STR fileName);
 extern BOOLEAN ReadInRandomStats(STR fileName);

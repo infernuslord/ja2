@@ -74,8 +74,19 @@ enum
 	NUM_CIV_QUOTES
 };
 
+enum //enemy taunts - SANDRO
+{
+	TAUNT_FIRE_GUN,
+	TAUNT_FIRE_LAUNCHER,
+	TAUNT_THROW,
+	TAUNT_CHARGE_KNIFE,
+	TAUNT_RUN_AWAY,
+	TAUNT_SEEK_NOISE,
+	TAUNT_ALERT,
+	TAUNT_GOT_HIT
+};
 
-
+void StartEnemyTaunt( SOLDIERTYPE *pCiv, INT8 iTauntType ); //enemy taunts - SANDRO
 
 void InitCivQuoteSystem( );
 

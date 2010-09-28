@@ -63,6 +63,7 @@
 #include "MapScreen Quotes.h"
 #include "email.h"
 #include "interface Dialogue.h"
+#include "Ja25_Tactical.h"
 #endif
 
 #include "BuildDefines.h"
@@ -822,14 +823,17 @@ UINT32	ShopKeeperScreenHandle()
 //ATM:
 	DisableSMPpanelButtonsWhenInShopKeeperInterface( FALSE );
 	//Heinz: 22.02.09 BUGFIX: buttons should not render upon shopkeeper's message
-	if( gfIsTheShopKeeperTalking && !gfInItemDescBox ) 
+	if( gfIsTheShopKeeperTalking && !gfInItemDescBox )
 	{
 		ButtonList[ guiSKI_TransactionButton ]->uiFlags |= BUTTON_FORCE_UNDIRTY;
 		ButtonList[ guiSKI_DoneButton ]->uiFlags |= BUTTON_FORCE_UNDIRTY;
 	}
+
 	RenderButtons( );
+	
 	//CHRISL: If we put this function call here, we overwrite the bullet graphic.  I don't know why.  I just know it happens.
-//	RenderItemDescriptionBox( );
+	//RenderItemDescriptionBox( );
+	
 	// render help
 	SaveBackgroundRects( );
 	RenderButtonsFastHelp( );
@@ -5111,12 +5115,12 @@ BOOLEAN IsGunOrAmmoOfSameTypeSelected( OBJECTTYPE	*pItemObject )
 //	if( Item[ pItemObject->usItem ].fFlags & ITEM_ATTACHMENT )
 	if( Item[ pItemObject->usItem ].attachment  )
 	{
-		if( NASValidAttachment( pItemObject->usItem, gpHighLightedItemObject->usItem ) )
+		if( ValidAttachment( pItemObject->usItem, gpHighLightedItemObject ) )
 			return( TRUE );
 	}
 	else
 	{
-		if( NASValidAttachment( gpHighLightedItemObject->usItem, pItemObject->usItem ) )
+		if( ValidAttachment( gpHighLightedItemObject->usItem, pItemObject ) )
 			return( TRUE );
 	}
 
@@ -6446,7 +6450,6 @@ void EvaluateItemAddedToPlayersOfferArea( INT8 bSlotID, BOOLEAN fFirstOne )
 					// he accepts items, but not this one
 					sQuoteNum = SK_QUOTES_DURING_EVALUATION_STUFF_REJECTED;
 				}
-				
 				break;
 
 			case EVAL_RESULT_NON_REPAIRABLE:
@@ -6753,10 +6756,13 @@ void InitShopKeeperItemDescBox( OBJECTTYPE *pObject, UINT16 ubPocket, UINT8 ubFr
 	INT16	sPosX, sPosY;
 
 
+	bool showItemDescriptionBox = false;
 	switch( ubFromLocation )
 	{
 		case ARMS_DEALER_INVENTORY:
 		{
+			showItemDescriptionBox = true;
+
 			UINT16	ubSelectedInvSlot = ubPocket - gSelectArmsDealerInfo.ubFirstItemIndexOnPage;
 
 			sPosX = SKI_ARMS_DEALERS_INV_START_X; // + ( SKI_INV_OFFSET_X * ( ubSelectedInvSlot % SKI_NUM_ARMS_DEALERS_INV_COLS ) - ( 358 / 2 ) ) + SKI_INV_SLOT_WIDTH / 2;
@@ -6786,6 +6792,8 @@ void InitShopKeeperItemDescBox( OBJECTTYPE *pObject, UINT16 ubPocket, UINT8 ubFr
 
 		case ARMS_DEALER_OFFER_AREA:
 		{
+			showItemDescriptionBox = false;
+
 			sPosX = SKI_ARMS_DEALERS_TRADING_INV_X; // + ( SKI_INV_OFFSET_X * ( ubPocket % ( SKI_NUM_TRADING_INV_SLOTS/2) ) - ( 358 / 2 ) ) + SKI_INV_SLOT_WIDTH / 2;
 
 			sPosY = SKI_ARMS_DEALERS_TRADING_INV_Y; // + ( ( SKI_INV_OFFSET_Y * ubPocket / ( SKI_NUM_TRADING_INV_SLOTS/2) ) + 1 ) - ( 128 / 2 ) + SKI_INV_SLOT_HEIGHT / 2;
@@ -6814,12 +6822,16 @@ void InitShopKeeperItemDescBox( OBJECTTYPE *pObject, UINT16 ubPocket, UINT8 ubFr
 			Assert( 0 );
 			return;
 	}
+	
+	// WANNE: Only allow right click (item desription box) in the arms dealer inventory
+	if (showItemDescriptionBox)
+	{
+		pShopKeeperItemDescObject = pObject;
 
-	pShopKeeperItemDescObject = pObject;
+		InitItemDescriptionBox( gpSMCurrentMerc, 255, sPosX, sPosY, 0 );
 
-	InitItemDescriptionBox( gpSMCurrentMerc, 255, sPosX, sPosY, 0 );
-
-	StartSKIDescriptionBox( );
+		StartSKIDescriptionBox( );
+	}
 }
 
 

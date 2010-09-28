@@ -1947,9 +1947,13 @@ UINT16 DisplayDamage(UINT16 usPosY, UINT16 usIndex, UINT16 usFontHeight)
 UINT16 DisplayRange(UINT16 usPosY, UINT16 usIndex, UINT16 usFontHeight)
 {
 	CHAR16	sTemp[20];
+	UINT16  gunRange = 0;
 
 	DrawTextToScreen(BobbyRText[BOBBYR_GUNS_RANGE], BOBBYR_ITEM_WEIGHT_TEXT_X, (UINT16)usPosY, 0, BOBBYR_ITEM_DESC_TEXT_FONT, BOBBYR_STATIC_TEXT_COLOR, FONT_MCOLOR_BLACK, FALSE, LEFT_JUSTIFIED);
-	swprintf(sTemp, L"%3d %s", Weapon[ usIndex ].usRange, pMessageStrings[ MSG_METER_ABBREVIATION ] );
+
+	gunRange = (UINT16)GetModifiedGunRange( usIndex);
+
+	swprintf(sTemp, L"%3d %s", gunRange, pMessageStrings[ MSG_METER_ABBREVIATION ] );
 	DrawTextToScreen(sTemp, BOBBYR_ITEM_WEIGHT_NUM_X, (UINT16)usPosY, BOBBYR_ITEM_WEIGHT_NUM_WIDTH, BOBBYR_ITEM_DESC_TEXT_FONT, BOBBYR_ITEM_DESC_TEXT_COLOR, FONT_MCOLOR_BLACK, FALSE, RIGHT_JUSTIFIED);
 	usPosY += usFontHeight + 2;
 	return(usPosY);
@@ -2441,6 +2445,7 @@ void CreateMouseRegionForBigImage( UINT16 usPosY, UINT8 ubCount, INT16 *pItemNum
 				//UINT16	gunDamage = (UINT16)( Weapon[ pItemNumbers[ i ] ].ubImpact + ( (double) Weapon[ pItemNumbers[ i ] ].ubImpact / 100) * gGameExternalOptions.ubGunDamageMultiplier );
 				UINT16		gunDamage = (UINT16)GetModifiedGunDamage( Weapon[ pItemNumbers[ i ] ].ubImpact );
 				UINT16		readyAPs = (UINT16)(( Weapon[ pItemNumbers[ i ] ].ubReadyTime * (100 - Item[ pItemNumbers[ i ] ].percentreadytimeapreduction)) / 100);
+				UINT16		gunRange = (UINT16)GetModifiedGunRange(pItemNumbers[ i ]);
 
 				//Calculate AP's
 				CHAR16		apStr[20];
@@ -2490,51 +2495,42 @@ void CreateMouseRegionForBigImage( UINT16 usPosY, UINT8 ubCount, INT16 *pItemNum
 				if (gGameExternalOptions.fBobbyRayTooltipsShowAttachments)
 				{
 					//WarmSteel - Need to add a check for the New Attachment System aswell.
-					if(gGameExternalOptions.fNewAttachmentSystem){
+					if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
 						UINT16 usItemXmlIndex;
-						BOOLEAN itemFound = FALSE;
 
 						//Get the list of the available slots on this gun
-						for(usItemXmlIndex = 0; usItemXmlIndex < ItemSlotAssign[usItemXmlIndex].itemIndex != 0; usItemXmlIndex++){
-							
-							if(ItemSlotAssign[usItemXmlIndex].itemIndex == Item[pItemNumbers[ i ]].uiIndex){
-								itemFound = TRUE;
-								break;
-							}
-						}
-						if(itemFound){
-							for(UINT16 usLoop = 0; usLoop < MAXATTACHMENTS; usLoop++){
-								for(UINT16 slotCount = 0; slotCount < ItemSlotAssign[usItemXmlIndex].itemSlots.size(); slotCount++){
-									//We're done here
-									if(AttachmentSlotAssign[usLoop].usAttachmentSlotIndexAssign == 0)
-										break;
-
-									//Does the slot of this attachment match any of the slots on the weapons?
-									if (AttachmentSlotAssign[usLoop].usAttachmentSlotIndexAssign == ItemSlotAssign[usItemXmlIndex].itemSlots[slotCount]){
-										//this one fits!
-										usAttachment = AttachmentSlotAssign[usLoop].uiAttachmentIndex;
+						for(usItemXmlIndex = 0; ItemSlotAssign[usItemXmlIndex].usItemIndex != 0 && ItemSlotAssign[usItemXmlIndex].usItemIndex != Item[pItemNumbers[ i ]].uiIndex; usItemXmlIndex++){}
+						
+						//Don't check if there are no valid slots.
+						if(ItemSlotAssign[usItemXmlIndex].usItemIndex != 0){
+							//Loop through all slots on the item
+							for(UINT16 slotCount = 0; slotCount < ItemSlotAssign[usItemXmlIndex].itemSlots.size(); slotCount++)
+							{
+								UINT16 usLoopSlotID = ItemSlotAssign[usItemXmlIndex].itemSlots[slotCount];
+								
+								//Print all attachments that fit on this item.
+								for(UINT16 usLoop = 0; usLoop < AttachmentSlots[usLoopSlotID].AttachmentAssignVector.size(); usLoop++)
+								{
+									//this one fits!
+									usAttachment = AttachmentSlots[usLoopSlotID].AttachmentAssignVector[usLoop].usAttachmentIndex;
 										
-										// If the attachment is not hidden
-										if (!Item[ usAttachment ].hiddenaddon && !Item[ usAttachment ].hiddenattachment)
+									// If the attachment is not hidden
+									if (!Item[ usAttachment ].hiddenaddon && !Item[ usAttachment ].hiddenattachment)
+									{
+										if (wcslen( attachStr3 ) + wcslen(Item[usAttachment].szItemName) > 3600)
 										{
-											if (wcslen( attachStr3 ) + wcslen(Item[usAttachment].szItemName) > 3600)
-											{
-												// End list early to avoid overflow
-												wcscat( attachStr3, L"\n..." );
-												break;
-											}
-											else
-											{// Add the attachment's name to the list.
-												fAttachmentsFound = TRUE;
-												swprintf( attachStr2, L"\n%s", Item[ usAttachment ].szItemName );
-												//Don't allow duplicate attachment strings (this can happen if an attachment will fit on more slots on the same item)
-												if( !( wcsstr(attachStr3,attachStr2) ) )
-													wcscat( attachStr3, attachStr2);
-											}
+											// End list early to avoid overflow
+											wcscat( attachStr3, L"\n..." );
+											break;
 										}
-										
-										//we found one slot this attachment fits in, so no need to look further.
-										break;
+										else
+										{// Add the attachment's name to the list.
+											fAttachmentsFound = TRUE;
+											swprintf( attachStr2, L"\n%s", Item[ usAttachment ].szItemName );
+											//Don't allow duplicate attachment strings (this can happen if an attachment will fit on more slots on the same item)
+											if( !( wcsstr(attachStr3,attachStr2) ) )
+												wcscat( attachStr3, attachStr2);
+										}
 									}
 								}
 							}
@@ -2620,7 +2616,7 @@ void CreateMouseRegionForBigImage( UINT16 usPosY, UINT8 ubCount, INT16 *pItemNum
 					gWeaponStatsDesc[ 11 ],					//Damage String
 					gunDamage,								//Gun damage
 					gWeaponStatsDesc[ 10 ],					//Range String
-					gGameSettings.fOptions[ TOPTION_SHOW_WEAPON_RANGE_IN_TILES ] ? Weapon[ pItemNumbers[ i ] ].usRange/10 : Weapon[ pItemNumbers[ i ] ].usRange,	//Gun Range 
+					gGameSettings.fOptions[ TOPTION_SHOW_WEAPON_RANGE_IN_TILES ] ? gunRange/10 : gunRange,	//Gun Range 
 					gWeaponStatsDesc[ 6 ],					//AP String
 					readyAPs,
 					apStr,									//AP's
@@ -2676,6 +2672,7 @@ void CreateMouseRegionForBigImage( UINT16 usPosY, UINT8 ubCount, INT16 *pItemNum
 			{
 				// HEADROCK HAM 3.6: Can now take a negative modifier.
 				UINT16 gunDamage = (UINT16)GetModifiedGunDamage( Weapon[ pItemNumbers[ i ] ].ubImpact );
+				UINT16 usRange = (UINT16)GetModifiedGunRange(pItemNumbers[ i ]);
 				//UINT16 gunDamage = (UINT16)( Weapon[ pItemNumbers[ i ] ].ubImpact + ( (double) Weapon[ pItemNumbers[ i ] ].ubImpact / 100) * gGameExternalOptions.ubGunDamageMultiplier );
 
 				swprintf( pStr, L"%s\n%s %d\n%s %d\n%s %d\n%s %s\n%s %1.1f %s",
@@ -2685,7 +2682,7 @@ void CreateMouseRegionForBigImage( UINT16 usPosY, UINT8 ubCount, INT16 *pItemNum
 					gWeaponStatsDesc[ 11 ],					//Damage String
 					gunDamage,								//Gun damage
 					gWeaponStatsDesc[ 10 ],					//Range String
-					gGameSettings.fOptions[ TOPTION_SHOW_WEAPON_RANGE_IN_TILES ] ? Weapon[ pItemNumbers[ i ] ].usRange/10 : Weapon[ pItemNumbers[ i ] ].usRange,	//Gun Range 
+					gGameSettings.fOptions[ TOPTION_SHOW_WEAPON_RANGE_IN_TILES ] ? usRange/10 : usRange,	//Gun Range 
 					gWeaponStatsDesc[ 6 ],					//AP String
 					//apStr,								//AP's
 					L"- / - / -",

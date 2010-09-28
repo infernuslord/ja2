@@ -6,6 +6,7 @@
 	ProjectGUID="{3E43B70D-A22F-4240-B00D-32BD14523335}"
 	RootNamespace="ja2export"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -41,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../VFS/include;../libpng;../zlib;src;src/ja2"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VFS_STATIC"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VFS_STATIC;VFS_WITH_SLF;VFS_WITH_7ZIP"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -87,9 +88,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -121,7 +119,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="../VFS/include;../libpng;../zlib;src;src/ja2"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;VFS_STATIC"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;VFS_STATIC;VFS_WITH_SLF;VFS_WITH_7ZIP"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -166,9 +164,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

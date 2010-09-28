@@ -48,7 +48,7 @@ void LuaMines::LoadScript()
 		string msg("Cannot open file: ");
 		msg.append(filename);
 		m_log << msg << vfs::Log::endl;
-		throw CBasicException(msg.c_str(), _FUNCTION_FORMAT_, __LINE__, __FILE__);
+		SGP_THROW(msg);
 	}
 
 	size = FileSize(filename);
@@ -64,7 +64,7 @@ void LuaMines::LoadScript()
 		error.append(lua_tostring(m_L, -1));
 		m_log << error << vfs::Log::endl;
 		lua_pop(m_L, 1);
-		throw CBasicException(error.c_str(), _FUNCTION_FORMAT_, __LINE__, __FILE__);
+		SGP_THROW(error);
 	}
 	else
 	{
@@ -74,7 +74,7 @@ void LuaMines::LoadScript()
 			string error("missing LUA function 'InitializeMines'");
 			m_log << error << vfs::Log::endl;
 			lua_pop(m_L, 1);
-			throw CBasicException(error.c_str(), _FUNCTION_FORMAT_, __LINE__, __FILE__);
+			SGP_THROW(error);
 		}
 		else
 			m_initMinesFuncID = luaL_ref(m_L, LUA_REGISTRYINDEX);
@@ -85,7 +85,7 @@ void LuaMines::LoadScript()
 			string error("missing LUA function 'InitializeHeadMiners'");
 			m_log << error << vfs::Log::endl;
 			lua_pop(m_L, 1);
-			throw CBasicException(error.c_str(), _FUNCTION_FORMAT_, __LINE__, __FILE__);
+			SGP_THROW(error);
 		}
 		else
 			m_initMinersFuncID = luaL_ref(m_L, LUA_REGISTRYINDEX);
@@ -145,13 +145,19 @@ void LuaMines::InitializeMines()
 	lua_setglobal(m_L, "difficultyLevel");
 	m_log << "global difficultyLevel=" << static_cast<int>(gGameOptions.ubDifficultyLevel) << vfs::Log::endl;
 
+	// quick fix for ini override option
+	lua_pushinteger(m_L, gGameExternalOptions.bWhichMineRunsOut);
+	lua_setglobal(m_L, "mineDepletionOverride");
+	m_log << "global mineDepletionOverride=" << static_cast<int>(gGameExternalOptions.bWhichMineRunsOut) << vfs::Log::endl;
+
+
 	// load and call lua function
 	lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_initMinesFuncID);
 	if (lua_pcall(m_L, 0, 1, 0) != 0)
 	{
 		string error(lua_tostring(m_L, -1));
 		lua_pop(m_L, 1);
-		throw CBasicException(error.c_str(), _FUNCTION_FORMAT_, __LINE__, __FILE__);
+		SGP_THROW(error);
 	}
 
 
@@ -316,7 +322,7 @@ BOOLEAN LuaMines::InitializeHeadMiners(UINT8 firstMineID)
 	{
 		string error(lua_tostring(m_L, -1));
 		lua_pop(m_L, 1);
-		throw CBasicException(error.c_str(), _FUNCTION_FORMAT_, __LINE__, __FILE__);
+		SGP_THROW(error);
 	}
 
 	if (lua_isnil(m_L, -1))

@@ -12,6 +12,7 @@
 	#include "sys globals.h"
 	#include "tile surface.h"
 	#include "fileMan.h"
+	#include "Debug.h"
 #endif
 
 #include <vfs/Core/vfs.h>
@@ -41,17 +42,17 @@ void InitEngineTilesets( )
 		const vfs::Path tileset_filename(L"Ja2Set.dat.xml");
 		if(!getVFS()->fileExists(tileset_filename))
 		{
-			TRYCATCH_RETHROW( ExportTilesets(tileset_filename), L"Could not export tileset XML file");
+			SGP_TRYCATCH_RETHROW( ExportTilesets(tileset_filename), L"Could not export tileset XML file");
 		}
 		vfs::tReadableFile* file = getVFS()->getReadFile(tileset_filename);
-		THROWIFFALSE(file, 
-			BuildString(L"File '").add(tileset_filename).add(L"' does not exist and could not be created").get());
+		SGP_THROW_IFFALSE(file, 
+			_BS(L"File '") << tileset_filename << L"' does not exist and could not be created" << _BS::wget);
 
 		CTilesetReader tileset_reader(gTilesets);
 		xml_auto::TGenericXMLParser<CTilesetReader> pars(&tileset_reader,NULL);
 		
-		TRYCATCH_RETHROW( pars.parseFile(file),
-			BuildString().add(L"Parser Error in file : ").add(file->getPath()).get() );
+		SGP_TRYCATCH_RETHROW( pars.parseFile(file),
+			_BS(L"Parser Error in file : ") << file->getPath() << _BS::wget );
 	}
 	else
 	{
@@ -140,7 +141,7 @@ void ExportTilesets(vfs::Path const& filename)
 
 	//OPEN FILE
 	HWFILE hfile = FileOpen( "BINARYDATA\\JA2SET.DAT", FILE_ACCESS_READ, FALSE );
-	THROWIFFALSE(hfile, L"Cannot open tileset data file" );
+	SGP_THROW_IFFALSE(hfile, L"Cannot open tileset data file" );
 
 	XMLWriter xmlw;
 	xmlw.openNode("JA2SET");
@@ -150,7 +151,7 @@ void ExportTilesets(vfs::Path const& filename)
 	FileRead( hfile, &numSets, sizeof( numSets ), &uiNumBytesRead );
 	
 	// CHECK
-	THROWIFFALSE( numSets <= MAX_TILESETS, L"Too many tilesets in the data file" );
+	SGP_THROW_IFFALSE( numSets <= MAX_TILESETS, L"Too many tilesets in the data file" );
 	xmlw.addAttributeToNextValue("numTilesets",(int)numSets);
 
 	// READ #files
@@ -158,7 +159,7 @@ void ExportTilesets(vfs::Path const& filename)
 	FileRead( hfile, &numFiles, sizeof( numFiles ), &uiNumBytesRead );
 
 	// COMPARE
-	THROWIFFALSE( numFiles == NUMBEROFTILETYPES,
+	SGP_THROW_IFFALSE( numFiles == NUMBEROFTILETYPES,
 		L"Number of tilesets slots in code does not match data file" );
 
 	xmlw.addAttributeToNextValue("numFiles",(int)numFiles);

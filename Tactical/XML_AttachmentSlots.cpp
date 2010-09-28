@@ -9,13 +9,18 @@
 	#include "XML.h"
 #endif
 
+UINT16 LAST_SLOT_INDEX = 0;
+
 struct
 {
 	PARSE_STAGE	curElement;
 
 	CHAR8		szCharData[MAX_CHAR_DATA_LENGTH+1];
-	AttachmentSlotStruct		curAttachmentSlot;
+
+	AttachmentSlotStruct	curAttachmentSlot;
 	AttachmentSlotStruct *	curArray;
+	AttachmentAssignStruct		curAttachmentAssign;
+
 	UINT32			maxArraySize;
 
 	UINT32			currentDepth;
@@ -34,7 +39,10 @@ attachmentslotStartElementHandle(void *userData, const XML_Char *name, const XML
 		{
 			pData->curElement = ELEMENT_LIST;
 
-			memset(pData->curArray,0,sizeof(AttachmentSlotStruct)*pData->maxArraySize);
+			//Clear curArray, but avoid memsetting the vector.
+			for(UINT32 i = 0; i < pData->maxArraySize; ++i){
+				memset(&(pData->curArray[i]),0,SIZEOF_ATTACHMENT_SLOT_STRUCT_POD);
+			}
 
 			pData->maxReadDepth++; //we are not skipping this element
 		}
@@ -42,7 +50,14 @@ attachmentslotStartElementHandle(void *userData, const XML_Char *name, const XML
 		{
 			pData->curElement = ELEMENT;
 
-			memset(&pData->curAttachmentSlot,0,sizeof(AttachmentSlotStruct));
+			memset(&pData->curAttachmentSlot,0,SIZEOF_ATTACHMENT_SLOT_STRUCT_POD);
+
+			//clear the vector.
+			if(!pData->curAttachmentSlot.AttachmentAssignVector.empty()){
+				while(pData->curAttachmentSlot.AttachmentAssignVector.size() > 0){
+					pData->curAttachmentSlot.AttachmentAssignVector.pop_back();
+				}
+			}
 
 			pData->maxReadDepth++; //we are not skipping this element
 		}
@@ -73,7 +88,22 @@ attachmentslotStartElementHandle(void *userData, const XML_Char *name, const XML
 
 			pData->maxReadDepth++; //we are not skipping this element
 		}
+		else if(strcmp(name, "ATTACHMENTASSIGN") == 0 && pData->curElement == ELEMENT)
+		{
+			pData->curElement = ELEMENT_SUBLIST;
 
+			memset(&pData->curAttachmentAssign,0,sizeof(AttachmentAssignStruct));
+
+			pData->maxReadDepth++; //we are not skipping this element
+		}
+		else if(pData->curElement == ELEMENT_SUBLIST &&
+				(strcmp(name, "usAttachmentIndex") == 0 ||
+				strcmp(name, "APCost") == 0 ))
+		{
+			pData->curElement = ELEMENT_SUBLIST_PROPERTY;
+
+			pData->maxReadDepth++; //we are not skipping this element
+		}
 		pData->szCharData[0] = '\0';
 	}
 
@@ -112,6 +142,10 @@ attachmentslotEndElementHandle(void *userData, const XML_Char *name)
 			if(pData->curAttachmentSlot.uiSlotIndex < pData->maxArraySize)
 			{
 				pData->curArray[pData->curAttachmentSlot.uiSlotIndex] = pData->curAttachmentSlot; //write the attachmentinfo into the table
+				//Save the highest known index up till now.
+				if(LAST_SLOT_INDEX < pData->curAttachmentSlot.uiSlotIndex){
+					LAST_SLOT_INDEX = (UINT16) pData->curAttachmentSlot.uiSlotIndex;
+				}
 			}
 		}
 		else if(strcmp(name, "uiSlotIndex") == 0)
@@ -221,13 +255,26 @@ attachmentslotEndElementHandle(void *userData, const XML_Char *name)
 			pData->curElement = ELEMENT;
 			pData->curAttachmentSlot.fDefaultLeggingsSlot = (BOOLEAN) atol(pData->szCharData);
 		}
+		else if(strcmp(name, "ATTACHMENTASSIGN") == 0)
+		{
+			pData->curElement = ELEMENT;
+			pData->curAttachmentSlot.AttachmentAssignVector.push_back(pData->curAttachmentAssign);
+		}
+		else if(strcmp(name, "usAttachmentIndex") == 0)
+		{
+			pData->curElement = ELEMENT_SUBLIST;
+			pData->curAttachmentAssign.usAttachmentIndex = (UINT16) atol(pData->szCharData);
+		}
+		else if(strcmp(name, "APCost") == 0)
+		{
+			pData->curElement = ELEMENT_SUBLIST;
+			pData->curAttachmentAssign.usAPCost = (UINT16) atol(pData->szCharData);
+		}
 		pData->maxReadDepth--;
 	}
 
 	pData->currentDepth--;
 }
-
-
 
 
 BOOLEAN ReadInAttachmentSlotsStats(STR fileName)
@@ -266,9 +313,15 @@ BOOLEAN ReadInAttachmentSlotsStats(STR fileName)
 	XML_SetCharacterDataHandler(parser, attachmentslotCharacterDataHandle);
 
 
-	memset(&pData,0,sizeof(pData));
-	pData.curArray = AttachmentSlots;
-	pData.maxArraySize = MAXITEMS;
+	// This should fix the crash in a Release Version with VS 2008	
+	//memset(&pData,0,sizeof(pData));
+	pData.curElement = ELEMENT_NONE;
+	pData.szCharData[0] = 0;
+	pData.currentDepth = 0;
+	pData.maxReadDepth = 0;	
+ 	pData.curArray = AttachmentSlots;
+ 	pData.maxArraySize = MAXITEMS;
+
 
 	XML_SetUserData(parser, &pData);
 
@@ -292,6 +345,7 @@ BOOLEAN ReadInAttachmentSlotsStats(STR fileName)
 	
 	return( TRUE );
 }
+
 BOOLEAN WriteAttachmentSlotsStats()
 {
 	//DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"writeattachmentslotstats");
@@ -333,6 +387,12 @@ BOOLEAN WriteAttachmentSlotsStats()
 			FilePrintf(hFile,"\t\t<fDefaultHelmetSlot>%d</fDefaultHelmetSlot>\r\n",						AttachmentSlots[cnt].fDefaultHelmetSlot				);
 			FilePrintf(hFile,"\t\t<fDefaultVestSlot>%d</fDefaultVestSlot>\r\n",							AttachmentSlots[cnt].fDefaultVestSlot				);
 			FilePrintf(hFile,"\t\t<fDefaultLeggingsSlot>%d</fDefaultLeggingsSlot>\r\n",					AttachmentSlots[cnt].fDefaultLeggingsSlot			);
+			for(UINT16 cnt2 = 0; cnt2 < AttachmentSlots[cnt].AttachmentAssignVector.size(); cnt2++){
+				FilePrintf(hFile,"\t\t<ATTACHMENTASSIGN>\r\n");
+				FilePrintf(hFile,"\t\t\t<usAttachmentIndex>%d</usAttachmentIndex>\r\n",					AttachmentSlots[cnt].AttachmentAssignVector[cnt2].usAttachmentIndex	);
+				FilePrintf(hFile,"\t\t\t<usAttachmentIndex>%d</usAttachmentIndex>\r\n",					AttachmentSlots[cnt].AttachmentAssignVector[cnt2].usAPCost			);
+				FilePrintf(hFile,"\t\t</ATTACHMENTASSIGN>\r\n");
+			}
 
 			FilePrintf(hFile,"\t</ATTACHMENTSLOT>\r\n");
 		}

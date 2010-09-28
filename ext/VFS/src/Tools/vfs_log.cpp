@@ -1,3 +1,26 @@
+/* 
+ * bfVFS : vfs/Tools/vfs_log.cpp
+ *  - simple file logger
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include <vfs/Tools/vfs_log.h>
 #include <cstring>
 
@@ -7,10 +30,15 @@ static const char ENDL[] = "\r\n";
 static const char ENDL[] = "\n";
 #endif
 
+typedef std::list<vfs::Log*> LogList_t;
+static LogList_t* __logs;
 std::list<vfs::Log*>& vfs::Log::_logs()
 {
-	static std::list<vfs::Log*> logs;
-	return logs;
+	if(!__logs)
+	{
+		__logs = new LogList_t;
+	}
+	return *__logs;
 }
 
 vfs::Log* vfs::Log::create(vfs::Path const& fileName, bool append, EFlushMode flushMode)
@@ -24,24 +52,23 @@ vfs::Log* vfs::Log::create(vfs::tWritableFile* file, bool append, EFlushMode flu
 	return _logs().back();
 }
 
-void vfs::Log::flushDelete()
+void vfs::Log::flushDeleteAll()
 {
-	std::list<vfs::Log*>::iterator it = _logs().begin();
+	LogList_t::iterator it = _logs().begin();
 	for(; it != _logs().end(); ++it)
 	{
 		(*it)->flush();
-		(*it)->Delete();
+		(*it)->Release();
 	}
 	_logs().clear();
 }
 
-void vfs::Log::flushRelease()
+void vfs::Log::flushReleaseAll()
 {
-	std::list<vfs::Log*>::iterator it = _logs().begin();
+	LogList_t::iterator it = _logs().begin();
 	for(; it != _logs().end(); ++it)
 	{
-		(*it)->flush();
-		(*it)->_file = NULL;
+		(*it)->releaseFile();
 	}
 }
 
@@ -76,27 +103,60 @@ vfs::Log::Log(vfs::tWritableFile* file, bool append, EFlushMode flushMode)
 
 vfs::Log::~Log()
 {
-	_test_flush(true);
+	// the final flush
+	flush();
+
+	// also delete file pointer if we created it
 	if(_file && _own_file)
 	{
 		delete _file;
+		_file = NULL;
 	}
+	
+	// one extra unlock wouldn't hurt
+	_mutex.unlock();
 }
 
-void vfs::Log::Delete()
+int vfs::Log::Reserve()
 {
-	this->UnRegister();
+	VFS_LOCK(_mutex);
+	return this->Register();
+}
+int vfs::Log::Release()
+{
+	_mutex.lock();
+	int tmp_count = this->UnRegister();
+	if(tmp_count > 0)
+	{
+		_mutex.unlock();
+	}
+	// otherwise the mutex object is destroyed at that time
+	return tmp_count;
+}
+int vfs::Log::RefCount()
+{
+	VFS_LOCK(_mutex);
+	return this->GetRefCount();
 }
 
 
 void vfs::Log::destroy()
 {
-	VFS_LOCK(_mutex);
+	// no need to lock here as 'flush' and 'Release' do it themselves
 	this->flush();
-	this->Delete();
-	_logs().remove(this);
+	if(this->Release() <= 0)
+	{
+		// object is deleted, so remove it now from the static list
+		_logs().remove(this);
+	}
 }
 
+void vfs::Log::releaseFile()
+{
+	VFS_LOCK(_mutex);
+	this->flush();
+	this->_file = NULL;
+}
 
 vfs::Log& vfs::Log::operator<<(vfs::UInt64 const& t)
 {
@@ -248,6 +308,16 @@ void vfs::Log::_test_flush(bool force)
 	}
 }
 
+
+vfs::Log::EFlushMode vfs::Log::flushMode()
+{
+	return _flush_mode;
+}
+void vfs::Log::flushMode(vfs::Log::EFlushMode fmode)
+{
+	_flush_mode = fmode;
+}
+
 #include <ctime>
 #include <vfs/Core/vfs.h>
 
@@ -262,7 +332,7 @@ void vfs::Log::flush()
 
 	if(!_file)
 	{
-		THROWIFFALSE(!_filename.empty(), L"_file is NULL and _filename is empty");
+		VFS_THROW_IFF(!_filename.empty(), L"_file is NULL and _filename is empty");
 		//vfs::CVirtualProfile *prof = getVFS()->getProfileStack()->topProfile();
 		//if( prof && prof->cWritable )
 		if(vfs::canWrite())

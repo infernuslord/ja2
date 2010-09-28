@@ -51,10 +51,10 @@ bool ja2xp::ConvertStructure(vfs::tReadableFile* pStructureFile, vfs::tWritableF
 	{
 		UINT32 uiDataSize = sizeof( AuxObjectData ) * Header.usNumberOfImages;
 		sgp::AutoArray<AuxObjectData> pAuxData(uiDataSize);
-		THROWIFFALSE( pAuxData(), L"" );
+		VFS_THROW_IFF( pAuxData(), L"" );
 
 		// Read AuxImage data
-		THROWIFFALSE( uiDataSize == rfile->read( (vfs::Byte*)pAuxData(), uiDataSize ), L"" );
+		VFS_THROW_IFF( uiDataSize == rfile->read( (vfs::Byte*)pAuxData(), uiDataSize ), L"" );
 
 		// Write AuxImage data
 		xmlw.addAttributeToNextValue("number_of", Header.usNumberOfImages);
@@ -95,9 +95,9 @@ bool ja2xp::ConvertStructure(vfs::tReadableFile* pStructureFile, vfs::tWritableF
 		{
 			uiDataSize = sizeof( RelTileLoc ) * Header.usNumberOfImageTileLocsStored;
 			sgp::AutoArray<RelTileLoc> pTileLocData(Header.usNumberOfImageTileLocsStored);
-			THROWIFFALSE( pTileLocData(), L"" );
+			VFS_THROW_IFF( pTileLocData(), L"" );
 
-			THROWIFFALSE( uiDataSize == rfile->read((vfs::Byte*)pTileLocData(), uiDataSize), L"" );
+			VFS_THROW_IFF( uiDataSize == rfile->read((vfs::Byte*)pTileLocData(), uiDataSize), L"" );
 
 			for(int i = 0; i < Header.usNumberOfImageTileLocsStored; ++i)
 			{
@@ -125,9 +125,9 @@ bool ja2xp::ConvertStructure(vfs::tReadableFile* pStructureFile, vfs::tWritableF
 		// Determine the size of the data, from the header just read,
 		// allocate enough memory and read it in
 		sgp::AutoArray<UINT8> pubStructureData( uiDataSize );
-		THROWIFFALSE(pubStructureData(), L"");
+		VFS_THROW_IFF(pubStructureData(), L"");
 
-		THROWIFFALSE( uiDataSize == rfile->read((vfs::Byte*)pubStructureData(), uiDataSize), L"" );
+		VFS_THROW_IFF( uiDataSize == rfile->read((vfs::Byte*)pubStructureData(), uiDataSize), L"" );
 
 		xmlw.addAttributeToNextValue("number_of", Header.usNumberOfStructures);
 		if(Header.usNumberOfStructures != Header.usNumberOfStructuresStored)

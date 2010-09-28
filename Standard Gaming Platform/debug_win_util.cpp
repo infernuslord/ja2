@@ -87,7 +87,7 @@ namespace {
 		// This function should only be called if Init() has been called. We do not
 		// LOG(FATAL) here because this code is called might be triggered by a
 		// LOG(FATAL) itself.
-		void OutputTraceToStream(const std::vector<void*>& trace, vfs::Log* os) {
+		void OutputTraceToStream(const std::vector<void*>& trace, sgp::Logger::LogInstance* os) {
 			//AutoLock lock(lock_);
 
 			for (size_t i = 0; (i < trace.size()); ++i) {
@@ -134,9 +134,9 @@ namespace {
 				{
 					(*os) << " - (" << line.FileName << ":" << line.LineNumber << ")";
 				}
-				(*os) << vfs::Log::endl;
+				(*os) << sgp::endl;
 			}
-			(*os) << vfs::Log::endl;
+			(*os) << sgp::endl;
 		}
 
 	private:
@@ -162,7 +162,7 @@ namespace {
 
 } // namespace
 
-
+#define ENABLE_STACK_TRACE 0
 StackTrace::StackTrace() {
 	// From http://msdn.microsoft.com/en-us/library/bb204633(VS.85).aspx,
 	// the sum of FramesToSkip and FramesToCapture must be less than 63,
@@ -174,40 +174,48 @@ StackTrace::StackTrace() {
 	
 	// WANNE: VS 2005 compilation error
 	// WANNE: I disabled the method call "CaptureStackBackTrace()" because it gives a compilation error in VS 2005
-	//int count = CaptureStackBackTrace(0, kMaxCallers, callers, NULL);
+#if ENABLE_STACK_TRACE
+	int count = CaptureStackBackTrace(0, kMaxCallers, callers, NULL);
 	
 	// WANNE: This also does not work in VS 2005
 	//int count = RtlCaptureStackBackTrace(0, kMaxCallers, callers, NULL);
-	/*if (count > 0) {
+	if (count > 0) {
 		trace_.resize(count);
 		memcpy(&trace_[0], callers, sizeof(callers[0]) * count);
 	} else {
 		trace_.resize(0);
-	}*/
+	}
+#endif
 }
 
-static vfs::Log& s_log = *vfs::Log::create(L"stack_trace.log", false, vfs::Log::FLUSH_ON_ENDL);
+static struct StackTraceLog {
+	sgp::Logger_ID id;
+	StackTraceLog() {
+		id = sgp::Logger::instance().createLogger();
+		sgp::Logger::instance().connectFile(id, L"stack_trace.log", false, sgp::Logger::FLUSH_ON_ENDL);
+	};
+} s_log;
 
 void StackTrace::PrintBacktrace(const char* msg) {
-	OutputToStream(msg, &s_log);
+	OutputToStream(msg, &(SGP_LOG(s_log.id)));
 }
 
-void StackTrace::OutputToStream(const char* msg, vfs::Log* os) {
+void StackTrace::OutputToStream(const char* msg, sgp::Logger::LogInstance* os) {
 	SymbolContext* context = SymbolContext::Get();
 	DWORD error = context->init_error();
 	if (error != ERROR_SUCCESS)
 	{
 		(*os)	<< "Error initializing symbols (" << error 
 				<< "). Dumping unresolved backtrace:"
-				<< vfs::Log::endl;
+				<< sgp::endl;
 		for (size_t i = 0; (i < trace_.size()); ++i)
 		{
-			(*os) << "\t" << trace_[i] << vfs::Log::endl;
+			(*os) << "\t" << trace_[i] << sgp::endl;
 		}
 	}
 	else
 	{
-		(*os) << L"Backtrace: " << (msg != NULL ? msg : "") << vfs::Log::endl;
+		(*os) << L"Backtrace: " << (msg != NULL ? msg : "") << sgp::endl;
 		context->OutputTraceToStream(trace_, os);
 	}
 }

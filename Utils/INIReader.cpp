@@ -12,6 +12,9 @@
 
 #include <vfs/Core/vfs.h>
 
+#ifdef USE_VFS
+std::set<vfs::Path,vfs::Path::Less> CIniReader::m_merge_files;
+#endif
 std::stack<std::string> iniErrorMessages;
 
 template<typename ValueType>
@@ -29,6 +32,13 @@ void PushErrorMessage(std::string const& filename,
 	iniErrorMessages.push(errMessage.str());
 }
 
+#ifdef USE_VFS
+void CIniReader::RegisterFileForMerging(vfs::Path const& filename)
+{
+	m_merge_files.insert(filename);
+}
+#endif
+
 CIniReader::CIniReader(const STR8	szFileName)
 {
 	memset(m_szFileName,0,sizeof(m_szFileName));
@@ -43,7 +53,26 @@ CIniReader::CIniReader(const STR8	szFileName)
 	}
 #else
 	strncpy(m_szFileName,szFileName, std::min<int>(strlen(szFileName), sizeof(m_szFileName)-1));
-	m_oProps.initFromIniFile(vfs::Path(szFileName));
+	if(m_merge_files.find(szFileName) == m_merge_files.end())
+	{
+		m_oProps.initFromIniFile(vfs::Path(szFileName));
+	}
+	else
+	{
+		vfs::CProfileStack* profs = getVFS()->getProfileStack();
+		vfs::CProfileStack::Iterator it = profs->begin();
+		std::stack<vfs::CVirtualProfile*> rev_order;
+		for(; !it.end(); it.next()) { rev_order.push(it.value()); }
+		while(!rev_order.empty())
+		{
+			vfs::IBaseFile* file = rev_order.top()->getFile(szFileName);
+			if(file)
+			{
+				m_oProps.initFromIniFile(vfs::tReadableFile::cast(file));
+			}
+			rev_order.pop();
+		}
+	}
 #endif
 }
 
@@ -79,7 +108,28 @@ CIniReader::CIniReader(const STR8	szFileName, BOOLEAN Force_Custom_Data_Path)
 	}
 #else
 	strncpy(m_szFileName,szFileName, std::min<int>(strlen(szFileName), sizeof(m_szFileName)-1));
-	CIniReader_File_Found = m_oProps.initFromIniFile(vfs::Path(szFileName));
+	if(m_merge_files.find(szFileName) == m_merge_files.end())
+	{
+		CIniReader_File_Found = m_oProps.initFromIniFile(vfs::Path(szFileName));
+	}
+	else
+	{
+		CIniReader_File_Found = TRUE;
+		vfs::CProfileStack* profs = getVFS()->getProfileStack();
+		vfs::CProfileStack::Iterator it = profs->begin();
+		std::stack<vfs::CVirtualProfile*> rev_order;
+		for(; !it.end(); it.next()) { rev_order.push(it.value()); }
+		while(!rev_order.empty())
+		{
+			vfs::IBaseFile* file = rev_order.top()->getFile(szFileName);
+			if(file)
+			{
+				CIniReader_File_Found = ((CIniReader_File_Found != FALSE) && m_oProps.initFromIniFile(vfs::tReadableFile::cast(file))) ? TRUE : FALSE;
+			}
+			rev_order.pop();
+		}
+	}
+
 #endif
 }
 

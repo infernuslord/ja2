@@ -2354,6 +2354,8 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 			case NPC_ACTION_TRIGGER_END_OF_FOOD_QUEST:
 				AddHistoryToPlayersLog( HISTORY_TALKED_TO_FATHER_WALKER, 0, GetWorldTotalMin(), gWorldSectorX, gWorldSectorY );
 				AddFutureDayStrategicEvent( EVENT_SET_BY_NPC_SYSTEM, GetWorldMinutesInDay(), NPC_SYSTEM_EVENT_ACTION_PARAM_BONUS + NPC_ACTION_TRIGGER_END_OF_FOOD_QUEST, 1 );
+				// SANDRO - merc records - quest counter (food quest)
+				GiveQuestRewardPoint( gWorldSectorX, gWorldSectorY, 4, NO_PROFILE );
 				break;
 
 			case NPC_ACTION_REMOVE_CONRAD:
@@ -2395,10 +2397,9 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 				break;
 
 			case NPC_ACTION_DELAYED_MAKE_BRENDA_LEAVE:
-				// set event to invoke Brenda's (#85) record 9 a minute from
-				// now
+				// set event to invoke Brenda's (#85) record 9 ten minutes from now
 				DeleteTalkingMenu();
-				AddSameDayStrategicEvent( EVENT_SET_BY_NPC_SYSTEM, GetWorldMinutesInDay() + 360, NPC_SYSTEM_EVENT_ACTION_PARAM_BONUS + NPC_ACTION_DELAYED_MAKE_BRENDA_LEAVE );
+				AddSameDayStrategicEvent( EVENT_SET_BY_NPC_SYSTEM, GetWorldMinutesInDay() + 10, NPC_SYSTEM_EVENT_ACTION_PARAM_BONUS + NPC_ACTION_DELAYED_MAKE_BRENDA_LEAVE );
 				break;
 
 			case NPC_ACTION_SEX:
@@ -2930,6 +2931,15 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 				}
 				// CJC Nov 28 2002 - fixed history record which didn't have location specified
 				AddHistoryToPlayersLog( HISTORY_GAVE_CARMEN_HEAD, 0, GetWorldTotalMin(), gWorldSectorX, gWorldSectorY );
+
+				// SANDRO - end the quest here - the team will gain exp and records by now
+				if (gMercProfiles[ CARMEN ].bNPCData <= 0)
+				{
+					SetFactTrue( FACT_ALL_TERRORISTS_KILLED );
+					EndQuest( QUEST_KILL_TERRORISTS, gWorldSectorX, gWorldSectorY );
+
+					IncrementTownLoyaltyEverywhere( LOYALTY_BONUS_TERRORISTS_DEALT_WITH );// end terrorist quest
+				}
 				break;
 
 			case NPC_ACTION_CARMEN_LEAVES_FOR_GOOD:
@@ -2943,13 +2953,14 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 				break;
 
 			case NPC_ACTION_CARMEN_LEAVES_ON_NEXT_SECTOR_LOAD:
-				if (gMercProfiles[ CARMEN ].bNPCData == 0)
-				{
-					SetFactTrue( FACT_ALL_TERRORISTS_KILLED );
-					// the next time we change sectors, quest 2 will be set to done
+				// SANDRO - removed from here
+				//	if (gMercProfiles[ CARMEN ].bNPCData == 0)
+				//{
+				//	SetFactTrue( FACT_ALL_TERRORISTS_KILLED );
+				//	// the next time we change sectors, quest 2 will be set to done
 
-					IncrementTownLoyaltyEverywhere( LOYALTY_BONUS_TERRORISTS_DEALT_WITH );
-				}
+				//	IncrementTownLoyaltyEverywhere( LOYALTY_BONUS_TERRORISTS_DEALT_WITH );
+				//}
 				// anyhow Carmen has given the player money so reset his balance to 0.
 				gMercProfiles[ CARMEN ].uiMoney = 0;
 				break;
@@ -3973,6 +3984,8 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 				else
 				{
 					TriggerNPCRecord( SERGEANT, 12 );
+					// SANDRO - give reward for rescuing Krott and getting the rocket rifle
+					GiveQuestRewardPoint( gWorldSectorX, gWorldSectorY, 5, CONRAD );
 				}
 				break;
 
@@ -4025,6 +4038,8 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 				if ( gfLastBoxingMatchWonByPlayer && !BoxerAvailable() )
 				{
 					TriggerNPCRecord( KINGPIN, 15 );
+					// SANDRO - merc records - quest counter (Kingpin impressed)
+					GiveQuestRewardPoint( gWorldSectorX, gWorldSectorY, 4, NO_PROFILE );
 				}
 				break;
 
@@ -5563,7 +5578,15 @@ void HandleTexBecomingCamoed()
 	}
 
 	//Then set him to be camo'ed in the profile ( cause he is still an RPC and we are just about to hire him )
-	gMercProfiles[ 64 ].bSkillTrait2 = CAMOUFLAGED;
+			// SANDRO - old/new traits check (I am not sure if this is used at all)
+		if ( gGameOptions.fNewTraitSystem )
+		{
+			gMercProfiles[ 64 ].bSkillTrait2 = RANGER_NT;
+		}
+		else
+		{
+			gMercProfiles[ 64 ].bSkillTrait2 = CAMOUFLAGED_OT;
+		}
 
 	//Close down the talking menu...
 	DeleteTalkingMenu( );

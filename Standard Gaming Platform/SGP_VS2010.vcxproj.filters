@@ -210,6 +210,12 @@
     <ClInclude Include="ZCONF.H">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sgp_logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="radbase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Button Sound Control.cpp">
@@ -339,6 +345,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WinFont.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sgp_logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -298,7 +298,7 @@ BOOLEAN InitMainMenu( )
 		vfs::CVirtualProfile *pProf = PS->getProfile("_MULTIPLAYER");
 		if( pProf && (pProf == PS->topProfile()) )
 		{
-			THROWIFFALSE(PS->popProfile(), "Leaving Multiplayer mode : Could not remove \"_MULTIPLAYER\" profile");
+			SGP_THROW_IFFALSE(PS->popProfile(), "Leaving Multiplayer mode : Could not remove \"_MULTIPLAYER\" profile");
 		}
 #endif
 
@@ -366,7 +366,8 @@ BOOLEAN InitMainMenu( )
 	SetPendingNewScreen( MAINMENU_SCREEN);
 	guiMainMenuExitScreen = MAINMENU_SCREEN;
 
-	InitGameOptions();
+	// WANNE: I don't think that is needed!
+	//InitGameOptions();
 
 	DequeueAllKeyBoardEvents();
 
@@ -410,6 +411,8 @@ void InitDependingGameStyleOptions()
 	LoadGameAPBPConstants();
 	// Load ja2_options.ini
 	LoadGameExternalOptions();
+	// Load new STOMP ini - SANDRO
+	LoadSkillTraitsExternalSettings();
 
 #ifdef JA2UB
 	LoadGameLegionOptions(); // JA25 UB
@@ -426,7 +429,8 @@ void InitDependingGameStyleOptions()
 	}
 	else
 	{
-		InitGameOptions();
+		// WANNE: I don't think that is needed
+		//InitGameOptions();
 
 		NUMBER_OF_MERCS = 15;
 		LAST_MERC_ID = 14;
@@ -839,5 +843,6 @@ void RestoreButtonBackGrounds()
 	}
 #endif
 }
+
 
 

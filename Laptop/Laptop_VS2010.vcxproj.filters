@@ -134,6 +134,9 @@
     </ClInclude>
     <ClInclude Include="IMP MainPage.h">
       <Filter>Header Files</Filter>
+    </ClInclude>        
+    <ClInclude Include="IMP Minor Trait.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IMP Personality Entrance.h">
       <Filter>Header Files</Filter>
@@ -336,6 +339,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IMP MainPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>  
+    <ClCompile Include="IMP Minor Trait.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IMP Personality Entrance.cpp">

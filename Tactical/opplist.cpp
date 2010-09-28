@@ -336,7 +336,17 @@ INT16 AdjustMaxSightRangeForEnvEffects( SOLDIERTYPE *pSoldier, INT8 bLightLevel,
 	{
 		//sNewDist = sNewDist * 70 / 100;
 		//rain
-		sNewDist = sNewDist * ( 100 - min( gGameExternalOptions.ubVisDistDecreasePerRainIntensity * gbCurrentRainIntensity, 100) ) / 100;
+		//Added a feature reducing weather penalty for ranger trait - SANDRO
+		INT16 sWeatherPenalty = 0; // percent vision reduction 0-100%
+		sWeatherPenalty = min( (max( 0, (gGameExternalOptions.ubVisDistDecreasePerRainIntensity * gbCurrentRainIntensity))), 100) ;
+		if( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, RANGER_NT ) )
+		{
+			sWeatherPenalty = (sWeatherPenalty * ( 100 - (gSkillTraitValues.ubRAWeatherPenaltiesReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ) / 100;
+			sWeatherPenalty = min( (max( 0, sWeatherPenalty)), 100 ); // keep it in 0-100 range
+		}
+
+		sNewDist = (sNewDist * ( 100 - sWeatherPenalty )) / 100;
+
 		//end rain
 	}
 
@@ -496,7 +506,8 @@ void HandleBestSightingPositionInRealtime( void )
 			if (gubBestToMakeSighting[ 1 ] == NOBODY)
 			{	// The_Bob - real time sneaking code 01/06/09
 				// if real time sneaking conditions are met...
-				if (gGameExternalOptions.fAllowRealTimeSneak && MercPtrs[gubBestToMakeSighting[ 0 ]]->bTeam == OUR_TEAM && NobodyAlerted() )
+				// this is now in the preferences window - SANDRO
+				if (gGameSettings.fOptions[TOPTION_ALLOW_REAL_TIME_SNEAK] && MercPtrs[gubBestToMakeSighting[ 0 ]]->bTeam == OUR_TEAM && NobodyAlerted() )
 					{
 						// get rid of the item under cursor (we gotta react FAST)
 						CancelItemPointer();
@@ -1266,7 +1277,9 @@ INT16 DistanceVisible( SOLDIERTYPE *pSoldier, INT8 bFacingDir, INT8 bSubjectDir,
 		sDistVisible += sDistVisible * GetTotalVisionRangeBonus(pSoldier, bLightLevel) / 100;
 
 		// HEADROCK HAM 3.2: Further reduce sightrange for cowering characters.
-		if (gGameExternalOptions.ubCoweringReducesSightRange == 1 || gGameExternalOptions.ubCoweringReducesSightRange == 2)
+		// SANDRO - this calls many sub-functions over and over, we should at least skip this for civilians and such  
+		if ((gGameExternalOptions.ubCoweringReducesSightRange == 1 || gGameExternalOptions.ubCoweringReducesSightRange == 2) &&
+			IS_MERC_BODY_TYPE(pSoldier) && (pSoldier->bTeam == ENEMY_TEAM || pSoldier->bTeam == MILITIA_TEAM || pSoldier->bTeam == gbPlayerNum) )
 		{
 			INT8 bTolerance = CalcSuppressionTolerance( pSoldier );
 
@@ -1281,12 +1294,19 @@ INT16 DistanceVisible( SOLDIERTYPE *pSoldier, INT8 bFacingDir, INT8 bSubjectDir,
 
 
 	// give one step better vision for people with nightops
-	if (HAS_SKILL_TRAIT( pSoldier, NIGHTOPS ))
+	// old/new traits check - SANDRO
+	if (gGameOptions.fNewTraitSystem)
 	{
-		sDistVisible += NightBonusScale( 1 * NUM_SKILL_TRAITS( pSoldier, NIGHTOPS ), bLightLevel);
+		if (HAS_SKILL_TRAIT( pSoldier, NIGHT_OPS_NT ))
+			sDistVisible += NightBonusScale( gSkillTraitValues.ubNOeSightRangeBonusInDark, bLightLevel);
+	}
+	else
+	{
+		if (HAS_SKILL_TRAIT( pSoldier, NIGHTOPS_OT ))
+			sDistVisible += NightBonusScale( 1 * NUM_SKILL_TRAITS( pSoldier, NIGHTOPS_OT ), bLightLevel);
 	}
 	// Bloodcat bonus only works above ground
-	else if ( pSoldier->ubBodyType == BLOODCAT && gbWorldSectorZ == 0 )
+	if ( pSoldier->ubBodyType == BLOODCAT && gbWorldSectorZ == 0 )
 	{
 		sDistVisible += NightBonusScale( UVGOGGLES_BONUS, bLightLevel);
 	}
@@ -1438,15 +1458,21 @@ INT8 DecideHearing( SOLDIERTYPE * pSoldier )
 
 	bHearing = 0;
 
-	if (pSoldier->stats.bExpLevel > 3)
+	if (EffectiveExpLevel( pSoldier ) > 3) // SANDRO - changed to calculate effective level
 	{
 		bHearing++;
 	}
 
-	if (HAS_SKILL_TRAIT( pSoldier, NIGHTOPS ))
+	// old/new traits check - SANDRO
+	if (gGameOptions.fNewTraitSystem)
 	{
-		// sharper hearing generally
-		bHearing += 1 * NUM_SKILL_TRAITS( pSoldier, NIGHTOPS );
+		if (HAS_SKILL_TRAIT( pSoldier, NIGHT_OPS_NT ))
+			bHearing += gSkillTraitValues.ubNOHearingRangeBonus;
+	}
+	else
+	{
+		if (HAS_SKILL_TRAIT( pSoldier, NIGHTOPS_OT ))
+			bHearing += 1 * NUM_SKILL_TRAITS( pSoldier, NIGHTOPS_OT );
 	}
 
 	//bSlot = FindObj( pSoldier, EXTENDEDEAR );
@@ -1474,10 +1500,17 @@ INT8 DecideHearing( SOLDIERTYPE * pSoldier )
 		case 14:
 		case 15:
 			bHearing += 3;
-			if (HAS_SKILL_TRAIT( pSoldier, NIGHTOPS ))
+			// yet another bonus for nighttime
+			// old/new traits check - SANDRO
+			if (gGameOptions.fNewTraitSystem)
 			{
-				// yet another bonus for nighttime
-				bHearing += 1 * NUM_SKILL_TRAITS( pSoldier, NIGHTOPS );
+				if (HAS_SKILL_TRAIT( pSoldier, NIGHT_OPS_NT ))
+					bHearing += gSkillTraitValues.ubNOHearingRangeBonusInDark;
+			}
+			else
+			{
+				if (HAS_SKILL_TRAIT( pSoldier, NIGHTOPS_OT ))
+					bHearing += 1 * NUM_SKILL_TRAITS( pSoldier, NIGHTOPS_OT );
 			}
 			break;
 		default:
@@ -2335,7 +2368,8 @@ void ManSeesMan(SOLDIERTYPE *pSoldier, SOLDIERTYPE *pOpponent, INT32 sOppGridNo,
 				}
 				*/
 
-				PlayJA2Sample( BLOODCAT_ROAR, RATE_11025, HIGHVOLUME, 1, MIDDLEPAN );
+				//PlayJA2Sample( BLOODCAT_ROAR, RATE_11025, HIGHVOLUME, 1, MIDDLEPAN );
+				PlayJA2Sample( BLOODCAT_ROAR, RATE_11025, MIDVOLUME +10, 1, MIDDLEPAN );
 			}
 			else
 			{
@@ -2343,7 +2377,8 @@ void ManSeesMan(SOLDIERTYPE *pSoldier, SOLDIERTYPE *pOpponent, INT32 sOppGridNo,
 				{
 					if ( Random( 2 ) == 0 )
 					{
-						PlayJA2Sample( BLOODCAT_ROAR, RATE_11025, HIGHVOLUME, 1, MIDDLEPAN );
+						//PlayJA2Sample( BLOODCAT_ROAR, RATE_11025, HIGHVOLUME, 1, MIDDLEPAN );
+						PlayJA2Sample( BLOODCAT_ROAR, RATE_11025, MIDVOLUME + 10, 1, MIDDLEPAN );
 					}
 				}
 			}
@@ -4553,7 +4588,7 @@ void DebugSoldierPage4( )
 		SetFontShade(LARGEFONT1, FONT_SHADE_GREEN);
 		gprintf( 0, LINE_HEIGHT * ubLine, L"Exp. Level:");
 		SetFontShade(LARGEFONT1, FONT_SHADE_NEUTRAL);
-		gprintf( 150, LINE_HEIGHT * ubLine, L"%d", pSoldier->stats.bExpLevel );
+		gprintf( 150, LINE_HEIGHT * ubLine, L"%d ( %d )", pSoldier->stats.bExpLevel, EffectiveExpLevel(pSoldier) ); // SANDRO - added effective level calc
 		switch( pSoldier->ubSoldierClass )
 		{
 			case SOLDIER_CLASS_ADMINISTRATOR:		gprintf( 320, LINE_HEIGHT * ubLine, L"(Administrator)" );	break;
@@ -5032,16 +5067,23 @@ UINT8 MovementNoise( SOLDIERTYPE *pSoldier )
 		return( (UINT8) (MAX_MOVEMENT_NOISE - PreRandom( 2 )) );
 	}
 
-	iStealthSkill = 20 + 4 * EffectiveExpLevel( pSoldier ) + ((EffectiveDexterity( pSoldier ) * 4) / 10); // 24-100
+	// CHANGED BY SANDRO - LET'S MAKE THE STEALTH BASED ON AGILITY LIKE IT SHOULD BE
+	//iStealthSkill = 20 + 4 * EffectiveExpLevel( pSoldier ) + ((EffectiveDexterity( pSoldier ) * 4) / 10); // 24-100
+	iStealthSkill = 20 + 4 * EffectiveExpLevel( pSoldier ) + ((EffectiveAgility( pSoldier ) * 4) / 10); // 24-100
 
 	// big bonus for those "extra stealthy" mercs
 	if ( pSoldier->ubBodyType == BLOODCAT )
 	{
 		iStealthSkill += 50;
 	}
-	else if (HAS_SKILL_TRAIT( pSoldier, STEALTHY ))
+	// SANDRO - new/old traits
+	else if ( gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, STEALTHY_NT ))
 	{
-		iStealthSkill += 25 * NUM_SKILL_TRAITS( pSoldier, STEALTHY );
+		iStealthSkill += gSkillTraitValues.ubSTBonusToMoveQuietly;
+	}
+	else if ( !gGameOptions.fNewTraitSystem && HAS_SKILL_TRAIT( pSoldier, STEALTHY_OT ))
+	{
+		iStealthSkill += 25 * NUM_SKILL_TRAITS( pSoldier, STEALTHY_OT );
 	}
 
 	if ( GetWornStealth(pSoldier) > 0 )

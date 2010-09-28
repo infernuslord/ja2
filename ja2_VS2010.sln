@@ -27,8 +27,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Laptop", "Laptop\Laptop_VS2
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Editor", "Editor\Editor_VS2010.vcxproj", "{23EA0500-038A-4EB8-B753-0C709B25470D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "7z", "ext\7z\Archive\7z\7z_VS2010.vcxproj", "{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Console", "Console\Console_VS2010.vcxproj", "{A32479BF-C284-4C40-99A5-4F6B5933D1C0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tactical", "Tactical\Tactical_VS2010.vcxproj", "{433FBCC4-F612-489C-AA28-CCD6CF27D80C}"
@@ -59,6 +57,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ja2export", "ext\export\ja2
 		{463CB476-2798-493F-9CE8-CEAC5ECE5664} = {463CB476-2798-493F-9CE8-CEAC5ECE5664}
 		{735F8DBF-6646-4713-BE36-394F33E69B57} = {735F8DBF-6646-4713-BE36-394F33E69B57}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "7z", "ext\VFS\build\7z_VS2010.vcxproj", "{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -169,16 +169,6 @@ Global
 		{23EA0500-038A-4EB8-B753-0C709B25470D}.Release|Win32.Build.0 = Release|Win32
 		{23EA0500-038A-4EB8-B753-0C709B25470D}.Relese_WithDebugInfo|Win32.ActiveCfg = Relese_WithDebugInfo|Win32
 		{23EA0500-038A-4EB8-B753-0C709B25470D}.Relese_WithDebugInfo|Win32.Build.0 = Relese_WithDebugInfo|Win32
-		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.Debug|Win32.ActiveCfg = Debug|Win32
-		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.Debug|Win32.Build.0 = Debug|Win32
-		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.MapEditor|Win32.ActiveCfg = MapEditor|Win32
-		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.MapEditor|Win32.Build.0 = MapEditor|Win32
-		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.MapEditorD|Win32.ActiveCfg = MapEditorD|Win32
-		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.MapEditorD|Win32.Build.0 = MapEditorD|Win32
-		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.Release|Win32.ActiveCfg = Release|Win32
-		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.Release|Win32.Build.0 = Release|Win32
-		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.Relese_WithDebugInfo|Win32.ActiveCfg = Relese_WithDebugInfo|Win32
-		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.Relese_WithDebugInfo|Win32.Build.0 = Relese_WithDebugInfo|Win32
 		{A32479BF-C284-4C40-99A5-4F6B5933D1C0}.Debug|Win32.ActiveCfg = Debug|Win32
 		{A32479BF-C284-4C40-99A5-4F6B5933D1C0}.Debug|Win32.Build.0 = Debug|Win32
 		{A32479BF-C284-4C40-99A5-4F6B5933D1C0}.MapEditor|Win32.ActiveCfg = MapEditor|Win32
@@ -229,6 +219,16 @@ Global
 		{802552D2-B514-42E5-A169-F1E108527678}.Release|Win32.Build.0 = Release|Win32
 		{802552D2-B514-42E5-A169-F1E108527678}.Relese_WithDebugInfo|Win32.ActiveCfg = Debug|Win32
 		{802552D2-B514-42E5-A169-F1E108527678}.Relese_WithDebugInfo|Win32.Build.0 = Debug|Win32
+		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.Debug|Win32.Build.0 = Debug|Win32
+		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.MapEditor|Win32.ActiveCfg = MapEditor|Win32
+		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.MapEditor|Win32.Build.0 = MapEditor|Win32
+		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.MapEditorD|Win32.ActiveCfg = MapEditorD|Win32
+		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.MapEditorD|Win32.Build.0 = MapEditorD|Win32
+		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.Release|Win32.ActiveCfg = Release|Win32
+		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.Release|Win32.Build.0 = Release|Win32
+		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.Relese_WithDebugInfo|Win32.ActiveCfg = Relese_WithDebugInfo|Win32
+		{3B7B950D-0DC8-4ADD-9FE2-7DE4297C62F6}.Relese_WithDebugInfo|Win32.Build.0 = Relese_WithDebugInfo|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

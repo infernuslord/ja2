@@ -186,17 +186,28 @@ UINT8 gPurpendicularDirection[ NUM_WORLD_DIRECTIONS ][ NUM_WORLD_DIRECTIONS ] =
 
 
 //----------------------legion by Jazz-----------------
-BOOLEAN FindOknoDirection( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bStartingDir, INT8 *pbDirection )
+
+BOOLEAN FindWindowJumpDirection( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bStartingDir, INT8 *pbDirection )
 {
 	INT32			cnt;
-	INT32			sNewGridNo, sOtherSideOfFence;
+	INT32 sNewGridNo, sOtherSideOfFence;
 	BOOLEAN		fFound = FALSE;
 	UINT8			bMinNumTurns = 100;
 	INT8			bNumTurns;
 	INT8			bMinDirection = 0;
+	INT8			direction2 = -1;
+
+    if ( pSoldier->ubDirection == NORTH )
+        direction2 = NORTH;
+    else if ( pSoldier->ubDirection == EAST )
+        direction2 = EAST;
+    else if ( pSoldier->ubDirection == SOUTH )
+        direction2 = SOUTH;
+    else if ( pSoldier->ubDirection == WEST )
+        direction2 = WEST;
 
 	// IF there is a fence in this gridno, return false!
-	if ( IsOknoFencePresentAtGridno( sGridNo ) )
+	if ( IsJumpableWindowPresentAtGridNo( sGridNo, direction2 ) )
 	{
 		return( FALSE );
 	}
@@ -207,19 +218,19 @@ BOOLEAN FindOknoDirection( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bStartingD
 		// go out *2* tiles
 		sNewGridNo = NewGridNo( sGridNo, (UINT16)DirectionInc( (UINT8)cnt ) );
 		sOtherSideOfFence = NewGridNo( sNewGridNo, (UINT16)DirectionInc( (UINT8)cnt ) );
-	
+
 		if ( NewOKDestination( pSoldier, sOtherSideOfFence, TRUE, 0 ) )
 		{
 			// ATE: Check if there is somebody waiting here.....
 
 
 			// Check if we have a fence here
-			if ( IsOknoFencePresentAtGridno( sNewGridNo ) )
+			if ( IsJumpableWindowPresentAtGridNo( sNewGridNo , direction2) )
 			{
 				fFound = TRUE;
 
 				// FInd how many turns we should go to get here
-				bNumTurns =  FindNumTurnsBetweenDirs( (INT8)cnt, bStartingDir );
+				bNumTurns =	FindNumTurnsBetweenDirs( (INT8)cnt, bStartingDir );
 
 				if ( bNumTurns < bMinNumTurns )
 				{
@@ -227,8 +238,7 @@ BOOLEAN FindOknoDirection( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bStartingD
 					bMinDirection = (INT8)cnt;
 				}
 			}
-	}
-	
+		}
 	}
 
 	if ( fFound )
@@ -296,7 +306,51 @@ BOOLEAN FindFenceDirection( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bStarting
 
 BOOLEAN FindHeigherLevelOkno( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bStartingDir, INT8 *pbDirection )
 {
+
 	INT32			cnt;
+	INT32			sNewGridNo;
+	BOOLEAN		fFound = FALSE;
+	UINT8			bMinNumTurns = 100;
+	INT8			bNumTurns;
+	INT8			bMinDirection = 0;
+
+	// LOOP THROUGH ALL 8 DIRECTIONS
+	for ( cnt = 0; cnt < 8; cnt+= 2 )
+	{
+		sNewGridNo = NewGridNo( sGridNo, (UINT16)DirectionInc( (UINT8)cnt ) );
+
+			// Make sure there is NOT a roof here...
+			// Check OK destination
+			if ( NewOKDestination( pSoldier, sNewGridNo, TRUE, 0 ) )
+			{
+				if ( FindStructure( sNewGridNo, STRUCTURE_WALLNWINDOW ) == NULL )
+				{
+					{
+						fFound = TRUE;
+
+						// FInd how many turns we should go to get here
+						bNumTurns =  FindNumTurnsBetweenDirs( (INT8)cnt, bStartingDir );
+
+						if ( bNumTurns < bMinNumTurns )
+						{
+							bMinNumTurns = bNumTurns;
+							bMinDirection = (INT8)cnt;
+						}
+
+					}
+				}
+			}
+	}
+
+	if ( fFound )
+	{
+		*pbDirection = bMinDirection;
+		return( TRUE );
+	}
+
+	return( FALSE );
+	
+/*	INT32			cnt;
 	INT32			sNewGridNo;
 	BOOLEAN		fFound = FALSE;
 	UINT8			bMinNumTurns = 100;
@@ -307,7 +361,7 @@ BOOLEAN FindHeigherLevelOkno( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bStarti
 
 	// IF there is a roof over our heads, this is an ivalid....
 	// return ( FALSE );l
-	if ( FindStructure( sGridNo, STRUCTURE_WALLNWINDOW ) != NULL )
+	if ( FindStructure( sGridNo, STRUCTURE_WALLNWINDOW ) != NULL  )
 	{
 
 		return( FALSE );
@@ -346,6 +400,7 @@ BOOLEAN FindHeigherLevelOkno( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bStarti
 	}
 
 	return( FALSE );
+*/
 }
 
 BOOLEAN FindHeigherLevelFence( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bStartingDir, INT8 *pbDirection )
@@ -897,7 +952,7 @@ INT32 GetRangeFromGridNoDiff( INT32 sGridNo1, INT32 sGridNo2 )
 	// Convert our grid-not into an XY
 	ConvertGridNoToXY( sGridNo2, &sXPos2, &sYPos2 );
 
-	uiDist = sqrt((double) ( sXPos2 - sXPos )*( sXPos2 - sXPos ) + ( sYPos2 - sYPos ) * ( sYPos2 - sYPos ) );	
+	uiDist = (INT32)(sqrt((double) ( sXPos2 - sXPos )*( sXPos2 - sXPos ) + ( sYPos2 - sYPos ) * ( sYPos2 - sYPos ) ));	
 
 	return( uiDist );
 }

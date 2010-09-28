@@ -145,7 +145,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Winmm.lib .\Multiplayer\raknet\RakNetLibStatic.lib ws2_32.lib DbgHelp.lib"
-				OutputFile="$(OutDir)\JA2_EN_3353.exe"
+				OutputFile="$(OutDir)\JA2_EN_3715.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				GenerateMapFile="true"
@@ -966,6 +966,10 @@
 				</File>
 			</Filter>
 		</Filter>
+		<File
+			RelativePath=".\binkw32.lib"
+			>
+		</File>
 		<File
 			RelativePath=".\fmodvc.lib"
 			>

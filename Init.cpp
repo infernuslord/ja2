@@ -174,33 +174,33 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, SPREADPATTERNSFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	ReadInSpreadPatterns(fileName);
+	SGP_THROW_IFFALSE(ReadInSpreadPatterns(fileName), SPREADPATTERNSFILENAME);
 
 	// WANNE: Enemy drops - begin
 	strcpy(fileName, directoryName);
 	strcat(fileName, ENEMYMISCDROPSFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInEnemyMiscDropsStats(gEnemyMiscDrops, fileName), ENEMYMISCDROPSFILENAME);
+	SGP_THROW_IFFALSE(ReadInEnemyMiscDropsStats(gEnemyMiscDrops, fileName), ENEMYMISCDROPSFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, ENEMYEXPLOSIVEDROPSFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInEnemyExplosiveDropsStats(gEnemyExplosiveDrops, fileName),ENEMYEXPLOSIVEDROPSFILENAME);
+	SGP_THROW_IFFALSE(ReadInEnemyExplosiveDropsStats(gEnemyExplosiveDrops, fileName),ENEMYEXPLOSIVEDROPSFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, ENEMYWEAPONDROPSFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInEnemyWeaponDropsStats(gEnemyWeaponDrops, fileName),ENEMYWEAPONDROPSFILENAME);
+	SGP_THROW_IFFALSE(ReadInEnemyWeaponDropsStats(gEnemyWeaponDrops, fileName),ENEMYWEAPONDROPSFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, ENEMYAMMODROPSFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInEnemyAmmoDropsStats(gEnemyAmmoDrops, fileName),ENEMYAMMODROPSFILENAME);
+	SGP_THROW_IFFALSE(ReadInEnemyAmmoDropsStats(gEnemyAmmoDrops, fileName),ENEMYAMMODROPSFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, ENEMYARMOURDROPSFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInEnemyArmourDropsStats(gEnemyArmourDrops, fileName),ENEMYARMOURDROPSFILENAME);
+	SGP_THROW_IFFALSE(ReadInEnemyArmourDropsStats(gEnemyArmourDrops, fileName),ENEMYARMOURDROPSFILENAME);
 	// WANNE: Enemy drops - end
 
 	// WANNE: Sector Loadscreens [2007-05-18]
@@ -210,7 +210,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	if ( FileExists(fileName) )
 	{
 		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-		THROWIFFALSE(ReadInSectorLoadscreensStats(gSectorLoadscreens, fileName),SECTORLOADSCREENSFILENAME);
+		SGP_THROW_IFFALSE(ReadInSectorLoadscreensStats(gSectorLoadscreens, fileName),SECTORLOADSCREENSFILENAME);
 	}
 	else
 	{
@@ -222,7 +222,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, AMMOTYPESFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInAmmoTypeStats(fileName),AMMOTYPESFILENAME);
+	SGP_THROW_IFFALSE(ReadInAmmoTypeStats(fileName),AMMOTYPESFILENAME);
 
 //Madd: Simple Localization
 //Read in the correct ammostring file for the given language
@@ -258,7 +258,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		//CHRISL: If we fail to load, try loading just the default english
 		strcpy(fileName, directoryName);
 		strcat(fileName, AMMOFILENAME);
-		THROWIFFALSE(!ReadInAmmoStats(fileName),AMMOFILENAME);
+		SGP_THROW_IFFALSE(!ReadInAmmoStats(fileName),AMMOFILENAME);
 	}
 
 
@@ -266,13 +266,13 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, BURSTSOUNDSFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInBurstSoundArray(fileName),BURSTSOUNDSFILENAME);
+	SGP_THROW_IFFALSE(ReadInBurstSoundArray(fileName),BURSTSOUNDSFILENAME);
 	// Lesh: end
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, ITEMSFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInItemStats(fileName,FALSE),ITEMSFILENAME);
+	SGP_THROW_IFFALSE(ReadInItemStats(fileName,FALSE),ITEMSFILENAME);
 
 //Madd: Simple localization
 // The idea here is that we can have a separate xml file that's named differently
@@ -299,57 +299,57 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, SOUNDSFILENAME);
-	THROWIFFALSE(ReadInSoundArray(fileName),SOUNDSFILENAME);
+	SGP_THROW_IFFALSE(ReadInSoundArray(fileName),SOUNDSFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, MAGAZINESFILENAME);
-	THROWIFFALSE(ReadInMagazineStats(fileName),MAGAZINESFILENAME);
+	SGP_THROW_IFFALSE(ReadInMagazineStats(fileName),MAGAZINESFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, ATTACHMENTSFILENAME);
-	THROWIFFALSE(ReadInAttachmentStats(fileName),ATTACHMENTSFILENAME);
+	SGP_THROW_IFFALSE(ReadInAttachmentStats(fileName),ATTACHMENTSFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, ATTACHMENTINFOFILENAME);
-	THROWIFFALSE(ReadInAttachmentInfoStats(fileName),ATTACHMENTINFOFILENAME);
+	SGP_THROW_IFFALSE(ReadInAttachmentInfoStats(fileName),ATTACHMENTINFOFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, LAUNCHABLESFILENAME);
-	THROWIFFALSE(ReadInLaunchableStats(fileName),LAUNCHABLESFILENAME);
+	SGP_THROW_IFFALSE(ReadInLaunchableStats(fileName),LAUNCHABLESFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, COMPATIBLEFACEITEMSFILENAME);
-	THROWIFFALSE(ReadInCompatibleFaceItemStats(fileName),COMPATIBLEFACEITEMSFILENAME);
+	SGP_THROW_IFFALSE(ReadInCompatibleFaceItemStats(fileName),COMPATIBLEFACEITEMSFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, MERGESFILENAME);
-	THROWIFFALSE(ReadInMergeStats(fileName),MERGESFILENAME);
+	SGP_THROW_IFFALSE(ReadInMergeStats(fileName),MERGESFILENAME);
 
 	//if(!WriteMergeStats())
 	//	return FALSE;
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, ATTACHMENTCOMBOMERGESFILENAME);
-	THROWIFFALSE(ReadInAttachmentComboMergeStats(fileName),ATTACHMENTCOMBOMERGESFILENAME);
+	SGP_THROW_IFFALSE(ReadInAttachmentComboMergeStats(fileName),ATTACHMENTCOMBOMERGESFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, EXPLOSIVESFILENAME);
-	THROWIFFALSE(ReadInExplosiveStats(fileName),EXPLOSIVESFILENAME);
+	SGP_THROW_IFFALSE(ReadInExplosiveStats(fileName),EXPLOSIVESFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, ARMOURSFILENAME);
-	THROWIFFALSE(ReadInArmourStats(fileName),ARMOURSFILENAME);
+	SGP_THROW_IFFALSE(ReadInArmourStats(fileName),ARMOURSFILENAME);
 
 	// CHRISL:
 	strcpy(fileName, directoryName);
 	strcat(fileName, LOADBEARINGEQUIPMENTFILENAME);
-	THROWIFFALSE(ReadInlbeStats(fileName),LOADBEARINGEQUIPMENTFILENAME);
+	SGP_THROW_IFFALSE(ReadInlbeStats(fileName),LOADBEARINGEQUIPMENTFILENAME);
 
 	// CHRISL:
 	LBEPocketType.clear();
 	strcpy(fileName, directoryName);
 	strcat(fileName, LBEPOCKETFILENAME);
-	THROWIFFALSE(ReadInLBEPocketStats(fileName,FALSE),LBEPOCKETFILENAME);
+	SGP_THROW_IFFALSE(ReadInLBEPocketStats(fileName,FALSE),LBEPOCKETFILENAME);
 
 //CHRISL: Simple localization
 // Same setup as what Madd used for items.xml
@@ -372,7 +372,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcat(fileName, MERCSTARTINGGEAR25FILENAME);
 	if ( FileExists(fileName) )
 	{
-	THROWIFFALSE(ReadInMercStartingGearStats(fileName),MERCSTARTINGGEAR25FILENAME);
+	SGP_THROW_IFFALSE(ReadInMercStartingGearStats(fileName),MERCSTARTINGGEAR25FILENAME);
 	}
 	else
 	{
@@ -381,7 +381,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	// CHRISL:
 	strcpy(fileName, directoryName);
 	strcat(fileName, MERCSTARTINGGEARFILENAME);
-	THROWIFFALSE(ReadInMercStartingGearStats(fileName),MERCSTARTINGGEARFILENAME);
+	SGP_THROW_IFFALSE(ReadInMercStartingGearStats(fileName),MERCSTARTINGGEARFILENAME);
 
 #ifdef JA2UB
 	}
@@ -390,41 +390,41 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, WEAPONSFILENAME);
-	THROWIFFALSE(ReadInWeaponStats(fileName),WEAPONSFILENAME);
+	SGP_THROW_IFFALSE(ReadInWeaponStats(fileName),WEAPONSFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, INCOMPATIBLEATTACHMENTSFILENAME);
-	THROWIFFALSE(ReadInIncompatibleAttachmentStats(fileName),INCOMPATIBLEATTACHMENTSFILENAME);
+	SGP_THROW_IFFALSE(ReadInIncompatibleAttachmentStats(fileName),INCOMPATIBLEATTACHMENTSFILENAME);
 
 	//WarmSteel - Attachment slots related xml's
 	strcpy(fileName, directoryName);
 	strcat(fileName, ATTACHMENTSLOTSFILENAME);
-	THROWIFFALSE(ReadInAttachmentSlotsStats(fileName),ATTACHMENTSLOTSFILENAME);
-
-	strcpy(fileName, directoryName);
-	strcat(fileName, ATTACHMENTSLOTASSIGNFILENAME);
-	THROWIFFALSE(ReadInAttachmentSlotAssignStats(fileName),ATTACHMENTSLOTASSIGNFILENAME);
+	SGP_THROW_IFFALSE(ReadInAttachmentSlotsStats(fileName),ATTACHMENTSLOTSFILENAME);
 
 	//This one *always* after ReadInAttachmentSlotAssignStats and ReadInAttachmentSlotsStats.
 	strcpy(fileName, directoryName);
 	strcat(fileName, ITEMSLOTASSIGNFILENAME);
-	THROWIFFALSE(ReadInItemSlotAssignStats(fileName),ITEMSLOTASSIGNFILENAME);
+	SGP_THROW_IFFALSE(ReadInItemSlotAssignStats(fileName),ITEMSLOTASSIGNFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, NASINCOMPATIBLEATTACHMENTS);
-	THROWIFFALSE(ReadInNASIncompatibleAttachmentsStats(fileName),NASINCOMPATIBLEATTACHMENTS);
+	SGP_THROW_IFFALSE(ReadInNASIncompatibleAttachmentsStats(fileName),NASINCOMPATIBLEATTACHMENTS);
+
+	strcpy(fileName, directoryName);
+	strcat(fileName, ALTERINGATTACHMENTSFILENAME);
+	SGP_THROW_IFFALSE(ReadInAlteringAttachmentsStats(fileName),ALTERINGATTACHMENTSFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, ENEMYGUNCHOICESFILENAME);
-	THROWIFFALSE(ReadInExtendedArmyGunChoicesStats (fileName),ENEMYGUNCHOICESFILENAME);
+	SGP_THROW_IFFALSE(ReadInExtendedArmyGunChoicesStats (fileName),ENEMYGUNCHOICESFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, ENEMYITEMCHOICESFILENAME);
-	THROWIFFALSE(ReadInArmyItemChoicesStats(fileName),ENEMYITEMCHOICESFILENAME);
+	SGP_THROW_IFFALSE(ReadInArmyItemChoicesStats(fileName),ENEMYITEMCHOICESFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, IMPITEMCHOICESFILENAME);
-	THROWIFFALSE(ReadInIMPItemChoicesStats(fileName),IMPITEMCHOICESFILENAME);
+	SGP_THROW_IFFALSE(ReadInIMPItemChoicesStats(fileName),IMPITEMCHOICESFILENAME);
 
 	std::copy(DefaultarmsDealerInfo, 
 			  DefaultarmsDealerInfo + sizeof(DefaultarmsDealerInfo)/sizeof(*DefaultarmsDealerInfo), 
@@ -432,98 +432,98 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, TONYINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gTonyInventory,fileName),TONYINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gTonyInventory,fileName),TONYINVENTORYFILENAME);
 
 #ifdef JA2UB
 //ja25 ub Biggins
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, BETTYINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gBettyInventory,fileName),BETTYINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gBettyInventory,fileName),BETTYINVENTORYFILENAME);
 
 	//UB
 	strcpy(fileName, directoryName);
 	strcat(fileName, RAULINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gRaulInventory,fileName),RAULINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gRaulInventory,fileName),RAULINVENTORYFILENAME);
 
 #else
 	strcpy(fileName, directoryName);
 	strcat(fileName, DEVININVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gDevinInventory,fileName),DEVININVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gDevinInventory,fileName),DEVININVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, PERKOINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gPerkoInventory,fileName),PERKOINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gPerkoInventory,fileName),PERKOINVENTORYFILENAME);
 
 #endif
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, FRANZINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gFranzInventory,fileName),FRANZINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gFranzInventory,fileName),FRANZINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, KEITHINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gKeithInventory,fileName),KEITHINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gKeithInventory,fileName),KEITHINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, SAMINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gSamInventory,fileName),SAMINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gSamInventory,fileName),SAMINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, JAKEINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gJakeInventory,fileName),JAKEINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gJakeInventory,fileName),JAKEINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, HOWARDINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gHowardInventory,fileName),HOWARDINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gHowardInventory,fileName),HOWARDINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, GABBYINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gGabbyInventory,fileName),GABBYINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gGabbyInventory,fileName),GABBYINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, FRANKINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gFrankInventory,fileName),FRANKINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gFrankInventory,fileName),FRANKINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, ELGININVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gElginInventory,fileName),ELGININVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gElginInventory,fileName),ELGININVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, MANNYINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gMannyInventory,fileName),MANNYINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gMannyInventory,fileName),MANNYINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, HERVEINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gHerveInventory,fileName),HERVEINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gHerveInventory,fileName),HERVEINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, PETERINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gPeterInventory,fileName),PETERINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gPeterInventory,fileName),PETERINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, ALBERTOINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gAlbertoInventory,fileName),ALBERTOINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gAlbertoInventory,fileName),ALBERTOINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, CARLOINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gCarloInventory,fileName),CARLOINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gCarloInventory,fileName),CARLOINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, MICKEYINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gMickyInventory,fileName),MICKEYINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gMickyInventory,fileName),MICKEYINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, ARNIEINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gArnieInventory,fileName),ARNIEINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gArnieInventory,fileName),ARNIEINVENTORYFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, FREDOINVENTORYFILENAME);
-	THROWIFFALSE(ReadInInventoryStats(gFredoInventory,fileName),FREDOINVENTORYFILENAME);
+	SGP_THROW_IFFALSE(ReadInInventoryStats(gFredoInventory,fileName),FREDOINVENTORYFILENAME);
 	
 	strcpy(fileName, directoryName);
 	strcat(fileName, CITYTABLEFILENAME);
-	THROWIFFALSE(ReadInMapStructure(fileName, FALSE),CITYTABLEFILENAME);
+	SGP_THROW_IFFALSE(ReadInMapStructure(fileName, FALSE),CITYTABLEFILENAME);
 
 #ifndef ENGLISH
 	AddLanguagePrefix(fileName);
@@ -542,12 +542,12 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	// Lesh: load altsectors list
 	strcpy(fileName, directoryName);
 	strcat(fileName, ALTSECTORSFILENAME);
-	THROWIFFALSE(ReadInAltSectors(fileName),ALTSECTORSFILENAME);
+	SGP_THROW_IFFALSE(ReadInAltSectors(fileName),ALTSECTORSFILENAME);
 
 	// Lesh: load samsites - must be after cities.xml
 	strcpy(fileName, directoryName);
 	strcat(fileName, SAMSITESFILENAME);
-	THROWIFFALSE(ReadInSAMInfo(fileName),SAMSITESFILENAME);
+	SGP_THROW_IFFALSE(ReadInSAMInfo(fileName),SAMSITESFILENAME);
 
 #ifdef JA2UB
 	if ( gGameLegionOptions.EnemyXML == TRUE ) 
@@ -556,55 +556,55 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	// Lesh: army externalization
 	strcpy(fileName, directoryName);
 	strcat(fileName, GARRISONFILENAME);
-	THROWIFFALSE(ReadInGarrisonInfo(fileName),GARRISONFILENAME);
+	SGP_THROW_IFFALSE(ReadInGarrisonInfo(fileName),GARRISONFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, PATROLFILENAME);
-	THROWIFFALSE(ReadInPatrolInfo(fileName),PATROLFILENAME);
+	SGP_THROW_IFFALSE(ReadInPatrolInfo(fileName),PATROLFILENAME);
 #ifdef JA2UB
 	}
 #endif
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, COMPOSITIONFILENAME);
-	THROWIFFALSE(ReadInArmyCompositionInfo(fileName),COMPOSITIONFILENAME);
+	SGP_THROW_IFFALSE(ReadInArmyCompositionInfo(fileName),COMPOSITIONFILENAME);
 
 	strcpy(fileName, directoryName);
 	strcat(fileName, EXPLOSIONDATAFILENAME);
-	THROWIFFALSE(ReadInExplosionDataStats(fileName),EXPLOSIONDATAFILENAME);
+	SGP_THROW_IFFALSE(ReadInExplosionDataStats(fileName),EXPLOSIONDATAFILENAME);
 
 	// Kaiden: Read in Restricted Sectors for Mobile Militia
 	strcpy(fileName, directoryName);
 	strcat(fileName, ROAMINGMILITIAFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInRoamingInfo(fileName),ROAMINGMILITIAFILENAME);
+	SGP_THROW_IFFALSE(ReadInRoamingInfo(fileName),ROAMINGMILITIAFILENAME);
 
 	// Dealtar: Read in shipping destinations and delivery methods
 	gPostalService.Clear();
 	strcpy(fileName, directoryName);
 	strcat(fileName, SHIPPINGDESTINATIONSFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInShippingDestinations(fileName, FALSE),SHIPPINGDESTINATIONSFILENAME);
+	SGP_THROW_IFFALSE(ReadInShippingDestinations(fileName, FALSE),SHIPPINGDESTINATIONSFILENAME);
 
 #ifndef ENGLISH
 	AddLanguagePrefix(fileName);
 	if ( FileExists(fileName) )
 	{
 		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-		THROWIFFALSE(ReadInShippingDestinations(fileName, TRUE),SHIPPINGDESTINATIONSFILENAME);
+		SGP_THROW_IFFALSE(ReadInShippingDestinations(fileName, TRUE),SHIPPINGDESTINATIONSFILENAME);
 	}
 #endif
 	
 	strcpy(fileName, directoryName);
 	strcat(fileName, DELIVERYMETHODSFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInDeliveryMethods(fileName),DELIVERYMETHODSFILENAME);
+	SGP_THROW_IFFALSE(ReadInDeliveryMethods(fileName),DELIVERYMETHODSFILENAME);
 
 	// HEADROCK HAM 3.5: Read in facility types
 	strcpy(fileName, directoryName);
 	strcat(fileName, FACILITYTYPESFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInFacilityTypes(fileName,FALSE), FACILITYTYPESFILENAME);
+	SGP_THROW_IFFALSE(ReadInFacilityTypes(fileName,FALSE), FACILITYTYPESFILENAME);
 	
 #ifndef ENGLISH
 	AddLanguagePrefix(fileName);
@@ -620,20 +620,19 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, SECTORFACILITIESFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInSectorFacilities(fileName), SECTORFACILITIESFILENAME);
+	SGP_THROW_IFFALSE(ReadInSectorFacilities(fileName), SECTORFACILITIESFILENAME);
 
 	// HEADROCK HAM 3.4: Read in dynamic roaming restrictions
 	strcpy(fileName, directoryName);
 	strcat(fileName, DYNAMICROAMINGFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInDynamicRoamingRestrictions(fileName), DYNAMICROAMINGFILENAME);
+	SGP_THROW_IFFALSE(ReadInDynamicRoamingRestrictions(fileName), DYNAMICROAMINGFILENAME);
 	
 	// HEADROCK HAM 3.6: Read in customized sector names
 	strcpy(fileName, directoryName);
 	strcat(fileName, SECTORNAMESFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInSectorNames(fileName,FALSE,0), SECTORNAMESFILENAME);
-	
+	SGP_THROW_IFFALSE(ReadInSectorNames(fileName,FALSE,0), SECTORNAMESFILENAME);
 #ifndef ENGLISH
 	AddLanguagePrefix(fileName);
 	if ( FileExists(fileName) )
@@ -647,7 +646,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, SECTORLEVEL1NAMESFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInSectorNames(fileName,FALSE,1), SECTORLEVEL1NAMESFILENAME);
+	SGP_THROW_IFFALSE(ReadInSectorNames(fileName,FALSE,1), SECTORLEVEL1NAMESFILENAME);
 	
 #ifndef ENGLISH
 	AddLanguagePrefix(fileName);
@@ -662,7 +661,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, SECTORLEVEL2NAMESFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInSectorNames(fileName,FALSE,2), SECTORLEVEL2NAMESFILENAME);
+	SGP_THROW_IFFALSE(ReadInSectorNames(fileName,FALSE,2), SECTORLEVEL2NAMESFILENAME);
 	
 #ifndef ENGLISH
 	AddLanguagePrefix(fileName);
@@ -677,7 +676,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, SECTORLEVEL3NAMESFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInSectorNames(fileName,FALSE,3), SECTORLEVEL3NAMESFILENAME);
+	SGP_THROW_IFFALSE(ReadInSectorNames(fileName,FALSE,3), SECTORLEVEL3NAMESFILENAME);
 	
 #ifndef ENGLISH
 	AddLanguagePrefix(fileName);
@@ -689,15 +688,14 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	}
 #endif
 
-	if (gGameExternalOptions.fReadProfileDataFromXML)
-	{
-		
-		
+	// SANDRO - always initialize those files, we need it on game start
+	//if (gGameExternalOptions.fReadProfileDataFromXML)
+	//{
 		// HEADROCK PROFEX: Read in Merc Profile data to replace PROF.DAT data
 		strcpy(fileName, directoryName);
 		strcat(fileName, MERCPROFILESFILENAME);
-		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));		
-		THROWIFFALSE(ReadInMercProfiles(fileName, FALSE), MERCPROFILESFILENAME);
+		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+		SGP_THROW_IFFALSE(ReadInMercProfiles(fileName, FALSE), MERCPROFILESFILENAME);
 
 		#ifndef ENGLISH
 			AddLanguagePrefix(fileName);
@@ -713,7 +711,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		strcpy(fileName, directoryName);
 		strcat(fileName, MERCOPINIONSFILENAME);
 		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));	
-		THROWIFFALSE(ReadInMercOpinions(fileName), MERCOPINIONSFILENAME);
+		SGP_THROW_IFFALSE(ReadInMercOpinions(fileName), MERCOPINIONSFILENAME);
 		
 		
 #ifdef JA2UB		
@@ -724,7 +722,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		if ( FileExists(fileName) )
 		{	
 		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));		
-		THROWIFFALSE(ReadInMercProfiles(fileName, FALSE), MERCPROFILESFILENAME25);
+		SGP_THROW_IFFALSE(ReadInMercProfiles(fileName, FALSE), MERCPROFILESFILENAME25);
 		
 		#ifndef ENGLISH
 			AddLanguagePrefix(fileName);
@@ -743,22 +741,21 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		if ( FileExists(fileName) )
 		{		
 		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-		THROWIFFALSE(ReadInMercOpinions(fileName), MERCOPINIONSFILENAME25);
+		SGP_THROW_IFFALSE(ReadInMercOpinions(fileName), MERCOPINIONSFILENAME25);
 		}
-#endif		
-	}
+#endif
 
 	// HEADROCK HAM 3.6: Read in customized Bloodcat Placements
 	strcpy(fileName, directoryName);
 	strcat(fileName, BLOODCATPLACEMENTSFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInBloodcatPlacements(fileName), BLOODCATPLACEMENTSFILENAME);
+	SGP_THROW_IFFALSE(ReadInBloodcatPlacements(fileName), BLOODCATPLACEMENTSFILENAME);
 
 	// HEADROCK HAM 3.6: Read in customized Uniform Colors
 	strcpy(fileName, directoryName);
 	strcat(fileName, UNIFORMCOLORSFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInUniforms(fileName), UNIFORMCOLORSFILENAME);
+	SGP_THROW_IFFALSE(ReadInUniforms(fileName), UNIFORMCOLORSFILENAME);
 
     strcpy(fileName, directoryName);
 	strcat(fileName, MULTIPLAYERTEAMSFILENAME);
@@ -769,13 +766,13 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, RPCFACESSMALLFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInSmallFacesStats(gRPCSmallFaceValues,fileName), RPCFACESSMALLFILENAME);
+	SGP_THROW_IFFALSE(ReadInSmallFacesStats(gRPCSmallFaceValues,fileName), RPCFACESSMALLFILENAME);
 	
 	//Hidden Names by Jazz 
 	strcpy(fileName, directoryName);
 	strcat(fileName, HIDDENNAMESFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInHiddenNamesStats(zPokaznazwe,fileName), HIDDENNAMESFILENAME);	
+	SGP_THROW_IFFALSE(ReadInHiddenNamesStats(zHiddenNames,fileName), HIDDENNAMESFILENAME);	
 
 	
 	
@@ -785,7 +782,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		strcpy(fileName, directoryName);
 		strcat(fileName, ENEMYNAMESFILENAME);
 		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-		THROWIFFALSE(ReadInEnemyNames(fileName,FALSE), ENEMYNAMESFILENAME);		
+		SGP_THROW_IFFALSE(ReadInEnemyNames(fileName,FALSE), ENEMYNAMESFILENAME);		
 
 #ifndef ENGLISH
 		AddLanguagePrefix(fileName);
@@ -805,7 +802,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		strcpy(fileName, directoryName);
 		strcat(fileName, CIVGROUPNAMESFILENAME);
 		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-		THROWIFFALSE(ReadInCivGroupNamesStats(fileName,FALSE), CIVGROUPNAMESFILENAME);
+		SGP_THROW_IFFALSE(ReadInCivGroupNamesStats(fileName,FALSE), CIVGROUPNAMESFILENAME);
 
 #ifndef ENGLISH
 		AddLanguagePrefix(fileName);
@@ -823,7 +820,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		strcpy(fileName, directoryName);
 		strcat(fileName, SENDERNAMELISTFILENAME);
 		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-		THROWIFFALSE(ReadInSenderNameList(fileName,FALSE), SENDERNAMELISTFILENAME);
+		SGP_THROW_IFFALSE(ReadInSenderNameList(fileName,FALSE), SENDERNAMELISTFILENAME);
 
 #ifndef ENGLISH
 		AddLanguagePrefix(fileName);
@@ -841,7 +838,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		strcpy(fileName, directoryName);
 		strcat(fileName, ENEMYRANKFILENAME);
 		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-		THROWIFFALSE(ReadInEnemyRank(fileName,FALSE), ENEMYRANKFILENAME);		
+		SGP_THROW_IFFALSE(ReadInEnemyRank(fileName,FALSE), ENEMYRANKFILENAME);		
 
 #ifndef ENGLISH
 		AddLanguagePrefix(fileName);
@@ -858,7 +855,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		strcpy(fileName, directoryName);
 		strcat(fileName, IMPPORTRAITS);
 		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-		THROWIFFALSE(ReadInIMPPortraits(fileName,FALSE), IMPPORTRAITS);
+		SGP_THROW_IFFALSE(ReadInIMPPortraits(fileName,FALSE), IMPPORTRAITS);
 
 #ifndef ENGLISH
 		AddLanguagePrefix(fileName);
@@ -875,39 +872,39 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, SOUNDPROFILE);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(WriteSoundProfile(gSoundProfileValue,fileName), SOUNDPROFILE);
+	SGP_THROW_IFFALSE(WriteSoundProfile(gSoundProfileValue,fileName), SOUNDPROFILE);
 */
 
 	//legion by jazz 
 	strcpy(fileName, directoryName);
 	strcat(fileName, SOUNDPROFILE);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInSoundProfile(gSoundProfileValue,fileName), SOUNDPROFILE);
+	SGP_THROW_IFFALSE(ReadInSoundProfile(fileName), SOUNDPROFILE);
 
 	//legion by jazz 
 	strcpy(fileName, directoryName);
 	strcat(fileName, RANDOMSTATS);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInRandomStats(fileName), RANDOMSTATS);
+	SGP_THROW_IFFALSE(ReadInRandomStats(fileName), RANDOMSTATS);
 	
 	/*
 	strcpy(fileName, directoryName);
 	strcat(fileName, RANDOMSTATS);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(WriteRandomStats(fileName), RANDOMSTATS);
+	SGP_THROW_IFFALSE(WriteRandomStats(fileName), RANDOMSTATS);
 	*/
 
 	//quote array by Jazz
 	strcpy(fileName, directoryName);
 	strcat(fileName, QUOTEARRAYFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInQarray(QuoteExp,fileName),QUOTEARRAYFILENAME);
+	SGP_THROW_IFFALSE(ReadInQarray(QuoteExp,fileName),QUOTEARRAYFILENAME);
 	
 		// Files Name List by Jazz
 		strcpy(fileName, directoryName);
 		strcat(fileName, FILESSENDERLISTFILENAME);
 		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-		THROWIFFALSE(ReadInFilesSenderList(fileName,FALSE), FILESSENDERLISTFILENAME);
+		SGP_THROW_IFFALSE(ReadInFilesSenderList(fileName,FALSE), FILESSENDERLISTFILENAME);
 
 #ifndef ENGLISH
 		AddLanguagePrefix(fileName);
@@ -952,7 +949,7 @@ UINT32 InitializeJA2(void)
 	//{
 	//	return( ERROR_SCREEN );
 	//}
-	TRYCATCH_RETHROW(LoadExternalGameplayData(TABLEDATA_DIRECTORY),L"Loading external data failed");
+	SGP_TRYCATCH_RETHROW(LoadExternalGameplayData(TABLEDATA_DIRECTORY),L"Loading external data failed");
 
 	// Load external text
 	LoadAllExternalText();

@@ -72,6 +72,7 @@
 #include "Explosion Control.h"
 #include "SmokeEffects.h"
 #include "MPChatScreen.h"
+#include "sgp_logger.h"
 #endif
 
 #include "MessageIdentifiers.h"
@@ -110,7 +111,7 @@
 #include <vfs/Core/vfs_init.h>
 #include <vfs/Core/vfs_profile.h>
 #include <vfs/Core/vfs_file_raii.h>
-#include <vfs/Core/os_functions.h>
+#include <vfs/Core/vfs_os_functions.h>
 #include <vfs/Core/File/vfs_file.h>
 #include "transfer_rules.h"
 
@@ -289,11 +290,11 @@ class ClientTransferCB : public FileListTransferCBInterface
 				vfs::COpenWriteFile wfile(fileName,true,true);
 				wfile->write(onFileStruct->fileData,onFileStruct->finalDataLength);
 			}
-			catch(CBasicException& ex)
+			catch(vfs::Exception& ex)
 			{
-				logException(ex);
+				SGP_ERROR(ex.what());
 				ScreenMsg( FONT_BCOLOR_BLUE, MSG_CHAT, L"Could not write received file '%S'", targetFileName);
-				//RETHROWEXCEPTION(L"Could not write received file",ex);
+				//SGP_RETHROW(L"Could not write received file",ex);
 			}
 #endif
 
@@ -2641,7 +2642,7 @@ void recieveFILE_TRANSFER_SETTINGS (RPCParameters *rpcParameters)
 		vfs::Path profileRoot = vfs::Path(gzFileTransferDirectory) + vfs::Path(server_fileTransferDirectoryPath);
 
 		/////////////////////////////////////////////////////////////////////
-		TRYCATCH_RETHROW( ja2::mp::InitializeMultiplayerProfile(profileRoot), L"" );
+		SGP_TRYCATCH_RETHROW( ja2::mp::InitializeMultiplayerProfile(profileRoot), L"" );
 		/////////////////////////////////////////////////////////////////////
 
 
@@ -2836,7 +2837,9 @@ void recieveSETTINGS (RPCParameters *rpcParameters) //recive settings from serve
 			gGameExternalOptions.gfAllowReinforcementsOnlyInCity	= false;
 
 			// Disable Real-Time Mode
-			gGameExternalOptions.fAllowRealTimeSneak = false;
+			// SANDRO - huh? real-time sneak is in preferences
+			//gGameExternalOptions.fAllowRealTimeSneak = false;
+			gGameSettings.fOptions[TOPTION_ALLOW_REAL_TIME_SNEAK] = false;
 			gGameExternalOptions.fQuietRealTimeSneak = false;
 
 			// WANNE: fix HOT DAY in night at arrival by night.
@@ -2863,6 +2866,9 @@ void recieveSETTINGS (RPCParameters *rpcParameters) //recive settings from serve
 			
 			// We have to take the selected inventory mode from the server
 			gGameOptions.ubInventorySystem=cl_lan->sofNewInv;
+
+			// WANNE: Always use old attachment system for now!
+			gGameOptions.ubAttachmentSystem = ATTACHMENT_OLD;
 
 			// WANNE - MP: We have to re-initialize the correct interface
 			if((UsingNewInventorySystem() == true) && IsNIVModeValid(true))
@@ -3007,7 +3013,9 @@ void reapplySETTINGS()
 	gGameExternalOptions.gfAllowReinforcementsOnlyInCity	= false;
 
 	// Disable Real-Time Mode
-	gGameExternalOptions.fAllowRealTimeSneak = false;
+	// SANDRO - real-time sneak is in preferences
+	//gGameExternalOptions.fAllowRealTimeSneak = false;
+	gGameSettings.fOptions[TOPTION_ALLOW_REAL_TIME_SNEAK] = false;
 	gGameExternalOptions.fQuietRealTimeSneak = false;
 
 	// WANNE: fix HOT DAY in night at arrival by night.
@@ -3034,6 +3042,9 @@ void reapplySETTINGS()
 	
 	// We have to take the selected inventory mode from the server
 	gGameOptions.ubInventorySystem=gMPServerSettings.sofNewInv;
+	
+	// WANNE: Always use old attachment system for now!
+	gGameOptions.ubAttachmentSystem = ATTACHMENT_OLD;
 
 	// WANNE - MP: We have to re-initialize the correct interface
 	if((UsingNewInventorySystem() == true) && IsNIVModeValid(true))
@@ -5123,6 +5134,8 @@ void connect_client ( void )
 			GetPrivateProfileString( "Ja2_mp Settings","FILE_TRANSFER_DIRECTORY", "Data-MP", FILE_TRANSFER_DIRECTORY_CLIENT, MAX_PATH, "..\\Ja2_mp.ini" );
 			
 			gGameOptions.ubInventorySystem = GetPrivateProfileInt( "Ja2_mp Settings","INVENTORY_MODE", INVENTORY_OLD, "..\\Ja2_mp.ini" );
+
+			// WANNE.NAS: TODO.NAS
 #else
 			strncpy(clname, iniReader.ReadString("Ja2_mp Settings","CLIENT_NAME", ""), 30);
 

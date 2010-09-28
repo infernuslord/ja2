@@ -352,7 +352,6 @@ void InitalizeStaticExternalNPCFaces( void )
 	//{
 	//	uiExternalStaticNPCFaces[ iCounter ] = ( UINT32 )InitFace( ( UINT8 )( uiExternalFaceProfileIds[ iCounter ] ), NOBODY, FACE_FORCE_SMALL );
 	//}
-
 	// ... put Skyrider's face at index 0
 	uiExternalStaticNPCFaces.push_back(( UINT32 )InitFace( ( UINT8 )( SKYRIDER ), NOBODY, FACE_FORCE_SMALL ));
 
@@ -1808,11 +1807,11 @@ BOOLEAN ExecuteCharacterDialogue( UINT8 ubCharacterNum, UINT16 usQuoteNum, INT32
 		// now being used in a different way...
 		/*
 		if ( ( (usQuoteNum == QUOTE_PERSONALITY_TRAIT &&
-					(gMercProfiles[ubCharacterNum].bPersonalityTrait == FORGETFUL ||
-					gMercProfiles[ubCharacterNum].bPersonalityTrait == CLAUSTROPHOBIC ||
-					gMercProfiles[ubCharacterNum].bPersonalityTrait == NERVOUS ||
-					gMercProfiles[ubCharacterNum].bPersonalityTrait == NONSWIMMER ||
-					gMercProfiles[ubCharacterNum].bPersonalityTrait == FEAR_OF_INSECTS))
+					(gMercProfiles[ubCharacterNum].bDisability == FORGETFUL ||
+					gMercProfiles[ubCharacterNum].bDisability == CLAUSTROPHOBIC ||
+					gMercProfiles[ubCharacterNum].bDisability == NERVOUS ||
+					gMercProfiles[ubCharacterNum].bDisability == NONSWIMMER ||
+					gMercProfiles[ubCharacterNum].bDisability == FEAR_OF_INSECTS))
 					//usQuoteNum == QUOTE_STARTING_TO_WHINE ||
 #ifdef JA2BETAVERSION
 					|| usQuoteNum == QUOTE_WHINE_EQUIPMENT) && (guiCurrentScreen != QUEST_DEBUG_SCREEN) )

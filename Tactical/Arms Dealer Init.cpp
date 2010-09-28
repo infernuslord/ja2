@@ -1468,14 +1468,12 @@ void AddObjectToArmsDealerInventory( UINT8 ubArmsDealer, OBJECTTYPE *pObject )
 			{
 				// add this particular attachment (they can't be imprinted, or themselves have attachments!)
 				AddObjectToArmsDealerInventory( ubArmsDealer, &(*iter) );
-				if(gGameExternalOptions.fNewAttachmentSystem){
-					OBJECTTYPE null;
-					iter = pData->attachments.erase(iter);
-					iter = pData->attachments.insert(iter, null);
+				
+				iter = pData->RemoveAttachmentAtIter(iter);
+					
+				if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW)
 					++iter;
-				} else {
-					iter = pData->attachments.erase(iter);
-				}
+
 				if (iter == pData->attachments.end()) {
 					break;
 				}

@@ -383,7 +383,7 @@ void DishoutQueenSwipeDamage( SOLDIERTYPE *pQueenSoldier );
 
 INT32 HTHImpact( SOLDIERTYPE * pSoldier, SOLDIERTYPE * pTarget, INT32 iHitBy, BOOLEAN fBladeAttack );
 
-UINT16 GunRange( OBJECTTYPE * pObj );
+UINT16 GunRange( OBJECTTYPE * pObj, SOLDIERTYPE * pSoldier ); // SANDRO - added argument
 BOOLEAN IsWeapon ( UINT16 itemIndex );
 UINT8 GetDamage ( OBJECTTYPE *pObj );
 UINT8 GetAutofireShotsPerFiveAPs( OBJECTTYPE *pObj );

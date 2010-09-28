@@ -1,3 +1,28 @@
+/* 
+ * bfVFS : vfs/Tools/vfs_parser_tools.h
+ *  - read file line-wise,
+ *  - split string into tokens,
+ *  - simple pattern matching
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #ifndef _VFS_PARSER_TOOLS_H_
 #define _VFS_PARSER_TOOLS_H_
 
@@ -50,52 +75,6 @@ namespace vfs
 	VFS_API bool matchPattern(vfs::String const& sPattern, vfs::String::str_t const& sStr);
 
 } // namespace vfs
-
-/**************************************************************/
-/**************************************************************/
-
-//#define USE_CODE_PAGE
-
-#ifdef USE_CODE_PAGE
-class CodePageReader
-{
-public:
-	enum EMode
-	{
-		Error, Normal, Shift, Ctrl, Alt
-	};
-	void ReadCodePage(vfs::Path const& codepagefile);
-private:
-	CodePageReader::EMode ExtractMode(std::string const &readStr, size_t startPos);
-	bool ExtractCode(std::string const& str, int iStart, vfs::UInt32& rInsertPoint, vfs::String::str_t& u8s);
-};
-
-namespace charSet
-{
-	enum ECharSet
-	{
-		CS_SPACE			= 1,
-		CS_ALPHA_LC			= 2,
-		CS_ALPHA_UC			= 4,
-		CS_ALPHA			= CS_ALPHA_LC + CS_ALPHA_UC,
-		CS_NUMERIC			= 8,
-		CS_ALPHA_NUM		= CS_ALPHA + CS_NUMERIC,
-		CS_SPECIAL_ALPHA_LC	= 16,
-		CS_SPECIAL_ALPHA_UC	= 32,
-		CS_SPECIAL_ALPHA	= CS_SPECIAL_ALPHA_LC + CS_SPECIAL_ALPHA_UC,
-		CS_SPECIAL_NON_CHAR	= 65,
-	};
-
-	bool IsFromSet(char wc,			unsigned int char_set);
-	bool IsFromSet(int wc,			unsigned int char_set);
-	bool IsFromSet(unsigned int wc,	unsigned int char_set);
-	bool IsFromSet(wchar_t wc,		unsigned int char_set);
-
-	void AddToCharSet(ECharSet eset, std::wstring cset);
-
-	void InitializeCharSets();
-};
-#endif // USE_CODE_PAGE
 
 #endif // _VFS_PARSER_TOOLS_H_
 

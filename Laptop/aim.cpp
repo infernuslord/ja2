@@ -14,6 +14,7 @@
 	#include "Text.h"
 	#include "LaptopSave.h"
 	#include "Multi Language Graphic Utils.h"
+	#include "GameSettings.h"
 #endif
 
 #include "LocalizedStrings.h"
@@ -470,14 +471,27 @@ BOOLEAN InitAimDefaults()
 	CHECKF(AddVideoObject(&VObjectDesc, &guiRustBackGround));
 
 	// load the Aim Symbol graphic and add it
-	VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
-	GetMLGFilename( VObjectDesc.ImageFile, MLG_AIMSYMBOL );
-	CHECKF(AddVideoObject(&VObjectDesc, &guiAimSymbol));
+	if(gGameExternalOptions.gfUseNewStartingGearInterface)
+	{
+		VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
+		GetMLGFilename( VObjectDesc.ImageFile, MLG_AIMSYMBOL_SMALL );
+		CHECKF(AddVideoObject(&VObjectDesc, &guiAimSymbol));
+		//Mouse region for the Links
+		MSYS_DefineRegion( &gSelectedAimLogo, AIM_SYMBOL_SMALL_X, AIM_SYMBOL_SMALL_Y, AIM_SYMBOL_SMALL_X+AIM_SYMBOL_SMALL_WIDTH, AIM_SYMBOL_SMALL_Y+AIM_SYMBOL_SMALL_HEIGHT, MSYS_PRIORITY_HIGH,
+								CURSOR_WWW, MSYS_NO_CALLBACK, SelectAimLogoRegionCallBack);
+		MSYS_AddRegion(&gSelectedAimLogo);
+	}
+	else
+	{
+		VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
+		GetMLGFilename( VObjectDesc.ImageFile, MLG_AIMSYMBOL );
+		CHECKF(AddVideoObject(&VObjectDesc, &guiAimSymbol));
+		//Mouse region for the Links
+		MSYS_DefineRegion( &gSelectedAimLogo, AIM_SYMBOL_X, AIM_SYMBOL_Y, AIM_SYMBOL_X+AIM_SYMBOL_WIDTH, AIM_SYMBOL_Y+AIM_SYMBOL_HEIGHT, MSYS_PRIORITY_HIGH,
+								CURSOR_WWW, MSYS_NO_CALLBACK, SelectAimLogoRegionCallBack);
+		MSYS_AddRegion(&gSelectedAimLogo);
+	}
 
-	//Mouse region for the Links
-	MSYS_DefineRegion( &gSelectedAimLogo, AIM_SYMBOL_X, AIM_SYMBOL_Y, AIM_SYMBOL_X+AIM_SYMBOL_WIDTH, AIM_SYMBOL_Y+AIM_SYMBOL_HEIGHT, MSYS_PRIORITY_HIGH,
-							CURSOR_WWW, MSYS_NO_CALLBACK, SelectAimLogoRegionCallBack);
-	MSYS_AddRegion(&gSelectedAimLogo);
 
 
 	return(TRUE);
@@ -514,8 +528,16 @@ BOOLEAN DrawAimDefaults()
 	}
 
 	// Aim Symbol
-	GetVideoObject(&hAimSymbolHandle, guiAimSymbol);
-	BltVideoObject(FRAME_BUFFER, hAimSymbolHandle, 0,AIM_SYMBOL_X, AIM_SYMBOL_Y, VO_BLT_SRCTRANSPARENCY,NULL);
+	if(gGameExternalOptions.gfUseNewStartingGearInterface)
+	{
+		GetVideoObject(&hAimSymbolHandle, guiAimSymbol);
+		BltVideoObject(FRAME_BUFFER, hAimSymbolHandle, 0,AIM_SYMBOL_SMALL_X, AIM_SYMBOL_SMALL_Y, VO_BLT_SRCTRANSPARENCY,NULL);
+	}
+	else
+	{
+		GetVideoObject(&hAimSymbolHandle, guiAimSymbol);
+		BltVideoObject(FRAME_BUFFER, hAimSymbolHandle, 0,AIM_SYMBOL_X, AIM_SYMBOL_Y, VO_BLT_SRCTRANSPARENCY,NULL);
+	}
 
 	return(TRUE);
 }

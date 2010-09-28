@@ -40,21 +40,22 @@ class SOLDIERTYPE;
 
 //*******	Local Defines **************************************************
 
+enum COVER_VALUES
+{
+	INVALID_COVER=-1,
+	NO_COVER=0,
+	MIN_COVER=1,
+	MED_COVER=2,
+	MAX_COVER=3
+};
+
 struct CoverCell
 {
 	INT32	sGridNo;
 	INT8	bCover;
 	BOOLEAN fInverseColor;
 
-	CoverCell() : sGridNo(NOWHERE), bCover(-1), fInverseColor(FALSE) {}
-};
-
-enum COVER_VALUES
-{
-	NO_COVER=0,
-	MIN_COVER=1,
-	MED_COVER=2,
-	MAX_COVER=3
+	CoverCell() : sGridNo(NOWHERE), bCover(INVALID_COVER), fInverseColor(FALSE) {}
 };
 
 enum COVER_DRAW_MODE {
@@ -63,35 +64,28 @@ enum COVER_DRAW_MODE {
 	COVER_DRAW_ENEMY_VIEW
 };
 
-COVER_DRAW_MODE gubDrawMode = COVER_DRAW_OFF;
-
 const UINT8 animArr[3] = {
 	ANIM_PRONE,
 	ANIM_CROUCH,
 	ANIM_STAND
 };
 
-//******	Global Variables	*****************************************
-
-// yea way too big... but some bytes more memory is cheap, as well as some extra loops
-// PS: brainscells arn't cheap ;)
-#define COVER_X_CELLS WORLD_COLS
-#define COVER_Y_CELLS WORLD_ROWS
+// yea way too big... but some bytes more memory is cheap
+#define COVER_X_CELLS WORLD_COLS_MAX
+#define COVER_Y_CELLS WORLD_ROWS_MAX
 #define COVER_Z_CELLS 2 // roof or no roof
+
+//******	Local Variables	*********************************************
 
 INT16 gsMinCellX, gsMinCellY, gsMaxCellX, gsMaxCellY = -1;
 
-// WANNE - BMP: COVER_X_CELLS, COVER_Y_CELLS, have to be constants,
-// so I set them to 2000 (for rows and cols). In normal map it is 160
-
-//CoverCell gCoverViewArea[ COVER_X_CELLS ][ COVER_Y_CELLS ][ COVER_Z_CELLS ];
-CoverCell gCoverViewArea[ 2000 ][ 2000 ][ COVER_Z_CELLS ];
+CoverCell gCoverViewArea[ COVER_X_CELLS ][ COVER_Y_CELLS ][ COVER_Z_CELLS ];
 
 DWORD guiCoverNextUpdateTime = 0;
 
-//*******	Function Prototypes ***************************************
+COVER_DRAW_MODE gubDrawMode = COVER_DRAW_OFF;
 
-void	SwitchCoverDrawMode();
+//*******	Local Function Prototypes ***********************************
 
 CHAR16* GetTerrainName( const UINT8& ubTerrainType );
 
@@ -116,30 +110,71 @@ BOOLEAN HasAdjTile( const INT32& ubX, const INT32& ubY );
 
 //*******	Functions **************************************************
 
-// TODO: internationalize
+///BEGIN key binding functions
+void SwitchToMercView()
+{
+	if (gubDrawMode == COVER_DRAW_MERC_VIEW)
+		return;
+
+	gubDrawMode = COVER_DRAW_MERC_VIEW;
+	ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, gzDisplayCoverText[DC_MSG__COVER_DRAW_MERC_VIEW]);
+	DisplayCover(TRUE);
+}
+
+void SwitchToEnemyView()
+{
+	if (gubDrawMode == COVER_DRAW_ENEMY_VIEW)
+		return;
+
+	gubDrawMode = COVER_DRAW_ENEMY_VIEW;
+	ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, gzDisplayCoverText[DC_MSG__COVER_DRAW_ENEMY_VIEW]);
+	DisplayCover(TRUE);
+}
+
+void SwitchViewOff()
+{
+	if (gubDrawMode == COVER_DRAW_OFF)
+		return;
+
+	gubDrawMode = COVER_DRAW_OFF;
+	ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, gzDisplayCoverText[DC_MSG__COVER_DRAW_OFF]);
+	DisplayCover(TRUE);
+}
+
+void ToggleEnemyView()
+{
+	if (gubDrawMode == COVER_DRAW_ENEMY_VIEW) {
+		SwitchViewOff();
+	} else {
+		SwitchToEnemyView();
+	}
+}
+
+void ToggleMercView()
+{
+	if (gubDrawMode == COVER_DRAW_MERC_VIEW) {
+		SwitchViewOff();
+	} else {
+		SwitchToMercView();
+	}
+}
+
 void SwitchCoverDrawMode()
 {
-	CHAR16 zDebugString[512];
-
 	switch(gubDrawMode)
 	{
 	case COVER_DRAW_OFF:
-		swprintf( zDebugString, gzDisplayCoverText[DC_MSG__COVER_DRAW_MERC_VIEW] );
-		gubDrawMode = COVER_DRAW_MERC_VIEW;
+		SwitchToMercView();
 		break;
 	case COVER_DRAW_MERC_VIEW:
-		swprintf( zDebugString, gzDisplayCoverText[DC_MSG__COVER_DRAW_ENEMY_VIEW] );
-		gubDrawMode = COVER_DRAW_ENEMY_VIEW;
+		SwitchToEnemyView();
 		break;
 	default:
-		swprintf( zDebugString, gzDisplayCoverText[DC_MSG__COVER_DRAW_OFF] );
-		gubDrawMode = COVER_DRAW_OFF;
+		SwitchViewOff();
 		break;
 	}
-	
-	DisplayCover(TRUE);
-	ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, zDebugString );
 }
+///END key binding functions
 
 void GetGridNoForViewPort( const INT32& ubX, const INT32& ubY, INT32& sGridNo )
 {
@@ -529,10 +564,14 @@ void DisplayRangeToTarget( SOLDIERTYPE *pSoldier, INT32 sTargetGridNo )
 		INT8 ubCover = - GetSightAdjustment(pSoldier, sTargetGridNo, gsInterfaceLevel);
 
 		//display a string with cover value of current selected merc and brightness
-		swprintf( zOutputString, gzDisplayCoverText[DC_MSG__COVER_INFORMATION], ubCover, GetTerrainName(ubTerrainType), ubBrightness );
+		//swprintf( zOutputString, gzDisplayCoverText[DC_MSG__COVER_INFORMATION], ubCover, GetTerrainName(ubTerrainType), ubBrightness );
 
 		//Display the msg
-		ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, zOutputString );
+		//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, zOutputString );
+
+		ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE,
+			gzDisplayCoverText[DC_MSG__COVER_INFORMATION],
+			ubCover, GetTerrainName(ubTerrainType), ubBrightness );
 	}
 
 	//Get the range to the target location
@@ -554,7 +593,7 @@ void DisplayRangeToTarget( SOLDIERTYPE *pSoldier, INT32 sTargetGridNo )
 		pSoldier->bTargetLevel = bTempTargetLevel;
 
 		// HEADROCK HAM 3.6: Calculate Gun Range using formula.
-		UINT16 usGunRange = GunRange(&pSoldier->inv[HANDPOS]);
+		UINT16 usGunRange = GunRange(&pSoldier->inv[HANDPOS], pSoldier ); // SANDRO - added argument
 
 		swprintf( zOutputString, gzDisplayCoverText[DC_MSG__GUN_RANGE_INFORMATION], usRange / 10, usGunRange / 10, uiHitChance );
 		//Display the msg

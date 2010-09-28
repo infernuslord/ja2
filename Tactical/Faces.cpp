@@ -283,21 +283,43 @@ INT32	InternalInitFace( UINT8 usMercProfileID, UINT8 ubSoldierID, UINT32 uiInitF
 			sprintf( VObjectDesc.ImageFile, "FACES\\b%02de.sti", iFaceFileID );
 		}
 	}
-//Tex
+
 #ifdef JA2UB
 	else if ( usMercProfileID == 64 )
 	{
-		if( gMercProfiles[ 64 ].bSkillTrait2 == CAMOUFLAGED )
+		// SANDRO - old/new traits check (I am not sure if this is used at all)
+		if ( gGameOptions.fNewTraitSystem )
 		{
-			sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
+			if( gMercProfiles[ 64 ].bSkillTrait2 == RANGER_NT )
+			{
+				sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
+			}
+		}
+		else
+		{
+			if( gMercProfiles[ 64 ].bSkillTrait2 == CAMOUFLAGED_OT )
+			{
+				sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
+			}
 		}
 		}
 #else
 	else if ( usMercProfileID == TEX )
 	{
-		if( gMercProfiles[ TEX ].bSkillTrait2 == CAMOUFLAGED )
+		// SANDRO - old/new traits check (I am not sure if this is used at all)
+		if ( gGameOptions.fNewTraitSystem )
 		{
-			sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
+			if( gMercProfiles[ TEX ].bSkillTrait2 == RANGER_NT )
+			{
+				sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
+			}
+		}
+		else
+		{
+			if( gMercProfiles[ TEX ].bSkillTrait2 == CAMOUFLAGED_OT )
+			{
+				sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
+			}
 		}
 		}
 #endif
@@ -568,7 +590,7 @@ void GetFaceRelativeCoordinates( FACETYPE *pFace, UINT16 *pusEyesX, UINT16 *pusE
 	usMouthX			= gMercProfiles[ usMercProfileID ].usMouthX;
 	
 #ifdef JA2UB	
-  if( usMercProfileID == 64 && gMercProfiles[ 64 ].bSkillTrait2 == CAMOUFLAGED )
+  if( usMercProfileID == 64 && ( gMercProfiles[ 64 ].bSkillTrait2 == CAMOUFLAGED_OT || gMercProfiles[ 64 ].bSkillTrait2 == RANGER_NT ) )
   {
 		usEyesX				= 13;
 		usEyesY				= 34;
@@ -1275,7 +1297,7 @@ void GetXYForRightIconPlacement_legion_NV( FACETYPE *pFace, UINT16 ubIndex, INT1
 	*psX = sX;
 	*psY = sY;
 }
-void DoRightIcon_legion_NV( UINT32 uiRenderBuffer, FACETYPE *pFace, INT16 sFaceX, INT16 sFaceY, INT8 bNumIcons, INT8 sIconIndex )
+void DoRightIcon_legion_NV( UINT32 uiRenderBuffer, FACETYPE *pFace, INT16 sFaceX, INT16 sFaceY, INT8 bNumIcons, UINT8 sIconIndex )
 {
 	INT16						sIconX, sIconY;	
 
@@ -1303,7 +1325,7 @@ void GetXYForRightIconPlacement_legion_GAS_MASK( FACETYPE *pFace, UINT16 ubIndex
 	*psX = sX;
 	*psY = sY;
 }
-void DoRightIcon_legion_GAS_MASK( UINT32 uiRenderBuffer, FACETYPE *pFace, INT16 sFaceX, INT16 sFaceY, INT8 bNumIcons, INT8 sIconIndex )
+void DoRightIcon_legion_GAS_MASK( UINT32 uiRenderBuffer, FACETYPE *pFace, INT16 sFaceX, INT16 sFaceY, INT8 bNumIcons, UINT8 sIconIndex )
 {
 	INT16						sIconX, sIconY;
 
@@ -1394,6 +1416,9 @@ void HandleRenderFaceAdjustments( FACETYPE *pFace, BOOLEAN fDisplayBuffer, BOOLE
 	INT16			sIconIndex_legion =-1; //legion
 	INT8			bNumRightIcons_legion = 0;
 	BOOLEAN	MASK = FALSE; //legion
+	UINT32 uiFaceItemOne=0;
+	UINT32 uiFaceItemTwo=0;
+	UINT8  ubFaceItemsCombined=0;
 
 	// If we are using an extern buffer...
 	if ( fUseExternBuffer )
@@ -1557,411 +1582,283 @@ void HandleRenderFaceAdjustments( FACETYPE *pFace, BOOLEAN fDisplayBuffer, BOOLE
 
 
 //------------------------------------Legion 2 by jazz--------------------------------
-if (gGameExternalOptions.fShowTacticalFaceIcons == TRUE && MercPtrs[ pFace->ubSoldierID ]->stats.bLife  > 0 ) 
+	// rewritten by silversurfer
+	// this section chooses the icons for face gear if the ini setting "SHOW_TACTICAL_FACE_ICONS" is TRUE 
+	// and the merc actually wears something to be shown
+	if (gGameExternalOptions.fShowTacticalFaceIcons == TRUE && MercPtrs[ pFace->ubSoldierID ]->stats.bLife  > 0 && 
+		( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem + MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem ) > 0 ) 
 	{
-	//GASMASK
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == GASMASK || (MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == GASMASK) )
-    {
-			sIconIndex = 9;
-			fDoIcon		 = TRUE;
-    }       
+		uiFaceItemOne=MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem;
+		uiFaceItemTwo=MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem;
 	
-	//NV
-	else   if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 211 || (MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 211) )
-    {
-			sIconIndex = 10;
-			fDoIcon		 = TRUE;
-    }  
-    else  if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 246 || (MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 246) )
-    {
-			sIconIndex = 10;
-			fDoIcon		 = TRUE;
-    }  
-    else if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 1024 || (MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 1024) )
-    {
-			sIconIndex = 10;
-			fDoIcon		 = TRUE;
-    }  
-    else if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 1025 || (MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 1025) )
-    {
-			sIconIndex = 10;
-			fDoIcon		 = TRUE;
-    }  
-    
-    //goggles
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 212 || (MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 212) )
-    {
-			sIconIndex = 15;
-			fDoIcon		 = TRUE;
-    }       
-	
-    
-    
-    //NV i GASMASK 
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == GASMASK && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 211 )
-    {
-			sIconIndex = 11;
-			fDoIcon		 = TRUE;
-    }  
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == GASMASK && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 246 )
-    {
-			sIconIndex = 11;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == GASMASK && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 1024 )
-    {
-			sIconIndex = 11;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == GASMASK && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 1025 )
-    {
-			sIconIndex = 11;
-			fDoIcon		 = TRUE;
-    }
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 211 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == GASMASK  )
-    {
-			sIconIndex = 11;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 246 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == GASMASK  )
-    {
-			sIconIndex = 11;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 1024 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == GASMASK )
-    {
-			sIconIndex = 11;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 1025 &&  MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == GASMASK  )
-    {
-			sIconIndex = 11;
-			fDoIcon		 = TRUE;
-    } 
-    
-	//goggles i gasmask
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == GASMASK && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 212 )
-    {
-			sIconIndex = 16;
-			fDoIcon		 = TRUE;
-    }  
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 212 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == GASMASK  )
-    {
-			sIconIndex = 16;
-			fDoIcon		 = TRUE;
-    }  
-    
-
-	//Extended Ear
-	 if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 210 || (MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 210) )
-    {
-			sIconIndex = 12;
-			fDoIcon		 = TRUE;
-    }  
-    
-    //Extended Ear i Gasmask
-	if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 210 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == GASMASK )
-    {
-			sIconIndex = 13;
-			fDoIcon		 = TRUE;
-    }  
-    
-	if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == GASMASK && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 210 )
-    {
-			sIconIndex = 13;
-			fDoIcon		 = TRUE;
-    }
-    
-    
-    //Extended Ear i NV
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 210 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 211 )
-    {
-			sIconIndex = 14;
-			fDoIcon		 = TRUE;
-    }  
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 210 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 246 )
-    {
-			sIconIndex = 14;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 210 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 1024 )
-    {
-			sIconIndex = 14;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 210 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 1025 )
-    {
-			sIconIndex = 14;
-			fDoIcon		 = TRUE;
-    }
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 211 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 210  )
-    {
-			sIconIndex = 14;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 246 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 210  )
-    {
-			sIconIndex = 14;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 1024 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 210 )
-    {
-			sIconIndex = 14;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 1025 &&  MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 210  )
-    {
-			sIconIndex = 14;
-			fDoIcon		 = TRUE;
-    } 
-    
-    
-    //goggles i NV
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 212 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 211 )
-    {
-			sIconIndex = 17;
-			fDoIcon		 = TRUE;
-    }  
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 212 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 246 )
-    {
-			sIconIndex = 17;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 212 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 1024 )
-    {
-			sIconIndex = 17;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 212 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 1025 )
-    {
-			sIconIndex = 17;
-			fDoIcon		 = TRUE;
-    }
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 211 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 212  )
-    {
-			sIconIndex = 17;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 246 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 212  )
-    {
-			sIconIndex = 17;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 1024 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 212 )
-    {
-			sIconIndex = 17;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 1025 &&  MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 212  )
-    {
-			sIconIndex = 17;
-			fDoIcon		 = TRUE;
-    }
-    
-    //goggles i Extended Ear
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 210 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 212 )
-    {
-			sIconIndex = 18;
-			fDoIcon		 = TRUE;
-    }  
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 210 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 212 )
-    {
-			sIconIndex = 18;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 210 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 212 )
-    {
-			sIconIndex = 18;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 210 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 212 )
-    {
-			sIconIndex = 18;
-			fDoIcon		 = TRUE;
-    }
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 212 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 210  )
-    {
-			sIconIndex = 18;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 212 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 210  )
-    {
-			sIconIndex = 18;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 212 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 210 )
-    {
-			sIconIndex = 18;
-			fDoIcon		 = TRUE;
-    }  
-    
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 212 &&  MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 210  )
-    {
-			sIconIndex = 18;
-			fDoIcon		 = TRUE;
-    }  
- 
-    } 
-    
-if (gGameExternalOptions.fShowTacticalFaceGear == TRUE && MercPtrs[ pFace->ubSoldierID ]->stats.bLife  > 0 ) 
-	{
-	
-//	if (MASK== FALSE)
-//	{
-   //NV i GASMASK 
-    if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == GASMASK && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 211 )
-    {
-			DoRightIcon_legion_GAS_MASK( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion,  MercPtrs[ pFace->ubSoldierID ]->ubProfile );
-			bNumRightIcons_legion++;
-			
-			sIconIndex = 10;
-			fDoIcon		 = TRUE;
-			MASK = TRUE;
-    }  
-    else if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == GASMASK && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 246 )
-    {
-    
-    		DoRightIcon_legion_GAS_MASK( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion,  MercPtrs[ pFace->ubSoldierID ]->ubProfile );
-			bNumRightIcons_legion++;
-			sIconIndex = 10;
-			
-			fDoIcon		 = TRUE;
-			MASK = TRUE;
-    }  
-   else if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == GASMASK && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 1024 )
-    {
-    		DoRightIcon_legion_GAS_MASK( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion,  MercPtrs[ pFace->ubSoldierID ]->ubProfile );
-			bNumRightIcons_legion++;
-			
-			sIconIndex = 10;
-			fDoIcon		 = TRUE;
-			MASK = TRUE;
-    }  
-   else if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == GASMASK && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 1025 )
-    {
-			DoRightIcon_legion_GAS_MASK( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion,  MercPtrs[ pFace->ubSoldierID ]->ubProfile );
-			bNumRightIcons_legion++;
-			
-			sIconIndex = 10;
-			fDoIcon		 = TRUE;
-			MASK = TRUE;
-    }
-   else if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 211 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == GASMASK  )
-    {
-			DoRightIcon_legion_NV( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion, MercPtrs[ pFace->ubSoldierID ]->ubProfile );
-			bNumRightIcons_legion++;
-			
-			sIconIndex = 9;
-			fDoIcon		 = TRUE;
-			MASK = TRUE;
-    }  
-   else if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 246 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == GASMASK  )
-    {
-			DoRightIcon_legion_NV( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion, MercPtrs[ pFace->ubSoldierID ]->ubProfile );
-			bNumRightIcons_legion++;
-			
-			sIconIndex = 9;
-			fDoIcon		 = TRUE;
-			MASK = TRUE;
-    }  
-  else  if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 1024 && MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == GASMASK )
-    {
-			DoRightIcon_legion_NV( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion, MercPtrs[ pFace->ubSoldierID ]->ubProfile );
-			bNumRightIcons_legion++;
-			
-			sIconIndex = 9;
-			fDoIcon		 = TRUE;
-			MASK = TRUE;
-    }  
-   else if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 1025 &&  MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == GASMASK  )
-    {
-			DoRightIcon_legion_NV( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion, MercPtrs[ pFace->ubSoldierID ]->ubProfile );
-			bNumRightIcons_legion++;
-			
-			sIconIndex = 9;
-			fDoIcon		 = TRUE;
-			MASK = TRUE;
-    }
-	
-//	}
-	if (MASK == FALSE) 
-	{
-			if(  MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == GASMASK || (MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == GASMASK) )   
+		// check first face slot
+		if ( uiFaceItemOne != NONE )
+		{
+			switch( uiFaceItemOne )
 			{
-			//sIconIndex_legion  = uiCount;
-			//fDoIcon_legion		 = TRUE;
-			//MercPtrs[ pFace->ubSoldierID ]->ubBodyType = 6;
-			DoRightIcon_legion_GAS_MASK( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion,  MercPtrs[ pFace->ubSoldierID ]->ubProfile );
-			bNumRightIcons_legion++;
+				// gas mask
+				case GASMASK:
+					uiFaceItemOne = 1;
+					break;
+				// NV goggles
+				case 211:
+				case 246:
+				case 1024:
+				case 1025:
+					uiFaceItemOne = 2;
+					break;
+				// sun goggles
+				case 212:
+					uiFaceItemOne = 3;
+					break;
+				// extended ear
+				case 210:
+					uiFaceItemOne = 4;
+					break;
+				default:
+					uiFaceItemOne = 0;
+					break;
 			}
-			else   if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 211 || (MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 211) )
-			{
-			DoRightIcon_legion_NV( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion, MercPtrs[ pFace->ubSoldierID ]->ubProfile );
-			bNumRightIcons_legion++;
-			//sIconIndex = uiCount;
-			//fDoIcon_legion		 = TRUE;
-			}  
-			else  if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 246 || (MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 246) )
-			{
-			DoRightIcon_legion_NV( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion, MercPtrs[ pFace->ubSoldierID ]->ubProfile );
-			bNumRightIcons_legion++;
-			//sIconIndex_legion  = uiCount;
-			//fDoIcon_legion		 = TRUE;
-			}  
-			else if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 1024 || (MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 1024) )
-			{
-			DoRightIcon_legion_NV( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion, MercPtrs[ pFace->ubSoldierID ]->ubProfile );
-			bNumRightIcons_legion++;
-			//sIconIndex_legion  = uiCount;
-			//fDoIcon_legion		 = TRUE;
-			}  
-			else if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 1025 || (MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 1025) )
-			{
-			DoRightIcon_legion_NV( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion, MercPtrs[ pFace->ubSoldierID ]->ubProfile );
-			bNumRightIcons_legion++;
-			//sIconIndex_legion  = uiCount;
-			//fDoIcon_legion		 = TRUE;
-			}
+		}
 		
-	}
-			//Extended Ear
-			if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 210 || (MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 210) )
+		// check second face slot
+		if ( uiFaceItemTwo != NONE )
+		{
+			switch( uiFaceItemTwo )
 			{
-			sIconIndex = 12;
-			fDoIcon		 = TRUE;
-			}   
-			/*
-			//goggles
-			if ( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem == 212 || (MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem == 212) )
-			{
-			sIconIndex = 15;
-			fDoIcon		 = TRUE;
-			}  	
-			*/	
-	}
-	
-    //--------------------
+				// gas mask
+				case GASMASK:
+					uiFaceItemTwo = 21;
+					break;
+				// NV goggles
+				case 211:
+				case 246:
+				case 1024:
+				case 1025:
+					uiFaceItemTwo = 42;
+					break;
+				// sun goggles
+				case 212:
+					uiFaceItemTwo = 63;
+					break;
+				// extended ear
+				case 210:
+					uiFaceItemTwo = 84;
+					break;
+				default:
+					uiFaceItemTwo = 0;
+					break;
+			}
+		}
 
+		// Now select the correct icon. This uses a matrix from uiFaceOneItem and uiFaceTwoItem (simple addition)
+		// the numbers on the outer border are used if that is the only item worn in that slot
+		//
+		//								21			42			63				84	
+		//	 face slot 1 \ slot 2	gas mask | NV goggles | sun goggles | extended ear
+		// 1	gas mask				--			43			64				85
+		// 2	NV goggles				23			--			--				86
+		// 3	sun goggles				24			--			--				87
+		// 4	extended ear			25			46			67				--
+		//
+		// this matrix leaves room for expansion
+		ubFaceItemsCombined = uiFaceItemOne + uiFaceItemTwo;
+		
+		switch( ubFaceItemsCombined )
+		{
+			// gas mask only
+			case 1:
+			case 21:
+				sIconIndex = 9;
+				fDoIcon		 = TRUE;
+				break;
+			// NV goggles only
+			case 2:
+			case 42:
+				sIconIndex = 10;
+				fDoIcon		 = TRUE;
+				break;
+			// sun goggles only
+			case 3:
+			case 63:
+				sIconIndex = 15;
+				fDoIcon		 = TRUE;
+				break;
+			// extended ear only
+			case 4:
+			case 84:
+				sIconIndex = 12;
+				fDoIcon		 = TRUE;
+				break;
+			// gas mask + NV goggles
+			case 23:
+			case 43:
+				sIconIndex = 11;
+				fDoIcon		 = TRUE;
+				break;
+			// gas mask + sun goggles
+			case 24:
+			case 64:
+				sIconIndex = 16;
+				fDoIcon		 = TRUE;
+				break;
+			// gas mask + extended ear
+			case 25:
+			case 85:
+				sIconIndex = 13;
+				fDoIcon		 = TRUE;
+				break;
+			// NV goggles + extended ear
+			case 46:
+			case 86:
+				sIconIndex = 14;
+				fDoIcon		 = TRUE;
+				break;
+			// sun goggles + extended ear
+			case 67:
+			case 87:
+				sIconIndex = 18;
+				fDoIcon		 = TRUE;
+				break;
+			default:
+				break;
+		}
+    }
+    
+	// this section chooses the pictures for gas mask and NV goggles if the ini setting "SHOW_TACTICAL_FACE_GEAR" is TRUE
+	// and the merc actually wears something to be shown
+	if (gGameExternalOptions.fShowTacticalFaceGear == TRUE && MercPtrs[ pFace->ubSoldierID ]->stats.bLife  > 0 && 
+		( MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem + MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem ) > 0 &&
+		// dirty hack for IMPs because they don't have pictures for face gear
+		( MercPtrs[ pFace->ubSoldierID ]->ubProfile < 51 || MercPtrs[ pFace->ubSoldierID ]->ubProfile > 56 )) 
+	{
+		// silversurfer: don't overwrite icons if they shall be shown!
+		if ( !gGameExternalOptions.fShowTacticalFaceIcons )
+		{
+			uiFaceItemOne=MercPtrs[ pFace->ubSoldierID ]->inv[HEAD1POS].usItem;
+			uiFaceItemTwo=MercPtrs[ pFace->ubSoldierID ]->inv[HEAD2POS].usItem;
+		
+			// check first face slot
+			if ( uiFaceItemOne != NONE )
+			{
+				switch( uiFaceItemOne )
+				{
+					// gas mask
+					case GASMASK:
+						uiFaceItemOne = 1;
+						break;
+					// NV goggles
+					case 211:
+					case 246:
+					case 1024:
+					case 1025:
+						uiFaceItemOne = 2;
+						break;
+					default:
+						uiFaceItemOne = 0;
+						break;
+				}
+			}
+			
+			// check second face slot
+			if ( uiFaceItemTwo != NONE )
+			{
+				switch( uiFaceItemTwo )
+				{
+					// gas mask
+					case GASMASK:
+						uiFaceItemTwo = 21;
+						break;
+					// NV goggles
+					case 211:
+					case 246:
+					case 1024:
+					case 1025:
+						uiFaceItemTwo = 42;
+						break;
+					default:
+						uiFaceItemTwo = 0;
+						break;
+				}
+			}
+
+			// Now select the correct picture. This uses a matrix from uiFaceOneItem and uiFaceTwoItem (simple addition)
+			// the numbers on the outer border are used if that is the only item worn in that slot
+			//
+			//								21			42			63				84	
+			//	 face slot 1 \ slot 2	gas mask | NV goggles | sun goggles | extended ear
+			// 1	gas mask				--			43			64				85
+			// 2	NV goggles				23			--			--				86
+			// 3	sun goggles				24			--			--				87
+			// 4	extended ear			25			46			67				--
+			//
+			// this matrix leaves room for expansion
+			// we only need a few of the matrix' values this time because we only show gas mask or NV goggles pictures
+			ubFaceItemsCombined = uiFaceItemOne + uiFaceItemTwo;
+		}
+
+		// silversurfer: we don't want to display icons for gas mask or NV goggles because you can actually see the merc wearing the gear
+		// in case of gas mask together with NV we display the picture of the item in face slot 1 and the icon of the item
+		// in face slot 2 (if icons are allowed)
+		switch( ubFaceItemsCombined )
+		{
+			// gas mask only
+			case 1:
+			case 21:
+				DoRightIcon_legion_GAS_MASK( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion,  MercPtrs[ pFace->ubSoldierID ]->ubProfile );
+				fDoIcon		 = FALSE;
+				break;
+			// NV goggles only
+			case 2:
+			case 42:
+				DoRightIcon_legion_NV( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion, MercPtrs[ pFace->ubSoldierID ]->ubProfile );
+				fDoIcon		 = FALSE;
+				break;
+			// NV goggles + gas mask
+			case 23:
+				DoRightIcon_legion_NV( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion, MercPtrs[ pFace->ubSoldierID ]->ubProfile );
+				if ( gGameExternalOptions.fShowTacticalFaceIcons )
+				{
+					sIconIndex = 9;
+					fDoIcon		 = TRUE;
+				}
+				break;
+			// gas mask + NV goggles
+			case 43:
+				DoRightIcon_legion_GAS_MASK( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion,  MercPtrs[ pFace->ubSoldierID ]->ubProfile );
+				if ( gGameExternalOptions.fShowTacticalFaceIcons )
+				{
+					sIconIndex = 10;
+					fDoIcon		 = TRUE;
+				}
+				break;
+			// gas mask + sun goggles
+			case 24:
+			case 64:
+				DoRightIcon_legion_GAS_MASK( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion,  MercPtrs[ pFace->ubSoldierID ]->ubProfile );
+				sIconIndex = 15;
+				fDoIcon		 = TRUE;
+				break;
+			// gas mask + extended ear
+			case 25:
+			case 85:
+				DoRightIcon_legion_GAS_MASK( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion,  MercPtrs[ pFace->ubSoldierID ]->ubProfile );
+				sIconIndex = 12;
+				fDoIcon		 = TRUE;
+				break;
+			// NV goggles + extended ear
+			case 46:
+			case 86:
+				DoRightIcon_legion_NV( uiRenderBuffer, pFace, sFaceX, sFaceY, bNumRightIcons_legion, MercPtrs[ pFace->ubSoldierID ]->ubProfile );
+				sIconIndex = 12;
+				fDoIcon		 = TRUE;
+				break;
+			default:
+				break;
+		}
+	}
+
+	//------------------------------------end of tactical face gear-----------------------------
 
 	// If blind...
 	if ( MercPtrs[ pFace->ubSoldierID ]->bBlindedCounter > 0 )

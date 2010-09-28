@@ -875,18 +875,26 @@ OBJECTTYPE* StackedObjectData::GetAttachmentAtIndex(UINT8 index)
 	return 0;
 }
 
-BOOLEAN StackedObjectData::RemoveAttachmentAtIndex(UINT8 index)
+BOOLEAN StackedObjectData::RemoveAttachmentAtIndex(UINT8 index, attachmentList::iterator * returnIter)
 {
 	attachmentList::iterator iter = attachments.begin();
 	for (int x = 0; iter != attachments.end(); ++x, ++iter) {
 		if(x == index){
-			if(gGameExternalOptions.fNewAttachmentSystem){
+			if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
 				OBJECTTYPE null;
 				iter = attachments.erase(iter);
-				attachments.insert(iter, null);
+				if(returnIter){
+					*returnIter = attachments.insert(iter, null);
+				} else {
+					attachments.insert(iter, null);
+				}
 				return TRUE;
 			} else {
-				attachments.erase(iter);
+				if(returnIter){
+					*returnIter = attachments.erase(iter);
+				} else {
+					attachments.erase(iter);
+				}
 				return TRUE;
 			}
 		}
@@ -894,9 +902,22 @@ BOOLEAN StackedObjectData::RemoveAttachmentAtIndex(UINT8 index)
 	return FALSE;
 }
 
+attachmentList::iterator StackedObjectData::RemoveAttachmentAtIter(attachmentList::iterator iter)
+{
+	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
+		OBJECTTYPE null;
+		iter = attachments.erase(iter);
+		iter = attachments.insert(iter, null);
+		return iter;
+	} else {
+		iter = attachments.erase(iter);
+		return iter;
+	}
+}
+
 BOOLEAN StackedObjectData::AddAttachmentAtIndex(UINT8 index, OBJECTTYPE Attachment)
 {
-	AssertMsg(gGameExternalOptions.fNewAttachmentSystem, "Cannot use the AddAttachmentAtIndex function without NAS");
+	AssertMsg(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW, "Cannot use the AddAttachmentAtIndex function without NAS");
 
 	attachmentList::iterator iter = attachments.begin();
 	for (int x = 0; iter != attachments.end(); ++x, ++iter) {

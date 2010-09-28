@@ -2,6 +2,7 @@
 #define ITEMS_H
 #include "Soldier Control.h"
 #include "Overhead Types.h"
+#include "Weapons.h"
 
 
 //forward declarations of common classes to eliminate includes
@@ -98,10 +99,9 @@ bool TryToPlaceInSlot(SOLDIERTYPE* pSoldier, OBJECTTYPE* pObj, bool fNewItem, in
 
 
 void RemoveInvObject( SOLDIERTYPE *pSoldier, UINT16 usItem );
+void InitItemAttachments(OBJECTTYPE* pObj);
 void RemoveProhibitedAttachments(SOLDIERTYPE* pSoldier, OBJECTTYPE* pObj, UINT16 usItem, BOOLEAN fOnlyRemoveWhenSlotsChange = 1);
-
 void ReInitMergedItem(SOLDIERTYPE* pSoldier, OBJECTTYPE* pObj, UINT16 usOldItem);
-
 void EjectAmmoAndPlace(SOLDIERTYPE* pSoldier, OBJECTTYPE* pObj);
 
 BOOLEAN CanItemFitInVehicle( SOLDIERTYPE *pSoldier, OBJECTTYPE *pObj, INT8 bPos, BOOLEAN fDoingPlacement );
@@ -139,9 +139,11 @@ BOOLEAN ItemHasAttachments( OBJECTTYPE *pItem, SOLDIERTYPE * pSoldier = NULL, UI
 //be possible to have this attachment on this item, but may already have an attachment on
 //it which doesn't work simultaneously with the new attachment (like a silencer and duckbill).
 BOOLEAN ValidItemAttachment( OBJECTTYPE * pObj, UINT16 usAttachment, BOOLEAN fAttemptingAttachment, BOOLEAN fDisplayMessage = TRUE, UINT8 subObject = 0);
-BOOLEAN ValidAttachmentSlot( UINT16 usAttachment, UINT16 usItem, UINT8* ubAPCost = NULL);
-BOOLEAN NASValidAttachment( UINT16 usAttachment, UINT16 usItem, UINT8* ubAPCost = NULL);
-BOOLEAN ValidItemAttachmentSlot( OBJECTTYPE * pObj, UINT16 usAttachment, BOOLEAN fAttemptingAttachment, BOOLEAN fDisplayMessage = TRUE, UINT8 subObject = 0, INT16 slotCount = -1, OBJECTTYPE ** ppAttachInSlot = NULL);
+//Return true if usAttachment would fit on an item with usItem, without considering possible other attachments on this gun. This may be inaccurate for NAS, because slots can change.
+BOOLEAN ValidAttachment( UINT16 usAttachment, UINT16 usItem, UINT8* ubAPCost = NULL);
+//This function does the same as the above, but is more accurate.
+BOOLEAN ValidAttachment( UINT16 usAttachment, OBJECTTYPE * pObj, UINT8* ubAPCost = NULL);
+BOOLEAN ValidItemAttachmentSlot( OBJECTTYPE * pObj, UINT16 usAttachment, BOOLEAN fAttemptingAttachment, BOOLEAN fDisplayMessage = TRUE, UINT8 subObject = 0, INT16 slotCount = -1, BOOLEAN fIgnoreAttachmentInSlot = FALSE, OBJECTTYPE ** ppAttachInSlot = NULL);
 
 // Determines if it is possible to merge an item with any item whose class 
 // is the same as the indicated item
@@ -155,8 +157,10 @@ BOOLEAN TwoHandedItem( UINT16 usItem );
 
 //Existing functions without header def's, added them here, just incase I'll need to call
 //them from the editor.
-BOOLEAN ValidAttachment( UINT16 usAttachment, UINT16 usItem, UINT8* ubAPCost = NULL);
-UINT8 AttachmentAPCost( UINT16 usAttachment, UINT16 usItem );
+
+UINT8 AttachmentAPCost( UINT16 usAttachment, UINT16 usItem, SOLDIERTYPE * pSoldier ); // SANDRO - added argument
+UINT8 AttachmentAPCost( UINT16 usAttachment, OBJECTTYPE * pObj, SOLDIERTYPE * pSoldier );
+
 
 BOOLEAN ValidLaunchable( UINT16 usLaunchable, UINT16 usItem );
 UINT16 GetLauncherFromLaunchable( UINT16 usLaunchable );
@@ -360,6 +364,15 @@ UINT8 GetModifiedExplosiveDamage( UINT16 ubDamage );
 UINT8 GetModifiedMeleeDamage( UINT16 ubDamage );
 UINT8 GetModifiedGunDamage( UINT16 ubDamage );
 
+UINT16 GetModifiedGunRange( UINT16 usWeaponIndex );
+
+
+// SANDRO - added some procedures
+INT16 ReduceCamoFromSoldier( SOLDIERTYPE * pSoldier, INT16 iCamoToRemove, INT16 iCamoToSkip );
+BOOLEAN HasExtendedEarOn( SOLDIERTYPE * pSoldier );
+BOOLEAN UseTotalMedicalKitPoints( SOLDIERTYPE * pSoldier, UINT16 usPointsToConsume );
+
 #endif
+
 
 

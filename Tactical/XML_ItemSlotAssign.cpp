@@ -8,6 +8,7 @@
 	#include "expat.h"
 	#include "gamesettings.h"
 	#include "XML.h"
+	#include "Item Types.h"
 #endif
 
 struct
@@ -43,8 +44,16 @@ itemslotassignStartElementHandle(void *userData, const XML_Char *name, const XML
 
 			//DebugMsg(TOPIC_JA2, DBG_LEVEL_3,"ItemSlotAssignStartElementHandle: setting memory for curItemSlotAssign");
 
-			memset(&pData->curItemSlotAssign,0,sizeof(pData->curItemSlotAssign));
-			pData->curItemSlotAssign.itemSlots.reserve(MAX_ATTACHMENTS);
+			//memset(&pData->curItemSlotAssign,0,sizeof(pData->curItemSlotAssign));
+			pData->curItemSlotAssign.usItemIndex = 0;
+
+			//clear vector
+			if(!pData->curItemSlotAssign.itemSlots.empty()){
+				while(pData->curItemSlotAssign.itemSlots.size() > 0){
+					pData->curItemSlotAssign.itemSlots.pop_back();
+				}
+			}
+			pData->curItemSlotAssign.itemSlots.reserve(MAX_ATTACHMENTS+1);
 
 			pData->maxReadDepth++; //we are not skipping this element
 			pData->curIndex++;
@@ -97,7 +106,7 @@ itemslotassignEndElementHandle(void *userData, const XML_Char *name)
 			{
 				pData->curItemSlotAssign.itemSlots.reserve(pData->curItemSlotAssign.itemSlots.size());
 				//DebugMsg(TOPIC_JA2, DBG_LEVEL_3,"ItemSlotAssignStartElementHandle: writing ItemSlotAssign to array");
-				ItemSlotAssign[pData->curIndex].itemIndex = pData->curItemSlotAssign.itemIndex; //write the ItemSlotAssign into the table
+				ItemSlotAssign[pData->curIndex].usItemIndex = pData->curItemSlotAssign.usItemIndex; //write the ItemSlotAssign into the table
 				ItemSlotAssign[pData->curIndex].itemSlots = pData->curItemSlotAssign.itemSlots;
 
 			}
@@ -105,7 +114,7 @@ itemslotassignEndElementHandle(void *userData, const XML_Char *name)
 		else if(strcmp(name, "itemIndex") == 0)
 		{
 			pData->curElement = ELEMENT;
-			pData->curItemSlotAssign.itemIndex = (UINT16) atol(pData->szCharData);
+			pData->curItemSlotAssign.usItemIndex = (UINT16) atol(pData->szCharData);
 		}
 		else if(strcmp(name, "itemSlotAssignIndex") == 0)
 		{
@@ -113,7 +122,7 @@ itemslotassignEndElementHandle(void *userData, const XML_Char *name)
 
 			pData->curItemSlotAssign.itemSlots.push_back((UINT16) atol(pData->szCharData));
 
-			AssertMsg(pData->curItemSlotAssign.itemSlots.size() <= MAX_ATTACHMENTS, "Too many attachments were found");
+			AssertMsg(pData->curItemSlotAssign.itemSlots.size() <= MAX_ATTACHMENTS, "Too many slots were found on this item");
 		}
 
 		pData->maxReadDepth--;
@@ -124,6 +133,10 @@ itemslotassignEndElementHandle(void *userData, const XML_Char *name)
 
 //WarmSteel - Adds the default slots as defined in AttachmentSlots.
 void AddDefaultSlots(){
+
+	//search for the first empty spot in .
+	UINT32 uiEmptySpot;
+	for(uiEmptySpot = 0; uiEmptySpot < MAXATTACHMENTS && ItemSlotAssign[uiEmptySpot].usItemIndex != 0; uiEmptySpot++){}
 
 	for(UINT32 cnt1 = 1; cnt1 < MAXITEMS; cnt1++)
 	{
@@ -138,10 +151,10 @@ void AddDefaultSlots(){
 		for(UINT32 cnt2 = 0; cnt2 < MAXATTACHMENTS; cnt2++)
 		{
 			//WarmSteel - end of this list, or we found the item
-			if(Item[cnt1].uiIndex == ItemSlotAssign[cnt2].itemIndex){
+			if(Item[cnt1].uiIndex == ItemSlotAssign[cnt2].usItemIndex){
 				totalSlots = ItemSlotAssign[cnt2].itemSlots.size();
 				break;
-			} else if (ItemSlotAssign[cnt2].itemIndex == 0){
+			} else if (ItemSlotAssign[cnt2].usItemIndex == 0){
 				break;
 			}
 		}
@@ -149,11 +162,8 @@ void AddDefaultSlots(){
 			AssertMsg(0, String( "Item(%d) is LBE gear, but has more than 4 slots (this is not allowed).", Item[cnt1].uiIndex ));
 		}
 		//WarmSteel - If no xml entry was found, set the default for the item class. 
-		if (totalSlots == -1 && gGameExternalOptions.fNewAttachmentSystem && Item[cnt1].usItemClass != IC_MONEY)
+		if (totalSlots == -1 && Item[cnt1].usItemClass != IC_MONEY)
 		{
-			//search for the first empty spot in .
-			UINT32 uiEmptySpot;
-			for(uiEmptySpot = 0; uiEmptySpot < MAXATTACHMENTS && ItemSlotAssign[uiEmptySpot].itemIndex != 0; uiEmptySpot++){}
 
 			if(gGameExternalOptions.fUseDefaultSlots){
 				//Add slots based on class
@@ -166,72 +176,72 @@ void AddDefaultSlots(){
 
 					case GUN_PISTOL:
 						//add pistol default slots.
-						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 							if(AttachmentSlots[cnt3].fDefaultPistolSlot){
-								ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex; //This may happen multiple times, but it doesn't matter.
+								ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex; //This may happen multiple times, but it doesn't matter.
 								ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 							}
 						}
 						break;
 
 					case GUN_M_PISTOL:
-						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 							if(AttachmentSlots[cnt3].fDefaultMachinePistolSlot){
-								ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex;
+								ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex;
 								ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 							}
 						}
 						break;
 
 					case GUN_SMG:
-						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 							if(AttachmentSlots[cnt3].fDefaultSubMachineGunSlot){
-								ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex;
+								ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex;
 								ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 							}
 						}
 						break;
 
 					case GUN_RIFLE:
-						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 							if(AttachmentSlots[cnt3].fDefaultRifleSlot){
-								ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex;
+								ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex;
 								ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 							}
 						}
 						break;
 
 					case GUN_SN_RIFLE:
-						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 							if(AttachmentSlots[cnt3].fDefaultSniperRifleSlot){
-								ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex;
+								ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex;
 								ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 							}
 						}
 						break;
 
 					case GUN_AS_RIFLE:
-						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 							if(AttachmentSlots[cnt3].fDefaultAssaultRifleSlot){
-								ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex;
+								ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex;
 								ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 							}
 						}
 						break;
 
 					case GUN_LMG:
-						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 							if(AttachmentSlots[cnt3].fDefaultLightMachineGunSlot){
-								ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex;
+								ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex;
 								ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 							}
 						}
 						break;
 
 					case GUN_SHOTGUN:
-						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 							if(AttachmentSlots[cnt3].fDefaultShotgunSlot){
-								ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex;
+								ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex;
 								ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 							}
 						}
@@ -242,24 +252,24 @@ void AddDefaultSlots(){
 				case IC_LAUNCHER:
 					// "&& !Item[cnt1].singleshotrocketlauncher" is not strictly needed, but in case anyone ever makes singleshots launchers.
 					if(Item[cnt1].rocketlauncher && !Item[cnt1].singleshotrocketlauncher){
-						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 							if(AttachmentSlots[cnt3].fDefaultRocketLauncherSlot){
-								ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex;
+								ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex;
 								ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 							}
 						}
 					} else if (Item[cnt1].grenadelauncher){
-						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 							if(AttachmentSlots[cnt3].fDefaultGrenadeLauncherSlot){
-								ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex;
+								ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex;
 								ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 							}
 						}
 					} else {
 						//if it's neither of the above, it's likely a mortar.
-						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 							if(AttachmentSlots[cnt3].fDefaultMortarSlot){
-								ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex;
+								ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex;
 								ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 							}
 						}
@@ -273,25 +283,25 @@ void AddDefaultSlots(){
 					switch(Armour[ ubClassIndex ].ubArmourClass){
 
 					case ARMOURCLASS_HELMET:
-						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 							if(AttachmentSlots[cnt3].fDefaultHelmetSlot){
-								ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex;
+								ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex;
 								ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 							}
 						}
 						break;
 					case ARMOURCLASS_VEST:
-						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 							if(AttachmentSlots[cnt3].fDefaultVestSlot){
-								ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex;
+								ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex;
 								ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 							}
 						}
 						break;
 					case ARMOURCLASS_LEGGINGS:
-						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+						for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 							if(AttachmentSlots[cnt3].fDefaultLeggingsSlot){
-								ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex;
+								ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex;
 								ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 							}
 						}
@@ -307,13 +317,15 @@ void AddDefaultSlots(){
 			//If we STILL didn't get any default slots, it means there are no default slots for this items class. Define the general ones.
 			if(totalSlots < 1){
 				//Assign default slots to weapons without XML
-				for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex != 0; cnt3++){
+				for(UINT32 cnt3 = 1; cnt3 < MAXITEMS && AttachmentSlots[cnt3].uiSlotIndex <= LAST_SLOT_INDEX; cnt3++){
 					if(AttachmentSlots[cnt3].fDefaultSlot){
-						ItemSlotAssign[uiEmptySpot].itemIndex = Item[cnt1].uiIndex;
+						ItemSlotAssign[uiEmptySpot].usItemIndex = Item[cnt1].uiIndex;
 						ItemSlotAssign[uiEmptySpot].itemSlots.push_back(AttachmentSlots[cnt3].uiSlotIndex);
 					}
 				}
-			}	
+			}
+			//Next spot will automatically be free and if we're here we've added a slot.
+			uiEmptySpot++;
 		}
 	}
 }
@@ -401,7 +413,7 @@ BOOLEAN WriteItemSlotAssignStats()
 		{
 			FilePrintf(hFile,"\t<ITEMSLOTASSIGN>\r\n");
 
-			FilePrintf(hFile,"\t\t<itemIndex>%d</itemIndex>\r\n",				ItemSlotAssign[cnt].itemIndex);
+			FilePrintf(hFile,"\t\t<itemIndex>%d</itemIndex>\r\n",				ItemSlotAssign[cnt].usItemIndex);
 			for(UINT16 cnt2 = 0; cnt2 < ItemSlotAssign[cnt].itemSlots.size(); cnt2++){
 				FilePrintf(hFile,"\t\t<itemSlotAssignIndex>%d</itemSlotAssignIndex>\r\n",		ItemSlotAssign[cnt].itemSlots[cnt2]);
 			}

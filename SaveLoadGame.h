@@ -64,12 +64,11 @@ typedef struct
 
 	UINT8	ubInventorySystem;
 
-	UINT8		ubFiller[109];
+	UINT8	ubAttachmentSystem;
 
-
+	UINT8		ubFiller[108];	// WANNE: Changed from 109 to 108 because of ubNewAttachmentSystem integration
 
 } SAVED_GAME_HEADER;
-
 
 
 extern	UINT32		guiScreenToGotoAfterLoadingSavedGame;

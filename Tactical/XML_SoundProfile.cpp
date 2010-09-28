@@ -36,15 +36,11 @@ SoundProfileStartElementHandle(void *userData, const XML_Char *name, const XML_C
 		{
 			pData->curElement = ELEMENT_LIST;
 
-			memset(pData->curArray,0,sizeof(SOUND_PROFILE_VALUES)*pData->maxArraySize);
-
 			pData->maxReadDepth++; //we are not skipping this element
 		}
 		else if(strcmp(name, "PROFILE") == 0 && pData->curElement == ELEMENT_LIST)
 		{
 			pData->curElement = ELEMENT;
-
-			memset(&pData->curSoundProfile,0,sizeof(SOUND_PROFILE_VALUES));
 
 			pData->maxReadDepth++; //we are not skipping this element
 		}
@@ -92,11 +88,8 @@ SoundProfileEndElementHandle(void *userData, const XML_Char *name)
 		{
 			pData->curElement = ELEMENT_LIST;
 
-			if(pData->curSoundProfile.uiIndex < pData->maxArraySize)
-			{
-				pData->curArray[pData->curSoundProfile.uiIndex] = pData->curSoundProfile; 
-			}
-		}
+			gSoundProfileValue[pData->curSoundProfile.uiIndex].EnabledSound = pData->curSoundProfile.EnabledSound;
+		}	
 		else if(strcmp(name, "uiIndex") == 0)
 		{
 			pData->curElement = ELEMENT;
@@ -116,7 +109,7 @@ SoundProfileEndElementHandle(void *userData, const XML_Char *name)
 
 
 
-BOOLEAN ReadInSoundProfile(SOUND_PROFILE_VALUES *pSoundProfile, STR fileName)
+BOOLEAN ReadInSoundProfile(STR fileName)
 {
 	HWFILE		hFile;
 	UINT32		uiBytesRead;
@@ -153,9 +146,6 @@ BOOLEAN ReadInSoundProfile(SOUND_PROFILE_VALUES *pSoundProfile, STR fileName)
 
 
 	memset(&pData,0,sizeof(pData));
-	pData.curArray = pSoundProfile;
-	pData.maxArraySize = 200;
-
 	XML_SetUserData(parser, &pData);
 
 
@@ -179,7 +169,7 @@ BOOLEAN ReadInSoundProfile(SOUND_PROFILE_VALUES *pSoundProfile, STR fileName)
 	return( TRUE );
 }
 
-BOOLEAN WriteSoundProfile(SOUND_PROFILE_VALUES *pSoundProfile, STR fileName)
+BOOLEAN WriteSoundProfile(STR fileName)
 {
 	HWFILE		hFile;
 
@@ -199,7 +189,7 @@ BOOLEAN WriteSoundProfile(SOUND_PROFILE_VALUES *pSoundProfile, STR fileName)
 			FilePrintf(hFile,"\t<PROFILE>\r\n");
 
 			FilePrintf(hFile,"\t\t<uiIndex>%d</uiIndex>\r\n", cnt);
-			FilePrintf(hFile,"\t\t<EnabledSound>1</EnabledSound>\r\n");//pSoundProfile[cnt].EnabledSound);
+			FilePrintf(hFile,"\t\t<EnabledSound>1</EnabledSound>\r\n");
 			FilePrintf(hFile,"\t</PROFILE>\r\n");
 		}
 		FilePrintf(hFile,"</SOUNDPROFILE>\r\n");

@@ -490,7 +490,7 @@ BOOLEAN HandleOpenableStruct( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE *p
 	if ( pStructure->fFlags & STRUCTURE_OPEN )
 	{
 		// Set costs for these
-		sAPCost = APBPConstants[AP_OPEN_DOOR];
+		sAPCost = GetAPsToOpenDoor( pSoldier ); // SANDRO
 		sBPCost = APBPConstants[BP_OPEN_DOOR];
 
 		fHandleDoor = TRUE;
@@ -515,7 +515,7 @@ BOOLEAN HandleOpenableStruct( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE *p
 
 						// Set costs for these
 						// Set AP costs to that of opening a door
-						sAPCost = APBPConstants[AP_OPEN_DOOR];
+						sAPCost = GetAPsToOpenDoor( pSoldier ); // SANDRO
 						sBPCost = APBPConstants[BP_OPEN_DOOR];
 
 						pSoldier->ChangeSoldierState( GetAnimStateForInteraction( pSoldier, fDoor, END_OPEN_DOOR ), 0, FALSE );
@@ -599,7 +599,7 @@ BOOLEAN HandleOpenableStruct( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE *p
 						if ( pDoor == NULL )
 						{
 							// Set costs for these
-							sAPCost = APBPConstants[AP_OPEN_DOOR];
+							sAPCost = GetAPsToOpenDoor( pSoldier ); // SANDRO
 							sBPCost = APBPConstants[BP_OPEN_DOOR];
 
 							// Open if it's not locked....
@@ -643,7 +643,7 @@ BOOLEAN HandleOpenableStruct( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE *p
 					case HANDLE_DOOR_FORCE:
 
 						// Set costs for these
-						sAPCost = APBPConstants[AP_BOOT_DOOR];
+						sAPCost = GetAPsToOpenDoor( pSoldier ); // SANDRO
 						sBPCost = APBPConstants[BP_BOOT_DOOR];
 
 						// OK, using force, if we have no lock, just open the door!
@@ -751,7 +751,7 @@ BOOLEAN HandleOpenableStruct( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE *p
 					case HANDLE_DOOR_EXPLODE:
 
 						// Set costs for these
-						sAPCost = APBPConstants[AP_EXPLODE_DOOR];
+						sAPCost = GetAPsToBombDoor( pSoldier ); // SANDRO
 						sBPCost = APBPConstants[BP_EXPLODE_DOOR];
 
 						if ( pDoor == NULL )
@@ -779,7 +779,7 @@ BOOLEAN HandleOpenableStruct( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE *p
 					case HANDLE_DOOR_LOCKPICK:
 
 						// Set costs for these
-						sAPCost = APBPConstants[AP_PICKLOCK];
+						sAPCost = GetAPsToPicklock( pSoldier ); // SANDRO
 						sBPCost = APBPConstants[BP_PICKLOCK];
 
 						// Attempt to pick lock
@@ -916,7 +916,7 @@ BOOLEAN HandleOpenableStruct( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE *p
 					case HANDLE_DOOR_UNTRAP:
 
 						// Set costs for these
-						sAPCost = APBPConstants[AP_UNTRAP_DOOR];
+						sAPCost = GetAPsToUntrapDoor( pSoldier ); // SANDRO
 						sBPCost = APBPConstants[BP_UNTRAP_DOOR];
 
 						// OK, if we have no lock, show that!
@@ -1013,7 +1013,8 @@ BOOLEAN HandleOpenableStruct( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE *p
 		else
 		{
 			// Set costs for these
-			sAPCost = APBPConstants[AP_OPEN_DOOR];
+			// SANDRO - changed this
+			sAPCost = GetAPsToOpenDoor( pSoldier );
 			sBPCost = APBPConstants[BP_OPEN_DOOR];
 
 			// Open if it's not locked....

@@ -2204,6 +2204,12 @@ void CalculateLaunchItemParamsForThrow( SOLDIERTYPE *pSoldier, INT32 sGridNo, UI
 	{
 		// then we hit!
 		bMissBy = 0;
+
+		// SANDRO - new merc records
+		if( pSoldier->bTeam == 0 && pSoldier->ubProfile != NO_PROFILE )
+		{
+			gMercProfiles[ pSoldier->ubProfile ].records.usShotsHit++;
+		}
 	}
 
 	//if ( 0 )

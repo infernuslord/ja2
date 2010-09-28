@@ -95,7 +95,7 @@ int INV_INTERFACE_START_Y;//	= ( SCREEN_HEIGHT - INV_INTERFACE_HEIGHT );
 #define	BUTTON_PANEL_WIDTH			78
 #define	BUTTON_PANEL_HEIGHT			76
 
-HIDDEN_NAMES_VALUES zPokaznazwe[500]; //legion2 Jazz
+HIDDEN_NAMES_VALUES zHiddenNames[500]; //legion2 Jazz
 ENEMY_NAMES_VALUES zEnemyName[500];
 ENEMY_RANK_VALUES zEnemyRank[500];
 CIV_NAMES_VALUES zCivGroupName[NUM_CIV_GROUPS];
@@ -352,7 +352,7 @@ BOOLEAN InitializeTacticalInterface(	)
 	if( !AddVideoObject( &VObjectDesc, &guiHATCH ) )
 		AssertMsg(0, "Missing INTERFACE\\hatch.sti" );
 
-	THROWIFFALSE( RegisterItemImages(), L"Registering Item Images failed" );
+	SGP_THROW_IFFALSE( RegisterItemImages(), L"Registering Item Images failed" );
 
 	// CHRISL:
 	// LOAD INTERFACE POCKET SILHOUETTES
@@ -1506,7 +1506,7 @@ void DrawSelectedUIAboveGuy( UINT16 usSoldierID )
 	INT32			iBack;
 	TILE_ELEMENT	TileElem;
 	CHAR16			*pStr;
-	CHAR16			*pStr2;
+	//CHAR16			*pStr2;
 	CHAR16			NameStr[ 50 ];
 	UINT16			usGraphicToUse = THIRDPOINTERS1;
 	BOOLEAN		 fRaiseName = FALSE;
@@ -1733,7 +1733,7 @@ void DrawSelectedUIAboveGuy( UINT16 usSoldierID )
 		{
 		swprintf( NameStr, zGrod[0] );
 		}
-		else if (zPokaznazwe[pSoldier->ubProfile].Hidden == TRUE) 
+		else if (zHiddenNames[pSoldier->ubProfile].Hidden == TRUE) 
 		{
 		swprintf( NameStr,L"???" );
 		}
@@ -1747,7 +1747,7 @@ void DrawSelectedUIAboveGuy( UINT16 usSoldierID )
 		{
 		swprintf( NameStr, pVehicleStrings[4] );
 		}
-		else if (zPokaznazwe[pSoldier->ubProfile].Hidden == TRUE) 
+		else if (zHiddenNames[pSoldier->ubProfile].Hidden == TRUE) 
 		{
 		swprintf( NameStr,L"???" );
 		}
@@ -1770,7 +1770,7 @@ void DrawSelectedUIAboveGuy( UINT16 usSoldierID )
 			{
 			swprintf( NameStr, zGrod[0] );
 			}
-			else if (zPokaznazwe[pSoldier->ubProfile].Hidden == TRUE) 
+			else if (zHiddenNames[pSoldier->ubProfile].Hidden == TRUE) 
 			{
 			swprintf( NameStr,L"???" );
 			}
@@ -1784,7 +1784,7 @@ void DrawSelectedUIAboveGuy( UINT16 usSoldierID )
 			{
 			swprintf( NameStr, pVehicleStrings[4] );
 			}
-			else if (zPokaznazwe[pSoldier->ubProfile].Hidden == TRUE) 
+			else if (zHiddenNames[pSoldier->ubProfile].Hidden == TRUE) 
 			{
 			swprintf( NameStr,L"???" );
 			}
@@ -2562,11 +2562,11 @@ void PopupDoorOpenMenu( BOOLEAN fClosingDoor )
 	}
 	else
 	{
-		swprintf( zDisp, L"%s ( %d )", pTacticalPopupButtonStrings[ LOCKPICK_DOOR_ICON ], APBPConstants[AP_PICKLOCK] );
+		swprintf( zDisp, L"%s ( %d )", pTacticalPopupButtonStrings[ LOCKPICK_DOOR_ICON ], GetAPsToPicklock( gOpenDoorMenu.pSoldier ) ); // SANDRO
 	}
 	SetButtonFastHelpText( iActionIcons[ LOCKPICK_DOOR_ICON ], zDisp );
 
-	if ( !EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_PICKLOCK], APBPConstants[BP_PICKLOCK], FALSE ) || fClosingDoor || AM_AN_EPC( gOpenDoorMenu.pSoldier ) )
+	if ( !EnoughPoints(	gOpenDoorMenu.pSoldier, GetAPsToPicklock( gOpenDoorMenu.pSoldier ), APBPConstants[BP_PICKLOCK], FALSE ) || fClosingDoor || AM_AN_EPC( gOpenDoorMenu.pSoldier ) ) // SANDRO
 	{
 		DisableButton( iActionIcons[ LOCKPICK_DOOR_ICON ] );
 	}
@@ -2594,11 +2594,11 @@ void PopupDoorOpenMenu( BOOLEAN fClosingDoor )
 	}
 	else
 	{
-		swprintf( zDisp, L"%s ( %d )", pTacticalPopupButtonStrings[ EXPLOSIVE_DOOR_ICON ], APBPConstants[AP_EXPLODE_DOOR] );
+		swprintf( zDisp, L"%s ( %d )", pTacticalPopupButtonStrings[ EXPLOSIVE_DOOR_ICON ], GetAPsToBombDoor( gOpenDoorMenu.pSoldier ) ); // SANDRO
 	}
 	SetButtonFastHelpText( iActionIcons[ EXPLOSIVE_DOOR_ICON ], zDisp );
 
-	if ( !EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_EXPLODE_DOOR], APBPConstants[BP_EXPLODE_DOOR], FALSE ) || fClosingDoor || AM_AN_EPC( gOpenDoorMenu.pSoldier ) )
+	if ( !EnoughPoints(	gOpenDoorMenu.pSoldier, GetAPsToBombDoor( gOpenDoorMenu.pSoldier ), APBPConstants[BP_EXPLODE_DOOR], FALSE ) || fClosingDoor || AM_AN_EPC( gOpenDoorMenu.pSoldier ) ) // SANDRO
 	{
 		DisableButton( iActionIcons[ EXPLOSIVE_DOOR_ICON ] );
 	}
@@ -2628,7 +2628,7 @@ void PopupDoorOpenMenu( BOOLEAN fClosingDoor )
 		}
 		else
 		{
-			swprintf( zDisp, L"%s ( %d )", pTacticalPopupButtonStrings[ CANCEL_ICON + 1 ], APBPConstants[AP_OPEN_DOOR] );
+			swprintf( zDisp, L"%s ( %d )", pTacticalPopupButtonStrings[ CANCEL_ICON + 1 ], GetAPsToOpenDoor( gOpenDoorMenu.pSoldier ) ); // SANDRO
 		}
 	}
 	else
@@ -2639,12 +2639,12 @@ void PopupDoorOpenMenu( BOOLEAN fClosingDoor )
 		}
 		else
 		{
-			swprintf( zDisp, L"%s ( %d )", pTacticalPopupButtonStrings[ OPEN_DOOR_ICON ], APBPConstants[AP_OPEN_DOOR] );
+			swprintf( zDisp, L"%s ( %d )", pTacticalPopupButtonStrings[ OPEN_DOOR_ICON ], GetAPsToOpenDoor( gOpenDoorMenu.pSoldier ) ); // SANDRO
 		}
 	}
 	SetButtonFastHelpText( iActionIcons[ OPEN_DOOR_ICON ], zDisp );
 
-	if ( !EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_OPEN_DOOR], APBPConstants[BP_OPEN_DOOR], FALSE ) )
+	if ( !EnoughPoints(	gOpenDoorMenu.pSoldier, GetAPsToOpenDoor( gOpenDoorMenu.pSoldier ), APBPConstants[BP_OPEN_DOOR], FALSE ) ) // SANDRO
 	{
 		DisableButton( iActionIcons[ OPEN_DOOR_ICON ] );
 	}
@@ -2715,11 +2715,11 @@ void PopupDoorOpenMenu( BOOLEAN fClosingDoor )
 	}
 	else
 	{
-		swprintf( zDisp, L"%s ( %d )", pTacticalPopupButtonStrings[ UNTRAP_DOOR_ICON ], APBPConstants[AP_UNTRAP_DOOR] );
+		swprintf( zDisp, L"%s ( %d )", pTacticalPopupButtonStrings[ UNTRAP_DOOR_ICON ], GetAPsToUntrapDoor( gOpenDoorMenu.pSoldier ) ); // SANDRO
 	}
 	SetButtonFastHelpText( iActionIcons[ UNTRAP_DOOR_ICON ], zDisp );
 
-	if ( !EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_UNTRAP_DOOR], APBPConstants[BP_UNTRAP_DOOR], FALSE ) || fClosingDoor || AM_AN_EPC( gOpenDoorMenu.pSoldier ) )
+	if ( !EnoughPoints(	gOpenDoorMenu.pSoldier, GetAPsToUntrapDoor( gOpenDoorMenu.pSoldier ), APBPConstants[BP_UNTRAP_DOOR], FALSE ) || fClosingDoor || AM_AN_EPC( gOpenDoorMenu.pSoldier ) ) // SANDRO
 	{
 		DisableButton( iActionIcons[ UNTRAP_DOOR_ICON ] );
 	}
@@ -2849,7 +2849,7 @@ void BtnDoorMenuCallback(GUI_BUTTON *btn,INT32 reason)
 			{
 				// Open door normally...
 				// Check APs
-				if ( EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_OPEN_DOOR], APBPConstants[BP_OPEN_DOOR], FALSE ) )
+			if ( EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_OPEN_DOOR], APBPConstants[BP_OPEN_DOOR], FALSE ) )
 				{
 				// Set UI
 					SetUIBusy( (UINT8)gOpenDoorMenu.pSoldier->ubID );
@@ -2872,7 +2872,8 @@ void BtnDoorMenuCallback(GUI_BUTTON *btn,INT32 reason)
 #else
 			// Open door normally...
 			// Check APs
-			if ( EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_OPEN_DOOR], APBPConstants[BP_OPEN_DOOR], FALSE ) )
+			// SANDRO - changed APs for opening dorrs calc
+			if ( EnoughPoints(	gOpenDoorMenu.pSoldier, GetAPsToOpenDoor( gOpenDoorMenu.pSoldier ), APBPConstants[BP_OPEN_DOOR], FALSE ) )
 			{
 				// Set UI
 				SetUIBusy( (UINT8)gOpenDoorMenu.pSoldier->ubID );
@@ -2931,7 +2932,7 @@ void BtnDoorMenuCallback(GUI_BUTTON *btn,INT32 reason)
 		if ( uiBtnID == iActionIcons[ LOCKPICK_DOOR_ICON ] )
 		{
 			// Lockpick
-			if ( EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_PICKLOCK], APBPConstants[BP_PICKLOCK], FALSE ) )
+			if ( EnoughPoints(	gOpenDoorMenu.pSoldier, GetAPsToPicklock( gOpenDoorMenu.pSoldier ), APBPConstants[BP_PICKLOCK], FALSE ) ) // SANDRO
 			{
 				// Set UI
 				SetUIBusy( (UINT8)gOpenDoorMenu.pSoldier->ubID );
@@ -2989,7 +2990,7 @@ void BtnDoorMenuCallback(GUI_BUTTON *btn,INT32 reason)
 			}
 #else
 			// Explode
-			if ( EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_EXPLODE_DOOR], APBPConstants[BP_EXPLODE_DOOR], FALSE ) )
+			if ( EnoughPoints(	gOpenDoorMenu.pSoldier, GetAPsToBombDoor( gOpenDoorMenu.pSoldier ), APBPConstants[BP_EXPLODE_DOOR], FALSE ) ) // SANDRO
 			{
 				// Set UI
 				SetUIBusy( (UINT8)gOpenDoorMenu.pSoldier->ubID );
@@ -3007,7 +3008,7 @@ void BtnDoorMenuCallback(GUI_BUTTON *btn,INT32 reason)
 		if ( uiBtnID == iActionIcons[ UNTRAP_DOOR_ICON ] )
 		{
 			// Explode
-			if ( EnoughPoints(	gOpenDoorMenu.pSoldier, APBPConstants[AP_UNTRAP_DOOR], APBPConstants[BP_UNTRAP_DOOR], FALSE ) )
+			if ( EnoughPoints(	gOpenDoorMenu.pSoldier, GetAPsToUntrapDoor( gOpenDoorMenu.pSoldier ), APBPConstants[BP_UNTRAP_DOOR], FALSE ) ) // SANDRO
 			{
 				// Set UI
 				SetUIBusy( (UINT8)gOpenDoorMenu.pSoldier->ubID );
@@ -4434,3 +4435,4 @@ void RenderTopmostMultiPurposeLocator( )
 
 	BltVideoObjectFromIndex(	FRAME_BUFFER, guiRADIO, gbMultiPurposeLocatorFrame, sXPos, sYPos, VO_BLT_SRCTRANSPARENCY, NULL );
 }
+

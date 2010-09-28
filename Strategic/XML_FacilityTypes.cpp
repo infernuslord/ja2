@@ -398,7 +398,7 @@ facilitytypeEndElementHandle(void *userData, const XML_Char *name)
 			}
 			else
 			{
-				THROWEXCEPTION(L"FacilityTypes.XML Error: Tag <FACILITYTYPES> encountered too early! Please make sure to close all opened tags first.");
+				SGP_THROW(L"FacilityTypes.XML Error: Tag <FACILITYTYPES> encountered too early! Please make sure to close all opened tags first.");
 			}
 		}
 		else if(strcmp(name, "FACILITYTYPE") == 0)
@@ -489,7 +489,7 @@ facilitytypeEndElementHandle(void *userData, const XML_Char *name)
 			}
 			else
 			{
-				THROWEXCEPTION(L"FacilityTypes.XML Error: A </FACILITYTYPE> tag was encountered too early! Please make sure all tags are closed properly.");
+				SGP_THROW(L"FacilityTypes.XML Error: A </FACILITYTYPE> tag was encountered too early! Please make sure all tags are closed properly.");
 			}
 		}
 
@@ -561,13 +561,13 @@ facilitytypeEndElementHandle(void *userData, const XML_Char *name)
 			{
 				CHAR16 sErrorString[256];
 				swprintf(sErrorString, L"FacilityTypes.XML Error: Assignment data for facility type %d is missing a <ubAssignmentType> tag", pData->curIndex);
-				THROWEXCEPTION(sErrorString);
+				SGP_THROW(sErrorString);
 			}
 			else if (pData->curAssignmentData.ubStaffLimit <= 0 && pData->curAssignmentType != FAC_AMBIENT && !FacilityTypes_TextOnly)
 			{
 				CHAR16 sErrorString[256];
 				swprintf(sErrorString, L"FacilityTypes.XML Error: Assignment data for facility type %d is missing a <ubStaffLimit> tag, or the value of the tag is 0.", pData->curIndex);
-				THROWEXCEPTION(sErrorString);
+				SGP_THROW(sErrorString);
 			}
 			else
 			{
@@ -816,7 +816,7 @@ facilitytypeEndElementHandle(void *userData, const XML_Char *name)
 			{
 				CHAR16 sErrorString[256];
 				swprintf(sErrorString, L"FacilityTypes.XML Error: Assignment type for facility %d is unrecognized!", pData->curIndex);
-				THROWEXCEPTION(sErrorString);
+				SGP_THROW(sErrorString);
 			}
 		}
 

@@ -1,3 +1,26 @@
+/* 
+ * bfVFS : vfs/Tools/vfs_log.h
+ *  - simple file logger
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #ifndef _VFS_LOG_H_
 #define _VFS_LOG_H_
 
@@ -16,16 +39,23 @@ namespace vfs
 		IRefCountable() : _ref_count(1) {}
 		virtual ~IRefCountable() {}
 
-		virtual void Delete() = 0;
+		virtual int Reserve()  { return Register();    }
+		virtual int Release()  { return UnRegister();  }
+		virtual int RefCount() { return GetRefCount(); }
 
-		void Register() {
-			_ref_count++;
+	protected:
+		int Register() {
+			return ++_ref_count;
 		}
-		void UnRegister() {
-			_ref_count--;
-			if(_ref_count <= 0){
+		int UnRegister() {
+			int tmp_count = --_ref_count;
+			if(_ref_count <= 0) {
 				delete this;
 			}
+			return tmp_count;
+		}
+		int GetRefCount() {
+			return _ref_count;
 		}
 	private:
 		int _ref_count;
@@ -48,15 +78,20 @@ namespace vfs
 		Log(vfs::tWritableFile* file, bool append = false, EFlushMode flushMode = FLUSH_ON_DELETE);
 		virtual ~Log();
 
-		virtual void	Delete();
+		// reimplemented for synchronization
+		virtual int Reserve();
+		virtual int Release();
+		virtual int RefCount();
 
 		// don't explicitely call destroy if you haven't explicitely created the object
 		void			destroy();
 
+		void			releaseFile();
+
 		static Log*		create(vfs::Path const& fileName, bool append = false, EFlushMode flushMode = FLUSH_ON_DELETE);
 		static Log*		create(vfs::tWritableFile* file, bool append = false, EFlushMode flushMode = FLUSH_ON_DELETE);
-		static void		flushRelease();
-		static void		flushDelete();
+		static void		flushReleaseAll();
+		static void		flushDeleteAll();
 
 		static vfs::String const&	getSharedString();
 		static void					setSharedString(vfs::String const& str);
@@ -64,7 +99,7 @@ namespace vfs
 		Log& operator<<(vfs::UInt64 const& t);
 		Log& operator<<(vfs::UInt32 const& t);
 		Log& operator<<(vfs::UInt16 const& t);
-		Log& operator<<(vfs::UInt8 const& t);
+		Log& operator<<(vfs::UInt8  const& t);
 
 		Log& operator<<(vfs::Int64 const& t);
 		Log& operator<<(vfs::Int32 const& t);
@@ -90,10 +125,14 @@ namespace vfs
 		void setAppend(bool append = true);
 		void setBufferSize(vfs::UInt32 bufferSize);
 
-		void flush();
 
 		void lock();
 		void unlock();
+
+		void		flush();
+		EFlushMode	flushMode();
+		void		flushMode(EFlushMode fmode);
+
 	private:
 		void _test_flush(bool force=false);
 

@@ -787,6 +787,63 @@ STR16 pPersonnelScreenStrings[] =
 	L"受伤次数: ", // number of times merc has been wounded
 	L"技能: ",
 	L"没有技能",
+	L"Achievements", // added by SANDRO
+};
+
+// SANDRO - helptexts for merc records
+STR16 pPersonnelRecordsHelpTexts[] =
+{
+	L"Elites:      %d\n",
+	L"Regulars:   %d\n",
+	L"Admins:    %d\n",
+	L"Hostile Civs: %d\n",
+	L"Creatures:  %d\n",
+	L"Tanks:      %d\n", 
+	L"Others:     %d\n",
+
+	L"To Mercs: %d\n",
+	L"Militia:   %d\n",
+	L"Others:     %d\n",
+
+	L"Shots Fired:         %d\n",
+	L"Missiles Launched:   %d\n",
+	L"Grenades Thrown:     %d\n",
+	L"Knives Thrown:       %d\n",
+	L"Blade Attacks:       %d\n",
+	L"HtH Attacks:         %d\n",
+	L"Successful Hits:     %d\n",
+
+	L"Locks Picked:     %d\n",
+	L"Locks Breached:   %d\n",
+	L"Traps Removed:     %d\n",
+	L"Explosives Detonated: %d\n",
+	L"Items Repaired:      %d\n",
+	L"Items Combined:    %d\n",
+	L"Items Stolen:    %d\n",
+	L"Militia Trained:    %d\n",
+	L"Mercs Bandaged:    %d\n",
+	L"Surgeries Made:    %d\n",
+	L"NPCs Met:      %d\n",
+	L"Sectors Discovered:  %d\n",
+	L"Ambushes Prevented:  %d\n",
+	L"Quests Handled:    %d\n",
+
+	L"Tactical Battles:    %d\n",
+	L"Autoresolve Battles:  %d\n",
+	L"Times Retreated:    %d\n",
+	L"Ambushes Experienced:  %d\n",
+	L"Largest Battle:   %d Enemies\n",
+
+	L"Shot:        %d\n",
+	L"Stabbed:     %d\n",
+	L"Punched:     %d\n",
+	L"Blasted:     %d\n",
+	L"Stat Damaged:   %d\n",
+	L"Surgeries Undergoed:  %d\n",
+	L"Facility Accidents:   %d\n",
+
+	L"Character:",
+	L"Disability:",
 };
 
 
@@ -809,11 +866,51 @@ STR16 gzMercSkillText[] =
 	L"刀技",
 	L"狙击手",
 	L"伪装",					//JA25: modified
-	L"伪装（城市）",
-	L"伪装（沙漠）",
-	L"伪装（雪地）",
+	// SANDRO - removed this
+	//L"伪装（城市）",
+	//L"伪装（沙漠）",
+	//L"伪装（雪地）",
 	L"专家",
 };
+
+//////////////////////////////////////////////////////////
+// SANDRO - added this
+STR16 gzMercSkillTextNew[] = 
+{
+	// Major traits
+	L"No Skill",
+	L"Auto Weapons",
+	L"Heavy Weapons",
+	L"Marksman",
+	L"Hunter",
+	L"Gunslinger",
+	L"Hand to Hand",
+	L"Deputy",
+	L"Technician",
+	L"Paramedic",
+	// Minor traits
+	L"Ambidextrous",
+	L"Melee",
+	L"Throwing",
+	L"Night Ops",
+	L"Stealthy",
+	L"Athletics",
+	L"Bodybuilding",
+	L"Demolitions",
+	L"Teaching",
+	L"Scouting",
+	// second names for major skills
+	L"Machinegunner",
+	L"Bombardier",
+	L"Sniper",
+	L"Ranger",
+	L"Gunfighter",
+	L"Martial Arts",
+	L"Squadleader",
+	L"Engineer",
+	L"Doctor",
+};
+//////////////////////////////////////////////////////////
 
 
 // This is pop up help text for the options that are available to the merc
@@ -1148,6 +1245,7 @@ CHAR16		gWeaponStatsDesc[][ 17 ] =
 
 	// TODO.Translate
 	L"Default:",	//17 //WarmSteel - So we can also display default attachments
+
 };
 
 // HEADROCK: Several arrays of tooltip text for new Extended Description Box
@@ -3292,7 +3390,13 @@ STR16			CharacterInfo[] =
 	L"附加信息",	//"Additional Info",				// Title for the additional info for the merc's bio
 	L"现役成员",	//"Active Members",		//20		// Title of the page
 	L"可选装备: ",	//"Optional Gear:",				// Displays the optional gear cost
+	L"gear",	//tais: Displays the optional gear cost in nsgi, this moved and can have only a small room, so just make it "gear" without extra's
 	L"所需医疗保证金",	//"MEDICAL deposit required",			// If the merc required a medical deposit, this is displayed
+	L"Kit 1",				// Text on Starting Gear Selection Button 1	// TODO.Translate
+	L"Kit 2",				// Text on Starting Gear Selection Button 2
+	L"Kit 3",				// Text on Starting Gear Selection Button 3
+	L"Kit 4",				// Text on Starting Gear Selection Button 4
+	L"Kit 5",				// Text on Starting Gear Selection Button 5
 };
 
 
@@ -3636,9 +3740,6 @@ STR16			zSaveLoadText[] =
 
 	L"新携行系统不兼容640x480的屏幕分辨率，请重新设置分辨率。",
 	L"新携行系统无法使用默认的 Data 文件夹，请仔细读说明。",
-
-	// TODO.Translate
-	L"You cannot play this savegame with the New Attachment System, because this savegame does not use the New Inventory.",
 };
 
 
@@ -3740,16 +3841,16 @@ STR16		zOptionsToggleText[] =
 	L"显示3D光标",	//"Show 3D Cursor",
 	L"显示命中机率",	//"Show Chance to Hit on cursor",
 	L"榴弹发射器连发时使用枪击光标",	//"GL Burst uses Burst cursor",
-	L"敌人掉落所有物品",	//"Enemies Drop all Items",
+	L"Allow Enemy Taunts", // Changed from "Enemies Drop all Items" - SANDRO
 	L"允许高仰角榴弹发射",	//"High angle Grenade launching",
-	L"限制额外的瞄准",	//"Restrict extra Aim Levels",
+	L"Allow Real Time Sneaking", // Changed from "Restrict extra Aim Levels" - SANDRO
 	L"按空格键选择下一支小队",	//"Space selects next Squad",
 	L"显示物品阴影",	//"Show Item Shadow",
 	L"用格数显示武器射程",	//"Show Weapon Ranges in Tiles",
 	L"单发曳光弹显示曳光",	//"Tracer effect for single shot",
 	L"雨声",	//"Rain noises",
 	L"允许乌鸦",	//"Allow crows",
-	L"允许士兵工具提示",	// Changed from "Random I.M.P personality" - SANDRO
+	L"允许士兵工具提示",	// Show Soldier Tooltips
 	L"自动存盘",	//"Auto save",
 	L"沉默的Skyrider",	//"Silent Skyrider",
 	L"降低CPU的使用率",	//"Low CPU usage",
@@ -3837,16 +3938,16 @@ STR16	zOptionsScreenHelpText[] =
 	// Options for 1.13
 	L"当打开时，在光标上显示命中机率。",
 	L"开启该选项时，榴弹发射器点射使用点射的准星",
-	L"当打开时，死亡的敌人掉落所有的物品。",
+	L"When ON, enemies will occasionally comment certain actions.", // Changed from Enemies Drop All Items - SANDRO
 	L"当打开时，榴弹发射器允许采用较高仰角发射榴弹。(|Q)",
-	L"当打开时，狙击步枪以外的枪支最多使用4AP去瞄准。",
+	L"When ON, the turn based mode will not be entered when sneaking unnoticed and seeing an enemy unless pressing |C|t|r+|X.", // Changed from Restrict Extra Aim Levels - SANDRO
 	L"当打开时，按空格键自动切换到下一小队。(|S|p|a|c|e)",
 	L"开启该选项时，会显示物品阴影",
 	L"当打开时，用格数显示武器射程。",
 	L"当打开时，单发曳光弹也显示曳光。",
 	L"当打开时，下雨时能听到雨水音效。",	//"When ON, you will hear rain noises when it is raining.",
 	L"当打开时，允许乌鸦出现。",
-	L"当启用时，把光标定位在敌人身上并且按下 |A|l|t 键会显示一个提示工具窗口。", 	// - Changed from random IMP personality - SANDRO
+	L"当启用时，把光标定位在敌人身上并且按下 |A|l|t 键会显示一个提示工具窗口。",
 	L"当打开时，游戏将在玩家回合后自动存盘",
 	L"当打开时，Skyrider将保持沉默。",
 	L"当打开时，游戏将使用更少的CPU资源。",
@@ -3878,9 +3979,9 @@ STR16	gzGIOScreenText[] =
 	L"现实",
 	L"科幻",
 	L"金版",
-	L"物品",
+	L"Available Arsenal", // changed by SANDRO
 	L"大量武器",
-	L"少量武器",
+	L"Reduced", // changed by SANDRO
 	L"难度",
 	L"新手",
 	L"老手",
@@ -3897,11 +3998,42 @@ STR16	gzGIOScreenText[] =
 	L"较多",
 	L"很多",
 	L"囧……多",
-	L"携行系统",
-	L"旧",
-	L"新",
+	L"Inventory / Attachments",	// TODO.Translate
+	L"NOT USED",
+	L"NOT USED",
 	L"读取联机游戏",
 	L"游戏初始设置（仅在服务器设置时有效）",
+	// Added by SANDRO
+	L"Skill Traits",
+	L"Old",
+	L"New",
+	L"Max IMP Characters",
+	L"One",
+	L"Two",
+	L"Three",
+	L"Four",
+	L"Five",
+	L"Six",
+	L"Enemies Drop All Items",
+	L"Off",
+	L"On",
+	L"Number of Terrorists",
+	L"Random",
+	L"All",
+	L"Secret Weapon Caches",
+	L"Random",
+	L"All",
+	L"Progress Speed of Item Choices",
+	L"Very Slow",
+	L"Slow",
+	L"Normal",
+	L"Fast",
+	L"Very Fast",
+
+	// TODO.Translate
+	L"Old / Old",
+	L"New / Old",
+	L"New / New",
 };
 
 STR16	gzMPJScreenText[] =
@@ -4139,8 +4271,8 @@ STR16 pMessageStrings[] =
 	L"日志已经更新。",	//"History log updated.",
 	L"榴弹发射器点射时使用准星光标（可以扫射）",
 	L"榴弹发射器连发时使用弹道光标(不可以扫射",	//"Grenade Bursts use Trajectory Cursor (Spread fire disabled)",
-	L"启用物品全掉",	//"Drop All Enabled",
-	L"禁用物品全掉",	//"Drop All Disabled",
+	L"Enabled Soldier Tooltips", // Changed from Drop All On - SANDRO
+	L"Disabled Soldier Tooltips", // Changed from Drop All Off - SANDRO
 	L"榴弹发射器以正常仰角发射榴弹",	//"Grenade Launchers fire at standard angles",
 	L"榴弹发射器以较高仰角发射榴弹",	//L"Grenade Launchers fire at higher angles",
 	// forced turn mode strings
@@ -4520,7 +4652,7 @@ STR16 gzLateLocalizedString[] =
 
 	L"%s的陶瓷片已经粉碎了!",	//"%s's ceramic plates have been smashed!",
 	L"%s多打了%d发子弹！",	//"%s fires %d more rounds than intended!",
-	L"%s多打了%d发子弹！",	//"%s fires %d more round than intended!",
+	L"%s多打了1发子弹！",	//"%s fires %d more round than intended!",
 };
 
 STR16 gzCWStrings[] =
@@ -4571,6 +4703,10 @@ STR16 gzTooltipStrings[] =
 	L"无防弹衣",
 	L"无作战裤",
 	L"|护|甲: %s\n",
+	 // Added - SANDRO
+	L"%s|Skill 1: %s\n",
+	L"%s|Skill 2: %s\n", 
+	L"%s|Skill 3: %s\n",
 };
 
 STR16 New113Message[] =
@@ -4599,7 +4735,25 @@ STR16 New113Message[] =
 	L"视野中没有敌人",
 	L"即时潜行模式 关闭",
 	L"即时潜行模式 开启",
-	L"发现敌人！（按|C|t|r|l|+|x进入回合制）",
+	L"发现敌人！", // this should be enough - SANDRO
+	//////////////////////////////////////////////////////////////////////////////////////
+	// These added by SANDRO
+	L"%s was successful on stealing!",
+	L"%s had not enough action points to steal all selected items.",
+	L"Do you want to make surgery on %s before bandaging? (You can heal about %i Health.)",
+	L"Do you want to make surgery on %s? (You can heal about %i Health.)",
+	L"Do you wish to make necessary surgeries first? (%i patient(s))",
+	L"Do you wish to make the surgery on this patient first?",
+	L"Apply first aid automatically with necessary surgeries or without them?",
+	L"Surgery on %s finished.",
+	L"%s is hit in the chest and loses a point of maximum health!",
+	L"%s is hit in the chest and loses %d points of maximum health!",
+	L"%s has regained one point of lost %s",
+	L"%s has regained %d points of lost %s",
+	L"Your scouting skills prevented you to be ambushed by the enemy!",
+	L"Thanks to your scouting skills you have successfuly avoided a pack of bloodcats!",
+	L"%s is hit to groin and falls down in pain!",
+	//////////////////////////////////////////////////////////////////////////////////////
 };
 
 STR16 New113HAMMessage[] =
@@ -4654,6 +4808,25 @@ STR16 MissingIMPSkillsDescriptions[] =
 	L"狙击手: 拥有鹰的眼睛和百步穿杨的枪法！?",
 	// Camouflage
 	L"伪装: 跟你的伪装迷彩比起来，树丛看起来倒象是假的！?",
+	// SANDRO - new strings for new traits added
+	// Ranger
+	L"Ranger: You are the one from Texas deserts, aren't you! ± ",	
+	// Gunslinger
+	L"Gunslinger: With a handgun or two, you can be as lethal as the Billy Kid! ± ",
+	// Squadleader
+	L"Squadleader: Natural leader and boss, you are the big shot no kidding! ± ",
+	// Technician
+	L"Technician: Fixing stuff, removing traps, planting bombs, that's your bussiness! ± ",
+	// Doctor
+	L"Doctor: You can make a quick surgery with pocket-knife and chewing gum anywhere! ± ",
+	// Athletics
+	L"Athletics: Your speed and vitality is on top of possibilities! ± ",
+	// Bodybuilding
+	L"Bodybuilding: That big muscular figure which cannot be overlooked is you actually! ± ",
+	// Demolitions
+	L"Demolitions: You can blow up a whole city just by common home stuff! ± ",
+	// Scouting
+	L"Scouting: Nothing can escape your notice! ± ",
 };
 
 STR16 NewInvMessage[] =
@@ -4887,16 +5060,25 @@ STR16 ChineseSpecString7 = L"%s [%d%％]\n%s %1.1f %s";
 // Following strings added - SANDRO
 STR16 pSkillTraitBeginIMPStrings[] =
 {
-	L"下一页你将会选择你所创造的佣兵的特长，请留意你最多能够选择两种特长，当你只选择一种特长时，该特长将会升级成为专家特长。除了电子和双手持枪之外，这两种是没有专家级的，请特别留意。",
-	L"你也可以选择什么特长也不要，作为补偿，你会得到更多的创造点数可以增加你的佣兵的各项能力数值。",
+	// For old traits
+	L"On the next page, you are going to choose your skill traits according to your proffessional specialization as a mercenary. No more than two different traits or one expert trait can be selected.",
+	L"You can also choose only one or even no traits, which will give you a bonus to your attribute points as a compensation. Note that Electronics and Ambidextrous traits cannot be achieved at expert levels.",
+	// For new major/minor traits
+	L"Next stage is about choosing your skill traits according to your proffessional specialization as a mercenary. On first page you can select up to two potential major traits, which mostly represent your main role in a team. While on second page is list of possible minor traits, which represent personal feats.",
+	L"No more then three choices altogeher are possible. Which means if you choose no major traits, you can then choose three minor traits. If you choose both major traits (or one enhanced), you can then choose only one minor trait...",
 };
-
 STR16 sgAttributeSelectionText[] =
 {
 	L"请 按 照 你 对 自 己 的 感 觉 ， 调 整 你 的 各 项 能 力 值 。 各 项 能 力 值 的 最 大 值 为",
 	L"IMP能力值和技能概览。",
 	L"奖励点数 :",
 	L"开始等级",
+	// New strings for new traits
+	L"On the next page you are going to specify your physical attributes and skills. As 'attributes' are called: health, dexterity, agility, strength and wisdom. Attributes cannot go lower than %d.",
+	L"The rest are called 'skills' and unlike attributes skills can be set to zero meaning you have absolutely no proficieny in it.",
+	L"All scores are set to a minimum at the beginning. Note that certain attributes are set to specific values according to skill traits you have selected. You cannot set those attributes lower than that.",
+	//L"Please adjust the scores the way to describe your attributes at best.",
+
 };
 
 STR16 pCharacterTraitBeginIMPStrings[] =
@@ -4906,7 +5088,7 @@ STR16 pCharacterTraitBeginIMPStrings[] =
 	L"下面来设定你性格上的缺陷，相信自己做一个诚实的孩子吧！每个人至少都有一种缺陷的。真实反映有助于让你的未来雇主更能了解你的潜力，避免给你安排不利的工作环境。",
 };
 
-STR16 gzIMPCharacterTraitText[]=
+STR16 gzIMPAttitudesText[]=
 {
 	L"平常",
 	L"友善",
@@ -4921,6 +5103,24 @@ STR16 gzIMPCharacterTraitText[]=
 	L"I.M.P. 性格特征",
 };
 
+STR16 gzIMPCharacterTraitText[]=
+{
+	L"Normal",
+	L"Sociable",
+	L"Loner",
+	L"Optimist",
+	L"Assertive",
+	L"Intellectual",
+	L"Primitive",
+	L"Aggressive",
+	L"Phlegmatic",
+	L"Dauntless",
+	L"Pacifist",
+	L"Malicious",
+	L"Show-off",
+	L"I.M.P. Character Traits",
+};
+
 STR16 gzIMPColorChoosingText[] =
 {
 	L"I.M.P. 颜色及身型",
@@ -4928,6 +5128,7 @@ STR16 gzIMPColorChoosingText[] =
 	L"请选择你喜欢的IMP发色、肤色、服装颜色以及体型。",
 	L"请选择你喜欢的IMP发色、肤色、服装颜色。",
 	L"点选这里佣兵将单手持大枪",
+	L"\n(Caution: you will need a big strength for this.)",
 };
 
 STR16 sColorChoiceExplanationTexts[]=
@@ -5061,6 +5262,97 @@ STR16 Additional113Text[]=
 {
 	L"Jagged Alliance 2 v1.13 窗口模式需要一个16bpp或更少的颜色深度。",
 };
+
+// SANDRO - Taunts (here for now, xml for future, I hope)
+STR16 sEnemyTauntsFireGun[]=
+{
+	L"Suck this!",
+	L"Touch this!",
+	L"Come get some!",
+	L"You're mine!",
+	L"Die!",
+	L"You scared, motherfucker?",
+	L"This will hurt!",
+	L"Come on you bastard!",
+	L"Come on! I don't got all day!",
+	L"Come to daddy!",
+	L"You'll be six feet under in no time!",
+	L"Will send ya home in a pinebox, loser!",
+	L"Hey, wanna play?",
+	L"You should have stayed home, bitch.",
+	L"Sucker!",
+};
+
+STR16 sEnemyTauntsFireLauncher[]=
+{
+
+	L"We have a barbecue here.",
+	L"I got a present for ya.",
+	L"Bam!",
+	L"Smile!",
+};
+
+STR16 sEnemyTauntsThrow[]=
+{
+	L"Catch!",
+	L"Here ya go!",
+	L"Pop goes the weasel.",
+	L"This one's for you.",
+	L"Muhehe.",
+	L"Catch this, swine!",
+	L"I like this.",
+};
+
+STR16 sEnemyTauntsChargeKnife[]=
+{
+	L"I'll get your scalp.",
+	L"Come to papa.",
+	L"Show me your guts!",
+	L"I'll rip you to pieces!",
+	L"Motherfucker!",
+};
+
+STR16 sEnemyTauntsRunAway[]=
+{
+	L"We're in some real shit...",
+	L"They said join the army. Not for this shit!",
+	L"I have enough.",
+	L"Oh my God.",
+	L"They ain't paying us enough for this.",
+	L"It's just too much for me.",
+	L"I'll bring some friends.",
+
+};
+
+STR16 sEnemyTauntsSeekNoise[]=
+{
+	L"I heard that!",
+	L"Who's there?",
+	L"What was that?",
+	L"Hey! What the...",
+
+};
+
+STR16 sEnemyTauntsAlert[]=
+{
+	L"They are here!",
+	L"Now the fun can start.",
+	L"I hoped this will never happen.",
+
+};
+
+STR16 sEnemyTauntsGotHit[]=
+{
+	L"Ouch!",
+	L"Ugh!",
+	L"This.. hurts!",
+	L"You fuck!",
+	L"You will regret.. uhh.. this.",
+	L"What the..!",
+	L"Now you have.. pissed me off.",
+
+};
+
 
 STR16	gzNewLaptopMessages[]=
 {

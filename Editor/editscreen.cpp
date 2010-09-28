@@ -297,7 +297,8 @@ BOOLEAN EditModeInit( void )
 
 	//dnl after multiplayer stuff was implemeted, editor goes to assertion when you leave editor mode, because InitGameOption() is not called anymore from InitializeGame()
 	is_networked = FALSE;
-	InitGameOptions();
+	//InitGameOptions();
+	GameInitOptionsScreenInit();
 
 	ResetCustomFileSectorSummary();//dnl ch30 150909
 

@@ -1,13 +1,35 @@
+/* 
+ * bfVFS : vfs/Core/File/vfs_file.cpp
+ *  - File with read/read-write access
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include <vfs/Core/File/vfs_file.h>
 #include <vfs/Core/vfs_debug.h>
-#include <vfs/Core/os_functions.h>
+#include <vfs/Core/vfs_os_functions.h>
 
-#include <vfs/Aspects/vfs_debugging.h>
 #include <vfs/Aspects/vfs_settings.h>
 
 #include <sys/stat.h>
 
-#define ERROR_FILE(msg)		BuildString(L"[").add(this->getPath()).add(L"] - ").add(msg).get()
+#define ERROR_FILE(msg)		(_BS(L"[") << this->getPath() << L"] - " << (msg) << _BS::wget)
 
 static inline bool hasAttrib(vfs::UInt32 const& attrib, vfs::UInt32 Attribs)
 {
@@ -16,39 +38,39 @@ static inline bool hasAttrib(vfs::UInt32 const& attrib, vfs::UInt32 Attribs)
 
 static inline void copyAttributes(vfs::UInt32 osFileAttributes, vfs::UInt32& vfsFileAttributes)
 {
-	if(os::FileAttributes::ATTRIB_ARCHIVE == (os::FileAttributes::ATTRIB_ARCHIVE & osFileAttributes))
+	if(vfs::OS::FileAttributes::ATTRIB_ARCHIVE == (vfs::OS::FileAttributes::ATTRIB_ARCHIVE & osFileAttributes))
 	{
 		vfsFileAttributes |= vfs::FileAttributes::ATTRIB_ARCHIVE;
 	}
-	if(os::FileAttributes::ATTRIB_COMPRESSED == (os::FileAttributes::ATTRIB_COMPRESSED & osFileAttributes))
+	if(vfs::OS::FileAttributes::ATTRIB_COMPRESSED == (vfs::OS::FileAttributes::ATTRIB_COMPRESSED & osFileAttributes))
 	{
 		vfsFileAttributes |= vfs::FileAttributes::ATTRIB_COMPRESSED;
 	}
-	if(os::FileAttributes::ATTRIB_DIRECTORY == (os::FileAttributes::ATTRIB_DIRECTORY & osFileAttributes))
+	if(vfs::OS::FileAttributes::ATTRIB_DIRECTORY == (vfs::OS::FileAttributes::ATTRIB_DIRECTORY & osFileAttributes))
 	{
 		vfsFileAttributes |= vfs::FileAttributes::ATTRIB_DIRECTORY;
 	}
-	if(os::FileAttributes::ATTRIB_HIDDEN == (os::FileAttributes::ATTRIB_HIDDEN & osFileAttributes))
+	if(vfs::OS::FileAttributes::ATTRIB_HIDDEN == (vfs::OS::FileAttributes::ATTRIB_HIDDEN & osFileAttributes))
 	{
 		vfsFileAttributes |= vfs::FileAttributes::ATTRIB_HIDDEN;
 	}
-	if(os::FileAttributes::ATTRIB_NORMAL == (os::FileAttributes::ATTRIB_NORMAL & osFileAttributes))
+	if(vfs::OS::FileAttributes::ATTRIB_NORMAL == (vfs::OS::FileAttributes::ATTRIB_NORMAL & osFileAttributes))
 	{
 		vfsFileAttributes |= vfs::FileAttributes::ATTRIB_NORMAL;
 	}
-	if(os::FileAttributes::ATTRIB_OFFLINE == (os::FileAttributes::ATTRIB_OFFLINE & osFileAttributes))
+	if(vfs::OS::FileAttributes::ATTRIB_OFFLINE == (vfs::OS::FileAttributes::ATTRIB_OFFLINE & osFileAttributes))
 	{
 		vfsFileAttributes |= vfs::FileAttributes::ATTRIB_OFFLINE;
 	}
-	if(os::FileAttributes::ATTRIB_READONLY == (os::FileAttributes::ATTRIB_READONLY & osFileAttributes))
+	if(vfs::OS::FileAttributes::ATTRIB_READONLY == (vfs::OS::FileAttributes::ATTRIB_READONLY & osFileAttributes))
 	{
 		vfsFileAttributes |= vfs::FileAttributes::ATTRIB_READONLY;
 	}
-	if(os::FileAttributes::ATTRIB_SYSTEM == (os::FileAttributes::ATTRIB_SYSTEM & osFileAttributes))
+	if(vfs::OS::FileAttributes::ATTRIB_SYSTEM == (vfs::OS::FileAttributes::ATTRIB_SYSTEM & osFileAttributes))
 	{
 		vfsFileAttributes |= vfs::FileAttributes::ATTRIB_SYSTEM;
 	}
-	if(os::FileAttributes::ATTRIB_TEMPORARY == (os::FileAttributes::ATTRIB_TEMPORARY & osFileAttributes))
+	if(vfs::OS::FileAttributes::ATTRIB_TEMPORARY == (vfs::OS::FileAttributes::ATTRIB_TEMPORARY & osFileAttributes))
 	{
 		vfsFileAttributes |= vfs::FileAttributes::ATTRIB_TEMPORARY;
 	}
@@ -69,7 +91,7 @@ static inline void copyAttributes(vfs::UInt32 osFileAttributes, vfs::UInt32& vfs
 		{
 			return FILE_END;
 		}
-		THROWEXCEPTION(BuildString().add(L"Unknown seek direction [").add(seekDir).add(L"]").get());
+		VFS_THROW(_BS(L"Unknown seek direction [") << seekDir << L"]" << _BS::wget);
 	}
 #else
 	static inline int _seekDir(vfs::IBaseFile::ESeekDir seekDir)
@@ -86,7 +108,7 @@ static inline void copyAttributes(vfs::UInt32 osFileAttributes, vfs::UInt32& vfs
 		{
 			return SEEK_END;
 		}
-		THROWEXCEPTION(BuildString().add(L"Unknown seek direction [").add(seekDir).add(L"]").get());
+		VFS_THROW(_BS(L"Unknown seek direction [") << seekDir << L"]" << _BS::wget);
 	}
 #endif
 
@@ -121,8 +143,7 @@ void vfs::TFile<WriteType>::close()
 			DWORD err = GetLastError();
 			if(err != NO_ERROR)
 			{
-				VFS_ON_ERROR(ERROR_FILE(BuildString(L"Could not close file : ").add(err).get()).c_str());
-				THROWEXCEPTION(ERROR_FILE(BuildString(L"Could not close file : ").add(err).get()));
+				VFS_THROW( ERROR_FILE(_BS(L"Could not close file : ") << err << _BS::wget) );
 			}
 		}
 #else
@@ -132,8 +153,7 @@ void vfs::TFile<WriteType>::close()
 		if(error)
 		{
 			//const char* error_str = perror(error);
-			VFS_ON_ERROR(ERROR_FILE(BuildString(L"Could not close file : ").add(error).get()).c_str());
-			THROWEXCEPTION(ERROR_FILE(BuildString(L"Could not close file : ").add(error).get()));
+			VFS_THROW( ERROR_FILE(_BS(L"Could not close file : ") << error << _BS::wget) );
 		}
 #endif
 		m_file = NULL;
@@ -146,11 +166,11 @@ vfs::FileAttributes vfs::TFile<WriteType>::getAttributes()
 {
 	//VFS_LOCK(m_mutex);
 	vfs::Path fullpath;
-	THROWIFFALSE(this->_getRealPath(fullpath), ERROR_FILE(L""));
+	VFS_THROW_IFF(this->_getRealPath(fullpath), ERROR_FILE(L""));
 
 	vfs::UInt32 osFileAttributes = 0;
-	os::FileAttributes fa;
-	THROWIFFALSE( fa.getFileAttributes(fullpath, osFileAttributes), ERROR_FILE(L"Could not read file attributes") );
+	vfs::OS::FileAttributes fa;
+	VFS_THROW_IFF( fa.getFileAttributes(fullpath, osFileAttributes), ERROR_FILE(L"Could not read file attributes") );
 
 	vfs::UInt32 _attribs = vfs::FileAttributes::ATTRIB_INVALID;
 	copyAttributes(osFileAttributes, _attribs);
@@ -184,7 +204,7 @@ bool vfs::TFile<WriteType>::_internalOpenRead(vfs::Path const& path)
 	DWORD err = GetLastError();
 	if(err != NO_ERROR && err != ERROR_ALREADY_EXISTS)
 	{
-		VFS_ON_ERROR(ERROR_FILE(BuildString(L"Error when opening file : ").add(err).get()).c_str());
+		VFS_LOG_ERROR( ERROR_FILE(_BS(L"Error when opening file : ") << err << _BS::wget) );
 		return m_isOpen_read = false;
 	}
 	return m_isOpen_read = true;
@@ -205,7 +225,7 @@ template<typename WriteType>
 vfs::size_t vfs::TFile<WriteType>::read(vfs::Byte* pData, vfs::size_t bytesToRead)
 {
 	//VFS_LOCK(m_mutex);
-	THROWIFFALSE( m_isOpen_read, ERROR_FILE(L"file not opened") );
+	VFS_THROW_IFF( m_isOpen_read, ERROR_FILE(L"file not opened") );
 #ifdef WIN32
 	DWORD has_read = 0;
 	if(!ReadFile(m_file, pData, bytesToRead, &has_read, NULL))
@@ -213,8 +233,7 @@ vfs::size_t vfs::TFile<WriteType>::read(vfs::Byte* pData, vfs::size_t bytesToRea
 		DWORD err = GetLastError();
 		if(err != NO_ERROR && err != ERROR_HANDLE_EOF)
 		{
-			VFS_ON_ERROR(ERROR_FILE(BuildString(L"read error : ").add(err).get()).c_str());
-			THROWEXCEPTION(ERROR_FILE(BuildString(L"read error : ").add(err).get()).c_str());
+			VFS_THROW( ERROR_FILE(_BS(L"read error : ") << err << _BS::wget) );
 		}
 	}
 #else
@@ -224,8 +243,7 @@ vfs::size_t vfs::TFile<WriteType>::read(vfs::Byte* pData, vfs::size_t bytesToRea
 		int error = ferror(m_file);
 		if(error)
 		{
-			VFS_ON_ERROR(ERROR_FILE(BuildString(L"read error : ").add(error).get()).c_str());
-			THROWEXCEPTION(ERROR_FILE(BuildString(L"read error : ").add(error).get()).c_str());
+			VFS_THROW( ERROR_FILE(_BS(L"read error : ") << error << _BS::wget) );
 		}
 		clearerr(m_file);
 	}
@@ -237,7 +255,7 @@ template<typename WriteType>
 vfs::size_t vfs::TFile<WriteType>::getReadPosition()
 {
 	//VFS_LOCK(m_mutex);
-	THROWIFFALSE( m_isOpen_read, ERROR_FILE(L"file not opened") );
+	VFS_THROW_IFF( m_isOpen_read, ERROR_FILE(L"file not opened") );
 #ifdef WIN32
 	LARGE_INTEGER current_position,zero;
 	zero.QuadPart = 0;
@@ -246,8 +264,7 @@ vfs::size_t vfs::TFile<WriteType>::getReadPosition()
 		DWORD err = GetLastError();
 		if(err != NO_ERROR)
 		{
-			VFS_ON_ERROR(ERROR_FILE(BuildString(L"set position error : ").add(err).get()).c_str());
-			THROWEXCEPTION(ERROR_FILE(BuildString(L"set position error : ").add(err).get()));
+			VFS_THROW( ERROR_FILE(_BS(L"set position error : ") << err << _BS::wget) );
 		}
 	}
 	return (vfs::size_t)current_position.QuadPart;
@@ -258,8 +275,7 @@ vfs::size_t vfs::TFile<WriteType>::getReadPosition()
 		int error = ferror(m_file);
 		if(error)
 		{
-			VFS_ON_ERROR(ERROR_FILE(BuildString(L"set position error : ").add(error).get()).c_str());
-			THROWEXCEPTION(ERROR_FILE(BuildString(L"set position error : ").add(error).get()));
+			VFS_THROW( ERROR_FILE(_BS(L"set position error : ") << error << _BS::wget) );
 		}
 	}
 	return (vfs::size_t)pos;
@@ -270,7 +286,7 @@ template<typename WriteType>
 void vfs::TFile<WriteType>::setReadPosition(vfs::size_t positionInBytes)
 {
 	//VFS_LOCK(m_mutex);
-	THROWIFFALSE( m_isOpen_read, ERROR_FILE(L"file not opened") );
+	VFS_THROW_IFF( m_isOpen_read, ERROR_FILE(L"file not opened") );
 #ifdef WIN32
 	LARGE_INTEGER pos;
 	pos.QuadPart = positionInBytes;
@@ -279,16 +295,14 @@ void vfs::TFile<WriteType>::setReadPosition(vfs::size_t positionInBytes)
 		DWORD err = GetLastError();
 		if(err != NO_ERROR)
 		{
-			VFS_ON_ERROR(ERROR_FILE(BuildString(L"set position error : ").add(err).get()).c_str());
-			THROWEXCEPTION(ERROR_FILE(BuildString(L"set position error : ").add(err).get()));
+			VFS_THROW( ERROR_FILE(_BS(L"set position error : ") << err << _BS::wget) );
 		}
 	}
 #else
 	int error = fseek(m_file,positionInBytes,SEEK_SET);
 	if(error)
 	{
-		VFS_ON_ERROR(ERROR_FILE(BuildString(L"set position error : ").add(error).get()).c_str());
-		THROWEXCEPTION(ERROR_FILE(BuildString(L"set position error : ").add(error).get()));
+		VFS_THROW( ERROR_FILE(_BS(L"set position error : ") << error << _BS::wget) );
 	}
 #endif
 }
@@ -297,10 +311,10 @@ template<typename WriteType>
 void vfs::TFile<WriteType>::setReadPosition(vfs::offset_t offsetInBytes, IBaseFile::ESeekDir seekDir)
 {
 	//VFS_LOCK(m_mutex);
-	THROWIFFALSE( m_isOpen_read, ERROR_FILE(L"file not opened") );
+	VFS_THROW_IFF( m_isOpen_read, ERROR_FILE(L"file not opened") );
 #ifdef WIN32
 	DWORD ioSeekDir;
-	TRYCATCH_RETHROW( ioSeekDir = _seekDir(seekDir), ERROR_FILE(L"seek error"));
+	VFS_TRYCATCH_RETHROW( ioSeekDir = _seekDir(seekDir), ERROR_FILE(L"seek error"));
 
 	LARGE_INTEGER offset;
 	offset.QuadPart = offsetInBytes;
@@ -309,18 +323,16 @@ void vfs::TFile<WriteType>::setReadPosition(vfs::offset_t offsetInBytes, IBaseFi
 		DWORD err = GetLastError();
 		if(err != NO_ERROR)
 		{
-			VFS_ON_ERROR(ERROR_FILE(BuildString(L"set position error : ").add(err).get()).c_str());
-			THROWEXCEPTION(ERROR_FILE(BuildString(L"set position error : ").add(err).get()).c_str());
+			VFS_THROW( ERROR_FILE(_BS(L"set position error : ") << err << _BS::wget) );
 		}
 	}
 #else
 	int ioSeekDir;
-	TRYCATCH_RETHROW( ioSeekDir = _seekDir(seekDir), ERROR_FILE(L"seek error"));
+	VFS_TRYCATCH_RETHROW( ioSeekDir = _seekDir(seekDir), ERROR_FILE(L"seek error"));
 	int error = fseek(m_file, offsetInBytes, ioSeekDir);
 	if(error)
 	{
-		VFS_ON_ERROR(ERROR_FILE(BuildString(L"set position error : ").add(error).get()).c_str());
-		THROWEXCEPTION(ERROR_FILE(BuildString(L"set position error : ").add(error).get()).c_str());
+		VFS_THROW( ERROR_FILE(_BS(L"set position error : ") << error << _BS::wget) );
 	}
 #endif
 }
@@ -354,7 +366,7 @@ bool vfs::CFile::deleteFile()
 {
 	//VFS_LOCK(m_mutex);
 	this->close();
-	return os::deleteRealFile(m_filename);
+	return vfs::OS::deleteRealFile(m_filename);
 }
 
 bool vfs::CFile::isOpenWrite()
@@ -397,7 +409,7 @@ bool vfs::CFile::_internalOpenWrite(vfs::Path const& path, bool createWhenNotExi
 	}
 	if(err != NO_ERROR && err != ERROR_ALREADY_EXISTS)
 	{
-		VFS_ON_ERROR(BuildString(L"Error when opening file - ").add(path.c_str()).add(L" - [").add(err).add(L"]").get().c_str());
+		VFS_LOG_ERROR(_BS(L"Error when opening file - ") << path << L" - [" << err << L"]" << _BS::wget);
 		return m_isOpen_write = false;
 	}
 	return m_isOpen_write = true;
@@ -421,7 +433,7 @@ bool vfs::CFile::openWrite(bool createWhenNotExist, bool truncate)
 vfs::size_t vfs::CFile::write(const vfs::Byte* data, vfs::size_t bytesToWrite)
 {
 	//VFS_LOCK(m_mutex);
-	THROWIFFALSE( m_isOpen_write, ERROR_FILE(L"file not opened") );
+	VFS_THROW_IFF( m_isOpen_write, ERROR_FILE(L"file not opened") );
 #ifdef WIN32
 	DWORD has_written = 0;
 	if(!WriteFile(m_file, data, bytesToWrite, &has_written, NULL))
@@ -429,8 +441,7 @@ vfs::size_t vfs::CFile::write(const vfs::Byte* data, vfs::size_t bytesToWrite)
 		DWORD err = GetLastError();
 		if(err != NO_ERROR)
 		{
-			VFS_ON_ERROR(BuildString(L"write error : ").add(err).get().c_str());
-			THROWEXCEPTION(BuildString(L"write error : ").add(err).get());
+			VFS_THROW(_BS(L"write error : ") << err << _BS::wget);
 		}
 	}
 #else
@@ -440,8 +451,7 @@ vfs::size_t vfs::CFile::write(const vfs::Byte* data, vfs::size_t bytesToWrite)
 		int error = ferror(m_file);
 		if(error)
 		{
-			VFS_ON_ERROR(BuildString(L"write error : ").add(error).get().c_str());
-			THROWEXCEPTION(BuildString(L"write error : ").add(error).get());
+			VFS_THROW(_BS(L"write error : ") << error << _BS::wget);
 		}
 	}
 
@@ -452,7 +462,7 @@ vfs::size_t vfs::CFile::write(const vfs::Byte* data, vfs::size_t bytesToWrite)
 vfs::size_t vfs::CFile::getWritePosition()
 {
 	//VFS_LOCK(m_mutex);
-	THROWIFFALSE( m_isOpen_write, ERROR_FILE(L"file not opened") );
+	VFS_THROW_IFF( m_isOpen_write, ERROR_FILE(L"file not opened") );
 #ifdef WIN32
 	LARGE_INTEGER current_position, zero;
 	zero.QuadPart = 0;
@@ -461,8 +471,7 @@ vfs::size_t vfs::CFile::getWritePosition()
 		DWORD err = GetLastError();
 		if(err != NO_ERROR)
 		{
-			VFS_ON_ERROR(ERROR_FILE(BuildString(L"set position error : ").add(err).get()).c_str());
-			THROWEXCEPTION(ERROR_FILE(BuildString(L"set position error : ").add(err).get()));
+			VFS_THROW( ERROR_FILE(_BS(L"set position error : ") << err << _BS::wget) );
 		}
 	}
 	return (vfs::size_t)current_position.QuadPart;
@@ -473,8 +482,7 @@ vfs::size_t vfs::CFile::getWritePosition()
 		int error = ferror(m_file);
 		if(error)
 		{
-			VFS_ON_ERROR(ERROR_FILE(BuildString(L"set position error : ").add(error).get()).c_str());
-			THROWEXCEPTION(ERROR_FILE(BuildString(L"set position error : ").add(error).get()));
+			VFS_THROW( ERROR_FILE(_BS(L"set position error : ") << error << _BS::wget) );
 		}
 	}
 	return (vfs::size_t)pos;
@@ -484,7 +492,7 @@ vfs::size_t vfs::CFile::getWritePosition()
 void vfs::CFile::setWritePosition(vfs::size_t positionInBytes)
 {
 	//VFS_LOCK(m_mutex);
-	THROWIFFALSE( m_isOpen_write, ERROR_FILE(L"file not opened") );
+	VFS_THROW_IFF( m_isOpen_write, ERROR_FILE(L"file not opened") );
 #ifdef WIN32
 	LARGE_INTEGER pos;
 	pos.QuadPart = positionInBytes;
@@ -493,16 +501,14 @@ void vfs::CFile::setWritePosition(vfs::size_t positionInBytes)
 		DWORD err = GetLastError();
 		if(err != NO_ERROR)
 		{
-			VFS_ON_ERROR(ERROR_FILE(BuildString(L"set position error : ").add(err).get()).c_str());
-			THROWEXCEPTION(ERROR_FILE(BuildString(L"set position error : ").add(err).get()));
+			VFS_THROW( ERROR_FILE(_BS(L"set position error : ") << err << _BS::wget) );
 		}
 	}
 #else
 	int error = fseek(m_file,positionInBytes,SEEK_SET);
 	if(error)
 	{
-		VFS_ON_ERROR(ERROR_FILE(BuildString(L"set position error : ").add(error).get()).c_str());
-		THROWEXCEPTION(ERROR_FILE(BuildString(L"set position error : ").add(error).get()));
+		VFS_THROW( ERROR_FILE(_BS(L"set position error : ") << error << _BS::wget) );
 	}
 #endif
 }
@@ -510,10 +516,10 @@ void vfs::CFile::setWritePosition(vfs::size_t positionInBytes)
 void vfs::CFile::setWritePosition(vfs::offset_t offsetInBytes, vfs::IBaseFile::ESeekDir seekDir)
 {
 	//VFS_LOCK(m_mutex);
-	THROWIFFALSE( m_isOpen_write, ERROR_FILE(L"file not opened") );
+	VFS_THROW_IFF( m_isOpen_write, ERROR_FILE(L"file not opened") );
 #ifdef WIN32
 	DWORD ioSeekDir;
-	TRYCATCH_RETHROW( ioSeekDir = _seekDir(seekDir), ERROR_FILE(L"seek error"));
+	VFS_TRYCATCH_RETHROW( ioSeekDir = _seekDir(seekDir), ERROR_FILE(L"seek error"));
 
 	LARGE_INTEGER offset;
 	offset.QuadPart = offsetInBytes;
@@ -522,18 +528,16 @@ void vfs::CFile::setWritePosition(vfs::offset_t offsetInBytes, vfs::IBaseFile::E
 		DWORD err = GetLastError();
 		if(err != NO_ERROR)
 		{
-			VFS_ON_ERROR(ERROR_FILE(BuildString(L"set position error : ").add(err).get()).c_str());
-			THROWEXCEPTION(ERROR_FILE(BuildString(L"set position error : ").add(err).get()));
+			VFS_THROW( ERROR_FILE(_BS(L"set position error : ") << err << _BS::wget) );
 		}
 	}
 #else
 	int ioSeekDir;
-	TRYCATCH_RETHROW( ioSeekDir = _seekDir(seekDir), ERROR_FILE(L"seek error"));
+	VFS_TRYCATCH_RETHROW( ioSeekDir = _seekDir(seekDir), ERROR_FILE(L"seek error"));
 	int error = fseek(m_file, offsetInBytes, ioSeekDir);
 	if(error)
 	{
-		VFS_ON_ERROR(ERROR_FILE(BuildString(L"set position error : ").add(error).get()).c_str());
-		THROWEXCEPTION(ERROR_FILE(BuildString(L"set position error : ").add(error).get()).c_str());
+		VFS_THROW( ERROR_FILE(_BS(L"set position error : ") << error << _BS::wget) );
 	}
 #endif
 }
@@ -550,7 +554,7 @@ vfs::size_t vfs::TFile<T>::getSize()
 	}
 	else
 	{
-		THROWIFFALSE(this->openRead(),ERROR_FILE(L"could not open file"));
+		VFS_THROW_IFF(this->openRead(),ERROR_FILE(L"could not open file"));
 	}
 	vfs::size_t size;
 #	ifdef _MSC_VER
@@ -560,8 +564,7 @@ vfs::size_t vfs::TFile<T>::getSize()
 			DWORD err = GetLastError();
 			if(err != NO_ERROR)
 			{
-				VFS_ON_ERROR(ERROR_FILE(BuildString(L"get size error : ").add(err).get()).c_str());
-				THROWEXCEPTION(ERROR_FILE(BuildString(L"get size error : ").add(err).get()));
+				VFS_THROW( ERROR_FILE(_BS(L"get size error : ") << err << _BS::wget) );
 			}
 		}
 		size = (vfs::size_t)li_size.QuadPart;
@@ -573,8 +576,7 @@ vfs::size_t vfs::TFile<T>::getSize()
 			DWORD err = GetLastError();
 			if(err != NO_ERROR)
 			{
-				VFS_ON_ERROR(ERROR_FILE(BuildString(L"get size error : ").add(err).get()).c_str());
-				THROWEXCEPTION(ERROR_FILE(BuildString(L"get size error : ").add(err).get()));
+				VFS_THROW( ERROR_FILE(_BS(L"get size error : ") << err << _BS::wget) );
 			}
 		}
 		size = low_part;
@@ -588,7 +590,7 @@ vfs::size_t vfs::TFile<T>::getSize()
 	// if file was alredy opened, keep it open, otherwise close it
 	bool closeAtExit = !m_isOpen_read;
 
-	THROWIFFALSE( m_isOpen_read || this->openRead(), ERROR_FILE(L"could not open file") )
+	VFS_THROW_IFF( m_isOpen_read || this->openRead(), ERROR_FILE(L"could not open file") )
 
 	// save current position 
 	long int current_position = ftell(m_file);
@@ -599,7 +601,7 @@ vfs::size_t vfs::TFile<T>::getSize()
 
 	// move to old position
 	fseek(m_file, current_position, SEEK_SET);
-	THROWIFFALSE(current_position == ftell(m_file), ERROR_FILE(L"could not restore seek position"));
+	VFS_THROW_IFF(current_position == ftell(m_file), ERROR_FILE(L"could not restore seek position"));
 
 	if(closeAtExit)
 	{
@@ -613,4 +615,5 @@ vfs::size_t vfs::TFile<T>::getSize()
 /******************************************************************/
 
 template class vfs::TFile<vfs::IWriteType>;
+template class vfs::TFile<vfs::IWritable>;
 

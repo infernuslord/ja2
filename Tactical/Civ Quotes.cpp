@@ -384,8 +384,7 @@ void QuoteOverlayClickCallback( MOUSE_REGION * pRegion, INT32 iReason )
 void BeginCivQuote( SOLDIERTYPE *pCiv, UINT16 ubCivQuoteID, UINT16 ubEntryID, INT16 sX, INT16 sY )
 {
 	VIDEO_OVERLAY_DESC		VideoOverlayDesc;
-	CHAR16									zQuote[ 320 ];
-	UINT16 iCounter2,FileEDTQUoteID;
+	CHAR16					zQuote[ 320 ];	
 	
 	// OK, do we have another on?
 	if ( gCivQuoteData.bActive )
@@ -608,7 +607,6 @@ UINT16 DetermineCivQuoteEntry( SOLDIERTYPE *pCiv, UINT16 *pubCivHintToUse, BOOLE
 		}
 	}
 
-	
 	// Are we in a town sector?
 	// get town id
 	bTownId = GetTownIdForSector( gWorldSectorX, gWorldSectorY );
@@ -1019,3 +1017,135 @@ BOOLEAN LoadCivQuotesFromLoadGameFile( HWFILE hFile )
 	return( TRUE );
 }
 //--------------------------------------------------------------
+
+// SANDRO - soldier taunts 
+void StartEnemyTaunt( SOLDIERTYPE *pCiv, INT8 iTauntType )
+{
+	INT16	sX, sY;
+	UINT8	ubEntryID = 0;
+	INT16	sScreenX, sScreenY;
+	UINT16	iTauntNumber;
+	STR16	sTauntText;
+	VIDEO_OVERLAY_DESC		VideoOverlayDesc;
+	CHAR16	gzTauntQuote[ 320 ];
+
+	// if we have a different quote on, return, this one is not important
+	if ( gCivQuoteData.bActive )
+	{
+		return;
+	}
+
+	switch(iTauntType)
+	{
+		case TAUNT_FIRE_GUN:
+			iTauntNumber = Random(15);
+			sTauntText = sEnemyTauntsFireGun[iTauntNumber];
+			break;
+		case TAUNT_FIRE_LAUNCHER:
+			iTauntNumber = Random(4);
+			sTauntText = sEnemyTauntsFireLauncher[iTauntNumber];
+			break;
+		case TAUNT_THROW:
+			iTauntNumber = Random(7);
+			sTauntText = sEnemyTauntsThrow[iTauntNumber];
+			break;
+		case TAUNT_CHARGE_KNIFE:
+			iTauntNumber = Random(5);
+			sTauntText = sEnemyTauntsChargeKnife[iTauntNumber];
+			break;
+		case TAUNT_RUN_AWAY:
+			iTauntNumber = Random(7);
+			sTauntText = sEnemyTauntsRunAway[iTauntNumber];
+			break;
+		case TAUNT_SEEK_NOISE:
+			iTauntNumber = Random(4);
+			sTauntText = sEnemyTauntsSeekNoise[iTauntNumber];
+			break;
+		case TAUNT_ALERT:
+			iTauntNumber = Random(3);
+			sTauntText = sEnemyTauntsAlert[iTauntNumber];
+			break;
+		case TAUNT_GOT_HIT:
+			iTauntNumber = Random(7);
+			sTauntText = sEnemyTauntsGotHit[iTauntNumber];
+			break;
+		default:
+			return;
+			break;
+	}
+
+	// Determine location...
+	// Get location of civ on screen.....
+	GetSoldierScreenPos( pCiv, &sScreenX, &sScreenY );
+	sX = sScreenX;
+	sY = sScreenY;
+
+#ifdef TAIWANESE
+	swprintf( gzTauntQuote, L"%s", sTauntText );
+#else
+	swprintf( gzTauntQuote, L"\"%s\"", sTauntText );
+#endif
+
+	// Create video oeverlay....
+	memset( &VideoOverlayDesc, 0, sizeof( VIDEO_OVERLAY_DESC ) );
+
+	// Prepare text box
+	gCivQuoteData.iDialogueBox = PrepareMercPopupBox( gCivQuoteData.iDialogueBox , BASIC_MERC_POPUP_BACKGROUND, BASIC_MERC_POPUP_BORDER, gzTauntQuote, DIALOGUE_DEFAULT_WIDTH, 0, 0, 0, &gusCivQuoteBoxWidth, &gusCivQuoteBoxHeight );
+
+	// OK, find center for box......
+	sX = sX - ( gusCivQuoteBoxWidth / 2 );
+	sY = sY - ( gusCivQuoteBoxHeight / 2 );
+
+	// OK, limit to screen......
+	{
+		if ( sX < 0 )
+		{
+			sX = 0;
+		}
+
+		// CHECK FOR LEFT/RIGHT
+		if ( ( sX + gusCivQuoteBoxWidth ) > SCREEN_WIDTH )
+		{
+			sX = SCREEN_WIDTH - gusCivQuoteBoxWidth;
+		}
+
+		// Now check for top
+		if ( sY < gsVIEWPORT_WINDOW_START_Y )
+		{
+			sY = gsVIEWPORT_WINDOW_START_Y;
+		}
+
+		// Check for bottom
+		if ( ( sY + gusCivQuoteBoxHeight ) > (SCREEN_HEIGHT - INV_INTERFACE_HEIGHT))
+		{
+			sY = (SCREEN_HEIGHT - INV_INTERFACE_HEIGHT) - gusCivQuoteBoxHeight;
+		}
+	}
+
+	VideoOverlayDesc.sLeft			= sX;
+	VideoOverlayDesc.sTop				= sY;
+	VideoOverlayDesc.sRight			= VideoOverlayDesc.sLeft + gusCivQuoteBoxWidth;
+	VideoOverlayDesc.sBottom		= VideoOverlayDesc.sTop + gusCivQuoteBoxHeight;
+	VideoOverlayDesc.sX					= VideoOverlayDesc.sLeft;
+	VideoOverlayDesc.sY					= VideoOverlayDesc.sTop;
+	VideoOverlayDesc.BltCallback = RenderCivQuoteBoxOverlay;
+
+	gCivQuoteData.iVideoOverlay =	RegisterVideoOverlay( 0, &VideoOverlayDesc );
+
+
+	//Define main region
+	MSYS_DefineRegion( &(gCivQuoteData.MouseRegion), VideoOverlayDesc.sLeft, VideoOverlayDesc.sTop,	VideoOverlayDesc.sRight, VideoOverlayDesc.sBottom, MSYS_PRIORITY_HIGHEST,
+						CURSOR_NORMAL, MSYS_NO_CALLBACK, QuoteOverlayClickCallback );
+	// Add region
+	MSYS_AddRegion( &(gCivQuoteData.MouseRegion) );
+
+
+	gCivQuoteData.bActive = TRUE;
+
+	gCivQuoteData.uiTimeOfCreation = GetJA2Clock( );
+
+	gCivQuoteData.uiDelayTime = FindDelayForString( gzCivQuote ) + 1500;
+
+	gCivQuoteData.pCiv = pCiv;
+
+}

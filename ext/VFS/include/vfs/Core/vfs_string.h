@@ -1,3 +1,27 @@
+/* 
+ * bfVFS : vfs/Core/vfs_string.h
+ *  - string class that allows conversions to/from Unicode representation (uses wchar_t internally)
+ *  - comparison, concatenation, stream output class/functions
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #ifndef _VFS_STRING_H_
 #define _VFS_STRING_H_
 
@@ -95,9 +119,10 @@ namespace vfs
 {
 	VFS_API bool			operator<(vfs::String const& s1, vfs::String const& s2);
 }
-VFS_API std::wstringstream& operator<<(std::wstringstream& out, vfs::String const& str);
-VFS_API std::wstringstream& operator<<(std::wstringstream& out, vfs::String::str_t const& str);
-VFS_API std::wstringstream& operator<<(std::wstringstream& out, const vfs::String::char_t* str);
+
+VFS_API std::wostream& operator<<(std::wostream& out, vfs::String const& str);
+VFS_API std::wostream& operator<<(std::wostream& out, vfs::String::str_t const& str);
+VFS_API std::wostream& operator<<(std::wostream& out, const vfs::String::char_t* str);
 
 namespace vfs
 {
@@ -143,8 +168,19 @@ namespace vfs
 class VFS_API BuildString
 {
 public:
+	enum _cget{cget};
+	enum _wget{wget};
 	BuildString()
 	{}
+
+	std::string operator<<(_cget)
+	{
+		return vfs::String::as_utf8(_strstr.str());
+	}
+	std::wstring operator<<(_wget)
+	{
+		return _strstr.str();
+	}
 
 	BuildString(BuildString const& bs)
 	{
@@ -162,6 +198,12 @@ public:
 		_strstr << value;
 		return *this;
 	}
+	template<typename T>
+	BuildString&				operator<<(T const& value)
+	{
+		_strstr << value;
+		return *this;
+	}
 
 	vfs::String::str_t			get()
 	{
@@ -171,12 +213,21 @@ private:
 	std::basic_stringstream<vfs::String::char_t> _strstr;
 };
 
+typedef BuildString _BS;
+
 template<>
 VFS_API BuildString& BuildString::add<vfs::String>(vfs::String const& value);
 template<>
 VFS_API BuildString& BuildString::add<std::string>(std::string const& value);
 template<>
 VFS_API BuildString& BuildString::add<const char*>(const char* const& value);
+
+template<>
+VFS_API BuildString& BuildString::operator<< <vfs::String>(vfs::String const& value);
+template<>
+VFS_API BuildString& BuildString::operator<< <std::string>(std::string const& value);
+template<>
+VFS_API BuildString& BuildString::operator<< <const char*>(const char* const& value);
 
 
 #endif // _VFS_STRING_H_

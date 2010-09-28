@@ -87,7 +87,8 @@ profileStartElementHandle(void *userData, const XML_Char *name, const XML_Char *
 				strcmp(name, "ubBodyType") == 0 ||
 				strcmp(name, "uiBodyTypeSubFlags") == 0 ||
 				strcmp(name, "bAttitude") == 0 ||
-				strcmp(name, "bPersonalityTrait") == 0 ||
+				strcmp(name, "bCharacterTrait") == 0 || // added by SANDRO
+				strcmp(name, "bDisability") == 0 ||
 				strcmp(name, "ubNeedForSleep") == 0 ||
 				strcmp(name, "bReputationTolerance") == 0 ||
 				strcmp(name, "bDeathRate") == 0 ||
@@ -104,8 +105,13 @@ profileStartElementHandle(void *userData, const XML_Char *name, const XML_Char *
 				strcmp(name, "bMechanical") == 0 ||
 				strcmp(name, "bExpLevel") == 0 ||
 				strcmp(name, "bEvolution") == 0 ||
-				strcmp(name, "bSkillTrait") == 0 ||
-				strcmp(name, "bSkillTrait2") == 0 ||
+				// added by SANDRO
+				strcmp(name, "bOldSkillTrait") == 0 ||
+				strcmp(name, "bOldSkillTrait2") == 0 ||
+				strcmp(name, "bNewSkillTrait1") == 0 ||
+				strcmp(name, "bNewSkillTrait2") == 0 ||
+				strcmp(name, "bNewSkillTrait3") == 0 ||
+
 				strcmp(name, "bBuddy1") == 0 ||
 				strcmp(name, "bBuddy2") == 0 ||
 				strcmp(name, "bBuddy3") == 0 ||
@@ -210,7 +216,8 @@ profileEndElementHandle(void *userData, const XML_Char *name)
 					tempProfiles[pData->curIndex].uiBodyTypeSubFlags = pData->curProfile.uiBodyTypeSubFlags;
 
 					tempProfiles[pData->curIndex].bAttitude = pData->curProfile.bAttitude;
-					tempProfiles[pData->curIndex].bPersonalityTrait = pData->curProfile.bPersonalityTrait;
+					tempProfiles[pData->curIndex].bCharacterTrait = pData->curProfile.bCharacterTrait; // added by SANDRO
+					tempProfiles[pData->curIndex].bDisability = pData->curProfile.bDisability;
 					tempProfiles[pData->curIndex].ubNeedForSleep = pData->curProfile.ubNeedForSleep;
 					tempProfiles[pData->curIndex].bReputationTolerance = pData->curProfile.bReputationTolerance;
 					tempProfiles[pData->curIndex].bDeathRate = pData->curProfile.bDeathRate;
@@ -229,8 +236,13 @@ profileEndElementHandle(void *userData, const XML_Char *name)
 					tempProfiles[pData->curIndex].bExpLevel = pData->curProfile.bExpLevel;
 
 					tempProfiles[pData->curIndex].bEvolution = pData->curProfile.bEvolution;
-					tempProfiles[pData->curIndex].bSkillTrait = pData->curProfile.bSkillTrait;
-					tempProfiles[pData->curIndex].bSkillTrait2 = pData->curProfile.bSkillTrait2;
+					// added by SANDRO
+					tempProfiles[pData->curIndex].bOldSkillTrait = pData->curProfile.bOldSkillTrait;
+					tempProfiles[pData->curIndex].bOldSkillTrait2 = pData->curProfile.bOldSkillTrait2;
+					tempProfiles[pData->curIndex].bNewSkillTrait1 = pData->curProfile.bNewSkillTrait1;
+					tempProfiles[pData->curIndex].bNewSkillTrait2 = pData->curProfile.bNewSkillTrait2;
+					tempProfiles[pData->curIndex].bNewSkillTrait3 = pData->curProfile.bNewSkillTrait3;
+
 
 					memcpy( &(tempProfiles[pData->curIndex].bBuddy), &(pData->curProfile.bBuddy), 5 * sizeof (INT8));
 					tempProfiles[pData->curIndex].bLearnToLike = pData->curProfile.bLearnToLike;
@@ -380,11 +392,17 @@ profileEndElementHandle(void *userData, const XML_Char *name)
 			pData->curElement = ELEMENT;
 			pData->curProfile.bAttitude = (UINT32) atol(pData->szCharData);
 		}
-
-		else if(strcmp(name, "bPersonalityTrait") == 0)
+		// SANDRO - added Character Trait
+		else if(strcmp(name, "bCharacterTrait") == 0)
 		{
 			pData->curElement = ELEMENT;
-			pData->curProfile.bPersonalityTrait = (UINT32) atol(pData->szCharData);
+			pData->curProfile.bCharacterTrait = (UINT32) atol(pData->szCharData);
+		}
+
+		else if(strcmp(name, "bDisability") == 0)
+		{
+			pData->curElement = ELEMENT;
+			pData->curProfile.bDisability = (UINT32) atol(pData->szCharData);
 		}
 
 		else if(strcmp(name, "ubNeedForSleep") == 0)
@@ -482,18 +500,38 @@ profileEndElementHandle(void *userData, const XML_Char *name)
 			pData->curElement = ELEMENT;
 			pData->curProfile.bEvolution = (UINT32) atol(pData->szCharData);
 		}
-		
-		else if(strcmp(name, "bSkillTrait") == 0)
+		////////////////////////////////////////////////////////////////////////////
+		// SANDRO was here - messed this a bit
+		else if(strcmp(name, "bOldSkillTrait") == 0)
 		{
 			pData->curElement = ELEMENT;
-			pData->curProfile.bSkillTrait = (UINT32) atol(pData->szCharData);
+			pData->curProfile.bOldSkillTrait = (UINT32) atol(pData->szCharData);
 		}
 		
-		else if(strcmp(name, "bSkillTrait2") == 0)
+		else if(strcmp(name, "bOldSkillTrait2") == 0)
 		{
 			pData->curElement = ELEMENT;
-			pData->curProfile.bSkillTrait2 = (UINT32) atol(pData->szCharData);
+			pData->curProfile.bOldSkillTrait2 = (UINT32) atol(pData->szCharData);
 		}
+
+		else if(strcmp(name, "bNewSkillTrait1") == 0)
+		{
+			pData->curElement = ELEMENT;
+			pData->curProfile.bNewSkillTrait1 = (UINT32) atol(pData->szCharData);
+		}
+		
+		else if(strcmp(name, "bNewSkillTrait2") == 0)
+		{
+			pData->curElement = ELEMENT;
+			pData->curProfile.bNewSkillTrait2 = (UINT32) atol(pData->szCharData);
+		}
+		
+		else if(strcmp(name, "bNewSkillTrait3") == 0)
+		{
+			pData->curElement = ELEMENT;
+			pData->curProfile.bNewSkillTrait3 = (UINT32) atol(pData->szCharData);
+		}
+		////////////////////////////////////////////////////////////////////////////
 
 		else if(strcmp(name, "bBuddy1") == 0)
 		{
@@ -1127,7 +1165,9 @@ BOOLEAN WriteMercProfiles()
 			FilePrintf(hFile,"\t\t<uiBodyTypeSubFlags>%d</uiBodyTypeSubFlags>\r\n", gMercProfiles[ cnt ].uiBodyTypeSubFlags);
 
 			FilePrintf(hFile,"\t\t<bAttitude>%d</bAttitude>\r\n", gMercProfiles[ cnt ].bAttitude);
-			FilePrintf(hFile,"\t\t<bPersonalityTrait>%d</bPersonalityTrait>\r\n", gMercProfiles[ cnt ].bPersonalityTrait);
+			// Added by SANDRO
+			FilePrintf(hFile,"\t\t<bCharacterTrait>%d</bCharacterTrait>\r\n", gMercProfiles[ cnt ].bCharacterTrait);
+			FilePrintf(hFile,"\t\t<bDisability>%d</bDisability>\r\n", gMercProfiles[ cnt ].bDisability);
 			FilePrintf(hFile,"\t\t<ubNeedForSleep>%d</ubNeedForSleep>\r\n", gMercProfiles[ cnt ].ubNeedForSleep);
 
 			FilePrintf(hFile,"\t\t<bReputationTolerance>%d</bReputationTolerance>\r\n", gMercProfiles[ cnt ].bReputationTolerance);
@@ -1146,8 +1186,25 @@ BOOLEAN WriteMercProfiles()
 			FilePrintf(hFile,"\t\t<bMechanical>%d</bMechanical>\r\n", gMercProfiles[ cnt ].bMechanical);
 			FilePrintf(hFile,"\t\t<bExpLevel>%d</bExpLevel>\r\n", gMercProfiles[ cnt ].bExpLevel);
 			FilePrintf(hFile,"\t\t<bEvolution>%d</bEvolution>\r\n", gMercProfiles[ cnt ].bEvolution);
-			FilePrintf(hFile,"\t\t<bSkillTrait>%d</bSkillTrait>\r\n", gMercProfiles[ cnt ].bSkillTrait);
-			FilePrintf(hFile,"\t\t<bSkillTrait2>%d</bSkillTrait2>\r\n", gMercProfiles[ cnt ].bSkillTrait2);
+			////////////////////////////////////////////////////////////////////////////////////////////
+			// SANDRO - old/new traits
+			if (gGameOptions.fNewTraitSystem)
+			{
+				FilePrintf(hFile,"\t\t<bOldSkillTrait>%d</bOldSkillTrait>\r\n", 0);
+				FilePrintf(hFile,"\t\t<bOldSkillTrait2>%d</bOldSkillTrait2>\r\n", 0);
+				FilePrintf(hFile,"\t\t<bNewSkillTrait1>%d</bNewSkillTrait1>\r\n", gMercProfiles[ cnt ].bSkillTrait);
+				FilePrintf(hFile,"\t\t<bNewSkillTrait2>%d</bNewSkillTrait2>\r\n", gMercProfiles[ cnt ].bSkillTrait2);
+				FilePrintf(hFile,"\t\t<bNewSkillTrait3>%d</bNewSkillTrait3>\r\n", gMercProfiles[ cnt ].bSkillTrait3);
+			}
+			else
+			{
+				FilePrintf(hFile,"\t\t<bOldSkillTrait>%d</bOldSkillTrait>\r\n", gMercProfiles[ cnt ].bSkillTrait);
+				FilePrintf(hFile,"\t\t<bOldSkillTrait2>%d</bOldSkillTrait2>\r\n", gMercProfiles[ cnt ].bSkillTrait2);
+				FilePrintf(hFile,"\t\t<bNewSkillTrait1>%d</bNewSkillTrait1>\r\n", 0);
+				FilePrintf(hFile,"\t\t<bNewSkillTrait2>%d</bNewSkillTrait2>\r\n", 0);
+				FilePrintf(hFile,"\t\t<bNewSkillTrait3>%d</bNewSkillTrait3>\r\n", 0);
+			}
+			////////////////////////////////////////////////////////////////////////////////////////////
 
 			FilePrintf(hFile,"\t\t<bBuddy1>%d</bBuddy1>\r\n", gMercProfiles[ cnt ].bBuddy[0]);
 			FilePrintf(hFile,"\t\t<bBuddy2>%d</bBuddy2>\r\n", gMercProfiles[ cnt ].bBuddy[1]);

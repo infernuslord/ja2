@@ -524,6 +524,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sgp_logger.h"
+				>
+			</File>
+			<File
 				RelativePath="shading.h"
 				>
 			</File>
@@ -745,6 +749,10 @@
 			</File>
 			<File
 				RelativePath="sgp.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\sgp_logger.cpp"
 				>
 			</File>
 			<File

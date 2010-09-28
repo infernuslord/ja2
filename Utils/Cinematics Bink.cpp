@@ -206,7 +206,7 @@ BINKFLIC *BinkOpenFlic( const CHAR8 *cFilename )
 		}
 		catch(std::exception& ex)
 		{
-	//		SGP_RETHROW(_BS(L"Intro file \"") << filename << L"\" could not be extracted" << _BS::wget, ex);
+			SGP_RETHROW(_BS(L"Intro file \"") << filename << L"\" could not be extracted" << _BS::wget, ex);
 		}
 	}
 #endif
@@ -225,7 +225,7 @@ BINKFLIC *BinkOpenFlic( const CHAR8 *cFilename )
 	}
 	catch(std::exception& ex)
 	{
-//		SGP_RETHROW(L"Temporary intro file could not be read", ex);
+		SGP_RETHROW(L"Temporary intro file could not be read", ex);
 	}
 	if( !( pBink->BinkHandle = BinkOpen(tempfilename.to_string().c_str(), BINKNOTHREADEDIO /*BINKFILEHANDLE*/ ) ) ) //| SMACKTRACKS 
 #endif

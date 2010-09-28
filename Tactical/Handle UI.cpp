@@ -92,6 +92,11 @@
 
 #include "teamturns.h"
 
+//////////////////////////////////////////////////////////////////////////////
+// SANDRO - In this file, all APBPConstants[AP_CROUCH] and APBPConstants[AP_PRONE] were changed to GetAPsCrouch() and GetAPsProne()
+//			On the bottom here, there are these functions made
+//////////////////////////////////////////////////////////////////////
+
 //extern BOOLEAN gfDisplayFullCountRingBurst;
 extern UINT16 PickSoldierReadyAnimation( SOLDIERTYPE *pSoldier, BOOLEAN fEndReady );
 
@@ -492,7 +497,7 @@ void GetMercOknoDirection( UINT8 ubSoldierID, BOOLEAN *pfGoDown, BOOLEAN *pfGoUp
 		return;
 	}
 
-	if ( pSoldier->pathing.bLevel == 0 )
+	if ( pSoldier->pathing.bLevel == 0 && ( pSoldier->ubDirection == NORTH || pSoldier->ubDirection == EAST || pSoldier->ubDirection == SOUTH || pSoldier->ubDirection == WEST ))
 	{
 		if ( FindHeigherLevelOkno( pSoldier, pSoldier->sGridNo, pSoldier->ubDirection, &bNewDirection ) )
 		{
@@ -2615,6 +2620,30 @@ void AttackRequesterCallback( UINT8 bExitValue )
 	}
 }
 
+// SANDRO - added function
+void SurgeryRequesterCallback( UINT8 bExitValue )
+{
+	if( bExitValue == MSG_BOX_RETURN_YES )
+	{
+		//gpRequesterMerc->ubSurgeryApprovalMerc = gpRequesterTargetMerc->ubID;
+		gTacticalStatus.ubLastRequesterSurgeryTargetID = gpRequesterTargetMerc->ubID;
+
+		UIHandleMercAttack( gpRequesterMerc , gpRequesterTargetMerc, gsRequesterGridNo );
+	}
+	else if( bExitValue == MSG_BOX_RETURN_NO )
+	{
+		gTacticalStatus.ubLastRequesterSurgeryTargetID = NOBODY;
+
+		if (!gpRequesterTargetMerc->bBleeding && gpRequesterTargetMerc->stats.bLife >= OKLIFE)
+		{
+			ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_UI_FEEDBACK, TacticalStr[ CANNOT_NO_NEED_FIRST_AID_STR ], gpRequesterTargetMerc->name );
+		}
+		else
+		{
+			UIHandleMercAttack( gpRequesterMerc , gpRequesterTargetMerc, gsRequesterGridNo );
+		}
+	}
+}
 
 UINT32 UIHandleCAMercShoot( UI_EVENT *pUIEvent )
 {
@@ -2659,6 +2688,30 @@ UINT32 UIHandleCAMercShoot( UI_EVENT *pUIEvent )
 					DoMessageBox( MSG_BOX_BASIC_STYLE, zStr, GAME_SCREEN, ( UINT8 )MSG_BOX_FLAG_YESNO, AttackRequesterCallback, NULL );
 
 				}
+				////////////////////////////////////////////////////////////////////////////////////////////////
+				// SANDRO - Should we ask if we really want to do the surgery?
+				else if (Item[ pSoldier->inv[ HANDPOS ].usItem ].medicalkit && (NUM_SKILL_TRAITS( pSoldier, DOCTOR_NT ) >= gSkillTraitValues.ubDONumberTraitsNeededForSurgery)
+					&& (pTSoldier->bTeam == OUR_TEAM || pTSoldier->bTeam == MILITIA_TEAM) 
+					&& (IS_MERC_BODY_TYPE( pTSoldier ) || IS_CIV_BODY_TYPE( pTSoldier )) 
+					&& gGameOptions.fNewTraitSystem && pTSoldier->iHealableInjury >= 100 
+					&& pTSoldier->ubID != pSoldier->ubID && gTacticalStatus.ubLastRequesterSurgeryTargetID != pTSoldier->ubID )
+				{
+					CHAR16	zStr[200];
+
+					gpRequesterMerc			= pSoldier;
+					gpRequesterTargetMerc = pTSoldier;
+					gsRequesterGridNo = usMapPos;
+	
+					fDidRequester = TRUE;
+	
+					if (pTSoldier->bBleeding)
+						swprintf( zStr, New113Message[ MSG113_DO_WE_WANT_SURGERY_FIRST ], pTSoldier->name, (pTSoldier->iHealableInjury * (gSkillTraitValues.ubDOSurgeryHealPercentBase + gSkillTraitValues.ubDOSurgeryHealPercentOnTop * NUM_SKILL_TRAITS( pSoldier, DOCTOR_NT )) / 10000) );
+					else
+						swprintf( zStr, New113Message[ MSG113_DO_WE_WANT_SURGERY ], pTSoldier->name, (pTSoldier->iHealableInjury * (gSkillTraitValues.ubDOSurgeryHealPercentBase + gSkillTraitValues.ubDOSurgeryHealPercentOnTop * NUM_SKILL_TRAITS( pSoldier, DOCTOR_NT )) / 10000) );
+
+					DoMessageBox( MSG_BOX_BASIC_STYLE, zStr, GAME_SCREEN, ( UINT8 )MSG_BOX_FLAG_YESNO, SurgeryRequesterCallback, NULL );
+				}
+				////////////////////////////////////////////////////////////////////////////////////////////////
 			}
 
 			if ( !fDidRequester )
@@ -3849,7 +3902,7 @@ INT8 DrawUIMovementPath( SOLDIERTYPE *pSoldier, INT32 usMapPos, UINT32 uiFlags )
 			{
 				sActionGridNo = sIntTileGridNo;
 			}
-			CalcInteractiveObjectAPs( sIntTileGridNo, pStructure, &sAPCost, &sBPCost );
+			CalcInteractiveObjectAPs( pSoldier, sIntTileGridNo, pStructure, &sAPCost, &sBPCost ); // SANDRO - added argument
 			//sAPCost += UIPlotPath( pSoldier, sActionGridNo, NO_COPYROUTE, PLOT, TEMPORARY, (UINT16)pSoldier->usUIMovementMode, NOT_STEALTH, FORWARD, pSoldier->bActionPoints);
 			sAPCost += UIPlotPath( pSoldier, sActionGridNo, NO_COPYROUTE, fPlot, TEMPORARY, (UINT16)pSoldier->usUIMovementMode, NOT_STEALTH, FORWARD, pSoldier->bActionPoints);
 
@@ -4081,7 +4134,23 @@ INT8 DrawUIMovementPath( SOLDIERTYPE *pSoldier, INT32 usMapPos, UINT32 uiFlags )
 			{
 				sActionGridNo = sAdjustedGridNo;
 			}
-			sAPCost += APBPConstants[AP_STEAL_ITEM];
+
+			/////////////////////////////////////////////////////////////////////////////////////////
+			// CHANGED BY SANDRO - REDUCE AP COST TO STEAL FOR MARTIAL ARTS AND HAND TO HAND NEW TRAITS
+			if (MercPtrs[ gusUIFullTargetID ]->bCollapsed && gGameExternalOptions.fEnhancedCloseCombatSystem)
+			{
+				sAPCost += (GetBasicAPsToPickupItem( pSoldier )); // stealing from collapsed soldiers is treated differently
+			}
+			else if ((HAS_SKILL_TRAIT( pSoldier, MARTIAL_ARTS_NT )) && ( gGameOptions.fNewTraitSystem ))
+			{
+				sAPCost += max( 1, (INT16)((APBPConstants[AP_STEAL_ITEM] *  (100 - gSkillTraitValues.ubMAReducedAPsToSteal * NUM_SKILL_TRAITS( pSoldier, MARTIAL_ARTS_NT ))/ 100) + 0.5));
+			}
+			else
+			{
+				sAPCost += APBPConstants[AP_STEAL_ITEM];
+			}
+			/////////////////////////////////////////////////////////////////////////////////////////
+
 			// CJC August 13 2002: take into account stance in AP prediction
 			if (!(PTR_STANDING))
 			{
@@ -4145,12 +4214,12 @@ INT8 DrawUIMovementPath( SOLDIERTYPE *pSoldier, INT32 usMapPos, UINT32 uiFlags )
 					sAPCost += UIPlotPath( pSoldier, sActionGridNo, NO_COPYROUTE, fPlot, TEMPORARY, (UINT16)pSoldier->usUIMovementMode, NOT_STEALTH, FORWARD, pSoldier->bActionPoints);
 					if ( sAPCost != 0 )
 					{
-						sAPCost += APBPConstants[AP_PICKUP_ITEM];
+						sAPCost += GetBasicAPsToPickupItem( pSoldier ); // SANDRO
 					}
 				}
 				else
 				{
-					sAPCost += APBPConstants[AP_PICKUP_ITEM];
+					sAPCost += GetBasicAPsToPickupItem( pSoldier ); // SANDRO
 				}
 
 				if ( sActionGridNo != pSoldier->sGridNo )
@@ -4193,19 +4262,21 @@ INT16 APsToTurnAround(SOLDIERTYPE *pSoldier, INT16 sAdjustedGridNo)
 	{
 		if ( gAnimControl[ pSoldier->usAnimState ].uiFlags & ( ANIM_BREATH | ANIM_OK_CHARGE_AP_FOR_TURN | ANIM_FIREREADY ) && !fInitalMove && !pSoldier->flags.fDontChargeTurningAPs )
 		{
-			// Which position has the soldier?
-			switch( gAnimControl[ pSoldier->usAnimState ].ubEndHeight )
-			{
-			case ANIM_STAND:
-				sAPCost += APBPConstants[AP_LOOK_STANDING];
-				break;
-			case ANIM_CROUCH:
-				sAPCost += APBPConstants[AP_LOOK_CROUCHED];
-				break;
-			case ANIM_PRONE:
-				sAPCost += APBPConstants[AP_LOOK_PRONE];
-				break;
-			}
+			// SANDRO - hey, we have a function for this, why not to use it, huh?
+			sAPCost += GetAPsToLook( pSoldier );
+			//// Which position has the soldier?
+			//switch( gAnimControl[ pSoldier->usAnimState ].ubEndHeight )
+			//{
+			//case ANIM_STAND:
+			//	sAPCost += APBPConstants[AP_LOOK_STANDING];
+			//	break;
+			//case ANIM_CROUCH:
+			//	sAPCost += APBPConstants[AP_LOOK_CROUCHED];
+			//	break;
+			//case ANIM_PRONE:
+			//	sAPCost += APBPConstants[AP_LOOK_PRONE];
+			//	break;
+			//}
 		}
 	}
 
@@ -4360,18 +4431,27 @@ BOOLEAN UIMouseOnValidAttackLocation( SOLDIERTYPE *pSoldier )
 			return( FALSE );
 		}
 
-	if ( pTSoldier->bBleeding == 0 && pTSoldier->stats.bLife != pTSoldier->stats.bLifeMax )
-	{
-			ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_UI_FEEDBACK, gzLateLocalizedString[ 19 ], pTSoldier->name );
-			return( FALSE );
-		}
-
-		if ( pTSoldier->bBleeding == 0 && pTSoldier->stats.bLife >= OKLIFE )
+		// SANDRO - doctor with medical bag trying to do the surgery
+		if ((NUM_SKILL_TRAITS( pSoldier, DOCTOR_NT ) >= gSkillTraitValues.ubDONumberTraitsNeededForSurgery) && Item[pSoldier->inv[ HANDPOS ].usItem].medicalkit && gGameOptions.fNewTraitSystem
+			&& (pTSoldier->stats.bLife != pTSoldier->stats.bLifeMax) && (pTSoldier->iHealableInjury >= 100))
 		{
-			ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_UI_FEEDBACK, TacticalStr[ CANNOT_NO_NEED_FIRST_AID_STR ], pTSoldier->name );
-			return( FALSE );
+			// should come a question first if you really want to do the surgery
+			return( TRUE );
 		}
+		else
+		{
+			if ( pTSoldier->bBleeding == 0 && pTSoldier->stats.bLife != pTSoldier->stats.bLifeMax )
+			{
+				ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_UI_FEEDBACK, gzLateLocalizedString[ 19 ], pTSoldier->name );
+				return( FALSE );
+			}
 
+			if ( pTSoldier->bBleeding == 0 && pTSoldier->stats.bLife >= OKLIFE )
+			{
+				ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_UI_FEEDBACK, TacticalStr[ CANNOT_NO_NEED_FIRST_AID_STR ], pTSoldier->name );
+				return( FALSE );
+			}
+		}
 	}
 
 	return( TRUE );
@@ -4425,42 +4505,42 @@ BOOLEAN SoldierCanAffordNewStance( SOLDIERTYPE *pSoldier, UINT8 ubDesiredStance 
 		if((UsingNewInventorySystem() == true))
 			if(pSoldier->inv[BPACKPOCKPOS].exists() == true && !pSoldier->flags.ZipperFlag)
 				bAP = bBP = 1;
-		bAP += APBPConstants[AP_CROUCH];
+		bAP += GetAPsCrouch(pSoldier, FALSE);
 		bBP += APBPConstants[BP_CROUCH];
 		break;
 	case ANIM_CROUCH - ANIM_STAND:
 		if((UsingNewInventorySystem() == true))
 			if(pSoldier->inv[BPACKPOCKPOS].exists() == true && !pSoldier->flags.ZipperFlag)
 				bAP = bBP = 2;
-		bAP += APBPConstants[AP_CROUCH];
+		bAP += GetAPsCrouch(pSoldier, FALSE);
 		bBP += APBPConstants[BP_CROUCH];
 		break;
 	case ANIM_STAND - ANIM_PRONE:
 		if((UsingNewInventorySystem() == true))
 			if(pSoldier->inv[BPACKPOCKPOS].exists() == true && !pSoldier->flags.ZipperFlag)
 				bAP = bBP = 2;
-		bAP += APBPConstants[AP_CROUCH] + APBPConstants[AP_PRONE];
+		bAP += GetAPsCrouch(pSoldier, FALSE) + GetAPsProne(pSoldier, FALSE);
 		bBP += APBPConstants[BP_CROUCH] + APBPConstants[BP_PRONE];
 		break;
 	case ANIM_PRONE - ANIM_STAND:
 		if((UsingNewInventorySystem() == true))
 			if(pSoldier->inv[BPACKPOCKPOS].exists() == true && !pSoldier->flags.ZipperFlag)
 				bAP = bBP = 4;
-		bAP += APBPConstants[AP_CROUCH] + APBPConstants[AP_PRONE];
+		bAP += GetAPsCrouch(pSoldier, FALSE) + GetAPsProne(pSoldier, FALSE);
 		bBP += APBPConstants[BP_CROUCH] + APBPConstants[BP_PRONE];
 		break;
 	case ANIM_CROUCH - ANIM_PRONE:
 		if((UsingNewInventorySystem() == true))
 			if(pSoldier->inv[BPACKPOCKPOS].exists() == true && !pSoldier->flags.ZipperFlag)
 				bAP = bBP = 1;
-		bAP += APBPConstants[AP_PRONE];
+		bAP += GetAPsProne(pSoldier, FALSE);
 		bBP += APBPConstants[BP_PRONE];
 		break;
 	case ANIM_PRONE - ANIM_CROUCH:
 		if((UsingNewInventorySystem() == true))
 			if(pSoldier->inv[BPACKPOCKPOS].exists() == true && !pSoldier->flags.ZipperFlag)
 				bAP = bBP = 2;
-		bAP += APBPConstants[AP_PRONE];
+		bAP += GetAPsProne(pSoldier, FALSE);
 		bBP += APBPConstants[BP_PRONE];
 		break;
 

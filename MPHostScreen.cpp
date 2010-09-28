@@ -33,7 +33,7 @@
 #include <vfs/Core/vfs.h>
 #include <vfs/Core/vfs_init.h>
 #include <vfs/Tools/vfs_property_container.h>
-#include <vfs/Core/os_functions.h>
+#include <vfs/Core/vfs_os_functions.h>
 #include "MPJoinScreen.h"
 #include "MainMenuScreen.h"
 #include "Init.h"
@@ -619,7 +619,7 @@ bool	ValidateMPSettings()
 
 #ifdef USE_VFS
 	vfs::Path sUserDir(gzFileTransferDirectory);
-	if(!os::createRealDirectory(sUserDir,true))
+	if(!vfs::OS::checkRealDirectory(sUserDir))
 	{
 		DoMPHMessageBox( MSG_BOX_BASIC_STYLE, gzMPHScreenText[MPH_FILE_TRANSFER_DIR_NOT_EXIST], MP_HOST_SCREEN, MSG_BOX_FLAG_OK, NULL );
 		return false;
@@ -649,6 +649,8 @@ bool	ValidateMPSettings()
 
 UINT32	MPHostScreenInit( void )
 {
+	memset( &gGameOptions, 0, sizeof( GAME_OPTIONS ) );
+
 	// this is wrong as ScreenInit is called at game start, but the settigs can change anytime
 	// has be called in ScreenEnter for example
 	std::vector<CHAR16> szTime(6,0);
@@ -1330,9 +1332,7 @@ void			GetMPHScreenUserInput()
 					if (ValidateMPSettings())
 					{
 						SaveMPSettings(); // Update Profiles/UserProfile/ja2_mp.ini
-#ifdef USE_VFS
-						TRYCATCH_RETHROW( ja2::mp::InitializeMultiplayerProfile(vfs::Path(gzFileTransferDirectory)), L"" );
-#endif
+						SGP_TRYCATCH_RETHROW( ja2::mp::InitializeMultiplayerProfile(vfs::Path(gzFileTransferDirectory)), L"" );
 						gubMPHScreenHandler = MPH_START;
 					}
 					break;
@@ -1359,9 +1359,7 @@ void BtnMPHStartCallback(GUI_BUTTON *btn,INT32 reason)
 		{
 			gubMPHScreenHandler = MPH_START;
 			SaveMPSettings(); // Update the Profiles/UserProfile/ja2_mp.ini
-#ifdef USE_VFS
-			TRYCATCH_RETHROW( ja2::mp::InitializeMultiplayerProfile(vfs::Path(gzFileTransferDirectory)), L"" );
-#endif
+			SGP_TRYCATCH_RETHROW( ja2::mp::InitializeMultiplayerProfile(vfs::Path(gzFileTransferDirectory)), L"" );
 
 			// The difficult level has to be set there. This is the only value so far, because it is used for initialization!
 			gGameOptions.ubDifficultyLevel = GetMPHCurrentDifficultyButtonSetting();

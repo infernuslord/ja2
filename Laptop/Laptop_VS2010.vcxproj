@@ -64,7 +64,8 @@
     <ClInclude Include="IMP Disability Trait.h" />
     <ClInclude Include="IMP Finish.h" />
     <ClInclude Include="IMP HomePage.h" />
-    <ClInclude Include="IMP MainPage.h" />
+    <ClInclude Include="IMP MainPage.h" />    
+    <ClInclude Include="IMP Minor Trait.h" />
     <ClInclude Include="IMP Personality Entrance.h" />
     <ClInclude Include="IMP Personality Finish.h" />
     <ClInclude Include="IMP Personality Quiz.h" />
@@ -133,7 +134,8 @@
     <ClCompile Include="IMP Disability Trait.cpp" />
     <ClCompile Include="IMP Finish.cpp" />
     <ClCompile Include="IMP HomePage.cpp" />
-    <ClCompile Include="IMP MainPage.cpp" />
+    <ClCompile Include="IMP MainPage.cpp" />  
+    <ClCompile Include="IMP Minor Trait.cpp" />
     <ClCompile Include="IMP Personality Entrance.cpp" />
     <ClCompile Include="IMP Personality Finish.cpp" />
     <ClCompile Include="IMP Personality Quiz.cpp" />

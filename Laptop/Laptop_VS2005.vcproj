@@ -504,6 +504,10 @@
 			</File>
 			<File
 				RelativePath=".\IMP MainPage.h"
+				>   
+			</File>
+			<File         
+				RelativePath=".\IMP Minor Trait.h"
 				>
 			</File>
 			<File
@@ -774,6 +778,10 @@
 			</File>
 			<File
 				RelativePath=".\IMP MainPage.cpp"
+				>
+			</File> 
+			<File
+				RelativePath=".\IMP Minor Trait.cpp"
 				>
 			</File>
 			<File

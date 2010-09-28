@@ -34,7 +34,7 @@
 #include <vfs/Core/vfs.h>
 #include <vfs/Core/vfs_init.h>
 #include <vfs/Tools/vfs_property_container.h>
-#include <vfs/Core/os_functions.h>
+#include <vfs/Core/vfs_os_functions.h>
 
 #include "Random.h"
 
@@ -221,7 +221,7 @@ void MpIniExists()
 {
 	if(!getVFS()->fileExists(L"Ja2_mp.ini"))
 	{
-		THROWIFFALSE(getVFS()->createNewFile(L"Ja2_mp.ini"),L"could not create file : Ja2_mp.ini");
+		SGP_THROW_IFFALSE(getVFS()->createNewFile(L"Ja2_mp.ini"),L"could not create file : Ja2_mp.ini");
 		vfs::tWritableFile* file = getVFS()->getWriteFile(L"Ja2_mp.ini");
 		if(file)
 		{
@@ -362,9 +362,9 @@ bool	ValidateJoinSettings(bool bSkipServerAddress, bool bSkipSyncDir)
 			CreateDirectoryA(syncDir, NULL);
 		}
 #else
-		if(os::createRealDirectory(vfs::Path(L"Multiplayer")))
+		if(vfs::OS::createRealDirectory(vfs::Path(L"Multiplayer")))
 		{
-			os::createRealDirectory(vfs::Path(L"Multiplayer/Servers"));
+			vfs::OS::createRealDirectory(vfs::Path(L"Multiplayer/Servers"));
 		}
 #endif
 	}

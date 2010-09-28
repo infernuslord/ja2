@@ -7,7 +7,7 @@
 
 #include <vfs/Core/vfs.h>
 #include <vfs/Core/vfs_file_raii.h>
-#include <vfs/Core/File/vfs_memory_file.h>
+#include <vfs/Core/File/vfs_buffer_file.h>
 #include <vfs/Ext/slf/vfs_slf_library.h>
 #include <vfs/Ext/7z/vfs_create_7z_library.h>
 
@@ -36,7 +36,7 @@ bool ja2xp::convertSLFto7z(vfs::tReadableFile* pInFile, vfs::tWritableFile *pOut
 	for(; !it.end(); it.next())
 	{
 		count++;
-		vfs::CMemoryFile* temp_file = NULL;
+		vfs::CBufferFile* temp_file = NULL;
 		vfs::tReadableFile *file = vfs::tReadableFile::cast(it.value());
 		if(bConvertSTIs)
 		{
@@ -44,7 +44,7 @@ bool ja2xp::convertSLFto7z(vfs::tReadableFile* pInFile, vfs::tWritableFile *pOut
 			if(vfs::StrCmp::Equal(filename().substr(filename().length()-4,4), L".sti"))
 			{
 				vfs::Path path = filename().substr(0,filename.length()-4) + L".jpc.7z";
-				temp_file = new vfs::CMemoryFile(path);
+				temp_file = new vfs::CBufferFile(path);
 				if(convertSTItoJPC(vfs::tReadableFile::cast(it.value()), vfs::tWritableFile::cast(temp_file), bPngOffsets, false))
 				{
 					file = vfs::tReadableFile::cast( temp_file );
@@ -161,7 +161,7 @@ void ja2xp::CExportSLF::handleCommand(param_list_t const& params)
 	{
 		convertSLFto7z(vfs.srcPattern(), vfs.dstPattern(), opt_Sti2Png, opt_PngOffsets);
 	}
-	catch(CBasicException& msg)
+	catch(vfs::Exception& msg)
 	{
 		std::wcout << msg.getLastEntryString().c_str() << std::endl;
 	}

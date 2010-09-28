@@ -163,18 +163,6 @@ BOOLEAN InitializeGame(void)
 	//Loads the saved (if any) general JA2 game settings
 	LoadGameSettings();
 
-	//Initialize the Game options ( Gun nut, scifi and dif. levels
-
-	// WANNE - MP: Moved InitGameOptions() to MainMenuScreen::MenuButtonCallback()
-	// because in this function "is_networked" is not set, so it is too early!
-	//InitGameOptions();
-
-	// preload mapscreen graphics
-	// OJW - Temporarily disabliing this as is_networked is not set up yet
-	// <TODO> see if there is a better place we can pre-load the gfx if nessesary
-	// or perhaps just reload the bits that will change
-	//HandlePreloadOfMapGraphics( );
-
 	guiCurrentScreen = INIT_SCREEN;
 
 	return TRUE;

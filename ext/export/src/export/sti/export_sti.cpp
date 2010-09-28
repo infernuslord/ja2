@@ -181,7 +181,7 @@ void ja2xp::CExportSTI::handleCommand(CExportSTI::param_list_t const& params)
 	{
 		convertSTItoJPC(vfs.srcPattern(), vfs.dstPattern(), opt_Packed, opt_ExportOffsets, opt_OnePng, opt_Rgba);
 	}
-	catch(CBasicException& msg)
+	catch(vfs::Exception& msg)
 	{
 		std::wcout << msg.getLastEntryString().c_wcs() << std::endl;
 	}

@@ -248,7 +248,7 @@ void MercDailyUpdate()
 			// CJC: For some personalities, reset personality quote said flag
 			if ( pSoldier->ubProfile != NO_PROFILE )
 			{
-				switch( gMercProfiles[ pSoldier->ubProfile ].bPersonalityTrait )
+				switch( gMercProfiles[ pSoldier->ubProfile ].bDisability )
 				{
 					case HEAT_INTOLERANT:
 					case CLAUSTROPHOBIC:
@@ -505,8 +505,8 @@ void MercDailyUpdate()
 						pProfile->ubMiscFlags3 |= PROFILE_MISC_FLAG3_PLAYER_HAD_CHANCE_TO_HIRE;
 					}
 				}
-
-				if (Random(100) < uiChance)
+				// tais: disable mercs being on assignment
+				if (Random(100) < uiChance && gGameExternalOptions.fMercsOnAssignment < 2)
 				{
 					pProfile->bMercStatus = MERC_WORKING_ELSEWHERE;
 					pProfile->uiDayBecomesAvailable = 1 + Random(6 + (pProfile->bExpLevel / 2) );		// 1-(6 to 11) days
@@ -1116,72 +1116,177 @@ void HourlyCamouflageUpdate( void )
 	{
 		if ( pSoldier->bActive )
 		{
-			// if the merc has non-zero camo, degrade it by 1%
-			if( ( pSoldier->bCamo > 0) && ( !( HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED) ) ) )
+			// SANDRO - new Ranger trait reduces camo degrading, which replaces camouflage trait
+			// may be a little awkward solution with chances, but can work
+			if (gGameOptions.fNewTraitSystem)
 			{
-				pSoldier->bCamo -= 2;
-				if (pSoldier->bCamo <= 0)
+				if( pSoldier->bCamo > 0 )
 				{
-					pSoldier->bCamo = 0;
-					camoWoreOff = TRUE;
-					
-					if (gGameExternalOptions.fShowCamouflageFaces == TRUE )
+					if (HAS_SKILL_TRAIT( pSoldier, RANGER_NT ))
 					{
-					//legion camo, remove camo face and create face
-					gCamoFace[pSoldier->ubProfile].gCamoface = FALSE;
-					DeleteSoldierFace( pSoldier );
-					pSoldier->iFaceIndex = InitSoldierFace( pSoldier );
+						pSoldier->bCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+						pSoldier->bCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
 					}
-				}
-			}
-			if( ( pSoldier->urbanCamo > 0) && ( !( HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_URBAN) ) ) )
-			{
-				pSoldier->urbanCamo -= 2;
-				if (pSoldier->urbanCamo <= 0)
-				{
-					pSoldier->urbanCamo = 0;
-					camoWoreOff = TRUE;
-					
-					if (gGameExternalOptions.fShowCamouflageFaces == TRUE )
-					{
-					//legion camo, remove camo face and create new face
-					gCamoFace[pSoldier->ubProfile].gUrbanCamoface = FALSE;
-					DeleteSoldierFace( pSoldier );
-					pSoldier->iFaceIndex = InitSoldierFace( pSoldier );
-					}
-				}
-			}
-			if( ( pSoldier->desertCamo > 0) && ( !( HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_DESERT) ) ) )
-			{
-				pSoldier->desertCamo -= 2;
-				if (pSoldier->desertCamo <= 0)
-				{
-					pSoldier->desertCamo = 0;
-					camoWoreOff = TRUE;
+					else
+						pSoldier->bCamo -= 2;
 
-					if (gGameExternalOptions.fShowCamouflageFaces == TRUE )
+					if (pSoldier->bCamo <= 0)
 					{
-					//legion camo, remove camo face and create new face
-					gCamoFace[pSoldier->ubProfile].gDesertCamoface = FALSE;
-					DeleteSoldierFace( pSoldier );
-					pSoldier->iFaceIndex = InitSoldierFace( pSoldier );
+						pSoldier->bCamo = 0;
+						camoWoreOff = TRUE;
+
+						if (gGameExternalOptions.fShowCamouflageFaces == TRUE )
+						{
+							//legion camo, remove camo face and create face
+							gCamoFace[pSoldier->ubProfile].gCamoface = FALSE;
+							DeleteSoldierFace( pSoldier );
+							pSoldier->iFaceIndex = InitSoldierFace( pSoldier );
+						}
+					}
+				}
+				if( pSoldier->urbanCamo > 0 )
+				{
+					if (HAS_SKILL_TRAIT( pSoldier, RANGER_NT ))
+					{
+						pSoldier->urbanCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+						pSoldier->urbanCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+					}
+					else
+						pSoldier->urbanCamo -= 2;
+
+					if (pSoldier->urbanCamo <= 0)
+					{
+						pSoldier->urbanCamo = 0;
+						camoWoreOff = TRUE;
+
+						if (gGameExternalOptions.fShowCamouflageFaces == TRUE )
+						{
+							//legion camo, remove camo face and create face
+							gCamoFace[pSoldier->ubProfile].gUrbanCamoface = FALSE;
+							DeleteSoldierFace( pSoldier );
+							pSoldier->iFaceIndex = InitSoldierFace( pSoldier );
+						}
+					}
+				}
+				if( pSoldier->desertCamo > 0 )
+				{
+					if (HAS_SKILL_TRAIT( pSoldier, RANGER_NT ))
+					{
+						pSoldier->desertCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+						pSoldier->desertCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+					}
+					else
+						pSoldier->desertCamo -= 2;
+
+					if (pSoldier->desertCamo <= 0)
+					{
+						pSoldier->desertCamo = 0;
+						camoWoreOff = TRUE;
+
+						if (gGameExternalOptions.fShowCamouflageFaces == TRUE )
+						{
+							//legion camo, remove camo face and create face
+							gCamoFace[pSoldier->ubProfile].gDesertCamoface = FALSE;
+							DeleteSoldierFace( pSoldier );
+							pSoldier->iFaceIndex = InitSoldierFace( pSoldier );
+						}
+					}
+				}
+				if( pSoldier->snowCamo > 0 )
+				{
+					if (HAS_SKILL_TRAIT( pSoldier, RANGER_NT ))
+					{
+						pSoldier->snowCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+						pSoldier->snowCamo -= (Chance(__max(0, 100 - gSkillTraitValues.ubRACamoWornountSpeedReduction * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ))) ? 1 : 0 );
+					}
+					else
+						pSoldier->snowCamo -= 2;
+
+					if (pSoldier->snowCamo <= 0)
+					{
+						pSoldier->snowCamo = 0;
+						camoWoreOff = TRUE;
+
+						if (gGameExternalOptions.fShowCamouflageFaces == TRUE )
+						{
+							//legion camo, remove camo face and create face
+							gCamoFace[pSoldier->ubProfile].gSnowCamoface = FALSE;
+							DeleteSoldierFace( pSoldier );
+							pSoldier->iFaceIndex = InitSoldierFace( pSoldier );
+						}
 					}
 				}
 			}
-			if( ( pSoldier->snowCamo > 0) && ( !( HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_SNOW) ) ) )
+			else
 			{
-				pSoldier->snowCamo -= 2;
-				if (pSoldier->snowCamo <= 0)
+				// if the merc has non-zero camo, degrade it by 1%
+				// SANDRO - different types of Camouflaged trait have been merged together
+				if( ( pSoldier->bCamo > 0) && ( !( HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_OT) ) ) )
 				{
-					pSoldier->snowCamo = 0;
-					camoWoreOff = TRUE;
-					
-					if (gGameExternalOptions.fShowCamouflageFaces == TRUE )
-					{					
-					//legion camo, remove camo face and create new face
-					gCamoFace[pSoldier->ubProfile].gSnowCamoface = FALSE;
-					DeleteSoldierFace( pSoldier );// remove face
-					pSoldier->iFaceIndex = InitSoldierFace( pSoldier );// create new face
+					pSoldier->bCamo -= 2;
+					if (pSoldier->bCamo <= 0)
+					{
+						pSoldier->bCamo = 0;
+						camoWoreOff = TRUE;
+
+						if (gGameExternalOptions.fShowCamouflageFaces == TRUE )
+						{
+							//legion camo, remove camo face and create face
+							gCamoFace[pSoldier->ubProfile].gCamoface = FALSE;
+							DeleteSoldierFace( pSoldier );
+							pSoldier->iFaceIndex = InitSoldierFace( pSoldier );
+						}
+					}
+				}
+				if( ( pSoldier->urbanCamo > 0) && ( !( HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_OT) ) ) )
+				{
+					pSoldier->urbanCamo -= 2;
+					if (pSoldier->urbanCamo <= 0)
+					{
+						pSoldier->urbanCamo = 0;
+						camoWoreOff = TRUE;
+
+						if (gGameExternalOptions.fShowCamouflageFaces == TRUE )
+						{
+							//legion camo, remove camo face and create face
+							gCamoFace[pSoldier->ubProfile].gUrbanCamoface = FALSE;
+							DeleteSoldierFace( pSoldier );
+							pSoldier->iFaceIndex = InitSoldierFace( pSoldier );
+						}
+					}
+				}
+				if( ( pSoldier->desertCamo > 0) && ( !( HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_OT) ) ) )
+				{
+					pSoldier->desertCamo -= 2;
+					if (pSoldier->desertCamo <= 0)
+					{
+						pSoldier->desertCamo = 0;
+						camoWoreOff = TRUE;
+
+						if (gGameExternalOptions.fShowCamouflageFaces == TRUE )
+						{
+							//legion camo, remove camo face and create face
+							gCamoFace[pSoldier->ubProfile].gDesertCamoface = FALSE;
+							DeleteSoldierFace( pSoldier );
+							pSoldier->iFaceIndex = InitSoldierFace( pSoldier );
+						}
+					}
+				}
+				if( ( pSoldier->snowCamo > 0) && ( !( HAS_SKILL_TRAIT( pSoldier, CAMOUFLAGED_OT) ) ) )
+				{
+					pSoldier->snowCamo -= 2;
+					if (pSoldier->snowCamo <= 0)
+					{
+						pSoldier->snowCamo = 0;
+						camoWoreOff = TRUE;
+
+						if (gGameExternalOptions.fShowCamouflageFaces == TRUE )
+						{
+							//legion camo, remove camo face and create face
+							gCamoFace[pSoldier->ubProfile].gSnowCamoface = FALSE;
+							DeleteSoldierFace( pSoldier );
+							pSoldier->iFaceIndex = InitSoldierFace( pSoldier );
+						}
 					}
 				}
 			}

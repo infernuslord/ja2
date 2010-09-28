@@ -421,7 +421,7 @@ void ProcessPlayerInputActivationString( void )
 			return;
 		}
 
-		if (CountFilledIMPSlots(-1) < gGameExternalOptions.iMaxIMPCharacters)
+		if (CountFilledIMPSlots(-1) < gGameOptions.ubMaxIMPCharacters)
 		{
 			// Kaiden: Need to reset skills, attributes and personalities with the new UB Method.
 			ResetSkillsAttributesAndPersonality( );
@@ -443,7 +443,7 @@ void ProcessPlayerInputActivationString( void )
 			return;
 		}
 
-		if (CountFilledIMPSlots(-1) < gGameExternalOptions.iMaxIMPCharacters)
+		if (CountFilledIMPSlots(-1) < gGameOptions.ubMaxIMPCharacters)
 		{
 			if (LoadImpCharacter( IMP_MERC_FILENAME ) == TRUE)
 			{
@@ -469,7 +469,7 @@ void ProcessPlayerInputActivationString( void )
 			return;
 		}
 
-		if (CountFilledIMPSlots(-1) < gGameExternalOptions.iMaxIMPCharacters)
+		if (CountFilledIMPSlots(-1) < gGameOptions.ubMaxIMPCharacters)
 		{
 			if (LoadImpCharacter( charPlayerActivationString ) == TRUE)
 			{

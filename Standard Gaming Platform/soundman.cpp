@@ -21,6 +21,7 @@
 	#include "random.h"
 	#include "fmod.h"
 	#include "fmod_errors.h"
+	#include "sgp_logger.h"
 #endif
 
 // Uncomment this to disable the startup of sound hardware
@@ -1801,14 +1802,16 @@ UINT32 uiCount;
 	return(FALSE);
 }
 
-#include <vfs/Core/vfs.h>
-#include <vfs/Tools/vfs_log.h>
-
 // Lesh modifications
 // Sound debug
-#ifdef USE_VFS
-static vfs::Log& s_SoundLog = *vfs::Log::create(SndDebugFileName,true);
-#endif
+static struct SoundLog {
+	sgp::Logger_ID id;
+	SoundLog() {
+		id = sgp::Logger::instance().createLogger();
+		sgp::Logger::instance().connectFile(id, SndDebugFileName, true, sgp::Logger::FLUSH_ON_DELETE);
+	}
+} s_SoundLog;
+
 //*****************************************************************************************
 // SoundLog
 //	Writes string into log file
@@ -1826,7 +1829,7 @@ void SoundLog(CHAR8 *strMessage)
 		fclose(SndDebug);
 	}
 #else
-	s_SoundLog << strMessage << vfs::Log::endl;
+	SGP_LOG(s_SoundLog.id, vfs::String::widen(strMessage,strlen(strMessage)));
 #endif
 }
 

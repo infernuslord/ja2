@@ -1582,7 +1582,7 @@ BOOLEAN StandardInterruptConditionsMet( SOLDIERTYPE * pSoldier, UINT8 ubOpponent
 			// if the soldier isn't currently crouching
 			if (!PTR_CROUCHED)
 			{
-				ubMinPtsNeeded = APBPConstants[AP_CROUCH];
+				ubMinPtsNeeded = GetAPsCrouch(pSoldier, TRUE); // Changed from APBPConstants[AP_CROUCH] - SANDRO
 			}
 			else
 			{
@@ -1751,13 +1751,33 @@ INT8 CalcInterruptDuelPts( SOLDIERTYPE * pSoldier, UINT8 ubOpponentID, BOOLEAN f
 		iPoints -= 2;
 	}
 
-	if ( HAS_SKILL_TRAIT( pSoldier, NIGHTOPS ) )
+	if (gGameOptions.fNewTraitSystem) // new/old traits check - SANDRO
 	{
-		bLightLevel = LightTrueLevel(pSoldier->sGridNo, pSoldier->pathing.bLevel);
-		if (bLightLevel > NORMAL_LIGHTLEVEL_DAY + 3)
+		if ( HAS_SKILL_TRAIT( pSoldier, NIGHT_OPS_NT ) )
 		{
-			// it's dark, give a bonus for interrupts
-			iPoints += 1 * NUM_SKILL_TRAITS( pSoldier, NIGHTOPS );
+			bLightLevel = LightTrueLevel(pSoldier->sGridNo, pSoldier->pathing.bLevel);
+			if (bLightLevel > NORMAL_LIGHTLEVEL_DAY + 3)
+			{
+				// it's dark, give a bonus for interrupts
+				iPoints += gSkillTraitValues.ubNOIterruptsBonusInDark;
+			}
+		}
+		// Phlegmatics get a small penalty to interrupts
+		if ( gMercProfiles[ pSoldier->ubProfile ].bCharacterTrait == CHAR_TRAIT_PHLEGMATIC )
+		{
+			iPoints -= 1;
+		}
+	}
+	else
+	{
+		if ( HAS_SKILL_TRAIT( pSoldier, NIGHTOPS_OT ) )
+		{
+			bLightLevel = LightTrueLevel(pSoldier->sGridNo, pSoldier->pathing.bLevel);
+			if (bLightLevel > NORMAL_LIGHTLEVEL_DAY + 3)
+			{
+				// it's dark, give a bonus for interrupts
+				iPoints += 1 * NUM_SKILL_TRAITS( pSoldier, NIGHTOPS_OT );
+			}
 		}
 	}
 

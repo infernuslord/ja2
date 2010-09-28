@@ -1,14 +1,37 @@
+/* 
+ * bfVFS : vfs/Tools/vfs_property_container.cpp
+ *  - <string,string> key-value map with capability to convert values to other types
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include <vfs/vfs_config.h>
-#include <vfs/Tools/vfs_property_container.h>
 
 #include <vfs/Core/vfs.h>
-#include <vfs/Core/File/vfs_file.h>
-#include <vfs/Core/File/vfs_memory_file.h>
 #include <vfs/Core/vfs_file_raii.h>
-#include <vfs/Core/os_functions.h>
+#include <vfs/Core/vfs_os_functions.h>
+#include <vfs/Core/File/vfs_file.h>
+#include <vfs/Core/File/vfs_buffer_file.h>
 
 #include <vfs/Tools/vfs_tools.h>
 #include <vfs/Tools/vfs_parser_tools.h>
+#include <vfs/Tools/vfs_property_container.h>
 
 #include <sstream>
 #include <vector>
@@ -89,7 +112,7 @@ vfs::PropertyContainer::EOperation vfs::PropertyContainer::extractKeyValue(vfs::
 	vfs::size_t iEqual = readStr.find_first_of(L"+=", startPos);
 	if(iEqual == vfs::npos)
 	{
-		//std::cout << "WARNING : could not extract key-value pair : " << readStr << std::endl;
+		VFS_LOG_WARNING(_BS("WARNING : could not extract key-value pair : ") << readStr << _BS::wget);
 		return vfs::PropertyContainer::Error;
 	}
 	// extract key
@@ -119,7 +142,11 @@ bool vfs::PropertyContainer::initFromIniFile(vfs::Path const& sFileName)
 	else
 	{
 		vfs::CFile file(sFileName);
-		return initFromIniFile(vfs::tReadableFile::cast(&file));
+		if(file.openRead())
+		{
+			return initFromIniFile(vfs::tReadableFile::cast(&file));
+		}
+		return false;
 	}
 }
 
@@ -162,12 +189,10 @@ bool vfs::PropertyContainer::initFromIniFile(vfs::tReadableFile *pFile)
 					{
 						vfs::String::as_utf16(sBuffer.substr(iStart, sBuffer.length()-iStart), u8s.r_wcs());
 					}
-					catch(CBasicException& ex)
+					catch(std::exception& ex)
 					{
-						std::wstringstream wss;
-						wss << L"Conversion error in file \"" << pFile->getPath().c_wcs()
-							<< L"\", line " << line_counter;
-						RETHROWEXCEPTION(wss.str().c_str(),&ex);
+						VFS_RETHROW( _BS(L"Conversion error in file \"") << pFile->getPath()
+							<< L"\", line " << line_counter << _BS::wget, ex);
 					}
 					if(this->extractSection(u8s.c_wcs(), 0, sCurrentSection))
 					{
@@ -175,7 +200,7 @@ bool vfs::PropertyContainer::initFromIniFile(vfs::tReadableFile *pFile)
 					}
 					else
 					{
-						//std::cout << "WARNING : could not extract section name : " << sBuffer << std::endl;
+						VFS_LOG_WARNING(_BS("WARNING : could not extract section name : ") << sBuffer << _BS::wget);
 					}
 				}
 				break;
@@ -187,12 +212,10 @@ bool vfs::PropertyContainer::initFromIniFile(vfs::tReadableFile *pFile)
 					{
 						vfs::String::as_utf16(sBuffer.substr(iStart, sBuffer.length()-iStart), u8s);
 					}
-					catch(CBasicException& ex)
+					catch(std::exception& ex)
 					{
-						std::wstringstream wss;
-						wss << L"Conversion error in file \"" << pFile->getPath().c_wcs()
-							<< L"\", line " << line_counter;
-						RETHROWEXCEPTION(wss.str().c_str(),&ex);
+						VFS_RETHROW( _BS(L"Conversion error in file \"") << pFile->getPath()
+							<< L"\", line " << line_counter << _BS::wget, ex);
 					}
 					vfs::String::str_t sKey, sValue;
 					EOperation op = this->extractKeyValue(u8s, 0, sKey, sValue);
@@ -212,7 +235,8 @@ bool vfs::PropertyContainer::initFromIniFile(vfs::tReadableFile *pFile)
 						}
 						else
 						{
-							//std::cout << "ERROR : could not find section ["<<sCurrentSection << "]in container" << std::endl;
+							VFS_LOG_WARNING(_BS(L"ERROR : could not find section [") << sCurrentSection 
+								<< L"] in container" << _BS::wget);
 						}
 					}
 				}
@@ -242,9 +266,9 @@ bool vfs::PropertyContainer::writeToIniFile(vfs::Path const& sFilename, bool bCr
 			file = &wfile.file();
 			wfile.release();
 		}
-		catch(CBasicException& ex)
+		catch(std::exception& ex)
 		{
-			logException(ex);
+			VFS_LOG_WARNING(ex.what());
 			// vfs not initialized?
 			vfs::CFile* cfile = new vfs::CFile(sFilename);
 			cfile->openWrite(true,true);
@@ -280,12 +304,11 @@ bool vfs::PropertyContainer::writeToIniFile(vfs::Path const& sFilename, bool bCr
 	else
 	{
 		// try to open via VirtualFileSystem
-		vfs::tReadableFile *pFile = NULL;
-		vfs::CMemoryFile rfile;
+		vfs::CBufferFile rfile;
 		if(getVFS()->fileExists(sFilename))
 		{
-			pFile = getVFS()->getReadFile(sFilename);
-			rfile.copyToBuffer(*pFile);
+			vfs::COpenReadFile rf(sFilename);
+			rfile.copyToBuffer(rf.file());
 		}
 		else if(getVFS()->createNewFile(sFilename))
 		{
@@ -293,18 +316,14 @@ bool vfs::PropertyContainer::writeToIniFile(vfs::Path const& sFilename, bool bCr
 			if(pFile && pFile->openRead())
 			{
 				rfile.copyToBuffer(*pFile);
+				pFile->close();
 			}
-			pFile->close();
 		}
 		else
 		{
 			// file doesn't exist or VFS not initialized yet
-			vfs::IBaseFile* pFile = new vfs::CFile(sFilename);
-			if(pFile)
-			{
-				rfile.copyToBuffer(*vfs::tReadableFile::cast(pFile));
-				delete pFile;				
-			}
+			vfs::CFile file(sFilename);
+			rfile.copyToBuffer(*vfs::tReadableFile::cast(&file));
 		}
 		std::stringstream outbuffer;
 
@@ -344,12 +363,10 @@ bool vfs::PropertyContainer::writeToIniFile(vfs::Path const& sFilename, bool bCr
 						{
 							vfs::String::as_utf16(sBuffer.substr(iStart, sBuffer.length()-iStart), u8s.r_wcs());
 						}
-						catch(CBasicException& ex)
+						catch(std::exception& ex)
 						{
-							std::wstringstream wss;
-							wss << L"Conversion error in file \"" << pFile->getPath().c_wcs()
-								<< L"\", line " << line_counter;
-							RETHROWEXCEPTION(wss.str().c_str(),&ex);
+							VFS_RETHROW(_BS(L"Conversion error in file \"") << sFilename
+								<< L"\", line " << line_counter << _BS::wget, ex);
 						}
 						vfs::String::str_t oldSection = sCurrentSection;
 						if(this->extractSection(u8s.c_wcs(), 0, sCurrentSection))
@@ -393,12 +410,10 @@ bool vfs::PropertyContainer::writeToIniFile(vfs::Path const& sFilename, bool bCr
 						{
 							vfs::String::as_utf16(sBuffer.substr(iStart, sBuffer.length()-iStart), u8s.r_wcs());
 						}
-						catch(CBasicException& ex)
+						catch(std::exception& ex)
 						{
-							std::wstringstream wss;
-							wss << L"Conversion error in file \"" << pFile->getPath().c_wcs()
-								<< L"\", line " << line_counter;
-							RETHROWEXCEPTION(wss.str().c_str(),&ex);
+							VFS_RETHROW(_BS(L"Conversion error in file \"") << sFilename
+								<< L"\", line " << line_counter << _BS::wget, ex);
 						}
 						vfs::String::str_t sKey, sValue;
 						if(this->extractKeyValue(u8s.c_wcs(), 0, sKey, sValue))
@@ -453,9 +468,9 @@ bool vfs::PropertyContainer::writeToIniFile(vfs::Path const& sFilename, bool bCr
 			vfs::COpenWriteFile wfile(sFilename,true,true);
 			wfile->write(outbuffer.str().c_str(),(vfs::size_t)outbuffer.str().length());
 		}
-		catch(CBasicException& ex)
+		catch(std::exception& ex)
 		{
-			logException(ex);
+			VFS_LOG_WARNING(ex.what());
 			vfs::CFile file(sFilename);
 			if(file.openWrite(true,true))
 			{

@@ -236,3 +236,7 @@ INT8 FindDirectionForClimbing( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bLevel
 INT16 AssessTacticalSituation( INT8 bSide );
 BOOLEAN TeamSeesOpponent( INT8 bSide, SOLDIERTYPE * pOpponent );
 INT32 CalcStraightThreatValue( SOLDIERTYPE *pEnemy );
+
+// SANDRO - added following functions
+BOOLEAN DoctorIsPresent( SOLDIERTYPE * pPatient, BOOLEAN fOnDoctorAssignmentCheck );
+BOOLEAN AIDetermineStealingWeaponAttempt( SOLDIERTYPE * pSoldier, SOLDIERTYPE * ubOpponent );

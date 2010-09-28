@@ -124,8 +124,7 @@
 #include "Strategic Mines.h"
 #include "Strategic Mines LUA.h"
 
-#include <vfs/Core/vfs.h>
-#include <vfs/Tools/vfs_log.h>
+#include "sgp_logger.h"
 
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -1514,40 +1513,43 @@ void EndLoadScreen( )
 		fclose( fp );
 	}
 #else
-	vfs::Log timeResults(L"TimeResults.txt", true);
+	sgp::Logger_ID time_log_id = sgp::Logger::instance().createLogger();
+	sgp::Logger::instance().connectFile(time_log_id, L"TimeResults.txt", true, sgp::Logger::FLUSH_ON_ENDL);
+	sgp::Logger::LogInstance timeResults = SGP_LOG(time_log_id);
+
 	ScreenMsg( FONT_YELLOW, MSG_TESTVERSION, L"See JA2\\Data\\TimeResults.txt for more detailed timings." );
 
 	//Record all of the timings.
-	timeResults << str << vfs::Log::endl;
+	timeResults << str << sgp::endl;
 	timeResults << "EnterSector() supersets LoadWorld().  This includes other external sections." << vfs::Log::endl;
 		//FileRead()
-	timeResults << 	vfs::Log::endl << vfs::Log::endl << "VARIOUS FUNCTION TIMINGS (exclusive of actual function timings in second heading)" << vfs::Log::endl;
+	timeResults << sgp::endl << vfs::Log::endl << "VARIOUS FUNCTION TIMINGS (exclusive of actual function timings in second heading)" << sgp::endl;
 	uiSeconds = uiTotalFileReadTime / 1000;
 	uiHundreths = (uiTotalFileReadTime / 10) % 100;
 	//fprintf( fp, "FileRead:  %d.%02d (called %d times)\n", uiSeconds, uiHundreths, uiTotalFileReadCalls );
-	timeResults << "FileRead:  " <<uiSeconds<< "." << uiHundreths << " (called " << uiTotalFileReadCalls << " times)" << vfs::Log::endl;
+	timeResults << "FileRead:  " <<uiSeconds<< "." << uiHundreths << " (called " << uiTotalFileReadCalls << " times)" << sgp::endl;
 
-	timeResults << vfs::Log::endl << vfs::Log::endl << "SECTIONS OF LOADWORLD (all parts should add up to 100%)" << vfs::Log::endl;
+	timeResults << sgp::endl << sgp::endl << "SECTIONS OF LOADWORLD (all parts should add up to 100%)" << sgp::endl;
 
 	//TrashWorld()
 	uiSeconds = uiTrashWorldTime / 1000;
 	uiHundreths = (uiTrashWorldTime / 10) % 100;
-	timeResults << "TrashWorld: " << uiSeconds << "." << uiHundreths << vfs::Log::endl;
+	timeResults << "TrashWorld: " << uiSeconds << "." << uiHundreths << sgp::endl;
 	//LoadMapTilesets()
 	uiSeconds = uiLoadMapTilesetTime / 1000;
 	uiHundreths = (uiLoadMapTilesetTime / 10) % 100;
-	timeResults << "LoadMapTileset: " << uiSeconds << "." << uiHundreths << vfs::Log::endl;
+	timeResults << "LoadMapTileset: " << uiSeconds << "." << uiHundreths << sgp::endl;
 	//LoadMapLights()
 	uiSeconds = uiLoadMapLightsTime / 1000;
 	uiHundreths = (uiLoadMapLightsTime / 10) % 100;
-	timeResults << "LoadMapLights: " << uiSeconds << "." << uiHundreths << vfs::Log::endl;
+	timeResults << "LoadMapLights: " << uiSeconds << "." << uiHundreths << sgp::endl;
 
 	uiSeconds = uiBuildShadeTableTime / 1000;
 	uiHundreths = (uiBuildShadeTableTime / 10) % 100;
-	timeResults << "  1)  BuildShadeTables: " << uiSeconds << "." << uiHundreths << vfs::Log::endl;
+	timeResults << "  1)  BuildShadeTables: " << uiSeconds << "." << uiHundreths << sgp::endl;
 
 	uiPercentage = uiNumImagesReloaded * 100 / NUMBEROFTILETYPES;
-	timeResults << "  2)  " << uiPercentage << "% of the tileset images were actually reloaded." << vfs::Log::endl;
+	timeResults << "  2)  " << uiPercentage << "% of the tileset images were actually reloaded." << sgp::endl;
 	if ( ( uiNumTablesSaved+uiNumTablesLoaded ) != 0 )
 	{
 		uiPercentage = uiNumTablesSaved * 100 / (uiNumTablesSaved+uiNumTablesLoaded);
@@ -1556,21 +1558,21 @@ void EndLoadScreen( )
 	{
 		uiPercentage = 0;
 	}
-	timeResults << "  3)  Of that, " << uiPercentage << "% of the shade tables were generated (not loaded)." << vfs::Log::endl;
+	timeResults << "  3)  Of that, " << uiPercentage << "% of the shade tables were generated (not loaded)." << sgp::endl;
 	if( gfForceBuildShadeTables )
 	{
-		timeResults << "  NOTE:  Force building of shadetables enabled on this local computer." << vfs::Log::endl;
+		timeResults << "  NOTE:  Force building of shadetables enabled on this local computer." << sgp::endl;
 	}
 
 	//Unaccounted
 	uiUnaccounted = uiLoadWorldTime - uiTrashWorldTime - uiLoadMapTilesetTime - uiLoadMapLightsTime;
 	uiSeconds = uiUnaccounted / 1000;
 	uiHundreths = (uiUnaccounted / 10) % 100;
-	timeResults << "Unaccounted: " << uiSeconds << "." << uiHundreths << vfs::Log::endl;
+	timeResults << "Unaccounted: " << uiSeconds << "." << uiHundreths << sgp::endl;
 	//LoadWorld()
 	uiSeconds = uiLoadWorldTime / 1000;
 	uiHundreths = (uiLoadWorldTime / 10) % 100;
-	timeResults << vfs::Log::endl << "Total: " << uiSeconds << "." << uiHundreths << vfs::Log::endl;
+	timeResults << vfs::Log::endl << "Total: " << uiSeconds << "." << uiHundreths << sgp::endl;
 #endif // USE_VFS
 #endif
 }
@@ -1883,6 +1885,8 @@ BOOLEAN	SetCurrentWorldSector( INT16 sMapX, INT16 sMapY, INT8 bMapZ )
 	}
 	else
 #endif
+		// reset goggle warning
+		gogglewarning = FALSE;
 		// is the sector already loaded?
 		if( ( gWorldSectorX == sMapX ) && ( sMapY == gWorldSectorY) && ( bMapZ == gbWorldSectorZ) )
 		{
@@ -2456,7 +2460,8 @@ void HandleQuestCodeOnSectorEntry( INT16 sNewSectorX, INT16 sNewSectorY, INT8 bN
 	if ( CheckFact( FACT_ALL_TERRORISTS_KILLED, 0 ) )
 	{
 		// end terrorist quest
-		EndQuest( QUEST_KILL_TERRORISTS, gMercProfiles[ CARMEN ].sSectorX, gMercProfiles[ CARMEN ].sSectorY );
+		// SANDRO - removed ending quest from here, placed to Interface Dialogue
+		//EndQuest( QUEST_KILL_TERRORISTS, gMercProfiles[ CARMEN ].sSectorX, gMercProfiles[ CARMEN ].sSectorY );
 		// remove Carmen
 		gMercProfiles[ CARMEN ].sSectorX = 0;
 		gMercProfiles[ CARMEN ].sSectorY = 0;
@@ -2715,6 +2720,12 @@ BOOLEAN EnterSector( INT16 sSectorX, INT16 sSectorY , INT8 bSectorZ )
 
 	// This has tobe done before loadworld, as it will remmove old gridnos if present
 	RemoveMercsInSector( );
+
+	// SANDRO - reset number of enemies here
+	if( !(gTacticalStatus.uiFlags & LOADING_SAVED_GAME ) )
+	{	
+		memset( &(gTacticalStatus.bNumFoughtInBattle), 0, MAXTEAMS ); 
+	}
 
 #ifdef JA2UB
 //Ja25 No meanwhiles
@@ -3227,7 +3238,13 @@ void GetSectorIDString( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ , STR16 zS
 
 		if ( pUnderground )
 		{
-			if ( pUnderground->fVisited )
+		
+			bMineIndex = GetIdOfMineForSector( sSectorX, sSectorY, bSectorZ );
+			if( bMineIndex != -1 )
+			{
+				swprintf( zString, L"%c%d: %s %s", 'A' + sSectorY - 1, sSectorX, pTownNames[ GetTownAssociatedWithMine( bMineIndex ) ], pwMineStrings[ 0 ] );
+			}	
+			else if ( pUnderground->fVisited )
 			{
 				if (fDetailed)
 				{			
@@ -3249,6 +3266,12 @@ void GetSectorIDString( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ , STR16 zS
 					wcscat( zString, zUnexploredUnderground );
 				}
 			}
+
+			if (pUnderground->ubNumCreatures)
+				swprintf( zString, L"%c%d: %s", 'A' + sSectorY - 1, sSectorX, pLandTypeStrings[ CREATURE_LAIR ] );
+			//else
+			//	swprintf( zString, L"%c%d-%d", 'A' + sSectorY - 1, sSectorX, bSectorZ );
+
 		}		
 
 } 
@@ -3310,14 +3333,13 @@ else
 		CHAR16 zUnexplored[MAX_SECTOR_NAME_LENGTH];
 		CHAR16 zDetailedUnexplored[MAX_SECTOR_NAME_LENGTH];
 		CHAR16 zExplored[MAX_SECTOR_NAME_LENGTH];
-		CHAR16 zDetailedExplored[MAX_SECTOR_NAME_LENGTH];	
-		
+		CHAR16 zDetailedExplored[MAX_SECTOR_NAME_LENGTH];
 		
 		wcscpy( zUnexplored, gzSectorNames[ ubSectorID ][0] );
 		wcscpy( zDetailedUnexplored, gzSectorNames[ ubSectorID ][1] );
 		wcscpy( zExplored, gzSectorNames[ ubSectorID ][2] );
 		wcscpy( zDetailedExplored, gzSectorNames[ ubSectorID ][3] );
-			
+
 		if (zUnexplored[0] == 0 || zDetailedUnexplored[0] == 0 || zExplored[0] == 0 || zDetailedExplored[0] == 0)
 		{
 			fSectorHasXMLNames = FALSE;
@@ -3900,16 +3922,52 @@ void AllMercsWalkedToExitGrid()
 {
 	PLAYERGROUP *pPlayer;
 	BOOLEAN fDone;
+	// SANDRO was here.. made some tweaks, fixed some stuff
+	BOOLEAN fEnemiesInLoadedSector = FALSE;
+	if( NumEnemiesInAnySector( gWorldSectorX, gWorldSectorY, gbWorldSectorZ ) )
+	{
+		fEnemiesInLoadedSector = TRUE;
+		////////////////////////////////////////////////////////////////////////////////////////
+		// SANDRO - if enemies are in sector, handle morale hit for fleeing
+		// Minor bug fix - check certain circumstances and don't reduce the morale if the fight is not over yet
+		// if all mercs leaving, morale gets hit
+		// if one merc only leaves, but there are others fighting on, don't reduce the morale
+		// if sector is about to be loaded and there are enemies in the current, then all mercs are leaving, so the morale gets hit
+		if( ( gubAdjacentJumpCode == JUMP_ALL_NO_LOAD && gpAdjacentGroup->ubGroupSize >= PlayerMercsInSector( (UINT8)gWorldSectorX, (UINT8)gWorldSectorY, (UINT8)gbWorldSectorZ )) ||
+			( gubAdjacentJumpCode == JUMP_SINGLE_NO_LOAD && PlayerMercsInSector( (UINT8)gWorldSectorX, (UINT8)gWorldSectorY, (UINT8)gbWorldSectorZ ) <= 1 ) ||
+			( gubAdjacentJumpCode == JUMP_ALL_LOAD_NEW || gubAdjacentJumpCode == JUMP_SINGLE_LOAD_NEW ) ) 
+		{
+			HandleLoyaltyImplicationsOfMercRetreat( RETREAT_TACTICAL_TRAVERSAL, gWorldSectorX, gWorldSectorY, gbWorldSectorZ );
+		
+			// End inetrrogation quest if we left the sector, but haven't killed all enemies
+			if ( gWorldSectorX == 7 && gWorldSectorY == 14 && gbWorldSectorZ == 0 && gubQuest[ QUEST_INTERROGATION ] == QUESTINPROGRESS )
+			{
+				// Finish quest, although not give points here...
+				InternalEndQuest( QUEST_INTERROGATION, gWorldSectorX, gWorldSectorY, FALSE );
+				// ... give them manually, but halved
+				GiveQuestRewardPoint( gWorldSectorX, gWorldSectorY, 4, NO_PROFILE );
+				// Also get us know, we finished the quest
+				ResetHistoryFact( QUEST_INTERROGATION, gWorldSectorX, gWorldSectorY );
+			}
+		}
+		////////////////////////////////////////////////////////////////////////////////////////
 
-  HandlePotentialMoraleHitForSkimmingSectors( gpAdjacentGroup );
+		HandlePotentialMoraleHitForSkimmingSectors( gpAdjacentGroup );
+	}
 
 	if( gubAdjacentJumpCode == JUMP_ALL_NO_LOAD || gubAdjacentJumpCode == JUMP_SINGLE_NO_LOAD )
 	{
 		Assert( gpAdjacentGroup );
-		pPlayer = gpAdjacentGroup->pPlayerList;
+		//pPlayer = gpAdjacentGroup->pPlayerList; // SANDRO - why was this here twice?
 		pPlayer = gpAdjacentGroup->pPlayerList;
 		while( pPlayer )
 		{
+			/////////////////////////////////////////////////////////////////////////////////
+			// SANDRO - merc records - times retreated counter
+			if( fEnemiesInLoadedSector && pPlayer->pSoldier->ubProfile != NO_PROFILE )
+				gMercProfiles[ pPlayer->pSoldier->ubProfile ].records.usBattlesRetreated++;
+			/////////////////////////////////////////////////////////////////////////////////
+
 			SetInsertionDataFromAdjacentMoveDirection( pPlayer->pSoldier, gubTacticalDirection, gsAdditionalData );
 
 			RemoveSoldierFromTacticalSector( pPlayer->pSoldier, TRUE );
@@ -3922,9 +3980,19 @@ void AllMercsWalkedToExitGrid()
 
 		SetDefaultSquadOnSectorEntry( TRUE );
 
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// SANDRO - reset num enemies here if the sector was unloaded
+		if( gWorldSectorX == 0 && gWorldSectorX == 0 && gbWorldSectorZ == -1 )
+		{
+			memset( &(gTacticalStatus.bNumFoughtInBattle), 0, MAXTEAMS );
+		}
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	}
 	else
 	{
+		// SANDRO - reset number of enemies here, we are about to load a new sector
+		memset( &(gTacticalStatus.bNumFoughtInBattle), 0, MAXTEAMS ); 
+
 		//Because we are actually loading the new map, and we are physically traversing, we don't want
 		//to bring up the prebattle interface when we arrive if there are enemies there.  This flag
 		//ignores the initialization of the prebattle interface and clears the flag.
@@ -3945,6 +4013,7 @@ void AllMercsWalkedToExitGrid()
 					AddCharacterToUniqueSquad( pPlayer->pSoldier );
 					break;
 				}
+				InitSoldierOppList( pPlayer->pSoldier );
 				pPlayer = pPlayer->next;
 			}
 			if( !pPlayer )
@@ -3958,6 +4027,12 @@ void AllMercsWalkedToExitGrid()
 		pPlayer = gpAdjacentGroup->pPlayerList;
 		while( pPlayer )
 		{
+			/////////////////////////////////////////////////////////////////////////////////
+			// SANDRO - merc records - times retreated counter
+			if( fEnemiesInLoadedSector && pPlayer->pSoldier->ubProfile != NO_PROFILE )
+				gMercProfiles[ pPlayer->pSoldier->ubProfile ].records.usBattlesRetreated++;
+			/////////////////////////////////////////////////////////////////////////////////
+
 			SetInsertionDataFromAdjacentMoveDirection( pPlayer->pSoldier, gubTacticalDirection, gsAdditionalData );
 
 			pPlayer = pPlayer->next;
@@ -3968,10 +4043,11 @@ void AllMercsWalkedToExitGrid()
 		gFadeOutDoneCallback = DoneFadeOutExitGridSector;
 		FadeOutGameScreen( );
 	}
-	if( !PlayerMercsInSector( (UINT8)gsAdjacentSectorX, (UINT8)gsAdjacentSectorY, (UINT8)gbAdjacentSectorZ ) )
-	{
-		HandleLoyaltyImplicationsOfMercRetreat( RETREAT_TACTICAL_TRAVERSAL, gsAdjacentSectorX, gsAdjacentSectorY, gbAdjacentSectorZ );
-	}
+	// SANDRO - This actually never happeneds, moved up
+	//if( !PlayerMercsInSector( (UINT8)gsAdjacentSectorX, (UINT8)gsAdjacentSectorY, (UINT8)gbAdjacentSectorZ ) )
+	//{
+	//	HandleLoyaltyImplicationsOfMercRetreat( RETREAT_TACTICAL_TRAVERSAL, gsAdjacentSectorX, gsAdjacentSectorY, gbAdjacentSectorZ );
+	//}
 	if( gubAdjacentJumpCode == JUMP_ALL_NO_LOAD || gubAdjacentJumpCode == JUMP_SINGLE_NO_LOAD )
 	{
 		gfTacticalTraversal = FALSE;
@@ -4029,9 +4105,31 @@ void AllMercsHaveWalkedOffSector( )
 	if( NumEnemiesInAnySector( gWorldSectorX, gWorldSectorY, gbWorldSectorZ ) )
 	{
 		fEnemiesInLoadedSector = TRUE;
+		////////////////////////////////////////////////////////////////////////////////////////
+		// SANDRO - if enemies are in sector, handle morale hit for fleeing
+		// Minor bug fix - check certain circumstances and don't reduce the morale if the fight is not over yet
+		// if all mercs leaving, morale gets hit
+		// if one merc only leaves, but there are others fighting on, don't reduce the morale
+		// if sector is about to be loaded and there are enemies in the current, then all mercs are leaving alway
+		if( ( gubAdjacentJumpCode == JUMP_ALL_NO_LOAD && gpAdjacentGroup->ubGroupSize >= PlayerMercsInSector( (UINT8)gWorldSectorX, (UINT8)gWorldSectorY, (UINT8)gbWorldSectorZ )) ||
+			( gubAdjacentJumpCode == JUMP_SINGLE_NO_LOAD && PlayerMercsInSector( (UINT8)gWorldSectorX, (UINT8)gWorldSectorY, (UINT8)gbWorldSectorZ ) <= 1 ) ||
+			( gubAdjacentJumpCode == JUMP_ALL_LOAD_NEW || gubAdjacentJumpCode == JUMP_SINGLE_LOAD_NEW ) ) 
+		{
+			HandleLoyaltyImplicationsOfMercRetreat( RETREAT_TACTICAL_TRAVERSAL, gWorldSectorX, gWorldSectorY, gbWorldSectorZ );
+		
+			// End inetrrogation quest if we left the sector, but haven't killed all enemies
+			if ( gWorldSectorX == 7 && gWorldSectorY == 14 && gbWorldSectorZ == 0 && gubQuest[ QUEST_INTERROGATION ] == QUESTINPROGRESS )
+			{
+				// Finish quest, although not give points here...
+				InternalEndQuest( QUEST_INTERROGATION, gWorldSectorX, gWorldSectorY, FALSE );
+				// ... give them manually, but halved
+				GiveQuestRewardPoint( gWorldSectorX, gWorldSectorY, 4, NO_PROFILE );
+				// Also get us know, we finished the quest
+				ResetHistoryFact( QUEST_INTERROGATION, gWorldSectorX, gWorldSectorY );
+			}
+		}
+		////////////////////////////////////////////////////////////////////////////////////////
 	}
-
-	HandleLoyaltyImplicationsOfMercRetreat( RETREAT_TACTICAL_TRAVERSAL, gWorldSectorX, gWorldSectorY, gbWorldSectorZ );
 
 	//Setup strategic traversal information
 	if( guiAdjacentTraverseTime <= 5 )
@@ -4060,15 +4158,41 @@ void AllMercsHaveWalkedOffSector( )
 		pPlayer = gpAdjacentGroup->pPlayerList;
 		while( pPlayer )
 		{
+			/////////////////////////////////////////////////////////////////////////////////
+			// SANDRO - merc records - times retreated counter
+			if( fEnemiesInLoadedSector && pPlayer->pSoldier->ubProfile != NO_PROFILE )
+				gMercProfiles[ pPlayer->pSoldier->ubProfile ].records.usBattlesRetreated++;
+			/////////////////////////////////////////////////////////////////////////////////
 			RemoveSoldierFromTacticalSector( pPlayer->pSoldier, TRUE );
 			pPlayer = pPlayer->next;
 		}
 		SetDefaultSquadOnSectorEntry( TRUE );
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// SANDRO - reset num enemies here if the sector was unloaded
+		if( !fEnemiesInLoadedSector || (gWorldSectorX == 0 && gWorldSectorX == 0 && gbWorldSectorZ == -1 ) )
+		{
+			memset( &(gTacticalStatus.bNumFoughtInBattle), 0, MAXTEAMS );
+		}
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	}
 	else
 	{
+		// SANDRO - reset number of enemies here, we are about to load a new sector
+		memset( &(gTacticalStatus.bNumFoughtInBattle), 0, MAXTEAMS ); 
+
 		if( fEnemiesInLoadedSector )
-		{ //We are retreating from a sector with enemies in it and there are no mercs left  so
+		{
+			/////////////////////////////////////////////////////////////////////////////////
+			// SANDRO - merc records - times retreated counter
+			pPlayer = gpAdjacentGroup->pPlayerList;
+			while( pPlayer )
+			{
+				if( fEnemiesInLoadedSector && pPlayer->pSoldier->ubProfile != NO_PROFILE )
+					gMercProfiles[ pPlayer->pSoldier->ubProfile ].records.usBattlesRetreated++;
+				pPlayer = pPlayer->next;
+			}
+			/////////////////////////////////////////////////////////////////////////////////
+			//We are retreating from a sector with enemies in it and there are no mercs left  so
 			//warp the game time by 5 minutes to simulate the actual retreat.  This restricts the
 			//player from immediately coming back to the same sector they left to perhaps take advantage
 			//of the tactical placement gui to get into better position.  Additionally, if there are any
@@ -4559,9 +4683,7 @@ void SetupNewStrategicGame( )
 	AddEveryDayStrategicEvent( EVENT_CHECKFORQUESTS, QUEST_CHECK_EVENT_TIME, 0 );
 	// Some things get updated in the very early morning
 	AddEveryDayStrategicEvent( EVENT_DAILY_EARLY_MORNING_EVENTS, EARLY_MORNING_TIME, 0 );
-	
 	//Daily Update BobbyRay Inventory
-	//Ja25:  BobbyRay stuff is NOT being called, only the arms dealer info, which just happens to be inthe same function
 	AddEveryDayStrategicEvent( EVENT_DAILY_UPDATE_BOBBY_RAY_INVENTORY, BOBBYRAY_UPDATE_TIME, 0 );
 
 	
@@ -5716,7 +5838,10 @@ BOOLEAN IsSectorDesert( INT16 sSectorX, INT16 sSectorY )
 		return( FALSE );
 	}
 
-	if ( SectorInfo[ SECTOR(sSectorX, sSectorY) ].ubTraversability[ THROUGH_STRATEGIC_MOVE ] == SAND )
+	// SANDRO - added more terrain types for heat intolerant feature
+	if ( SectorInfo[ SECTOR(sSectorX, sSectorY) ].ubTraversability[ THROUGH_STRATEGIC_MOVE ] == SAND ||
+		SectorInfo[ SECTOR(sSectorX, sSectorY) ].ubTraversability[ THROUGH_STRATEGIC_MOVE ] == SAND_ROAD ||
+		SectorInfo[ SECTOR(sSectorX, sSectorY) ].ubTraversability[ THROUGH_STRATEGIC_MOVE ] == SAND_SAM_SITE )
 	{
 		// desert
 		return( TRUE );
@@ -5726,7 +5851,20 @@ BOOLEAN IsSectorDesert( INT16 sSectorX, INT16 sSectorY )
 		return( FALSE );
 	}
 }
-
+// SANDRO - added function
+BOOLEAN IsSectorTropical( INT16 sSectorX, INT16 sSectorY )
+{
+	if (SectorInfo[ SECTOR(sSectorX, sSectorY) ].ubTraversability[ THROUGH_STRATEGIC_MOVE ] == TROPICS ||
+		SectorInfo[ SECTOR(sSectorX, sSectorY) ].ubTraversability[ THROUGH_STRATEGIC_MOVE ] == TROPICS_ROAD ||
+		SectorInfo[ SECTOR(sSectorX, sSectorY) ].ubTraversability[ THROUGH_STRATEGIC_MOVE ] == TROPICS_SAM_SITE )
+	{
+		return ( TRUE );
+	}
+	else
+	{
+		return ( FALSE ); 
+	}
+}
 
 
 BOOLEAN HandleDefiniteUnloadingOfWorld( UINT8 ubUnloadCode )
@@ -6068,7 +6206,7 @@ void SetupProfileInsertionDataForSoldier( SOLDIERTYPE *pSoldier )
 
 void HandlePotentialMoraleHitForSkimmingSectors( GROUP *pGroup )
 {
-	PLAYERGROUP *pPlayer;
+	//PLAYERGROUP *pPlayer;
 
   if ( !gTacticalStatus.fHasEnteredCombatModeSinceEntering && gTacticalStatus.fEnemyInSector )
   {
@@ -6078,16 +6216,17 @@ void HandlePotentialMoraleHitForSkimmingSectors( GROUP *pGroup )
 		//time to setup a good ambush!
 		pGroup->uiFlags |= GROUPFLAG_HIGH_POTENTIAL_FOR_AMBUSH;
 
-	  pPlayer = pGroup->pPlayerList;
+	  //SANDRO - WTF?!?
+	  //pPlayer = pGroup->pPlayerList;
 
-	  while( pPlayer )
-	  {
-      // Do morale hit...
-      // CC look here!
-      // pPlayer->pSoldier
+	  //while( pPlayer )
+	  //{
+   //   // Do morale hit...
+   //   // CC look here!
+   //   // pPlayer->pSoldier
 
-		  pPlayer = pPlayer->next;
-	  }
+		 // pPlayer = pPlayer->next;
+	  //}
   }
 }
 

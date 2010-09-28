@@ -839,7 +839,8 @@ void CheckIfMercGetsAnotherContract( SOLDIERTYPE *pSoldier )
 		// multiply by experience level
 		iChance *= pSoldier->stats.bExpLevel;
 
-		if( (INT32) Random( 100 ) < iChance )
+		//tais: disabled mercs going on other assignment after being fired..
+		if( (INT32) Random( 100 ) < iChance && gGameExternalOptions.fMercsOnAssignment < 2 )
 		{
 			// B'bye!
 			pSoldier->flags.fSignedAnotherContract = TRUE;

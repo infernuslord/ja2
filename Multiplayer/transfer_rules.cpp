@@ -1,5 +1,5 @@
 #include "transfer_rules.h"
-
+#include "Debug.h"
 #include <vfs/Core/vfs.h>
 #include <vfs/Core/vfs_file_raii.h>
 #include <vfs/Core/File/vfs_file.h>
@@ -73,22 +73,22 @@ bool CTransferRules::initFromTxtFile(vfs::tReadableFile* pFile)
 						else
 						{
 							std::wstring trybuffer = L"Invalid UTF-8 character in string";
-							IGNOREEXCEPTION( trybuffer = vfs::String(sBuffer).c_wcs() ); /* just make sure we don't break off when string conversion fails */
+							VFS_IGNOREEXCEPTION( trybuffer = vfs::String(sBuffer).c_wcs(), "" ); /* just make sure we don't break off when string conversion fails */
 							std::wstringstream wss;
 							wss << L"Unknown action in file \"" << pFile->getPath().c_wcs()
 								<< L", line " << line_counter << " : " << vfs::String(sBuffer).c_wcs();
-							THROWEXCEPTION(wss.str().c_str());
+							SGP_THROW(wss.str().c_str());
 						}
 						try
 						{
 							rule.pattern = vfs::Path(vfs::trimString(sBuffer, iEnd, sBuffer.length()));
 						}
-						catch(CBasicException& ex)
+						catch(vfs::Exception& ex)
 						{
 							std::wstringstream wss;
 							wss << L"Could not convert string, invalid utf8 encoding in file \"" << pFile->getPath().c_wcs()
 								<< L"\", line "  << line_counter;
-							RETHROWEXCEPTION(wss.str().c_str(),&ex);
+							SGP_RETHROW(wss.str().c_str(), ex);
 						}
 						m_listRules.push_back(rule);
 					}

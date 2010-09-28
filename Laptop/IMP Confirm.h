@@ -85,5 +85,7 @@ void ResetIMPCharactersEyesAndMouthOffsets( UINT8 ubMercProfileID );
 
 BOOLEAN ImpExists ( STR fileName );
 
+INT32 iGetProfileCost( void ); // added by SANDRO
+
 #endif
 

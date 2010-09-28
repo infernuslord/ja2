@@ -38,10 +38,10 @@ public:
 	TRANSITION_ENTER{
 		long T_num, F_num;
 		if(atts.getLong("numTilesets", T_num)) T_DATA.numTilesets = (int)T_num;
-		else THROWEXCEPTION(L"Attribute 'numTileset' not found");
+		else SGP_THROW(L"Attribute 'numTileset' not found");
 
 		if(atts.getLong("numFiles",F_num)) T_DATA.numFiles = (int)F_num ;
-		else THROWEXCEPTION(L"Attribute 'numFiles' not found");
+		else SGP_THROW(L"Attribute 'numFiles' not found");
 	}
 	FINISH_TRANSITION;
 
@@ -53,10 +53,10 @@ public:
 	TRANSITION_ENTER{
 		long lindex;
 		if(atts.getLong("index", lindex)){
-			THROWIFFALSE(lindex < MAX_TILESETS, BuildString(L"tileset index is too large : ").add(lindex).get() );
+			SGP_THROW_IFFALSE(lindex < MAX_TILESETS, _BS(L"tileset index is too large : ") << lindex << _BS::wget );
 			P_DATA->_current_tileset = &(P_DATA->_tilesets[ lindex ]);
 		}
-		else THROWEXCEPTION(L"Attribute 'index' not found");
+		else SGP_THROW(L"Attribute 'index' not found");
 	}
 	TRANSITION_LEAVE{
 		P_DATA->_current_tileset = NULL;
@@ -68,7 +68,7 @@ public:
 	 */
 	DEFINE_TRANSITION(TilesetName, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE( P_DATA->_current_tileset != NULL, L"No tileset selected" );
+		SGP_THROW_IFFALSE( P_DATA->_current_tileset != NULL, L"No tileset selected" );
 		std::string tmpString = vfs::trimString(char_data, 0, char_data.length());
 		wcsncpy( P_DATA->_current_tileset->zName, vfs::String( tmpString ).c_str(), 32 );
 	}
@@ -79,10 +79,10 @@ public:
 	 */
 	DEFINE_TRANSITION(TilesetAmbientID, _myt, true);
 	TRANSITION_LEAVE{
-		THROWIFFALSE( P_DATA->_current_tileset != NULL, L"No tileset selected" );
+		SGP_THROW_IFFALSE( P_DATA->_current_tileset != NULL, L"No tileset selected" );
 		int tmp;
-		THROWIFFALSE( vfs::convertTo<int>(char_data, tmp),
-			BuildString(L"Could not convert to int : ").add(char_data).get() );
+		SGP_THROW_IFFALSE( vfs::convertTo<int>(char_data, tmp),
+			_BS(L"Could not convert to int : ") << char_data << _BS::wget );
 		P_DATA->_current_tileset->ubAmbientID = tmp;
 			
 	}
@@ -95,14 +95,14 @@ public:
 	TRANSITION_ENTER{
 		long lindex;
 		if(atts.getLong("index", lindex)){
-			THROWIFFALSE(lindex < NUMBEROFTILETYPES,
-				BuildString(L"tileset file index is too large : ").add(lindex).get() );
+			SGP_THROW_IFFALSE(lindex < NUMBEROFTILETYPES,
+				_BS(L"tileset file index is too large : ") << lindex << _BS::wget );
 			T_DATA.index = lindex;
 		}
-		else THROWEXCEPTION(L"Attribute 'index' not found");
+		else SGP_THROW(L"Attribute 'index' not found");
 	}
 	TRANSITION_LEAVE{
-		THROWIFFALSE( P_DATA->_current_tileset != NULL, L"No tileset selected" );
+		SGP_THROW_IFFALSE( P_DATA->_current_tileset != NULL, L"No tileset selected" );
 		std::string tmpString = vfs::trimString(char_data, 0, char_data.length());
 		strncpy( P_DATA->_current_tileset->TileSurfaceFilenames[T_DATA.index], tmpString.c_str(), 32);
 	}

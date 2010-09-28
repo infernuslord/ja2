@@ -1,3 +1,27 @@
+/* 
+ * bfVFS : vfs/Core/vfs_profile.cpp
+ *  - Virtual Profile, container for real file system locations or archives
+ *  - Profile Stack, orders profiles in a linear fashion (top-bottom)
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include <vfs/Core/vfs_profile.h>
 #include <vfs/Core/vfs.h>
 #include <vfs/Core/Location/vfs_lib_dir.h>
@@ -15,7 +39,7 @@ class vfs::CVirtualProfile::IterImpl : public vfs::CVirtualProfile::Iterator::II
 
 	IterImpl(CVirtualProfile* profile) : tBaseClass(), m_profile(profile)
 	{
-		THROWIFFALSE(profile, L"");
+		VFS_THROW_IFF(profile, L"");
 		// only unique locations
 		_loc_iter = m_profile->m_setLocations.begin();
 	}
@@ -95,7 +119,7 @@ private:
 vfs::CVirtualProfile::FileIterImpl::FileIterImpl(vfs::Path const& sPattern, CVirtualProfile* profile)
 : tBaseClass(), m_pattern(sPattern), m_profile(profile)
 {
-	THROWIFFALSE(profile, L"");
+	VFS_THROW_IFF(profile, L"");
 	iter = m_profile->begin();
 	while(!iter.end())
 	{
@@ -180,18 +204,19 @@ void vfs::CVirtualProfile::addLocation(vfs::IBaseLocation* pLoc)
 		std::list<vfs::Path>::const_iterator cit = lDirs.begin();
 		for(;cit != lDirs.end(); ++cit)
 		{
-			vfs::IBaseLocation *pNewLoc = m_mapLocations[*cit];
-			if(!pNewLoc)
+			vfs::IBaseLocation *pOldLoc = m_mapLocations[*cit];
+			if(!pOldLoc)
 			{
 				m_mapLocations[*cit] = pLoc;
 			}
-			else if(pNewLoc == pLoc)
+			else if(pOldLoc == pLoc)
 			{
 				// seems to be an update. do nothing
 			}
 			else
 			{
-				THROWEXCEPTION(L"Location already taken");
+				VFS_LOG_WARNING((L"Another location is already mapped to '" + ((*cit)()) + L"' [keeping old location]").c_str());
+				//VFS_THROW(L"Location already taken");
 			}
 		}
 	}
@@ -230,7 +255,7 @@ class vfs::CProfileStack::IterImpl : public vfs::CProfileStack::Iterator::IImple
 
 	IterImpl(CProfileStack* pPStack) : tBaseClass(), m_pPStack(pPStack)
 	{
-		THROWIFFALSE(m_pPStack, L"");
+		VFS_THROW_IFF(m_pPStack, L"");
 		_prof_iter = m_pPStack->m_profiles.begin();
 	}
 public:
@@ -323,7 +348,7 @@ bool vfs::CProfileStack::popProfile()
 {
 	// there might be some files in this profile that are referenced in a Log object
 	// we need to it to release the file
-	vfs::Log::flushRelease();
+	vfs::Log::flushReleaseAll();
 	// an observer pattern would probably be the better solution,
 	// but for now lets do it this way 
 
@@ -347,26 +372,20 @@ bool vfs::CProfileStack::popProfile()
 					{
 						if( !vloc->removeFile(file) )
 						{
-							std::wstringstream wss;
-							wss << L"Could not remove file ["
-								<< file->getPath()()
-								<< L"] in Profile ["
-								<< prof->cName << L"]";
-							THROWEXCEPTION(wss.str().c_str());
+							VFS_THROW(_BS(L"Could not remove file [") << file->getPath()
+								<< L"] in Profile [" << prof->cName << L"]" << _BS::wget);
 						}
 					}
 					else
 					{
-						std::wstringstream wss;
-						wss << L"Virtual location [" << sDir() << L"] doesn't exist. Maybe the VFS was not properly setup.";
-						THROWEXCEPTION(wss.str().c_str());
+						VFS_THROW(_BS(L"Virtual location [") << sDir
+							<< L"] doesn't exist. Maybe the VFS was not properly setup." << _BS::wget);
 					}
 				}
 				else
 				{
-					std::wstringstream wss;
-					wss << L"File is NULL during iteration over files in location [" << loc->getPath()() << L"]";
-					THROWEXCEPTION(wss.str().c_str());
+					VFS_THROW(_BS(L"File is NULL during iteration over files in location [")
+						<< loc->getPath() << L"]" << _BS::wget);
 				}
 			}
 		}
@@ -392,18 +411,18 @@ void vfs::CProfileStack::pushProfile(CVirtualProfile* pProfile)
 			{
 				pit++;
 			}
-			if(pit != m_profiles.end())
+			//if(pit != m_profiles.end())
 			{
 				m_profiles.insert(pit,pProfile);
 			}
-			else
-			{
-				m_profiles.push_front(pProfile);
-			}
+			//else
+			//{
+			//	m_profiles.push_front(pProfile);
+			//}
 		}
 		return;
 	}
-	THROWEXCEPTION(L"A profile with this name already exists");
+	VFS_THROW(L"A profile with this name already exists");
 }
 
 vfs::CProfileStack::Iterator vfs::CProfileStack::begin()

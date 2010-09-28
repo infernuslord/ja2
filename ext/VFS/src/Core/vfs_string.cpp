@@ -1,3 +1,27 @@
+/* 
+ * bfVFS : vfs/Core/vfs_string.cpp
+ *  - string class that allows conversions to/from Unicode representation (uses wchar_t internally)
+ *  - comparison, concatenation, stream output class/functions
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include <vfs/Core/vfs_string.h>
 #include <utf8.h>
 
@@ -139,17 +163,17 @@ void vfs::String::as_utf16(std::string const& str, vfs::String::str_t &str16)
 	catch(utf8::invalid_utf8& ex)
 	{
 		utf8::uint8_t c = ex.utf8_octet();
-		THROWEXCEPTION(BuildString().add(L"Invalid UTF8 character '").add((wchar_t)c).add(L"'=").add((unsigned char)c).get());
+		VFS_THROW( _BS(L"Invalid UTF8 character '") << (wchar_t)c << L"'=" << (unsigned char)c <<_BS::wget );
 	}
 	catch(utf8::not_enough_room &ex)
 	{
 		std::wstring err;
-		IGNOREEXCEPTION(vfs::String::as_utf16(ex.what(),err));
-		THROWEXCEPTION(BuildString().add(L"Incomplete UTF8 string [").add(err).add(L"]").get());
+		VFS_IGNOREEXCEPTION(vfs::String::as_utf16(ex.what(),err), true);
+		VFS_THROW( _BS(L"Incomplete UTF8 string [") << err << L"]" << _BS::wget );
 	}
 	catch(...)
 	{
-		THROWEXCEPTION(L"Unicode error");
+		VFS_THROW(L"Unicode error");
 	}
 }
 
@@ -178,13 +202,13 @@ void vfs::String::as_utf16(const char* str, vfs::String::str_t &str16)
 	catch(utf8::invalid_utf8& ex)
 	{
 		utf8::uint8_t c = ex.utf8_octet();
-		THROWEXCEPTION(BuildString().add(L"Invalid UTF8 character '").add((wchar_t)c).add(L"'=").add((unsigned char)c).get());
+		VFS_THROW( _BS(L"Invalid UTF8 character '") << (wchar_t)c << L"'=" << (unsigned char)c << _BS::wget );
 	}
 	catch(utf8::not_enough_room &ex)
 	{
 		std::wstring err;
-		IGNOREEXCEPTION(vfs::String::as_utf16(ex.what(), err));
-		THROWEXCEPTION(BuildString().add(L"Incomplete UTF8 string [").add(err).add(L"]").get());
+		VFS_IGNOREEXCEPTION(vfs::String::as_utf16(ex.what(), err), true);
+		VFS_THROW( _BS(L"Incomplete UTF8 string [") << err << L"]" << _BS::wget );
 	}
 }
 
@@ -339,19 +363,19 @@ bool vfs::operator<(vfs::String const& s1, vfs::String const& s2)
 	return s1._str < s2._str;
 }
 
-std::wstringstream& operator<<(std::wstringstream& out, vfs::String const& str)
+std::wostream& operator<<(std::wostream& out, vfs::String const& str)
 {
 	out.write(str.c_str(), (std::streamsize)str.length());
 	return out;
 }
 
-std::wstringstream& operator<<(std::wstringstream& out, vfs::String::str_t const& str)
+std::wostream& operator<<(std::wostream& out, vfs::String::str_t const& str)
 {
 	out.write(str.c_str(), (std::streamsize)str.length());
 	return out;
 }
 
-std::wstringstream& operator<<(std::wstringstream& out, const vfs::String::char_t* str)
+std::wostream& operator<<(std::wostream& out, const vfs::String::char_t* str)
 {
 	out.write(str, (std::streamsize)wcslen(str));
 	return out;
@@ -546,6 +570,25 @@ BuildString& BuildString::add<std::string>(std::string const& value)
 }
 template<>
 BuildString& BuildString::add<const char*>(const char* const& value)
+{
+	this->add(vfs::String::as_utf16(value));
+	return *this;
+}
+
+template<>
+BuildString& BuildString::operator<< <vfs::String>(vfs::String const& value)
+{
+	this->add(value.c_str());
+	return *this;
+}
+template<>
+BuildString& BuildString::operator<< <std::string>(std::string const& value)
+{
+	this->add(vfs::String::as_utf16(value));
+	return *this;
+}
+template<>
+BuildString& BuildString::operator<< <const char*>(const char* const& value)
 {
 	this->add(vfs::String::as_utf16(value));
 	return *this;

@@ -20,7 +20,8 @@ extern BOOLEAN DoesSAMExistHere( INT16 sSectorX, INT16 sSectorY, INT16 sSectorZ,
 
 
 //----------------legion by Jazz
-BOOLEAN	IsOknoFencePresentAtGridno( INT32 sGridNo )
+
+BOOLEAN	IsJumpableWindowPresentAtGridNo( INT32 sGridNo, INT8 direction2 )
 {
 	STRUCTURE * pStructure;
 
@@ -28,12 +29,57 @@ BOOLEAN	IsOknoFencePresentAtGridno( INT32 sGridNo )
 
 	if ( pStructure )
 	{
-		
-		if ( pStructure->fFlags & STRUCTURE_WALLNWINDOW && !(pStructure->fFlags & STRUCTURE_SPECIAL)  && ( pStructure->fFlags & STRUCTURE_OPEN ))
+
+             if ( ( direction2 == SOUTH || direction2 == NORTH ) && (pStructure->ubWallOrientation == OUTSIDE_TOP_LEFT || pStructure->ubWallOrientation == INSIDE_TOP_LEFT ) && pStructure->fFlags & STRUCTURE_WALLNWINDOW && !(pStructure->fFlags & STRUCTURE_SPECIAL) && ( pStructure->fFlags & STRUCTURE_OPEN ) )
+	        {
+         	return( TRUE );
+	      	}
+	                            	
+            if ( ( direction2 == EAST || direction2 == WEST ) && ( pStructure->ubWallOrientation == OUTSIDE_TOP_RIGHT || pStructure->ubWallOrientation == INSIDE_TOP_RIGHT ) && pStructure->fFlags & STRUCTURE_WALLNWINDOW && !(pStructure->fFlags & STRUCTURE_SPECIAL) && ( pStructure->fFlags & STRUCTURE_OPEN ) )
+	      	{
+		return( TRUE );
+	      	}
+	}
+
+	return( FALSE );
+}
+
+
+BOOLEAN	IsOknoFencePresentAtGridno( INT32 sGridNo )
+{
+
+	STRUCTURE * pStructure;
+
+	pStructure = FindStructure( sGridNo, STRUCTURE_WALLNWINDOW );
+
+	if ( pStructure )
+	{
+		if ( pStructure->fFlags & STRUCTURE_WALLNWINDOW && !(pStructure->fFlags & STRUCTURE_SPECIAL) && ( pStructure->fFlags & STRUCTURE_OPEN ) )
 		{
 			return( TRUE );
 		}
 	}
+	
+/*	STRUCTURE * pStructure;
+	STRUCTURE * pStructure2;
+
+	pStructure = FindStructure( sGridNo, STRUCTURE_WALLNWINDOW );
+
+	if ( pStructure )
+	{
+	//	pStructure2 = FindStructure( sGridNo, STRUCTURE_WALL );
+              // 	if ( !pStructure2 )
+              //	{
+        	if ( pStructure->fFlags & STRUCTURE_WALLNWINDOW && !(pStructure->fFlags & STRUCTURE_SPECIAL)  && ( pStructure->fFlags & STRUCTURE_OPEN ))
+		{
+			return( TRUE );
+		}
+		
+	//	}
+		
+	}
+	
+	*/
 	return( FALSE );
 }
 

@@ -1,6 +1,6 @@
 #include <init_vfs.h>
 
-#include <vfs/Core/os_functions.h>
+#include <vfs/Core/vfs_os_functions.h>
 #include <vfs/Core/vfs_init.h>
 #include <vfs/Tools/vfs_property_container.h>
 
@@ -130,12 +130,12 @@ bool ja2xp::InitVFS::init()
 		this->dst_pattern = L".";
 	}
 
-	if(!this->src_lib && !os::createRealDirectory(src_root,true))
+	if(!this->src_lib && !vfs::OS::checkRealDirectory(src_root))
 	{
 		std::wcout << L"Source directory \"" << src_root() << L"\" does not exist" << std::endl;
 		return false;
 	}
-	if(!os::createRealDirectory(dst_root,true))
+	if(!vfs::OS::checkRealDirectory(dst_root))
 	{
 		if(!this->dst_create)
 		{
@@ -144,7 +144,7 @@ bool ja2xp::InitVFS::init()
 		}
 		std::stack<vfs::Path> dirs;
 		vfs::Path left = dst_root, right, temp;
-		while(!left.empty() && !os::createRealDirectory(left,true))
+		while(!left.empty() && !vfs::OS::checkRealDirectory(left))
 		{
 			dirs.push(left);
 			left.splitLast(temp,right);
@@ -152,7 +152,7 @@ bool ja2xp::InitVFS::init()
 		}
 		while(!dirs.empty())
 		{
-			if(!os::createRealDirectory(dirs.top()))
+			if(!vfs::OS::createRealDirectory(dirs.top()))
 			{
 				std::wcout << L"Could not create directory \"" << dirs.top().c_wcs() << std::endl;
 				return false;
@@ -193,7 +193,7 @@ bool ja2xp::InitVFS::init()
 	{
 		vfs_init::initVirtualFileSystem(conf);
 	}
-	catch(CBasicException& ex)
+	catch(vfs::Exception& ex)
 	{
 		std::wcout << ex.m_CallStack.front().message.c_wcs() << std::endl;
 		return false;

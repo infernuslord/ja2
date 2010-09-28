@@ -45,13 +45,13 @@
 	#include "Container.h"
 	#include "LibraryDataBase.h"
 	#include "io.h"
-
+	#include "sgp_logger.h"
 #endif
 
 using namespace std;
 
 #include <vfs/Core/vfs.h>
-#include <vfs/Core/os_functions.h>
+#include <vfs/Core/vfs_os_functions.h>
 #include <vfs/Aspects/vfs_settings.h>
 
 #ifdef USE_VFS
@@ -410,10 +410,10 @@ HWFILE FileOpen( STR strFilename, UINT32 uiOptions, BOOLEAN fDeleteOnClose )
 	// sometimes a file is supposed to opened that does not exist (not tested with FileExists())
 	// this operation can fail with an exception that the calling code doesn't catch
 	// instead we catch it (any exception, not just CBasicException) here and return 0
-	catch(CBasicException& ex) { logException(ex); }
+	catch(vfs::Exception& ex) { SGP_ERROR(ex.what()); }
 	catch(...)
 	{ 
-		logException( CBasicException("Caught undefined exception", _FUNCTION_FORMAT_, __LINE__, __FILE__) );
+		SGP_ERROR( "Caught undefined exception" );
 	}
 	return 0;
 #else
@@ -685,10 +685,10 @@ BOOLEAN FileRead( HWFILE hFile, PTR pDest, UINT32 uiBytesToRead, UINT32 *puiByte
 			{
 				uiBytesRead = pRF->read((vfs::Byte*)pDest, uiBytesToRead);
 			}
-			catch(CBasicException& ex)
+			catch(std::exception& ex)
 			{
 				pRF->close();
-				RETHROWEXCEPTION(L"", &ex);
+				SGP_RETHROW(L"", ex);
 			}
 
 			if(puiBytesRead)
@@ -820,10 +820,10 @@ BOOLEAN FileWrite( HWFILE hFile, PTR pDest, UINT32 uiBytesToWrite, UINT32 *puiBy
 			{
 				uiBytesWritten = pWF->write((vfs::Byte*)pDest, uiBytesToWrite);
 			}
-			catch(CBasicException& ex)
+			catch(std::exception& ex)
 			{
 				pWF->close();
-				RETHROWEXCEPTION(L"", &ex);
+				SGP_RETHROW(L"", ex);
 			}
 
 			if (uiBytesToWrite != uiBytesWritten)
@@ -905,7 +905,7 @@ BOOLEAN FileLoad( STR strFilename, PTR pDest, UINT32 uiBytesToRead, UINT32 *puiB
 	if(pFile)
 	{
 		UINT32 uiNumBytesRead;
-		TRYCATCH_RETHROW(uiNumBytesRead = pFile->read((vfs::Byte*)pDest,uiBytesToRead), L"");
+		SGP_TRYCATCH_RETHROW(uiNumBytesRead = pFile->read((vfs::Byte*)pDest,uiBytesToRead), L"");
 
 		if (uiBytesToRead != uiNumBytesRead)
 		{
@@ -1073,7 +1073,7 @@ BOOLEAN FileSeek( HWFILE hFile, UINT32 uiDistance, UINT8 uiHow )
 			vfs::tWritableFile *pWF = vfs::tWritableFile::cast(pFile);
 			if(pWF)
 			{
-				TRYCATCH_RETHROW(pWF->setWritePosition(iDistance, eSD), L"");
+				SGP_TRYCATCH_RETHROW(pWF->setWritePosition(iDistance, eSD), L"");
 				return TRUE;
 			}
 		}
@@ -1082,13 +1082,13 @@ BOOLEAN FileSeek( HWFILE hFile, UINT32 uiDistance, UINT8 uiHow )
 			vfs::tReadableFile *pRF = vfs::tReadableFile::cast(pFile);
 			if(pRF)
 			{
-				TRYCATCH_RETHROW(pRF->setReadPosition(iDistance, eSD), L"");
+				SGP_TRYCATCH_RETHROW(pRF->setReadPosition(iDistance, eSD), L"");
 				return TRUE;
 			}
 		}
 		else
 		{
-			THROWEXCEPTION(L"unknown operation");
+			SGP_THROW(L"unknown operation");
 		}
 	}
 	return FALSE;
@@ -1604,11 +1604,11 @@ BOOLEAN SetFileManCurrentDirectory( STR pcDirectory )
 #else
 	try
 	{
-		os::setCurrectDirectory(pcDirectory);
+		vfs::OS::setCurrectDirectory(pcDirectory);
 	}
-	catch(CBasicException& ex)
+	catch(vfs::Exception& ex)
 	{
-		logException(ex);
+		SGP_ERROR(ex.what());
 		return FALSE;
 	}
 	return TRUE;
@@ -1628,12 +1628,12 @@ BOOLEAN GetFileManCurrentDirectory( STRING512 pcDirectory )
 	try
 	{
 		vfs::Path sDir;
-		os::getCurrentDirectory(sDir);
+		vfs::OS::getCurrentDirectory(sDir);
 		strncpy(pcDirectory, sDir.to_string().c_str(), 512);
 	}
-	catch(CBasicException& ex)
+	catch(vfs::Exception& ex)
 	{
-		logException(ex);
+		SGP_ERROR(ex.what());
 		return FALSE;
 	}
 	return TRUE;
@@ -1841,7 +1841,7 @@ BOOLEAN GetExecutableDirectory( STRING512 pcDirectory )
 {
 #ifdef USE_VFS
 	vfs::Path exe_dir, exe_file;
-	os::getExecutablePath(exe_dir, exe_file);
+	vfs::OS::getExecutablePath(exe_dir, exe_file);
 	strncpy(pcDirectory, exe_dir.to_string().c_str(), 512);
 	return true;
 #else

@@ -1,12 +1,35 @@
+/* 
+ * bfVFS : vfs/Core/Location/vfs_directory_tree.cpp
+ *  - class for directories in a File System, implements Directory interface
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include <vfs/Core/Location/vfs_directory_tree.h>
 #include <vfs/Core/File/vfs_dir_file.h>
-#include <vfs/Core/os_functions.h>
+#include <vfs/Core/vfs_os_functions.h>
 
 #include <queue>
 #include <list>
 #include <set>
 
-#define ERROR_FILE(msg) BuildString().add((msg)).add(L" : ").add(pFile->getPath()).get()
+#define ERROR_FILE(msg) (_BS(msg) << L" : " << pFile->getPath() << _BS::wget)
 
 namespace vfs
 {
@@ -28,7 +51,7 @@ namespace vfs
 
 			IterImpl(TSubDir<WriteType>* dir): _dir(dir)
 			{
-				THROWIFFALSE(_dir, L"");
+				VFS_THROW_IFF(_dir, L"");
 				_iter = _dir->m_mapFiles.begin();
 			}
 		public:
@@ -222,9 +245,7 @@ bool vfs::TSubDir<vfs::IWritable>::deleteDirectory(vfs::Path const& sDirPath)
 			pFile->close();
 			if(!pFile->deleteFile())
 			{
-				std::wstringstream wss;
-				wss << L"Could not delete file \"" << pFile->getPath()() << L"\"";
-				THROWEXCEPTION( ERROR_FILE(L"Could not delete file") );
+				VFS_THROW( ERROR_FILE(L"Could not delete file") );
 			}
 			delete pFile;
 		}
@@ -249,7 +270,7 @@ bool vfs::TSubDir<vfs::IWritable>::deleteFileFromDirectory(vfs::Path const& rFil
 		if(pFile)
 		{
 			pFile->close();
-			THROWIFFALSE(pFile->deleteFile(), ERROR_FILE(L"Could not delete file"));
+			VFS_THROW_IFF(pFile->deleteFile(), ERROR_FILE(L"Could not delete file"));
 			delete pFile;
 		}
 		m_mapFiles.erase(it);
@@ -415,15 +436,15 @@ bool vfs::TDirectoryTree<WriteType>::init()
 
 		try
 		{
-			os::CIterateDirectory::EFileAttribute eFA;
-			os::CIterateDirectory iterFS(oCurDir, vfs::Const::STAR());
+			vfs::OS::CIterateDirectory::EFileAttribute eFA;
+			vfs::OS::CIterateDirectory iterFS(oCurDir, vfs::Const::STAR());
 			while ( iterFS.nextFile(sFilename, eFA) ) 
 			{
 				if (StrCmp::Equal(vfs::Const::DOT(),sFilename) || StrCmp::Equal(vfs::Const::DOTDOT(),sFilename) || StrCmp::Equal(vfs::Const::DOTSVN(),sFilename) )
 				{
 					continue;
 				}
-				if (eFA == os::CIterateDirectory::FA_DIRECTORY) 
+				if (eFA == vfs::OS::CIterateDirectory::FA_DIRECTORY) 
 				{
 					vfs::Path sLocal = qSubDirs.front().first + sFilename;
 
@@ -438,11 +459,11 @@ bool vfs::TDirectoryTree<WriteType>::init()
 				}
 			}
 		}
-		catch(CBasicException &ex)
+		catch(std::exception &ex)
 		{
 			// probably directory doesn't exist. abort or continue???
 			// -> abort AND continue
-			logException(ex);
+			VFS_LOG_WARNING(ex.what());
 			return false;
 		}
 		qSubDirs.pop();
@@ -466,7 +487,7 @@ typename vfs::TDirectoryTree<WriteType>::tFileType* vfs::TDirectoryTree<WriteTyp
 			sCreateDir += sLeft;
 			if(!this->createSubDirectory(sCreateDir))
 			{
-				THROWEXCEPTION(BuildString(L"could not create directory : ").add(sCreateDir()).get());
+				VFS_THROW(_BS(L"could not create directory : ") << sCreateDir << _BS::wget);
 			}
 		}
 		it = m_catDirs.find(sDir);
@@ -572,7 +593,7 @@ typename vfs::TDirectoryTree<WriteType>::tFileType* vfs::TDirectoryTree<WriteTyp
 template<typename WriteType>
 bool vfs::TDirectoryTree<WriteType>::createSubDirectory(vfs::Path const& sSubDirPath)
 {
-	if(os::createRealDirectory( this->m_realPath + sSubDirPath ))
+	if(vfs::OS::createRealDirectory( this->m_realPath + sSubDirPath ))
 	{
 		if( m_catDirs[sSubDirPath] == NULL)
 		{

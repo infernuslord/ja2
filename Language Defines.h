@@ -23,9 +23,9 @@
 /* please set one manually here (by uncommenting) if not willingly to set Workspace wide */
 //#define ENGLISH
 //#define GERMAN
-//#define RUSSIAN
+#define RUSSIAN
 //#define DUTCH
-#define POLISH
+//#define POLISH
 //#define FRENCH
 //#define ITALIAN
 //#define TAIWANESE

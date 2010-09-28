@@ -1,3 +1,26 @@
+/* 
+ * bfVFS : vfs/Core/Location/vfs_lib_dir.cpp
+ *  - class for readonly (sub)directories in archives/libraries
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include <vfs/Core/Location/vfs_lib_dir.h>
 #include <vfs/Tools/vfs_log.h>
 
@@ -116,8 +139,7 @@ bool vfs::CLibDirectory::deleteDirectory(vfs::Path const& dirPath)
 	//	m_files.clear();
 	//	return true;
 	//}
-	vfs::Log log(L"errors.log",true);
-	log << "called 'vfs::CLibDirectory::deleteDirectory' which doesn't implement the IWritable interface" << vfs::Log::endl;
+	VFS_LOG_ERROR(L"called 'deleteDirectory', 'vfs::CLibDirectory' doesn't implement the IWritable interface");
 	return false;
 }
 
@@ -133,8 +155,7 @@ bool vfs::CLibDirectory::deleteFileFromDirectory(vfs::Path const& filename)
 	//		return true;
 	//	}
 	//}
-	vfs::Log log(L"errors.log",true);
-	log << "called 'vfs::CLibDirectory::deleteFileFromDirectory' which doesn't implement the IWritable interface" << vfs::Log::endl;
+	VFS_LOG_ERROR(L"called 'deleteFileFromDirectory', 'vfs::CLibDirectory' doesn't implement the IWritable interface");
 	return false;
 }
 

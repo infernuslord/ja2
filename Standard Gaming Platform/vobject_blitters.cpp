@@ -19,6 +19,7 @@
 	#include "vobject.h"
 	#include "vobject_blitters.h"
 	#include "shading.h"
+	#include "sgp_logger.h"
 #endif
 
 #include <map>
@@ -7091,9 +7092,9 @@ UINT32 uiLineSkipDest, uiLineSkipSrc;
 			}
 		}
 	}
-	catch(CBasicException& ex)
+	catch(std::exception& ex)
 	{
-		logException(ex);
+		SGP_ERROR(ex.what());
 		return false;
 	}
 

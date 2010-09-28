@@ -372,6 +372,9 @@ extern INT8 gubFacilityInSubmenu;
 extern UINT8 gubFacilityLineForSubmenu;
 extern SOLDIERTYPE *gpFacilityStaffer;
 
+// SANDRO - function to award record points for militia training
+void RecordNumMilitiaTrainedForMercs( INT16 sX, INT16 sY, INT8 sZ, UINT8 ubMilitiaTrained, BOOLEAN fMobile );
+
 #endif
 
 

@@ -191,7 +191,7 @@ BOOLEAN WriteHiddenNamesStats(HIDDEN_NAMES_VALUES *pHiddenNames, STR fileName)
 		UINT32 cnt;
 
 		FilePrintf(hFile,"<HIDDENNAMES>\r\n");
-		for(cnt = 0;cnt < 501;cnt++)
+		for(cnt = 0;cnt < 500;cnt++)
 		{
 
 			FilePrintf(hFile,"\t<NAME>\r\n");
@@ -215,5 +215,5 @@ void LoadHiddenNames()
 	strcpy(fileName, TABLEDATA_DIRECTORY);
 	strcat(fileName, HIDDENNAMESFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	THROWIFFALSE(ReadInHiddenNamesStats(zPokaznazwe,fileName), HIDDENNAMESFILENAME);	
+	SGP_THROW_IFFALSE(ReadInHiddenNamesStats(zHiddenNames,fileName), HIDDENNAMESFILENAME);	
 }

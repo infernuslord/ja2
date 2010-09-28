@@ -34,6 +34,13 @@ extern UINT8			AimMercArray[ MAX_NUMBER_MERCS ];
 #define			AIM_SYMBOL_WIDTH						203
 #define			AIM_SYMBOL_HEIGHT						51
 
+//tais: small logo for nsgi
+#define			AIM_SYMBOL_SMALL_X						IMAGE_OFFSET_X + 3
+#define			AIM_SYMBOL_SMALL_Y						IMAGE_OFFSET_Y + 3
+#define			AIM_SYMBOL_SMALL_WIDTH					102
+#define			AIM_SYMBOL_SMALL_HEIGHT					26
+
+
 // RustBackGround
 #define			RUSTBACKGROUND_SIZE_X				125
 #define			RUSTBACKGROUND_SIZE_Y				100

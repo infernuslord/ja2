@@ -1525,7 +1525,11 @@ void AddPossiblePendingEnemiesToBattle()
 				ubInsertionCode = INSERTION_CODE_NORTH;
 			else
 			{
-				Assert(0);
+				// WANNE: Hack: If no valid insertion is found, get random insertion instead of Assert() error
+				UINT32 rndInsertionCode = GetRndNum(3);				
+				ubInsertionCode = rndInsertionCode;
+
+				//Assert(0);
 			}
 		}
 		else if( pGroup->ubNextX && pGroup->ubNextY )
@@ -1540,7 +1544,11 @@ void AddPossiblePendingEnemiesToBattle()
 				ubInsertionCode = INSERTION_CODE_NORTH;
 			else
 			{
-				Assert(0);
+				// WANNE: Hack: If no valid insertion is found, get random insertion instead of Assert() error
+				UINT32 rndInsertionCode = GetRndNum(3);				
+				ubInsertionCode = rndInsertionCode;
+				
+				//Assert(0);
 			}
 		}
 		else
@@ -1993,6 +2001,7 @@ void EnemyCapturesPlayerSoldier( SOLDIERTYPE *pSoldier )
   if ( AM_AN_EPC( pSoldier ) )
   {
 	  pSoldier->stats.bLife = 0;
+	  pSoldier->iHealableInjury = 0; // added by SANDRO
     HandleSoldierDeath( pSoldier, &fMadeCorpse );
     return;
   }
@@ -2122,6 +2131,8 @@ void EnemyCapturesPlayerSoldier( SOLDIERTYPE *pSoldier )
 	{
 		pSoldier->stats.bLife += (INT8)(10 - Random( 21 ) );
 	}
+	// SANDRO - make the lost life insta-healable
+	pSoldier->iHealableInjury = ((pSoldier->stats.bLifeMax - pSoldier->stats.bLife) * 100);
 
 	// make him quite exhausted when found
 	pSoldier->bBreath = pSoldier->bBreathMax = 50;
@@ -2142,6 +2153,7 @@ void HandleEnemyStatusInCurrentMapBeforeLoadingNewMap()
 		if( MercPtrs[ i ]->bActive && MercPtrs[ i ]->stats.bLife < OKLIFE && MercPtrs[ i ]->stats.bLife )
 		{
 			MercPtrs[ i ]->stats.bLife = 0;
+			MercPtrs[ i ]->iHealableInjury = 0; // added just for sure - SANDRO
 			HandleSoldierDeath( MercPtrs[ i ], &fMadeCorpse );
 			bKilledEnemies++;
 		}
@@ -2162,6 +2174,7 @@ void HandleEnemyStatusInCurrentMapBeforeLoadingNewMap()
 		if( MercPtrs[ i ]->bActive && MercPtrs[ i ]->stats.bLife < OKLIFE && MercPtrs[ i ]->stats.bLife )
 		{
 			MercPtrs[ i ]->stats.bLife = 0;
+			MercPtrs[ i ]->iHealableInjury = 0; // added just for sure - SANDRO
 			HandleSoldierDeath( MercPtrs[ i ], &fMadeCorpse );
 			bKilledRebels++;
 		}
@@ -2172,6 +2185,7 @@ void HandleEnemyStatusInCurrentMapBeforeLoadingNewMap()
 		if( MercPtrs[ i ]->bActive && MercPtrs[ i ]->stats.bLife < OKLIFE && MercPtrs[ i ]->stats.bLife )
 		{
 			MercPtrs[ i ]->stats.bLife = 0;
+			MercPtrs[ i ]->iHealableInjury = 0; // added just for sure - SANDRO
 			HandleSoldierDeath( MercPtrs[ i ], &fMadeCorpse );
 			bKilledCivilians++;
 		}

@@ -52,6 +52,8 @@ UINT32 guiPabloExtraDaysBribed = 0;
 
 UINT8		gubCambriaMedicalObjects;
 
+extern INT8 NumMercsNear( UINT8 ubProfileID, UINT8 ubMaxDist );
+
 // WANNE: No more used for the new airport code
 //void DropOffItemsInMeduna( UINT8 ubOrderNum );
 
@@ -726,8 +728,10 @@ void HandleNPCSystemEvent( UINT32 uiEvent )
 				}
 				break;
 			case NPC_ACTION_DELAYED_MAKE_BRENDA_LEAVE:
-				//IC:
-				//TriggerNPCRecord( 85, 9 );
+				// silversurfer: reenabled this
+				// but only play Brendas quote when we are near enough to hear her
+				if ( NumMercsNear( 85, 8 ) > 0 )
+					TriggerNPCRecord( 85, 9 );
 				SetFactTrue( FACT_BRENDA_PATIENCE_TIMER_EXPIRED );
 				break;
 			case NPC_ACTION_SET_DELAY_TILL_GIRLS_AVAILABLE:
@@ -846,8 +850,8 @@ void HandleEarlyMorningEvents( void )
 
 	if( gMercProfiles[ TONY ].ubLastDateSpokenTo > 0 && !( gWorldSectorX == 5 && gWorldSectorY == MAP_ROW_C && gbWorldSectorZ == 0 ) )
 	{
-		// San Mona C5 is not loaded so make Tony possibly not available
-		if (Random( 4 ))
+		// San Mona C5 is not loaded so make Tony possibly not availableif 
+		if (Random( 99 ) < gGameExternalOptions.ubChanceTonyAvailable) // silversurfer/SANDRO
 		{
 			// Tony IS available
 			SetFactFalse( FACT_TONY_NOT_AVAILABLE );

@@ -1013,7 +1013,7 @@ UINT32 ProcessFileIO()
 					return(EDIT_SCREEN);
 				}
 				gbCurrentFileIOStatus = IOSTATUS_NONE;
-				CreateMessageBox((STR16)BuildString(L" Error saving ").add((const char*)ubNewFilename).add(L" file. Try another filename? ").get().c_str());
+				CreateMessageBox((STR16)(_BS(L" Error saving ") << (const char*)ubNewFilename << L" file. Try another filename? " << _BS::wget).c_str() );
 				return(guiCurrentScreen);
 			}
 			if( gfShowPits )
@@ -1055,7 +1055,7 @@ UINT32 ProcessFileIO()
 				gbCurrentFileIOStatus = IOSTATUS_NONE;
 				gfGlobalError = FALSE;
 				gfLoadError = TRUE;
-				CreateMessageBox((STR16)BuildString(L" Error loading ").add((const char*)ubNewFilename).add(L" file. Try another filename? ").get().c_str());
+				CreateMessageBox((STR16)(_BS(L" Error loading ") << (const char*)ubNewFilename << L" file. Try another filename? " << _BS::wget).c_str());
 				return(guiCurrentScreen);
 			}
 			//ADB these are NOT set yet! but they need to be, duh

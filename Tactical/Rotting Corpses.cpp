@@ -950,7 +950,7 @@ BOOLEAN TurnSoldierIntoCorpse( SOLDIERTYPE *pSoldier, BOOLEAN fRemoveMerc, BOOLE
 							}
 						}
 
-						if(gGameExternalOptions.fNewAttachmentSystem){
+						if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
 							ReduceAttachmentsOnGunForNonPlayerChars(pSoldier, pObj);
 						}
 					// HEADROCK HAM B2.8: Militia will drop items only if allowed.
@@ -1885,24 +1885,25 @@ void ReduceAmmoDroppedByNonPlayerSoldiers( SOLDIERTYPE *pSoldier, INT32 iInvSlot
 
 void ReduceAttachmentsOnGunForNonPlayerChars(SOLDIERTYPE *pSoldier, OBJECTTYPE * pObj){
 	
-	Assert(gGameExternalOptions.fNewAttachmentSystem);
+	//Not meant for use in OAS.
+	Assert(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW);
 	
 	//OBJECTTYPE * pObj = &(pSoldier->inv[ invSlot ]);
 	
 	//If this item has any attachments, is not from a player, and is overwriteable. It's also only for guns.
-	if((*pObj)[0]->AttachmentListSize() > 0 && pSoldier->bTeam != gbPlayerNum && !((*pObj).fFlags & OBJECT_NO_OVERWRITE) && Item[pObj->usItem].usItemClass == IC_GUN && !gGameSettings.fOptions[TOPTION_DROP_ALL]){
+	if((*pObj)[0]->AttachmentListSize() > 0 && pSoldier->bTeam != gbPlayerNum && !((*pObj).fFlags & OBJECT_NO_OVERWRITE) && Item[pObj->usItem].usItemClass == IC_GUN && !gGameOptions.fEnemiesDropAllItems){
 		UINT8 slotCount = 0;
 		for(std::list<OBJECTTYPE>::iterator iter = (*pObj)[0]->attachments.begin(); iter != (*pObj)[0]->attachments.end(); ++iter, ++slotCount){
 			//A few conditions under which we will not delete this attachment
 			if(!iter->exists())
 				continue;
 
-			if(Item[iter->usItem].inseparable)
-				continue;
+			//Loop to find out if this attachment is a default one, if so, we don't want to remove it.
+			int i;
+			for(i = 0; i < MAX_DEFAULT_ATTACHMENTS && Item[pObj->usItem].defaultattachments[i] != iter->usItem; i++){}
 
-			//WarmSteel - Think we want to erase these anyway;D
-			//if(Item[pObj->usItem].defaultattachment == iter->usItem)
-			//	continue;
+			if(Item[pObj->usItem].defaultattachments[i] != iter->usItem)
+				continue;
 
 			//Erase this attachment or not?
 			if(!Chance(gGameExternalOptions.usAttachmentDropRate)){

@@ -778,23 +778,25 @@ UINT8 status;
 UINT8 number;
 UINT8 drop;
 UINT8 slot;
+UINT8 i1;
 int i;
 
 	for (i= 1; i<=n; i++ )
 	{
 		if (i == 1 ) ID = lua_tointeger(L,i);
-		if (i == 2 ) inv = lua_tointeger(L,i);
-		if (i == 3 ) number = lua_tointeger(L,i);
-		if (i == 4 ) status = lua_tointeger(L,i);
-		if (i == 5 ) drop = lua_tointeger(L,i);
-		if (i == 6 ) slot = lua_tointeger(L,i);
+		if (i == 3 ) inv = lua_tointeger(L,i);
+		if (i == 4 ) inv = lua_tointeger(L,i);
+		if (i == 5 ) number = lua_tointeger(L,i);
+		if (i == 6 ) status = lua_tointeger(L,i);
+		if (i == 7 ) drop = lua_tointeger(L,i);
+		if (i == 8 ) slot = lua_tointeger(L,i);
 	}
 
 		
-gMercProfileGear[ID].inv[slot] = inv;
-gMercProfileGear[ID].iNumber[slot] = number;
-gMercProfileGear[ID].iStatus[slot] = status;
-gMercProfileGear[ID].iDrop[slot] = drop;
+gMercProfileGear[ID][i1].inv[slot] = inv;
+gMercProfileGear[ID][i1].iNumber[slot] = number;
+gMercProfileGear[ID][i1].iStatus[slot] = status;
+gMercProfileGear[ID][i1].iDrop[slot] = drop;
 	
 	return 0;
 }

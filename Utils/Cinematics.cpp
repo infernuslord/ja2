@@ -234,11 +234,9 @@ SMKFLIC *SmkOpenFlic(const CHAR8 *cFilename)
 			vfs::COpenWriteFile wfile(tempfile,true);
 			wfile->write(&data[0],size);
 		}
-		catch(CBasicException& ex)
+		catch(std::exception& ex)
 		{
-			BuildString bs;
-			bs.add(L"Intro file \"").add(filename()).add(L"\" could not be extracted");
-			RETHROWEXCEPTION(bs.get(), &ex);
+			SGP_RETHROW(_BS(L"Intro file \"") << filename << L"\" could not be extracted" << _BS::wget, ex);
 		}
 	}
 #endif
@@ -262,9 +260,9 @@ SMKFLIC *SmkOpenFlic(const CHAR8 *cFilename)
 			return NULL;
 		}
 	}
-	catch(CBasicException& ex)
+	catch(std::exception& ex)
 	{
-		RETHROWEXCEPTION(L"Temporary intro file could not be read", &ex);
+		SGP_RETHROW(L"Temporary intro file could not be read", ex);
 	}
 	if(!(pSmack->SmackHandle=SmackOpen(tempfilename.to_string().c_str(), SMACKTRACKS, SMACKAUTOEXTRA)))
 #endif

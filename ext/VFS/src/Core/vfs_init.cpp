@@ -1,17 +1,45 @@
-#include <vfs/Core/vfs_init.h>
+/* 
+ * bfVFS : vfs/Core/vfs_init.cpp
+ *  - initialization functions/classes
+ *
+ * Copyright (C) 2008 - 2010 (BF) john.bf.smith@googlemail.com
+ * 
+ * This file is part of the bfVFS library
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include <vfs/Core/vfs.h>
+#include <vfs/Core/vfs_init.h>
 #include <vfs/Core/File/vfs_file.h>
-#include <vfs/Core/File/vfs_memory_file.h>
+#include <vfs/Core/File/vfs_buffer_file.h>
 #include <vfs/Core/Location/vfs_directory_tree.h>
-#include <vfs/Ext/slf/vfs_slf_library.h>
-#include <vfs/Ext/7z/vfs_7z_library.h>
-#include <vfs/Ext/7z/vfs_create_7z_library.h>
+#include <vfs/Core/Interface/vfs_library_interface.h>
+
+#ifdef VFS_WITH_SLF
+#	include <vfs/Ext/slf/vfs_slf_library.h>
+#endif
+#ifdef VFS_WITH_7ZIP
+#	include <vfs/Ext/7z/vfs_7z_library.h>
+#	include <vfs/Ext/7z/vfs_create_7z_library.h>
+#endif
 
 #include <vfs/Tools/vfs_property_container.h>
 #include <vfs/Tools/vfs_log.h>
 
 #include <vfs/Aspects/vfs_logging.h>
-#include <vfs/Aspects/vfs_debugging.h>
 #include <vfs/Aspects/vfs_settings.h>
 
 /////////////////////////////////
@@ -99,7 +127,6 @@ bool vfs_init::initVirtualFileSystem(vfs::PropertyContainer& oVFSProps)
 	if(lProfiles.empty())
 	{
 		VFS_LOG_ERROR(L"no profiles specified");
-		VFS_ON_ERROR(L"no profiles specified");
 		return false;
 	}
 	
@@ -146,13 +173,15 @@ bool vfs_init::initWriteProfile(vfs::CVirtualProfile &rProf)
 	}
 	else
 	{
+		VFS_LOG_WARNING(_BS(L"Could not find location (\"\") for profile '") << rProf.cName << L"'" << _BS::wget );
+		VFS_LOG_WARNING(_BS(L"Trying to initialize profile root : ") << rProf.cRoot << _BS::wget );
 		vfs::CDirectoryTree *pDirTree = NULL;
 		pDirTree = new vfs::CDirectoryTree(vfs::Path(vfs::Const::EMPTY()),rProf.cRoot);
 		if(!pDirTree->init())
 		{
 			return false;
 		}
-		TRYCATCH_RETHROW( rProf.addLocation(pDirTree), L"" );
+		VFS_TRYCATCH_RETHROW( rProf.addLocation(pDirTree), L"" );
 		getVFS()->addLocation(pDirTree, &rProf);
 		pDir = pDirTree;
 	}
@@ -174,7 +203,7 @@ bool vfs_init::initVirtualFileSystem(vfs_init::VfsConfig const& conf)
 	for(; prof_it != conf.profiles.end(); ++prof_it)
 	{
 		vfs_init::Profile* prof = prof_it->second;
-		VFS_LOG_INFO(BuildString(L"  Reading profile : ").add(prof->m_name).get().c_str());
+		VFS_LOG_INFO(_BS(L"  Reading profile : ") << prof->m_name << _BS::wget);
 
 		vfs::Path profileRoot = prof->m_root;
 
@@ -189,8 +218,8 @@ bool vfs_init::initVirtualFileSystem(vfs_init::VfsConfig const& conf)
 		}
 		else
 		{
-			THROWIFFALSE(pProf->cWritable == bIsWritable, L"profile already exists, but their write properties differ");
-			THROWIFFALSE(pProf->cRoot == profileRoot, L"profile already exists, but their root directories differ");
+			VFS_THROW_IFF(pProf->cWritable == bIsWritable, L"profile already exists, but their write properties differ");
+			VFS_THROW_IFF(pProf->cRoot == profileRoot, L"profile already exists, but their root directories differ");
 			continue;
 		}
 
@@ -208,7 +237,7 @@ bool vfs_init::initVirtualFileSystem(vfs_init::VfsConfig const& conf)
 				bool bOwnFile = false;
 
 				vfs::Path fullpath = profileRoot + loc->m_path;
-				VFS_LOG_INFO( BuildString(L"    library : \"").add(fullpath).add(L"\"").get().c_str() );
+				VFS_LOG_INFO( _BS(L"    library : \"") << fullpath << L"\"" << _BS::wget );
 
 				if(!loc->m_path.empty())
 				{
@@ -228,28 +257,33 @@ bool vfs_init::initVirtualFileSystem(vfs_init::VfsConfig const& conf)
 					vfs::ILibrary *pLib = NULL;
 					if(vfs::StrCmp::Equal(ext,L"slf"))
 					{
+#ifdef VFS_WITH_SLF
 						pLib = new vfs::CSLFLibrary( pLibFile, loc->m_mount_point );
+#else
+						VFS_LOG_ERROR(L"Trying to init slf library : SLF support disabled");
+						continue;
+#endif
 					}
 					else if(vfs::StrCmp::Equal(ext,L".7z"))
 					{
+#ifdef VFS_WITH_7ZIP
 						pLib = new vfs::CUncompressed7zLibrary( pLibFile, loc->m_mount_point );
+#else
+						VFS_LOG_ERROR(L"Trying to init 7z library : 7zip support disabled");
+						continue;
+#endif
 					}
 					else
 					{
-						BuildString bs = BuildString(L"File [").add(loc->m_path).add(L"] in not an SLF or 7z library");
-						VFS_LOG_ERROR(bs.get().c_str());
-						THROWEXCEPTION(bs.get());
+						VFS_THROW(_BS(L"File [") << loc->m_path << L"] in not an SLF or 7z library" << _BS::wget);
 					}
 					if(!pLib->init())
 					{
 						if(!bOptional)
 						{
-							VFS_LOG_ERROR(L"Could not initialize library");
-							THROWEXCEPTION(
-								BuildString(L"Could not initialize library [").add(
-								loc->m_path).add(L" ]").add(
-								L" in : profile [ ").add(prof->m_name).add(L" ],").add(
-								L" path [ ").add(fullpath).add(L" ]").get());
+							VFS_THROW(_BS(L"Could not initialize library [ ") << loc->m_path << L" ]" <<
+								L" in : profile [ " << prof->m_name << L" ]," <<
+								L" path [ " << fullpath << L" ]" << _BS::wget);
 						}
 					}
 					else
@@ -260,14 +294,13 @@ bool vfs_init::initVirtualFileSystem(vfs_init::VfsConfig const& conf)
 				}
 				else
 				{
-					VFS_LOG_ERROR(BuildString(L"File not found : ").add(loc->m_path).get().c_str());
-					THROWEXCEPTION(BuildString(L"File not found : ").add(loc->m_path).get());
+					VFS_THROW(_BS(L"File not found : ") << loc->m_path << _BS::wget);
 				}
 			}
 			else if(vfs::StrCmp::Equal(loc->m_type,L"DIRECTORY"))
 			{
 				vfs::Path fullpath = profileRoot + loc->m_path;
-				VFS_LOG_INFO( BuildString(L"    directory : \"").add(fullpath).add(L"\"").get().c_str() );
+				VFS_LOG_INFO( _BS(L"    directory : \"") << fullpath << L"\"" << _BS::wget );
 
 				vfs::IBaseLocation *pDirLocation = NULL;
 				bool init_success = false;
@@ -285,11 +318,9 @@ bool vfs_init::initVirtualFileSystem(vfs_init::VfsConfig const& conf)
 				}
 				if(!init_success)
 				{
-					VFS_LOG_ERROR(L"Could not initialize directory");
-					THROWEXCEPTION(
-						BuildString(L"Could not initialize directory [\"").add(loc->m_path).add(L"\"]").add(
-						L" in : profile [\"").add(prof->m_name).add(L"\"],").add(
-						L" path [\"").add(fullpath).add(L"\"]").get());
+					VFS_THROW(_BS(L"Could not initialize directory [\"") << loc->m_path << L"\"]" <<
+						L" in : profile [\"" << prof->m_name << L"\"]," <<
+						L" path [\"" << fullpath << L"\"]" << _BS::wget);
 				}
 				else
 				{
@@ -309,9 +340,7 @@ bool vfs_init::initVirtualFileSystem(vfs_init::VfsConfig const& conf)
 			}
 			else if(!pProf->cWritable)
 			{
-				BuildString bs = BuildString(L"Profile [").add(prof->m_name).add(L"] is supposed to be writable!");
-				VFS_LOG_ERROR(bs.get().c_str());
-				THROWEXCEPTION(bs.get());
+				VFS_THROW(_BS(L"Profile [") << prof->m_name << L"] is supposed to be writable!" << _BS::wget);
 			}
 			initWriteProfile(*pProf);
 		}

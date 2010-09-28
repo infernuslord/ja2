@@ -40,7 +40,7 @@ UINT32 MDItemVideoObjects::getVObjectForItem(UINT32 key)
 	{
 		return it->second;
 	}
-	THROWEXCEPTION(BuildString(L"Item key not registered : ").add(key).get());	
+	SGP_THROW(_BS(L"Item key not registered : ") << key << _BS::wget);	
 }
 
 void MDItemVideoObjects::registerItem(UINT32 key, vfs::Path const& sFileName)
@@ -48,7 +48,7 @@ void MDItemVideoObjects::registerItem(UINT32 key, vfs::Path const& sFileName)
 	std::map<UINT32,UINT32>::iterator it = m_mapVObjects.find(key);
 	if(it != m_mapVObjects.end())
 	{
-		THROWEXCEPTION(BuildString(L"Item image already registered : ").add(key).get());
+		SGP_THROW(_BS(L"Item image already registered : ") << key << _BS::wget);
 	}
 	// LOAD INTERFACE GUN PICTURES
 	UINT32 uiVObject;
@@ -57,7 +57,7 @@ void MDItemVideoObjects::registerItem(UINT32 key, vfs::Path const& sFileName)
 	FilenameForBPP(const_cast<STR>(sFileName.to_string().c_str()), VObjectDesc.ImageFile);
 	if(! AddVideoObject( &VObjectDesc, &uiVObject )) 
 	{
-		THROWEXCEPTION( BuildString(L"Could not add video object for file \"").add(sFileName).get() );
+		SGP_THROW(_BS(L"Could not add video object for file \"") << sFileName << _BS::wget);
 	}
 	m_mapVObjects.insert(std::make_pair(key,uiVObject));
 }
@@ -76,7 +76,7 @@ bool MDItemVideoObjects::registerItemsFromFilePattern(vfs::Path const& sFilePatt
 		wss.str(it.value()->getName().c_wcs());
 		if( !(wss >> item) )
 		{
-			std::wstring err = BuildString().add(L"Could not extract item number from file \"").add(wss.str()).add(L"\"").get();
+			std::wstring err = _BS(L"Could not extract item number from file \"") << wss.str() << L"\"" << _BS::wget;
 			WriteMessageToFile( const_cast<STR16>(err.c_str()) );
 			continue;
 		}
@@ -84,10 +84,9 @@ bool MDItemVideoObjects::registerItemsFromFilePattern(vfs::Path const& sFilePatt
 		{
 			this->registerItem(item, it.value()->getPath());
 		}
-		catch(CBasicException& ex)
+		catch(std::exception& ex)
 		{
-			RETHROWEXCEPTION( BuildString().add(L"Registering item from file \"").add(wss.str()).add(L"\" failed").get().c_str(),
-				&ex );
+			SGP_RETHROW( _BS(L"Registering item from file \"") << wss.str() << L"\" failed" << _BS::wget, ex );
 		}
 	}
 	return true;

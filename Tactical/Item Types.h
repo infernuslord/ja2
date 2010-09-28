@@ -153,7 +153,8 @@ extern	int	SMALLPOCKFINAL		;//= NUM_INV_SLOTS;//RESET in initInventory
 
 #define MAX_OBJECTS_PER_SLOT 255
 #define MAX_ATTACHMENTS 30
-#define MAX_DEFAULT_ATTACHMENTS 10
+#define MAX_DEFAULT_ATTACHMENTS 20
+extern UINT16 LAST_SLOT_INDEX;
 #define MAX_MONEY_PER_SLOT 20000
 
 typedef enum
@@ -419,7 +420,8 @@ public:
 	~StackedObjectData();
 	void	initialize() {attachments.clear(); data.initialize();};
 	OBJECTTYPE* GetAttachmentAtIndex(UINT8 index);
-	BOOLEAN	RemoveAttachmentAtIndex(UINT8 index);
+	BOOLEAN	RemoveAttachmentAtIndex(UINT8 index, attachmentList::iterator * returnIter = NULL);
+	attachmentList::iterator RemoveAttachmentAtIter(attachmentList::iterator iter);
 	BOOLEAN	AddAttachmentAtIndex(UINT8 index, OBJECTTYPE pObj);
 	UINT16 AttachmentListSize();
 	bool operator==(StackedObjectData& compare);
@@ -1250,7 +1252,7 @@ extern UINT16 NASIncompatibleAttachments[MAXATTACHMENTS][2];
 
 typedef struct
 {
-	UINT16	itemIndex;
+	UINT16	usItemIndex;
 	std::vector<UINT16> itemSlots;
 } ItemSlotAssignStruct;
 
@@ -1258,14 +1260,10 @@ extern ItemSlotAssignStruct ItemSlotAssign[MAXITEMS+1];
 
 typedef struct
 {
-	UINT16	usAttachmentSlotIndexAssign;
-	UINT16	uiAttachmentIndex;
+	UINT16	usAttachmentIndex;
 	UINT16	usAPCost;
-	std::vector<UINT16> usRemovesSlots;
-	std::vector<UINT16> usAddsSlots;
-} AttachmentSlotAssignStruct;
 
-extern AttachmentSlotAssignStruct AttachmentSlotAssign[MAXATTACHMENTS];
+} AttachmentAssignStruct;
 
 typedef struct
 {
@@ -1291,9 +1289,34 @@ typedef struct
 	BOOLEAN fDefaultVestSlot;
 	BOOLEAN fDefaultLeggingsSlot;
 
+	char	endOfPOD;
+#define SIZEOF_ATTACHMENT_SLOT_STRUCT_POD	(offsetof(AttachmentSlotStruct, endOfPOD))
+
+	std::vector<AttachmentAssignStruct> AttachmentAssignVector;
+
 } AttachmentSlotStruct;
 
 extern AttachmentSlotStruct AttachmentSlots[MAXITEMS+1]; 
+
+typedef struct
+{
+	std::vector<UINT16> usItemExclude;
+	std::vector<UINT16> usItemInclude;
+	std::vector<UINT16> ubWeaponClass;
+	std::vector<UINT16> usAddsSlots;
+	std::vector<UINT16> usRemovesSlots;
+
+} AlterationStruct;
+
+typedef struct
+{
+	UINT16	usAttachmentIndex;
+	std::vector<AlterationStruct> Alterations;
+
+} AlteringAttachmentStruct;
+
+extern AlteringAttachmentStruct AlteringAttachments[MAXITEMS+1];
+
 typedef struct
 {
 	UINT16	usItem;
@@ -1358,22 +1381,29 @@ enum
 	IMP_EXPLOSIVE,
 	IMP_MECHANICAL,
 	IMP_MEDICAL,
-//SKILLS
-	IMP_HTH,
-	IMP_MARTIALARTS,
-	IMP_NIGHTOPS,
+//SKILLS - SANDRO was here
+	IMP_AUTO_WEAPONS,
+	IMP_HEAVY_WEAPONS,
+	IMP_SNIPER,
+	IMP_RANGER,
+	IMP_GUNSLINGER,
+	IMP_MARTIAL_ARTS,
+	IMP_SQUADLEADER,
+	IMP_TECHNICIAN,
+	IMP_DOCTOR,
+	IMP_AMBIDEXTROUS,
+	IMP_MELEE,
+	IMP_THROWING,
+	IMP_NIGHT_OPS,
 	IMP_STEALTHY,
-	IMP_PROF_SNIPER,
+	IMP_ATHLETICS,
+	IMP_BODYBUILDING,
+	IMP_DEMOLITIONS,
+	IMP_TEACHING,
+	IMP_SCOUTING,
 	IMP_LOCKPICKING,
 	IMP_ELECTRONICS,
-	IMP_THROWING,
-	IMP_KNIFING,
-	IMP_HEAVYWEAPONS,
-	IMP_AUTOWEAPONS,
-	IMP_AMBIDEXTROUS,
 	IMP_CAMOUFLAGED,
-	IMP_TEACHING,
-	IMP_THIEF,
 
 	MAX_IMP_ITEM_TYPES
 };

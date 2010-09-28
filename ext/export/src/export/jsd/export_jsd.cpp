@@ -6,7 +6,7 @@
 
 #include <vfs/Core/vfs.h>
 #include <vfs/Core/vfs_file_raii.h>
-#include <vfs/Core/File/vfs_memory_file.h>
+#include <vfs/Core/File/vfs_buffer_file.h>
 #include <vfs/Ext/slf/vfs_slf_library.h>
 #include <vfs/Ext/7z/vfs_create_7z_library.h>
 
@@ -80,7 +80,7 @@ void ja2xp::CExportJSD::handleCommand(param_list_t const& params)
 	{
 		convertJSDtoXML(vfs.srcPattern(), vfs.dstPattern());
 	}
-	catch(CBasicException& msg)
+	catch(vfs::Exception& msg)
 	{
 		std::wcout << msg.getLastEntryString().c_str() << std::endl;
 	}

@@ -429,7 +429,7 @@ typedef struct
 	INT8	fMorrisShouldSayHi;
 	BOOLEAN		fFirstTimeInGameHeliCrash;
 #endif
-	BOOLEAN Pokaznazwe[500]; //legion by Jazz
+	BOOLEAN HiddenNames[500]; //legion by Jazz
 
 
 	UINT8		ubFiller[534];		//This structure should be 1024 bytes
@@ -1223,6 +1223,11 @@ BOOLEAN MERCPROFILESTRUCT::Load(HWFILE hFile, bool forceLoadOldVersion, bool for
 			bInvStatus[x] = status;
 			bInvNumber[x] = number;
 		}
+		// SANDRO - read records
+		if ( !FileRead( hFile, &this->records, sizeof(STRUCT_Records), &uiNumBytesRead ) )
+		{
+			return(FALSE);
+		}
 		if ( this->uiProfileChecksum != this->GetChecksum() )
 		{
 			return( FALSE );
@@ -1294,6 +1299,11 @@ BOOLEAN MERCPROFILESTRUCT::Save(HWFILE hFile)
 		{
 			return(FALSE);
 		}
+	}
+	// SANDRO - save records
+	if ( !FileWrite( hFile, &this->records, sizeof(STRUCT_Records), &uiNumBytesWritten ) )
+	{
+		return(FALSE);
 	}
 	return TRUE;
 }
@@ -1723,7 +1733,7 @@ BOOLEAN StackedObjectData::Save( HWFILE hFile, bool fSavingMap )
 	int size = 0;
 	for (attachmentList::iterator iter = attachments.begin(); iter != attachments.end(); ++iter) {
 		//WarmSteel - In fact, attachments CAN be null now with NAS.
-		if (iter->exists() == true || gGameExternalOptions.fNewAttachmentSystem) {
+		if (iter->exists() == true || gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW) {
 			++size;
 		}
 		else {
@@ -1742,7 +1752,7 @@ BOOLEAN StackedObjectData::Save( HWFILE hFile, bool fSavingMap )
 	}
 	for (attachmentList::iterator iter = attachments.begin(); iter != attachments.end(); ++iter) {
 		//WarmSteel - Can be null with NAS, sadly.
-		if (iter->exists() == true || gGameExternalOptions.fNewAttachmentSystem) {
+		if (iter->exists() == true || gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW) {
 			if (! iter->Save(hFile, fSavingMap)) {
 				return FALSE;
 			}
@@ -2173,6 +2183,8 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 
 	// CHRISL: We need to know what inventory system we're using early on
 	SaveGameHeader.ubInventorySystem = gGameOptions.ubInventorySystem;
+
+	SaveGameHeader.ubAttachmentSystem = gGameOptions.ubAttachmentSystem;
 
 	//
 	// Save the Save Game header file
@@ -3143,6 +3155,7 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 	if(SaveGameHeader.uiSavedGameVersion < NIV_SAVEGAME_DATATYPE_CHANGE)
 		SaveGameHeader.ubInventorySystem = 0;
 	gGameOptions.ubInventorySystem = SaveGameHeader.ubInventorySystem;
+
 	if((UsingNewInventorySystem() == true))
 	{
 		if(IsNIVModeValid() == FALSE){
@@ -3157,7 +3170,7 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 	}
 	else
 	{
-		if(gGameExternalOptions.fNewAttachmentSystem)
+		if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW)
 			return(FALSE);
 
 		InitInventoryOld();
@@ -3165,6 +3178,8 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 		InitializeSMPanelCoordsOld();
 		InitializeInvPanelCoordsOld();
 	}
+	
+	gGameOptions.ubAttachmentSystem = SaveGameHeader.ubAttachmentSystem;
 
 	//if the player is loading up an older version of the game, and the person DOESNT have the cheats on, 
 	if( guiCurrentSaveGameVersion < 65 && !CHEATER_CHEAT_LEVEL( ) )
@@ -3456,6 +3471,8 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Strategic Information..." );
 	RenderProgressBar( 0, 100 );
 	uiRelStartPerc = uiRelEndPerc;
+
+
 
 	//Load the strategic Information
 	if( !LoadStrategicInfoFromSavedFile( hFile ) )
@@ -6318,9 +6335,9 @@ BOOLEAN SaveGeneralInfo( HWFILE hFile )
 	sGeneralInfo.fFirstTimeInGameHeliCrash			= gfFirstTimeInGameHeliCrash;
 #endif
 
-	for (int i=0;i<501;i++)
+	for (int i=0;i<500;i++)
 	{
-	sGeneralInfo.Pokaznazwe[i] = !zPokaznazwe[i].Hidden; //legion2
+		sGeneralInfo.HiddenNames[i] = !zHiddenNames[i].Hidden; //legion2
 	}
 
 	//Setup the 
@@ -6613,9 +6630,9 @@ BOOLEAN LoadGeneralInfo( HWFILE hFile )
 	gfFirstTimeInGameHeliCrash			= sGeneralInfo.fFirstTimeInGameHeliCrash;
 #endif
 
-	for (int i=0;i<501;i++)
+	for (int i=0;i<500;i++)
 	{
-	zPokaznazwe[i].Hidden = !sGeneralInfo.Pokaznazwe[i];
+		zHiddenNames[i].Hidden = !sGeneralInfo.HiddenNames[i];
 	}
 	
 	if ( gGameExternalOptions.fShowCamouflageFaces == TRUE ) 

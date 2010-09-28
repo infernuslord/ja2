@@ -142,8 +142,8 @@ namespace xml_auto
 			typename struct_t::transition_t* tr = m_base->getTransition(m_state.state(), name);
 			if(tr && m_state.stateTransition(tr->EndPoint, LazyTrue(), tr->StartPoint))
 			{
-				THROWIFFALSE(tr == m_tr_stack.top(),
-					BuildString().add(L"Transition associated to tag [").add(name).add(L"] doesn't correspond to saved transition").get());
+				SGP_THROW_IFFALSE(tr == m_tr_stack.top(),
+					_BS(L"Transition associated to tag [") << name << L"] doesn't correspond to saved transition" << _BS::wget);
 				tr->leave(name, sCharData);
 				m_tr_stack.pop();
 			}
@@ -171,7 +171,7 @@ namespace xml_auto
 					<< vfs::String::as_utf16(XML_ErrorString(XML_GetErrorCode(_parser)))
 					<< L" in line "
 					<< XML_GetCurrentLineNumber(_parser);
-				THROWEXCEPTION(wss.str().c_str());
+				SGP_THROW(wss.str().c_str());
 			}
 		}
 
@@ -186,20 +186,20 @@ namespace xml_auto
 			vfs::size_t size = rfile->getSize();
 			std::vector<vfs::Byte> buffer(size+1);
 
-			TRYCATCH_RETHROW( rfile->read(&buffer[0],size), L"" );
+			SGP_TRYCATCH_RETHROW( rfile->read(&buffer[0],size), L"" );
 			buffer[size] = 0;
 			
-			TRYCATCH_RETHROW( this->parseBuffer(&buffer[0], size),
-				BuildString(L"error in file : ").add(pFile->getPath()).get());
+			SGP_TRYCATCH_RETHROW( this->parseBuffer(&buffer[0], size),
+				_BS(L"error in file : ") << pFile->getPath() << _BS::wget);
 		}
 
 		void parseFile(vfs::Path const& sFile)
 		{
 			vfs::tReadableFile* file = getVFS()->getReadFile(sFile);
-			THROWIFFALSE(file, BuildString(L"Could not find file : ").add(sFile).get());
+			SGP_THROW_IFFALSE(file, _BS(L"Could not find file : ") << sFile << _BS::wget);
 
-			TRYCATCH_RETHROW( this->parseFile(file),
-				BuildString(L"error in file : ").add(sFile).get());
+			SGP_TRYCATCH_RETHROW( this->parseFile(file),
+				_BS(L"error in file : ") << sFile << _BS::wget);
 		}
 
 	private:

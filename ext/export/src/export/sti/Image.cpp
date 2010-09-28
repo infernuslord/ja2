@@ -7,9 +7,10 @@
 #include "XMLWriter.h"
 
 #include <vfs/Core/vfs.h>
+#include <vfs/Core/vfs_debug.h>
 #include <vfs/Core/vfs_file_raii.h>
 #include <vfs/Core/Interface/vfs_file_interface.h>
-#include <vfs/Core/File/vfs_memory_file.h>
+#include <vfs/Core/File/vfs_buffer_file.h>
 #include <vfs/Ext/7z/vfs_create_7z_library.h>
 
 #include <sstream>
@@ -566,7 +567,7 @@ void user_flush_data(png::png_structp png_ptr)
 
 bool ja2xp::CImage::writeSubImageToPNGFile(int i, vfs::tWritableFile* file, bool rgba)
 {
-	THROWIFFALSE(i >= 0 && i < m_pRawImage->usNumberOfObjects, L"invalid index");
+	VFS_THROW_IFF(i >= 0 && i < m_pRawImage->usNumberOfObjects, L"invalid index");
 	ETRLEObject &image = m_pRawImage->pETRLEObject[i];
 
 	png::png_error_ptr user_error_ptr  = NULL;
@@ -972,7 +973,7 @@ bool ja2xp::CImage::WriteAsPNGs(vfs::tWritableFile* outFile, bool bWriteOffsets,
 		for(int i=0; i<m_pRawImage->usNumberOfObjects; ++i)
 		{
 			vfs::Path filename = CreateFileName("", sFileName, i, m_pRawImage->usNumberOfObjects, L"png");
-			vfs::CMemoryFile memFile(filename);
+			vfs::CBufferFile memFile(filename);
 			vfs::tWritableFile *pFile = vfs::tWritableFile::cast(&memFile);
 
 			this->writeSubImageToPNGFile(i, pFile, rgba);
@@ -982,21 +983,20 @@ bool ja2xp::CImage::WriteAsPNGs(vfs::tWritableFile* outFile, bool bWriteOffsets,
 	else
 	{
 		vfs::Path filename = CreateFileName("", sFileName, 0, m_pRawImage->usNumberOfObjects, L"png");
-		vfs::CMemoryFile memFile(filename);
+		vfs::CBufferFile memFile(filename);
 		vfs::tWritableFile *pFile = vfs::tWritableFile::cast(&memFile);
 
 		this->writeImageToPNGFile(pFile, rgba);
 		outLib.addFile(vfs::tReadableFile::cast(pFile));
 	}
-	if(m_pRawImage->pAppData || bWriteOffsets)
+	if(m_pRawImage->usNumberOfObjects > 0)
 	{
-		if(m_pRawImage->usNumberOfObjects > 0)
+		std::vector<bool> write_image(m_pRawImage->usNumberOfObjects, false);
+		bool write_appdata = false;
+		if(m_pRawImage->pAppData)
 		{
-			std::vector<bool> write_image(m_pRawImage->usNumberOfObjects);
-			bool need_writing = false;
 			for(int i=0; i<m_pRawImage->usNumberOfObjects; ++i)
 			{
-				write_image[i] = false;
 				AuxObjectData *pAOD = (AuxObjectData*)(&(m_pRawImage->pAppData[i*16]));
 				if(pAOD && (pAOD->fFlags || 
 							pAOD->ubCurrentFrame || 
@@ -1006,20 +1006,16 @@ bool ja2xp::CImage::WriteAsPNGs(vfs::tWritableFile* outFile, bool bWriteOffsets,
 							pAOD->usTileLocIndex) )
 				{
 					write_image[i] = true;
-					need_writing = true;
+					write_appdata = true;
 				}
 			}
-			if(need_writing || bWriteOffsets)
-			{
-				vfs::CMemoryFile appDataFile("appdata.xml");
-				this->writeSTIAppData(write_image, bWriteOffsets, vfs::tWritableFile::cast(&appDataFile));
-
-				outLib.addFile(vfs::tReadableFile::cast(&appDataFile));
-			}
 		}
-		else
+		if(write_appdata || bWriteOffsets)
 		{
-			THROWEXCEPTION(L"appdata is !NULL but number of object is 0");
+			vfs::CBufferFile appDataFile("appdata.xml");
+			this->writeSTIAppData(write_image, bWriteOffsets, vfs::tWritableFile::cast(&appDataFile));
+
+			outLib.addFile(vfs::tReadableFile::cast(&appDataFile));
 		}
 	}
 
@@ -1054,15 +1050,14 @@ bool ja2xp::CImage::WriteAsPNGs(vfs::Path outpath, bool bWriteOffsets, bool rgba
 		vfs::COpenWriteFile file(filename, true, true);
 		this->writeImageToPNGFile(&file.file(), rgba);
 	}
-	if(m_pRawImage->pAppData || bWriteOffsets)
+	if(m_pRawImage->usNumberOfObjects > 0)
 	{
-		if(m_pRawImage->usNumberOfObjects > 0)
+		std::vector<bool> write_image(m_pRawImage->usNumberOfObjects, false);
+		bool write_appdata = false;
+		if(m_pRawImage->pAppData)
 		{
-			std::vector<bool> write_image(m_pRawImage->usNumberOfObjects);
-			bool need_writing = false;
 			for(int i=0; i<m_pRawImage->usNumberOfObjects; ++i)
 			{
-				write_image[i] = false;
 				AuxObjectData *pAOD = (AuxObjectData*)(&(m_pRawImage->pAppData[i*16]));
 				if(pAOD && (pAOD->fFlags || 
 							pAOD->ubCurrentFrame || 
@@ -1072,18 +1067,14 @@ bool ja2xp::CImage::WriteAsPNGs(vfs::Path outpath, bool bWriteOffsets, bool rgba
 							pAOD->usTileLocIndex) )
 				{
 					write_image[i] = true;
-					need_writing = true;
+					write_appdata = true;
 				}
 			}
-			if(need_writing || bWriteOffsets)
-			{
-				vfs::COpenWriteFile file(outpath+vfs::Path(L"appdata.xml"), true, true);
-				this->writeSTIAppData(write_image, bWriteOffsets, &file.file());
-			}
 		}
-		else
+		if(write_appdata || bWriteOffsets)
 		{
-			throw "appdata is !NULL but number of object is 0";
+			vfs::COpenWriteFile file(outpath+vfs::Path(L"appdata.xml"), true, true);
+			this->writeSTIAppData(write_image, bWriteOffsets, &file.file());
 		}
 	}
 

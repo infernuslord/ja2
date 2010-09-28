@@ -173,6 +173,8 @@ void GenerateMilitiaSquad(INT16 sMapX, INT16 sMapY, INT16 sTMapX, INT16 sTMapY, 
 	UINT8 ubTargetRegularPercent = 0;
 	UINT8 ubTempLeadership = ubBestLeadership;
 
+	UINT8 ubActualyAdded = 0; // Added by SANDRO
+
 	// Does trainer have enough leadership to train a squad?
 	if ( ubBestLeadership < gGameExternalOptions.ubMinimumLeadershipToTrainMobileMilitia )
 	{
@@ -311,6 +313,7 @@ void GenerateMilitiaSquad(INT16 sMapX, INT16 sMapY, INT16 sTMapX, INT16 sTMapY, 
 				StrategicAddMilitiaToSector( sTMapX, sTMapY, ELITE_MILITIA, 1);
 				ubTargetElite--;
 				ubMilitiaToTrain--;
+				ubActualyAdded++;
 			}
 			else if (ubTargetRegular > 0)
 			{
@@ -318,6 +321,7 @@ void GenerateMilitiaSquad(INT16 sMapX, INT16 sMapY, INT16 sTMapX, INT16 sTMapY, 
 				StrategicAddMilitiaToSector( sTMapX, sTMapY, REGULAR_MILITIA, 1);
 				ubTargetRegular--;
 				ubMilitiaToTrain--;
+				ubActualyAdded++;
 			}
 			else if (ubTargetGreen > 0)
 			{
@@ -325,6 +329,7 @@ void GenerateMilitiaSquad(INT16 sMapX, INT16 sMapY, INT16 sTMapX, INT16 sTMapY, 
 				StrategicAddMilitiaToSector( sTMapX, sTMapY, GREEN_MILITIA, 1);
 				ubTargetGreen--;
 				ubMilitiaToTrain--;
+				ubActualyAdded++;
 			}
 			else
 			{
@@ -347,6 +352,7 @@ void GenerateMilitiaSquad(INT16 sMapX, INT16 sMapY, INT16 sTMapX, INT16 sTMapY, 
 					StrategicAddMilitiaToSector( sTMapX, sTMapY, ELITE_MILITIA, 1);
 					ubTargetElite--;
 					ubMilitiaToTrain--;
+					ubActualyAdded++;
 				}
 				else if (ubTargetRegular > 0 && // Got a regular
 					(!gGameExternalOptions.gfTrainVeteranMilitia || // Not allowed to train Elites
@@ -356,6 +362,7 @@ void GenerateMilitiaSquad(INT16 sMapX, INT16 sMapY, INT16 sTMapX, INT16 sTMapY, 
 					StrategicAddMilitiaToSector( sTMapX, sTMapY, ELITE_MILITIA, 1);
 					ubTargetElite--;
 					ubMilitiaToTrain--;	
+					ubActualyAdded++;
 				}
 				// Else, we've got more men to train but no room for them. In this case, upgrade existing
 				// militia to the next class, using our remainder men as "upgrade points".
@@ -376,12 +383,14 @@ void GenerateMilitiaSquad(INT16 sMapX, INT16 sMapY, INT16 sTMapX, INT16 sTMapY, 
 							// Comes at a cost of one regular that we were supposed to train.
 							ubTargetRegular--;
 							ubMilitiaToTrain--;
+							ubActualyAdded++;
 						}
 						else
 						{
 							// No regulars to train? Remove two greens instead.
 							ubTargetGreen -= 2;
 							ubMilitiaToTrain -= 2;
+							ubActualyAdded += 2;
 						}
 					}
 					// Else elite training was not allowed or we simply did not have enough points to add an elite
@@ -391,6 +400,7 @@ void GenerateMilitiaSquad(INT16 sMapX, INT16 sMapY, INT16 sTMapX, INT16 sTMapY, 
 						StrategicAddMilitiaToSector( sTMapX, sTMapY, REGULAR_MILITIA, 1);
 						ubTargetGreen--;
 						ubMilitiaToTrain--;
+						ubActualyAdded++;
 					}
 					else
 					{
@@ -406,6 +416,11 @@ void GenerateMilitiaSquad(INT16 sMapX, INT16 sMapY, INT16 sTMapX, INT16 sTMapY, 
 			}
 		}
 	}
+
+	// SANDRO - merc records (num militia trained)
+	if( ubActualyAdded > 0 )
+		RecordNumMilitiaTrainedForMercs( sMapX, sMapY, 0, ubActualyAdded, TRUE );
+
 
 	// This reduces the group back to "maximum" size. It starts by eliminating extra greens, then regulars, then elites.
 	// That produces a group of max size, with only the best troops remaining.

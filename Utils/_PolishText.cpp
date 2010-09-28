@@ -788,6 +788,63 @@ STR16 pPersonnelScreenStrings[] =
  	L"Ranny(a):", // number of times merc has been wounded
  	L"Umiejêtnoœci:",
  	L"Brak umiêjêtnoœci",
+	L"Achievements", // added by SANDRO
+};
+
+// SANDRO - helptexts for merc records
+STR16 pPersonnelRecordsHelpTexts[] =
+{
+	L"Elites:      %d\n",
+	L"Regulars:   %d\n",
+	L"Admins:    %d\n",
+	L"Hostile Civs: %d\n",
+	L"Creatures:  %d\n",
+	L"Tanks:      %d\n", 
+	L"Others:     %d\n",
+
+	L"To Mercs: %d\n",
+	L"Militia:   %d\n",
+	L"Others:     %d\n",
+
+	L"Shots Fired:         %d\n",
+	L"Missiles Launched:   %d\n",
+	L"Grenades Thrown:     %d\n",
+	L"Knives Thrown:       %d\n",
+	L"Blade Attacks:       %d\n",
+	L"HtH Attacks:         %d\n",
+	L"Successful Hits:     %d\n",
+
+	L"Locks Picked:     %d\n",
+	L"Locks Breached:   %d\n",
+	L"Traps Removed:     %d\n",
+	L"Explosives Detonated: %d\n",
+	L"Items Repaired:      %d\n",
+	L"Items Combined:    %d\n",
+	L"Items Stolen:    %d\n",
+	L"Militia Trained:    %d\n",
+	L"Mercs Bandaged:    %d\n",
+	L"Surgeries Made:    %d\n",
+	L"NPCs Met:      %d\n",
+	L"Sectors Discovered:  %d\n",
+	L"Ambushes Prevented:  %d\n",
+	L"Quests Handled:    %d\n",
+
+	L"Tactical Battles:    %d\n",
+	L"Autoresolve Battles:  %d\n",
+	L"Times Retreated:    %d\n",
+	L"Ambushes Experienced:  %d\n",
+	L"Largest Battle:   %d Enemies\n",
+
+	L"Shot:        %d\n",
+	L"Stabbed:     %d\n",
+	L"Punched:     %d\n",
+	L"Blasted:     %d\n",
+	L"Stat Damaged:   %d\n",
+	L"Surgeries Undergoed:  %d\n",
+	L"Facility Accidents:   %d\n",
+
+	L"Character:",
+	L"Disability:",
 };
 
 
@@ -810,11 +867,51 @@ STR16 gzMercSkillText[] =
 	L"Broñ bia³a",
 	L"Snajper",				//JA25: modified
 	L"Kamufla¿",						//JA25: modified
-	L"Kamufla¿ (miasto)",
-	L"Kamufla¿ (pustynia)",
-	L"Kamufla¿ (œnieg)",
+	// SANDRO - removed this
+	//L"Kamufla¿ (miasto)",
+	//L"Kamufla¿ (pustynia)",
+	//L"Kamufla¿ (œnieg)",
 	L"(Eksp.)",
 };
+
+//////////////////////////////////////////////////////////
+// SANDRO - added this
+STR16 gzMercSkillTextNew[] = 
+{
+	// Major traits
+	L"No Skill",
+	L"Auto Weapons",
+	L"Heavy Weapons",
+	L"Marksman",
+	L"Hunter",
+	L"Gunslinger",
+	L"Hand to Hand",
+	L"Deputy",
+	L"Technician",
+	L"Paramedic",
+	// Minor traits
+	L"Ambidextrous",
+	L"Melee",
+	L"Throwing",
+	L"Night Ops",
+	L"Stealthy",
+	L"Athletics",
+	L"Bodybuilding",
+	L"Demolitions",
+	L"Teaching",
+	L"Scouting",
+	// second names for major skills
+	L"Machinegunner",
+	L"Bombardier",
+	L"Sniper",
+	L"Ranger",
+	L"Gunfighter",
+	L"Martial Arts",
+	L"Squadleader",
+	L"Engineer",
+	L"Doctor",
+};
+//////////////////////////////////////////////////////////
 
 
 // This is pop up help text for the options that are available to the merc
@@ -2348,7 +2445,7 @@ STR16 pImpButtonText[] =
 	L"ZACZNIJ", 			// begin profiling
 	L"Umiejêtnoœci", 		// personality section
 	L"Atrybuty", 		// personal stats/attributes section
-	L"Appearance", 			// changed from portrait - SANDRO
+	L"Appearance", 			// changed from portrait
 	L"G³os %d", 			// the voice selection
 	L"Gotowe", 			// done profiling
 	L"Zacznij od pocz¹tku", 		// start over profiling
@@ -2369,12 +2466,12 @@ STR16 pImpButtonText[] =
 	L"Rejestr", 			// the IMP site registry..when name and gender is selected
 	L"Analizujê...", 			// analyzing your profile results
 	L"OK",
-	L"Character", // Change from "Voice" - SANDRO
+	L"Character", // Change from "Voice"
 };
 
 STR16 pExtraIMPStrings[] =
 {
-	// These texts have been also slightly changed - SANDRO
+	// These texts have been also slightly changed 
 	L"With your character traits chosen, it is time to select your skills.",
 	L"To complete the process, select your attributes.",
 	L"To commence actual profiling, select portrait, voice and colors.",
@@ -3295,7 +3392,13 @@ STR16			CharacterInfo[] =
 	L"Dodatkowe informacje",				// Title for the additional info for the merc's bio
 	L"Aktywni cz³onkowie",		//20		// Title of the page
 	L"Opcjonalne wyposa¿enie:",				// Displays the optional gear cost
+	L"gear",			//"gear",	//tais: Displays the optional gear cost in nsgi, this moved and can have only a small room, so just make it "gear" without extra's
 	L"Wymagany jest zastaw na ¿ycie",			// If the merc required a medical deposit, this is displayed
+	L"Kit 1",				// Text on Starting Gear Selection Button 1  // TODO.Translate
+	L"Kit 2",				// Text on Starting Gear Selection Button 2
+	L"Kit 3",				// Text on Starting Gear Selection Button 3
+	L"Kit 4",				// Text on Starting Gear Selection Button 4
+	L"Kit 5",				// Text on Starting Gear Selection Button 5
 };
 
 
@@ -3640,9 +3743,6 @@ STR16			zSaveLoadText[] =
 
 	L"Nowy inwentarz nie dzia³a w rozdzielczoœci 640x480. Aby z niego korzystaæ zmieñ rozdzielczoœæ i spróbuj ponownie.",
 	L"Nowy inwentarz nie korzysta z domyœlnego folderu 'Data'.",
-
-	// TODO.Translate
-	L"You cannot play this savegame with the New Attachment System, because this savegame does not use the New Inventory.",
 };
 
 
@@ -3744,16 +3844,16 @@ STR16		zOptionsToggleText[] =
 	L"Pokazuj kursor 3D",
 	L"Pokazuj szansê na trafienie",
 	L"Zamiana kursora granatnika",
-	L"Wróg opuszcza ca³y ekwipunek",
+	L"Allow Enemy Taunts", // Changed from "Enemies Drop all Items" - SANDRO
 	L"Wysoki k¹t strza³ów z granatnika",
-	L"Ograniczenie poziomów celowania",
+	L"Allow Real Time Sneaking", // Changed from "Restrict extra Aim Levels" - SANDRO
 	L"Spacja = nastêpny oddzia³",
 	L"Pokazuj cienie przedmiotów",
 	L"Pokazuj zasiêg broni w polach",
 	L"Efekt smugowy dla poj. strza³u",
 	L"Odg³osy padaj¹cego deszczu",
 	L"Pokazuj wrony",
-	L"Show Soldier Tooltips",	// Changed from "Random I.M.P personality" - SANDRO
+	L"Show Soldier Tooltips",
 	L"Automatyczny zapis",
 	L"Cichy Skyrider",
 	L"Niskie obci¹¿enie procesora",
@@ -3841,16 +3941,16 @@ STR16	zOptionsScreenHelpText[] =
 	// Options for 1.13
 	L"Jeœli W£¥CZONE, kursor bêdzie pokazywa³ szansê na trafienie.",
 	L"Jeœli W£¥CZONE, seria z granatnika bêdzie u¿ywa³a kursora serii z broni palnej.",
-	L"Jeœli W£¥CZONE, martwi wrogowie bêd¹ upuszczaæ ca³y ekwipunek.",
+	L"When ON, enemies will occasionally comment certain actions.", // Changed from Enemies Drop All Items - SANDRO
 	L"Jeœli W£¥CZONE, granatniki bêd¹ strzela³y pod wysokim k¹tem. ( |Q )",
-	L"Jeœli W£¥CZONE, poziom celowania powy¿ej 4 bêdzie dostêpny tylko dla karabinów i karabinów snajperskich.",
+	L"When ON, the turn based mode will not be entered when sneaking unnoticed and seeing an enemy unless pressing |C|t|r+|X.", // Changed from Restrict Extra Aim Levels - SANDRO
 	L"Jeœli W£¥CZONE, |S|p|a|c|j|a wybiera kolejny oddzia³.",
 	L"Jeœli W£¥CZONE, pokazywane bêd¹ cienie przedmiotów.",
 	L"Jeœli W£¥CZONE, zasiêg broni bêdzie wyœwietlany w polach.",
 	L"Jeœli W£¥CZONE, pojedynczy strza³ bêdzie z efektem pocisku smugowego",
 	L"Jeœli W£¥CZONE, bêdziesz s³ysza³ padaj¹cy deszcz.",
 	L"Jeœli W£¥CZONE, w grze pojawiaæ siê bêd¹ wrony.",
-	L"When ON, a tooltip window is shown when pressing |A|l|t and hovering cursor over an enemy.", 	// - Changed from random IMP personality - SANDRO
+	L"When ON, a tooltip window is shown when pressing |A|l|t and hovering cursor over an enemy.",
 	L"Jeœli W£¥CZONE, gra bêdzie zapisywana ka¿dorazowo po zakoñczeniu tury gracza.",
 	L"Jeœli W£¥CZONE, Skyrider nie bêdzie nic mówi³.",
 	L"Jeœli W£¥CZONE, gra bêdzie obci¹¿a³a procesor w mniejszym stopniu.",
@@ -3900,11 +4000,42 @@ STR16	gzGIOScreenText[] =
 	L"Œwietne",
 	L"Wyœmienite",
 	L"Niewiarygodne",
-	L"System Inwentarza",
-	L"Tradycyjny",
-	L"Rozbudowany",
+	L"Inventory / Attachments",	// TODO.Translate
+	L"NOT USED",
+	L"NOT USED",
 	L"Load MP Game",
 	L"POCZ¥TKOWE USTAWIENIA GRY (Only the server settings take effect)",
+	// Added by SANDRO
+	L"Skill Traits",
+	L"Old",
+	L"New",
+	L"Max IMP Characters",
+	L"One",
+	L"Two",
+	L"Three",
+	L"Four",
+	L"Five",
+	L"Six",
+	L"Enemies Drop All Items",
+	L"Off",
+	L"On",
+	L"Number of Terrorists",
+	L"Random",
+	L"All",
+	L"Secret Weapon Caches",
+	L"Random",
+	L"All",
+	L"Progress Speed of Item Choices",
+	L"Very Slow",
+	L"Slow",
+	L"Normal",
+	L"Fast",
+	L"Very Fast",
+
+	// TODO.Translate
+	L"Old / Old",
+	L"New / Old",
+	L"New / New",
 };
 
 STR16	gzMPJScreenText[] =
@@ -4141,8 +4272,8 @@ STR16 pMessageStrings[] =
 	L"Lista historii zaktualizowana.",
 	L"Seria z granatnika u¿ywa kursora celowania (dostêpny ogieñ rozproszony)",		//L"Grenade Bursts use Targeting Cursor (Spread fire enabled)", BY£O -->>L"Grenade Bursts - Using Targeting Cursor (Spread fire enabled)",
 	L"Seria z granatnika u¿ywa kursora trajektorii (dostêpny ogieñ rozproszony)",		//L"Grenade Bursts use Trajectory Cursor (Spread fire disabled)", BY£O -->L"Grenade Bursts - Using Trajectory Cursor (Spread fire disabled)",
-	L"Upuszczanie wszystkiego w³¹czone",
-	L"Upuszczanie wszystkiego wy³¹czone",
+	L"Enabled Soldier Tooltips", // Changed from Drop All On - SANDRO
+	L"Disabled Soldier Tooltips", // Changed from Drop All Off - SANDRO
 	L"Granatniki strzelaj¹ pod standardowymi k¹tami",					//L"Grenade Launchers fire at standard angles", BY£o->>L"Grenade Launchers - Fire at standard angles",
 	L"Granatniki strzelaj¹ pod wysokimi k¹tami",						//L"Grenade Launchers fire at higher angles", BY£o-->>L"Grenade Launchers - Fire at high angles",
 	// forced turn mode strings
@@ -4521,7 +4652,7 @@ STR16 gzLateLocalizedString[] =
 
 	L"%s: dodatki do pancerza zosta³y zniszczone!",
 	L"%s wystrzeli³(a) %d pocisk(ów) wiêcej ni¿ to by³o zamierzone!",
-	L"%s wystrzeli³(a) %d pocisk(ów) wiêcej ni¿ to by³o zamierzone!",
+	L"%s wystrzeli³(a) 1 pocisk(ów) wiêcej ni¿ to by³o zamierzone!",
 };
 
 STR16 gzCWStrings[] = 
@@ -4572,6 +4703,10 @@ STR16 gzTooltipStrings[] =
 	L"brak kamizelki",
 	L"brak getrów ochronnych",
 	L"|Pancerz: %s\n", 
+	 // Added - SANDRO
+	L"%s|Skill 1: %s\n",
+	L"%s|Skill 2: %s\n", 
+	L"%s|Skill 3: %s\n",
 };
 
 STR16 New113Message[] =
@@ -4600,7 +4735,26 @@ STR16 New113Message[] =
 	L"No enemies in sight",
 	L"Real-time sneaking OFF",
 	L"Real-time sneaking ON",
-	L"Enemy spotted! (Ctrl + x to enter turn based)",
+	//L"Enemy spotted! (Ctrl + x to enter turn based)",
+	L"Enemy spotted!", // this should be enough - SANDRO
+	//////////////////////////////////////////////////////////////////////////////////////
+	// These added by SANDRO
+	L"%s was successful on stealing!",
+	L"%s had not enough action points to steal all selected items.",
+	L"Do you want to make surgery on %s before bandaging? (You can heal about %i Health.)",
+	L"Do you want to make surgery on %s? (You can heal about %i Health.)",
+	L"Do you wish to make necessary surgeries first? (%i patient(s))",
+	L"Do you wish to make the surgery on this patient first?",
+	L"Apply first aid automatically with necessary surgeries or without them?",
+	L"Surgery on %s finished.",
+	L"%s is hit in the chest and loses a point of maximum health!",
+	L"%s is hit in the chest and loses %d points of maximum health!",
+	L"%s has regained one point of lost %s",
+	L"%s has regained %d points of lost %s",
+	L"Your scouting skills prevented you to be ambushed by the enemy!",
+	L"Thanks to your scouting skills you have successfuly avoided a pack of bloodcats!",
+	L"%s is hit to groin and falls down in pain!",
+	//////////////////////////////////////////////////////////////////////////////////////
 };
 
 // TODO.Translate
@@ -4657,6 +4811,25 @@ STR16 MissingIMPSkillsDescriptions[] =
 	L"Snajper: Sokole oczy! Mo¿esz odstrzeliæ skrzyd³a muszce ze stu jardów. ± ",
 	// Camouflage
 	L"Kamufla¿: Przy tobie nawet krzaki wygl¹daj¹ na sztuczne! ± ",	
+	// SANDRO - new strings for new traits added
+	// Ranger
+	L"Ranger: You are the one from Texas deserts, aren't you! ± ",	
+	// Gunslinger
+	L"Gunslinger: With a handgun or two, you can be as lethal as the Billy Kid! ± ",
+	// Squadleader
+	L"Squadleader: Natural leader and boss, you are the big shot no kidding! ± ",
+	// Technician
+	L"Technician: Fixing stuff, removing traps, planting bombs, that's your bussiness! ± ",
+	// Doctor
+	L"Doctor: You can make a quick surgery with pocket-knife and chewing gum anywhere! ± ",
+	// Athletics
+	L"Athletics: Your speed and vitality is on top of possibilities! ± ",
+	// Bodybuilding
+	L"Bodybuilding: That big muscular figure which cannot be overlooked is you actually! ± ",
+	// Demolitions
+	L"Demolitions: You can blow up a whole city just by common home stuff! ± ",
+	// Scouting
+	L"Scouting: Nothing can escape your notice! ± ",
 };
 
 STR16 NewInvMessage[] = 
@@ -4879,26 +5052,35 @@ STR16 gzMPChatboxText[] =
 // Following strings added - SANDRO
 STR16 pSkillTraitBeginIMPStrings[] =
 {
-	L"On the next page, you are going to choose your skill traits according to your proffessional specialization as a mercenary. No more than two different traits or one expert trait can be selected. To achieve an expert level on a trait, simply choose only that one trait.",
-	L"You can also choose only one or even no traits, which will give you a bonus to your attribute points as a compensation. Note that Electronics and Ambidextrous traits cannot be achieved at expert levels, and if you choose one of them only, you will have only one skill trait.",
+	// For old traits
+	L"On the next page, you are going to choose your skill traits according to your proffessional specialization as a mercenary. No more than two different traits or one expert trait can be selected.",
+	L"You can also choose only one or even no traits, which will give you a bonus to your attribute points as a compensation. Note that Electronics and Ambidextrous traits cannot be achieved at expert levels.",
+	// For new major/minor traits
+	L"Next stage is about choosing your skill traits according to your proffessional specialization as a mercenary. On first page you can select up to two potential major traits, which mostly represent your main role in a team. While on second page is list of possible minor traits, which represent personal feats.",
+	L"No more then three choices altogeher are possible. Which means if you choose no major traits, you can then choose three minor traits. If you choose both major traits (or one enhanced), you can then choose only one minor trait...",
 };
 
 STR16 sgAttributeSelectionText[] = 
 {
-	L"Please adjust your physical attributes as comapred to that of an avarage merc. You cannot raise any score above",
+	L"Please adjust your physical attributes according to your true abilities. You cannot raise any score above",
 	L"I.M.P. Attributes and skills review.",
 	L"Bonus Pts.:",
 	L"Starting Level",
+	// New strings for new traits
+	L"On the next page you are going to specify your physical attributes and skills. As 'attributes' are called: health, dexterity, agility, strength and wisdom. Attributes cannot go lower than %d.",
+	L"The rest are called 'skills' and unlike attributes skills can be set to zero meaning you have absolutely no proficieny in it.",
+	L"All scores are set to a minimum at the beginning. Note that certain attributes are set to specific values according to skill traits you have selected. You cannot set those attributes lower than that.",
+	//L"Please adjust the scores the way to describe your attributes at best.",
 };
 
 STR16 pCharacterTraitBeginIMPStrings[] =
 {
 	L"I.M.P. Character Analysis",
-	L"The analysis of your character is the next step on your profile creation. On the first page you will be shown a list of attitudes to choose. We imagine you could identify yourself with more of them, but here you will be able to pick only one. Choose the one which you feel aligned with mostly. ",
+	L"The analysis of your character is the next step on your profile creation. On the first page you will be shown a list of character traits to choose. We imagine you could identify yourself with more of them, but here you will be able to pick only one. Choose the one which you feel aligned with mostly. ",
 	L"The second page enlists possible disabilities you might have. If you suffer from any of these disabilities, choose which one (we believe that everyone has only one such disablement). Be honest, as it is important to inform potential employers of your true condition.",
 };
 
-STR16 gzIMPCharacterTraitText[]=
+STR16 gzIMPAttitudesText[]=
 {
 	L"Normal",
 	L"Friendly",
@@ -4910,6 +5092,24 @@ STR16 gzIMPCharacterTraitText[]=
 	L"Big Shot",
 	L"Asshole",
 	L"Coward",
+	L"I.M.P. Attitudes",
+};
+
+STR16 gzIMPCharacterTraitText[]=
+{
+	L"Normal",
+	L"Sociable",
+	L"Loner",
+	L"Optimist",
+	L"Assertive",
+	L"Intellectual",
+	L"Primitive",
+	L"Aggressive",
+	L"Phlegmatic",
+	L"Dauntless",
+	L"Pacifist",
+	L"Malicious",
+	L"Show-off",
 	L"I.M.P. Character Traits",
 };
 
@@ -4920,6 +5120,7 @@ STR16 gzIMPColorChoosingText[] =
 	L"Please select the respective colors of your skin, hair and clothing. And select what body type you have.",
 	L"Please select the respective colors of your skin, hair and clothing.",
 	L"Toggle this to use alternative rifle holding.",
+	L"\n(Caution: you will need a big strength for this.)",
 };
 
 STR16 sColorChoiceExplanationTexts[]=
@@ -5056,6 +5257,96 @@ STR16 gzFacilityAssignmentStrings[]=
 STR16 Additional113Text[]=
 {
 	L"Jagged Alliance 2 v1.13 trybie okienkowym wymaga g³êbi koloru 16-bitowego lub mniej.",
+};
+
+// SANDRO - Taunts (here for now, xml for future, I hope)
+STR16 sEnemyTauntsFireGun[]=
+{
+	L"Suck this!",
+	L"Touch this!",
+	L"Come get some!",
+	L"You're mine!",
+	L"Die!",
+	L"You scared, motherfucker?",
+	L"This will hurt!",
+	L"Come on you bastard!",
+	L"Come on! I don't got all day!",
+	L"Come to daddy!",
+	L"You'll be six feet under in no time!",
+	L"Will send ya home in a pinebox, loser!",
+	L"Hey, wanna play?",
+	L"You should have stayed home, bitch.",
+	L"Sucker!",
+};
+
+STR16 sEnemyTauntsFireLauncher[]=
+{
+
+	L"We have a barbecue here.",
+	L"I got a present for ya.",
+	L"Bam!",
+	L"Smile!",
+};
+
+STR16 sEnemyTauntsThrow[]=
+{
+	L"Catch!",
+	L"Here ya go!",
+	L"Pop goes the weasel.",
+	L"This one's for you.",
+	L"Muhehe.",
+	L"Catch this, swine!",
+	L"I like this.",
+};
+
+STR16 sEnemyTauntsChargeKnife[]=
+{
+	L"I'll get your scalp.",
+	L"Come to papa.",
+	L"Show me your guts!",
+	L"I'll rip you to pieces!",
+	L"Motherfucker!",
+};
+
+STR16 sEnemyTauntsRunAway[]=
+{
+	L"We're in some real shit...",
+	L"They said join the army. Not for this shit!",
+	L"I have enough.",
+	L"Oh my God.",
+	L"They ain't paying us enough for this.",
+	L"It's just too much for me.",
+	L"I'll bring some friends.",
+
+};
+
+STR16 sEnemyTauntsSeekNoise[]=
+{
+	L"I heard that!",
+	L"Who's there?",
+	L"What was that?",
+	L"Hey! What the...",
+
+};
+
+STR16 sEnemyTauntsAlert[]=
+{
+	L"They are here!",
+	L"Now the fun can start.",
+	L"I hoped this will never happen.",
+
+};
+
+STR16 sEnemyTauntsGotHit[]=
+{
+	L"Ouch!",
+	L"Ugh!",
+	L"This.. hurts!",
+	L"You fuck!",
+	L"You will regret.. uhh.. this.",
+	L"What the..!",
+	L"Now you have.. pissed me off.",
+
 };
 
 //Ja25 UB

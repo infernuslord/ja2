@@ -6,6 +6,7 @@
 #include "himage.h"
 #include "Types.h"
 #include <vfs/Core/vfs_file_raii.h>
+#include <vfs/Core/vfs_debug.h>
 #include <string>
 
 #include <cassert>
@@ -36,8 +37,8 @@ BOOLEAN ja2xp::LoadSTCIFileToImage(vfs::tReadableFile *pFile, HIMAGE hImage, UIN
 	// Open the file and read the header
 	
 	vfs::COpenReadFile file(pFile);
-	THROWIFFALSE( STCI_HEADER_SIZE == pFile->read((vfs::Byte*)&Header,STCI_HEADER_SIZE), L"" );
-	THROWIFFALSE( memcmp( Header.cID, STCI_ID_STRING, STCI_ID_LEN ) == 0, L"" );
+	VFS_THROW_IFF( STCI_HEADER_SIZE == pFile->read((vfs::Byte*)&Header,STCI_HEADER_SIZE), L"" );
+	VFS_THROW_IFF( memcmp( Header.cID, STCI_ID_STRING, STCI_ID_LEN ) == 0, L"" );
 
 	// Determine from the header the data stored in the file. and run the appropriate loader
 	if (Header.fFlags & STCI_RGB)
@@ -101,9 +102,9 @@ BOOLEAN ja2xp::STCILoadRGB(vfs::tReadableFile *pFile, HIMAGE hImage, UINT16 fCon
 		try
 		{
 			vfs::size_t size = pHeader->uiStoredSize;
-			THROWIFFALSE( size == pFile->read( (vfs::Byte*)hImage->pImageData, size ), L"" ); 
+			VFS_THROW_IFF( size == pFile->read( (vfs::Byte*)hImage->pImageData, size ), L"" ); 
 		}
-		catch(CBasicException& ex)
+		catch(vfs::Exception& ex)
 		{
 			delete[] hImage->pImageData;
 			return( FALSE );
@@ -182,9 +183,9 @@ BOOLEAN ja2xp::STCILoadIndexed(vfs::tReadableFile *pFile, HIMAGE hImage, UINT16 
 		// Read in the palette
 		try
 		{
-			THROWIFFALSE( uiFileSectionSize == pFile->read( (vfs::Byte*)pSTCIPalette, uiFileSectionSize ), L"" );
+			VFS_THROW_IFF( uiFileSectionSize == pFile->read( (vfs::Byte*)pSTCIPalette, uiFileSectionSize ), L"" );
 		}
-		catch(CBasicException& ex)
+		catch(vfs::Exception& ex)
 		{
 			pFile->close();
 			delete[] pSTCIPalette;
@@ -207,7 +208,7 @@ BOOLEAN ja2xp::STCILoadIndexed(vfs::tReadableFile *pFile, HIMAGE hImage, UINT16 
 		{
 			pFile->setReadPosition( uiFileSectionSize, vfs::IBaseFile::SD_CURRENT);
 		}
-		catch(CBasicException& ex)
+		catch(vfs::Exception& ex)
 		{
 			pFile->close();
 			return( FALSE );	
@@ -233,9 +234,9 @@ BOOLEAN ja2xp::STCILoadIndexed(vfs::tReadableFile *pFile, HIMAGE hImage, UINT16 
 			}
 			try
 			{
-				THROWIFFALSE(uiFileSectionSize == pFile->read((vfs::Byte*)hImage->pETRLEObject, uiFileSectionSize), L"")
+				VFS_THROW_IFF(uiFileSectionSize == pFile->read((vfs::Byte*)hImage->pETRLEObject, uiFileSectionSize), L"")
 			}
-			catch(CBasicException& ex)
+			catch(vfs::Exception& ex)
 			{ 
 				//FileClose( hFile );
 				pFile->close();
@@ -266,9 +267,9 @@ BOOLEAN ja2xp::STCILoadIndexed(vfs::tReadableFile *pFile, HIMAGE hImage, UINT16 
 		}
 		try
 		{
-			THROWIFFALSE(pHeader->uiStoredSize == pFile->read( (vfs::Byte*)hImage->pImageData, pHeader->uiStoredSize), L"");
+			VFS_THROW_IFF(pHeader->uiStoredSize == pFile->read( (vfs::Byte*)hImage->pImageData, pHeader->uiStoredSize), L"");
 		}
-		catch(CBasicException& ex)
+		catch(vfs::Exception& ex)
 		{ // Problem reading in the image data!
 			pFile->close();
 			delete[] hImage->pImageData;
@@ -290,7 +291,7 @@ BOOLEAN ja2xp::STCILoadIndexed(vfs::tReadableFile *pFile, HIMAGE hImage, UINT16 
 		{
 			pFile->setReadPosition( pHeader->uiStoredSize, vfs::IBaseFile::SD_CURRENT);
 		}
-		catch(CBasicException& ex)
+		catch(vfs::Exception& ex)
 		{
 			//FileClose( hFile );
 			pFile->close();
@@ -322,9 +323,9 @@ BOOLEAN ja2xp::STCILoadIndexed(vfs::tReadableFile *pFile, HIMAGE hImage, UINT16 
 		}
 		try
 		{
-			THROWIFFALSE(pHeader->uiAppDataSize == pFile->read( (vfs::Byte*)hImage->pAppData, pHeader->uiAppDataSize), L"");
+			VFS_THROW_IFF(pHeader->uiAppDataSize == pFile->read( (vfs::Byte*)hImage->pAppData, pHeader->uiAppDataSize), L"");
 		}
-		catch(CBasicException& ex)
+		catch(vfs::Exception& ex)
 		{ 
 			pFile->close();
 			delete[] hImage->pAppData;
@@ -402,10 +403,10 @@ BOOLEAN ja2xp::IsSTCIETRLEFile(vfs::tReadableFile *pFile, CHAR8 * ImageFile )
 
 	try
 	{
-		THROWIFFALSE(STCI_HEADER_SIZE == pFile->read( (vfs::Byte*)&Header, STCI_HEADER_SIZE), L"");
-		THROWIFFALSE( memcmp( Header.cID, STCI_ID_STRING, STCI_ID_LEN ) == 0, L"" );
+		VFS_THROW_IFF(STCI_HEADER_SIZE == pFile->read( (vfs::Byte*)&Header, STCI_HEADER_SIZE), L"");
+		VFS_THROW_IFF( memcmp( Header.cID, STCI_ID_STRING, STCI_ID_LEN ) == 0, L"" );
 	}
-	catch(CBasicException& ex)
+	catch(vfs::Exception& ex)
 	{
 		pFile->close();
 		return( FALSE );

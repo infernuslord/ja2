@@ -12,8 +12,7 @@
 #include <iosfwd>
 #include <vector>
 
-#include <vfs/Core/vfs_string.h>
-
+#include "sgp_logger.h"
 
 // A macro to disallow the copy constructor and operator= functions
 // This should be used in the private: declarations for a class
@@ -23,10 +22,6 @@
 
 // An older, deprecated, politically incorrect name for the above.
 #define DISALLOW_EVIL_CONSTRUCTORS(TypeName) DISALLOW_COPY_AND_ASSIGN(TypeName)
-
-namespace vfs{
-	class Log;
-}
 
 // A stacktrace can be helpful in debugging. For example, you can include a
 // stacktrace member in a object (probably around #ifndef NDEBUG) so that you
@@ -42,7 +37,7 @@ public:
 	void PrintBacktrace(const char* msg);
 
 	// Resolve backtrace to symbols and write to stream.
-	void OutputToStream(const char* msg, vfs::Log* os);
+	void OutputToStream(const char* msg, sgp::Logger::LogInstance* os);
 
 private:
 	std::vector<void*> trace_;
