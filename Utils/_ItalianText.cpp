@@ -3959,9 +3959,15 @@ STR16	zOptionsScreenHelpText[] =
 STR16	gzGIOScreenText[] =
 {
 	L"INSTALLAZIONE INIZIALE DEL GIOCO",
+#ifdef JA2UB
+	L"Random Manuel texts",
+	L"Off",
+	L"On",
+#else
 	L"Versione del gioco",
 	L"Realistica",
 	L"Fantascientifica",
+#endif	
 	L"Platinum", //Placeholder English
 	L"Opzioni delle armi",
 	L"Varietà di armi",
@@ -4001,9 +4007,15 @@ STR16	gzGIOScreenText[] =
 	L"Enemies Drop All Items",
 	L"Off",
 	L"On",
+#ifdef JA2UB
+	L"Tex and John",
+	L"Random",
+	L"All",
+#else
 	L"Number of Terrorists",
 	L"Random",
 	L"All",
+#endif	
 	L"Secret Weapon Caches",
 	L"Random",
 	L"All",

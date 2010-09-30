@@ -3975,9 +3975,15 @@ STR16	zOptionsScreenHelpText[] =
 STR16	gzGIOScreenText[] =
 {
 	L"游戏初始设置",
+#ifdef JA2UB
+	L"Random Manuel texts ",
+	L"Off",
+	L"On",
+#else
 	L"游戏风格",
 	L"现实",
 	L"科幻",
+#endif	
 	L"金版",
 	L"Available Arsenal", // changed by SANDRO
 	L"大量武器",
@@ -4017,9 +4023,15 @@ STR16	gzGIOScreenText[] =
 	L"Enemies Drop All Items",
 	L"Off",
 	L"On",
+#ifdef JA2UB
+	L"Tex and John",
+	L"Random",
+	L"All",
+#else
 	L"Number of Terrorists",
 	L"Random",
 	L"All",
+#endif	
 	L"Secret Weapon Caches",
 	L"Random",
 	L"All",

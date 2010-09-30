@@ -1359,9 +1359,13 @@ void InternalEndQuest( UINT8 ubQuest, INT16 sSectorX, INT16 sSectorY, BOOLEAN fU
 				else
 					GiveQuestRewardPoint( sSectorX, sSectorY, 9, NO_PROFILE );
 				break;
-//			case QUEST_KILL_DEIDRANNA :
-//				GiveQuestRewardPoint( sSectorX, sSectorY, 25, NO_PROFILE );
-//				break;
+#ifdef JA2UB
+//off
+#else
+			case QUEST_KILL_DEIDRANNA :
+				GiveQuestRewardPoint( sSectorX, sSectorY, 25, NO_PROFILE );
+				break;
+#endif
 			default :
 				GiveQuestRewardPoint( sSectorX, sSectorY, 4, NO_PROFILE );
 				break;

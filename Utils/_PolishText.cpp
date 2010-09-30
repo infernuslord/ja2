@@ -3977,9 +3977,15 @@ STR16	zOptionsScreenHelpText[] =
 STR16	gzGIOScreenText[] =
 {
 	L"POCZ¥TKOWE USTAWIENIA GRY",
+#ifdef JA2UB
+	L"Dialogi Manuel'a",
+	L"Off",
+	L"On",
+#else
 	L"Styl gry",
 	L"Realistyczny",
 	L"S-F",
+#endif	
 	L"Platynowy", //Placeholder English
 	L"Opcje broni",
 	L"Mnóstwo broni",
@@ -3988,7 +3994,7 @@ STR16	gzGIOScreenText[] =
 	L"Nowicjusz",
 	L"Doœwiadczony",
 	L"Ekspert",
-	L"SZALONY",
+	L"Szalony",
 	L"Ok",
 	L"Anuluj",
 	L"Rozszerzony poziom trudnoœci",
@@ -4010,18 +4016,24 @@ STR16	gzGIOScreenText[] =
 	L"Old",
 	L"New",
 	L"Max IMP Characters",
-	L"One",
-	L"Two",
-	L"Three",
-	L"Four",
-	L"Five",
-	L"Six",
+	L"1",
+	L"2",
+	L"3",
+	L"4",
+	L"5",
+	L"6",
 	L"Enemies Drop All Items",
 	L"Off",
 	L"On",
+#ifdef JA2UB
+	L"Tex and John",
+	L"Random",
+	L"All",
+#else
 	L"Number of Terrorists",
 	L"Random",
 	L"All",
+#endif	
 	L"Secret Weapon Caches",
 	L"Random",
 	L"All",
@@ -4033,9 +4045,9 @@ STR16	gzGIOScreenText[] =
 	L"Very Fast",
 
 	// TODO.Translate
-	L"Old / Old",
-	L"New / Old",
-	L"New / New",
+	L"Stary / Stary",
+	L"Nowy / Stary",
+	L"Nowy / Nowy",
 };
 
 STR16	gzMPJScreenText[] =

@@ -127,6 +127,10 @@ typedef struct
 	INT32	iStartingCashExpert;
 	INT32	iStartingCashInsane;
 	
+	BOOLEAN TEX_AND_JOHN;
+	
+	BOOLEAN Random_Manuel_Text;
+	
 	BOOLEAN RISRAPORT;
        
 } GAME_LEGION_OPTIONS;

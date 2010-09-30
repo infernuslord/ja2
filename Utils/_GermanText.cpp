@@ -3802,9 +3802,15 @@ STR16 zOptionsScreenHelpText[] =
 STR16 gzGIOScreenText[] =
 {
 	L"GRUNDEINSTELLUNGEN",
+#ifdef JA2UB
+	L"Random Manuel texts",
+	L"Off",
+	L"On",
+#else
 	L"Spielmodus",
 	L"Realistisch",
 	L"SciFi",
+#endif	
 	L"Platinum", //Placeholder English
 	L"Waffen",													
 	L"Zus. Waffen",
@@ -3844,8 +3850,15 @@ STR16 gzGIOScreenText[] =
 	L"Tote Gegner lassen alles fallen",
 	L"Aus",
 	L"An",
+#ifdef JA2UB
+	L"Tex and John",
+	L"Zufällig",
+	L"Alle vorhanden",
+#else
 	L"Anzahl der Terroristen",
 	L"Zufällig",
+	L"Alle vorhanden",
+#endif	
 	L"Alle vorhanden",
 	L"Geheime Waffenlager",
 	L"Zufällig",

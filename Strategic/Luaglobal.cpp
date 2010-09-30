@@ -22,6 +22,7 @@
 #include "Queen Command.h"
 #include "gamescreen.h"
 #include "Map Screen Interface Map.h"
+#include "Legion cfg.h"
 
 extern "C" {
 #include "lua.h"
@@ -145,5 +146,10 @@ void IniGlobalGameSetting(lua_State *L)
 	lua_pushinteger(L, gbIntroScreenMode);
 	lua_setglobal(L, "gbIntroScreenMode");	
 
+	lua_pushboolean(L, gGameLegionOptions.TEX_AND_JOHN);
+	lua_setglobal(L, "enabledJohnAndTex");		
+	
+	lua_pushboolean(L, gGameLegionOptions.Random_Manuel_Text);
+	lua_setglobal(L, "RandomManuelText");	
 	
 }

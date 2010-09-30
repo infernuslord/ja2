@@ -3961,9 +3961,15 @@ STR16	zOptionsScreenHelpText[] =
 STR16	gzGIOScreenText[] =
 {
 	L"УСТАНОВКИ НАЧАЛА ИГРЫ",
+#ifdef JA2UB
+	L"Random Manuel texts",
+	L"Off",
+	L"On",
+#else
 	L"Элементы фантастики",
 	L"нет",
 	L"есть",
+#endif	
 	L"Платиновая серия",
 	L"Ассортимент оружия в игре",
 	L"всё доступное",
@@ -4003,9 +4009,15 @@ STR16	gzGIOScreenText[] =
 	L"Враг оставляет всё снаряжение",
 	L"нет",
 	L"да",
+#ifdef JA2UB
+	L"Tex and John",
+	L"Random",
+	L"All",
+#else
 	L"Число террористов",
 	L"случайное",
 	L"все сразу",
+#endif		
 	L"Спрятанное оружие секторов",	//Secret Weapon Caches
 	L"выборочно",
 	L"всё возможное",

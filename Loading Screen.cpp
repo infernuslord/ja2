@@ -349,6 +349,10 @@ void DisplayLoadScreenWithID( UINT8 ubLoadScreenID )
 	HVSURFACE			hVSurface;
 	UINT32				uiLoadScreen;
 	STRING512			smallImage = {0};
+	
+	STRING512 xName;
+	char szFullImagePath[80];
+	STRING512			sImage = {0};
 
 	bShowSmallImage = FALSE;
 
@@ -397,7 +401,7 @@ void DisplayLoadScreenWithID( UINT8 ubLoadScreenID )
 					switch (ubLoadScreenID)
 					{
 						case DAY:
-							imagePath = gSectorLoadscreens[i].szDay;
+							imagePath = gSectorLoadscreens[i].szDay;	
 							break;
 						case DAY_ALT:
 							imagePath = gSectorLoadscreens[i].szDayAlt;
@@ -406,14 +410,14 @@ void DisplayLoadScreenWithID( UINT8 ubLoadScreenID )
 							imagePath = gSectorLoadscreens[i].szNight;
 							break;
 						case NIGHT_ALT:
-							imagePath = gSectorLoadscreens[i].szNight;
+							imagePath = gSectorLoadscreens[i].szNightAlt;
 							break;
 					}
 					break;
 				}
 			}
 		}
-
+	
 		// Small image: 640x480
 		std::string strSmallImage;
 		BuildLoadscreenFilename(strSmallImage, imagePath, 0, imageFormat);
@@ -422,7 +426,23 @@ void DisplayLoadScreenWithID( UINT8 ubLoadScreenID )
 		// Actual image, depending on the resolution
 		std::string strBigImage;
 		BuildLoadscreenFilename(strBigImage, imagePath, iResolution, imageFormat);
-		strBigImage.copy(vs_desc.ImageFile, sizeof(vs_desc.ImageFile)-1);
+		strBigImage.copy(vs_desc.ImageFile, sizeof(vs_desc.ImageFile)-1);		
+		
+		
+		if ( !FileExists(vs_desc.ImageFile) )
+		{
+			// Small image: 640x480
+		std::string strSmallImage("LOADSCREENS\\");
+		std::string strBigImage("LOADSCREENS\\");
+		BuildLoadscreenFilename(strSmallImage, LoadScreenNames[1], 0, imageFormat);
+		strSmallImage.copy(smallImage, sizeof(smallImage)-1);
+
+		// Actual image, depending on the resolution
+		BuildLoadscreenFilename(strBigImage, LoadScreenNames[1], iResolution, imageFormat);
+		strBigImage.copy(vs_desc.ImageFile, sizeof(vs_desc.ImageFile)-1);		
+		
+		}
+		
 	}
 	else
 	{

@@ -145,6 +145,15 @@ enum
 };
 
 // Game Settings options
+#ifdef JA2UB
+enum
+{
+	GIO_TEXT_OFF,
+	GIO_TEXT_ON,	
+
+	NUM_TEXT_STYLES,
+};
+#else
 enum
 {
 	GIO_REALISTIC,
@@ -152,6 +161,7 @@ enum
 
 	NUM_GAME_STYLES,
 };
+#endif
 
 // Iron man mode
 enum
@@ -162,6 +172,15 @@ enum
 	NUM_SAVE_OPTIONS,
 };
 
+#ifdef JA2UB
+enum
+{
+	GIO_TEX_JOHN_RANDOM,
+	GIO_TEX_AND_JOHN,
+
+	NUM_RPC_UB_OPTIONS,
+};
+#else
 enum
 {
 	GIO_TERRORISTS_RANDOM,
@@ -169,6 +188,7 @@ enum
 
 	NUM_TERRORISTS_OPTIONS,
 };
+#endif
 
 // BR options
 enum
@@ -323,10 +343,21 @@ void BtnGIONewTraitsCallback(GUI_BUTTON *btn,INT32 reason);
 void NewTraitsNotPossibleMessageBoxCallBack( UINT8 bExitValue );
 
 //checkbox to toggle Game style
+#ifdef JA2UB
+UINT32	guiGameTextTogglesImage[ NUM_TEXT_STYLES ];
+UINT32	guiGameTextToggles[ NUM_TEXT_STYLES ];
+#else
 UINT32	guiGameStyleTogglesImage[ NUM_GAME_STYLES ];
 UINT32	guiGameStyleToggles[ NUM_GAME_STYLES ];
+#endif
+
+#ifdef JA2UB
+void BtnGIOOffStyleCallback(GUI_BUTTON *btn,INT32 reason);
+void BtnGIOOnStyleCallback(GUI_BUTTON *btn,INT32 reason);
+#else
 void BtnGIORealisticStyleCallback(GUI_BUTTON *btn,INT32 reason);
 void BtnGIOScifiStyleCallback(GUI_BUTTON *btn,INT32 reason);
+#endif
 
 //checkbox to toggle Save style
 UINT32	guiGameSaveTogglesImage[ NUM_SAVE_OPTIONS ];
@@ -334,10 +365,21 @@ UINT32	guiGameSaveToggles[ NUM_SAVE_OPTIONS ];
 void BtnGIOIronManOffCallback(GUI_BUTTON *btn,INT32 reason);
 void BtnGIOIronManOnCallback(GUI_BUTTON *btn,INT32 reason);
 
+#ifdef JA2UB
+UINT32	guiRpcOptionTogglesImage[ NUM_RPC_UB_OPTIONS ];
+UINT32	guiRpcOptionToggles[ NUM_RPC_UB_OPTIONS ];
+#else
 UINT32	guiTerroristsOptionTogglesImage[ NUM_TERRORISTS_OPTIONS ];
 UINT32	guiTerroristsOptionToggles[ NUM_TERRORISTS_OPTIONS ];
+#endif
+
+#ifdef JA2UB
+void BtnGIORpcRandomCallback(GUI_BUTTON *btn,INT32 reason);
+void BtnGIORpcAllCallback(GUI_BUTTON *btn,INT32 reason);
+#else
 void BtnGIOTerroristsRandomCallback(GUI_BUTTON *btn,INT32 reason);
 void BtnGIOTerroristsAllCallback(GUI_BUTTON *btn,INT32 reason);
+#endif
 
 UINT32	guiDropAllOptionTogglesImage[ NUM_DROPALL_OPTIONS ];
 UINT32	guiDropAllOptionToggles[ NUM_DROPALL_OPTIONS ];
@@ -350,11 +392,14 @@ UINT32	guiGunOptionToggles[ NUM_GUN_OPTIONS ];
 void BtnGIOGunSettingReducedCallback(GUI_BUTTON *btn,INT32 reason);
 void BtnGIOGunSettingToGCallback(GUI_BUTTON *btn,INT32 reason);
 
+#ifdef JA2UB
+//off
+#else
 UINT32	guiWeaponCachesOptionTogglesImage[ NUM_CACHES_OPTIONS ];
 UINT32	guiWeaponCachesOptionToggles[ NUM_CACHES_OPTIONS ];
 void BtnGIOWeaponCachesRandomCallback(GUI_BUTTON *btn,INT32 reason);
 void BtnGIOWeaponCachesAllCallback(GUI_BUTTON *btn,INT32 reason);
-
+#endif
 
 UINT32	guiTimedTurnToggles[ GIO_NUM_TIMED_TURN_OPTIONS ];
 void BtnTimedTurnsTogglesCallback(GUI_BUTTON *btn,INT32 reason);
@@ -377,13 +422,27 @@ void			GetGIOScreenUserInput();
 UINT8			GetCurrentGunButtonSetting();
 // JA2Gold: added save (iron man) button setting
 UINT8			GetCurrentGameSaveButtonSetting();
+
+#ifdef JA2UB
+UINT8			GetCurrentTextStyleButtonSetting();
+#else
 UINT8			GetCurrentGameStyleButtonSetting();
+#endif
 
 // SANDRO - added following
 UINT8	GetCurrentTraitsOptionButtonSetting();
 UINT8	GetCurrentDropAllButtonSetting();
+#ifdef JA2UB
+UINT8	GetCurrentTexAndJohnButtonSetting();
+#else
 UINT8	GetCurrentTerroristsButtonSetting();
+#endif
+#ifdef JA2UB
+//off
+#else
 UINT8	GetCurrentWeaponCachesButtonSetting();
+#endif
+
 
 void		DoneFadeOutForExitGameInitOptionScreen( void );
 void		DoneFadeInForExitGameInitOptionScreen( void );
@@ -500,12 +559,19 @@ UINT32	GameInitOptionsScreenInit( void )
 	// Available Arsenal (Default: Tons of Guns = 1)
 	gGameOptions.fGunNut =  (BOOLEAN)props.getIntProperty( L"Ja2_sp Settings", L"AVAILABLE_ARSENAL", 1);
 
+	#ifdef JA2UB
+	// tex and john
+	gGameLegionOptions.TEX_AND_JOHN =  (BOOLEAN)props.getIntProperty( L"Ja2_sp Settings", L"RPC_TEX_AND_JOHN", 0);	
+	
+	gGameLegionOptions.Random_Manuel_Text =  (BOOLEAN)props.getIntProperty( L"Ja2_sp Settings", L"RANDOM_MANUEL_TEXT", 0);	
+	#else
 	// Number of Terrorists (Default: Random = 0)
 	gGameOptions.fEnableAllTerrorists =  (BOOLEAN)props.getIntProperty( L"Ja2_sp Settings", L"NUMBER_OF_TERRORISTS", 0);
-
+	#endif
+	
 	// Secret Weapon Caches (Default: Random = 0)
 	gGameOptions.fEnableAllWeaponCaches =  (BOOLEAN)props.getIntProperty( L"Ja2_sp Settings", L"SECRET_WEAPON_CACHES", 0);
-
+	
 	gGameOptions.fAirStrikes =  FALSE;
 	gGameOptions.fTurnTimeLimit	= FALSE;
 
@@ -716,6 +782,33 @@ BOOLEAN		EnterGIOScreen()
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	// GAME SETTING ( realistic, sci fi )
 
+	#ifdef JA2UB
+	guiGameTextTogglesImage[ GIO_TEXT_OFF ] = 	UseLoadedButtonImage( guiTraitsOptionTogglesImage[ GIO_TRAITS_OLD ], -1,1,-1,3,-1 );
+	guiGameTextToggles[ GIO_TEXT_OFF ] = CreateIconAndTextButton( guiGameTextTogglesImage[ GIO_TEXT_OFF ], gzGIOScreenText[ GIO_REALISTIC_TEXT ], GIO_TOGGLE_TEXT_FONT,
+													GIO_TOGGLE_TEXT_COLOR, NO_SHADOW,
+													GIO_TOGGLE_TEXT_COLOR, NO_SHADOW,
+													TEXT_CJUSTIFIED,
+													(GIO_GAME_SETTING_X + 74), (GIO_GAME_SETTING_Y + 10), BUTTON_TOGGLE, MSYS_PRIORITY_HIGH,
+													DEFAULT_MOVE_CALLBACK, BtnGIOOffStyleCallback);
+
+	guiGameTextTogglesImage[ GIO_TEXT_ON ] = UseLoadedButtonImage( guiTraitsOptionTogglesImage[ GIO_TRAITS_OLD ], -1,1,-1,3,-1 );
+	guiGameTextToggles[ GIO_TEXT_ON ] = CreateIconAndTextButton( guiGameTextTogglesImage[ GIO_TEXT_ON ],  gzGIOScreenText[ GIO_SCI_FI_TEXT ], GIO_TOGGLE_TEXT_FONT,
+													GIO_TOGGLE_TEXT_COLOR, NO_SHADOW,
+													GIO_TOGGLE_TEXT_COLOR, NO_SHADOW,
+													TEXT_CJUSTIFIED,
+													(GIO_GAME_SETTING_X), (GIO_GAME_SETTING_Y + 10), BUTTON_TOGGLE, MSYS_PRIORITY_HIGH,
+													DEFAULT_MOVE_CALLBACK, BtnGIOOnStyleCallback );
+
+	SpecifyButtonSoundScheme( guiGameTextToggles[ GIO_TEXT_OFF ], BUTTON_SOUND_SCHEME_BIGSWITCH3 );
+	SpecifyButtonSoundScheme( guiGameTextToggles[ GIO_TEXT_ON ], BUTTON_SOUND_SCHEME_BIGSWITCH3 );
+	MSYS_SetBtnUserData(guiGameTextToggles[ GIO_TEXT_OFF ],0, 0 );
+	MSYS_SetBtnUserData(guiGameTextToggles[ GIO_TEXT_ON ],0, 1 );
+
+	if( gGameLegionOptions.Random_Manuel_Text )
+		ButtonList[ guiGameTextToggles[ GIO_TEXT_ON ] ]->uiFlags |= BUTTON_CLICKED_ON;
+	else 
+		ButtonList[ guiGameTextToggles[ GIO_TEXT_OFF ] ]->uiFlags |= BUTTON_CLICKED_ON;		
+	#else
 	guiGameStyleTogglesImage[ GIO_REALISTIC ] = 	UseLoadedButtonImage( guiTraitsOptionTogglesImage[ GIO_TRAITS_OLD ], -1,1,-1,3,-1 );
 	guiGameStyleToggles[ GIO_REALISTIC ] = CreateIconAndTextButton( guiGameStyleTogglesImage[ GIO_REALISTIC ], gzGIOScreenText[ GIO_REALISTIC_TEXT ], GIO_TOGGLE_TEXT_FONT,
 													GIO_TOGGLE_TEXT_COLOR, NO_SHADOW,
@@ -741,7 +834,7 @@ BOOLEAN		EnterGIOScreen()
 		ButtonList[ guiGameStyleToggles[ GIO_SCI_FI ] ]->uiFlags |= BUTTON_CLICKED_ON;
 	else 
 		ButtonList[ guiGameStyleToggles[ GIO_REALISTIC ] ]->uiFlags |= BUTTON_CLICKED_ON;		
-
+	#endif
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	// IRON MAN SETTING
 
@@ -774,7 +867,24 @@ BOOLEAN		EnterGIOScreen()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	// NUMBER OF TERRORISTS SETTING
-
+	
+	#ifdef JA2UB
+	guiRpcOptionTogglesImage[ GIO_TEX_JOHN_RANDOM ] = 	UseLoadedButtonImage( guiTraitsOptionTogglesImage[ GIO_TRAITS_OLD ], -1,1,-1,3,-1 );
+	guiRpcOptionToggles[ GIO_TEX_JOHN_RANDOM ] = CreateIconAndTextButton( guiRpcOptionTogglesImage[ GIO_TEX_JOHN_RANDOM ], gzGIOScreenText[ GIO_TERRORISTS_RANDOM_TEXT ], GIO_TOGGLE_TEXT_FONT,
+													GIO_TOGGLE_TEXT_COLOR, NO_SHADOW,
+													GIO_TOGGLE_TEXT_COLOR, NO_SHADOW,
+													TEXT_CJUSTIFIED,
+													(GIO_TERRORISTS_SETTING_X), (GIO_TERRORISTS_SETTING_Y + 10), BUTTON_TOGGLE, MSYS_PRIORITY_HIGH,
+													DEFAULT_MOVE_CALLBACK, BtnGIORpcRandomCallback);
+	
+	guiRpcOptionTogglesImage[ GIO_TEX_AND_JOHN ] = UseLoadedButtonImage( guiTraitsOptionTogglesImage[ GIO_TRAITS_OLD ], -1,1,-1,3,-1 );
+	guiRpcOptionToggles[ GIO_TEX_AND_JOHN ] = CreateIconAndTextButton( guiRpcOptionTogglesImage[ GIO_TEX_AND_JOHN ],  gzGIOScreenText[ GIO_TERRORISTS_ALL_TEXT ], GIO_TOGGLE_TEXT_FONT,
+													GIO_TOGGLE_TEXT_COLOR, NO_SHADOW,
+													GIO_TOGGLE_TEXT_COLOR, NO_SHADOW,
+													TEXT_CJUSTIFIED,
+													(GIO_TERRORISTS_SETTING_X + 74), (GIO_TERRORISTS_SETTING_Y + 10), BUTTON_TOGGLE, MSYS_PRIORITY_HIGH,
+													DEFAULT_MOVE_CALLBACK, BtnGIORpcAllCallback );
+	#else
 	guiTerroristsOptionTogglesImage[ GIO_TERRORISTS_RANDOM ] = 	UseLoadedButtonImage( guiTraitsOptionTogglesImage[ GIO_TRAITS_OLD ], -1,1,-1,3,-1 );
 	guiTerroristsOptionToggles[ GIO_TERRORISTS_RANDOM ] = CreateIconAndTextButton( guiTerroristsOptionTogglesImage[ GIO_TERRORISTS_RANDOM ], gzGIOScreenText[ GIO_TERRORISTS_RANDOM_TEXT ], GIO_TOGGLE_TEXT_FONT,
 													GIO_TOGGLE_TEXT_COLOR, NO_SHADOW,
@@ -782,7 +892,7 @@ BOOLEAN		EnterGIOScreen()
 													TEXT_CJUSTIFIED,
 													(GIO_TERRORISTS_SETTING_X), (GIO_TERRORISTS_SETTING_Y + 10), BUTTON_TOGGLE, MSYS_PRIORITY_HIGH,
 													DEFAULT_MOVE_CALLBACK, BtnGIOTerroristsRandomCallback);
-
+													
 	guiTerroristsOptionTogglesImage[ GIO_TERRORISTS_ALL ] = UseLoadedButtonImage( guiTraitsOptionTogglesImage[ GIO_TRAITS_OLD ], -1,1,-1,3,-1 );
 	guiTerroristsOptionToggles[ GIO_TERRORISTS_ALL ] = CreateIconAndTextButton( guiTerroristsOptionTogglesImage[ GIO_TERRORISTS_ALL ],  gzGIOScreenText[ GIO_TERRORISTS_ALL_TEXT ], GIO_TOGGLE_TEXT_FONT,
 													GIO_TOGGLE_TEXT_COLOR, NO_SHADOW,
@@ -790,7 +900,20 @@ BOOLEAN		EnterGIOScreen()
 													TEXT_CJUSTIFIED,
 													(GIO_TERRORISTS_SETTING_X + 74), (GIO_TERRORISTS_SETTING_Y + 10), BUTTON_TOGGLE, MSYS_PRIORITY_HIGH,
 													DEFAULT_MOVE_CALLBACK, BtnGIOTerroristsAllCallback );
+	#endif
 
+																								
+	#ifdef JA2UB
+	SpecifyButtonSoundScheme( guiRpcOptionToggles[ GIO_TEX_JOHN_RANDOM ], BUTTON_SOUND_SCHEME_BIGSWITCH3 );
+	SpecifyButtonSoundScheme( guiRpcOptionToggles[ GIO_TEX_AND_JOHN ], BUTTON_SOUND_SCHEME_BIGSWITCH3 );
+	MSYS_SetBtnUserData(guiRpcOptionToggles[ GIO_TEX_JOHN_RANDOM ],0, 0 );
+	MSYS_SetBtnUserData(guiRpcOptionToggles[ GIO_TEX_AND_JOHN ],0, 1 );
+
+	if( gGameLegionOptions.TEX_AND_JOHN )
+		ButtonList[ guiRpcOptionToggles[ GIO_TEX_AND_JOHN ] ]->uiFlags |= BUTTON_CLICKED_ON;
+	else 
+		ButtonList[ guiRpcOptionToggles[ GIO_TEX_JOHN_RANDOM ] ]->uiFlags |= BUTTON_CLICKED_ON;		
+	#else 
 	SpecifyButtonSoundScheme( guiTerroristsOptionToggles[ GIO_TERRORISTS_RANDOM ], BUTTON_SOUND_SCHEME_BIGSWITCH3 );
 	SpecifyButtonSoundScheme( guiTerroristsOptionToggles[ GIO_TERRORISTS_ALL ], BUTTON_SOUND_SCHEME_BIGSWITCH3 );
 	MSYS_SetBtnUserData(guiTerroristsOptionToggles[ GIO_TERRORISTS_RANDOM ],0, 0 );
@@ -799,8 +922,9 @@ BOOLEAN		EnterGIOScreen()
 	if( gGameOptions.fEnableAllTerrorists )
 		ButtonList[ guiTerroristsOptionToggles[ GIO_TERRORISTS_ALL ] ]->uiFlags |= BUTTON_CLICKED_ON;
 	else 
-		ButtonList[ guiTerroristsOptionToggles[ GIO_TERRORISTS_RANDOM ] ]->uiFlags |= BUTTON_CLICKED_ON;		
-
+		ButtonList[ guiTerroristsOptionToggles[ GIO_TERRORISTS_RANDOM ] ]->uiFlags |= BUTTON_CLICKED_ON;	
+	
+	#endif
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	// BOBBY RAY SETTING
 	
@@ -968,7 +1092,9 @@ BOOLEAN		EnterGIOScreen()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WEAPON CACHES SETTING
-
+	#ifdef JA2UB
+	//off
+	#else
 	guiWeaponCachesOptionTogglesImage[ GIO_CACHES_RANDOM ] = UseLoadedButtonImage( guiTraitsOptionTogglesImage[ GIO_TRAITS_OLD ], -1,1,-1,3,-1 );
 	guiWeaponCachesOptionToggles[ GIO_CACHES_RANDOM ] = CreateIconAndTextButton( guiWeaponCachesOptionTogglesImage[ GIO_CACHES_RANDOM ], gzGIOScreenText[ GIO_CACHES_RANDOM_TEXT ], GIO_TOGGLE_TEXT_FONT,
 													GIO_TOGGLE_TEXT_COLOR, NO_SHADOW,
@@ -994,7 +1120,7 @@ BOOLEAN		EnterGIOScreen()
 		ButtonList[ guiWeaponCachesOptionToggles[ GIO_CACHES_ALL ] ]->uiFlags |= BUTTON_CLICKED_ON;
 	else
 		ButtonList[ guiWeaponCachesOptionToggles[ GIO_CACHES_RANDOM ] ]->uiFlags |= BUTTON_CLICKED_ON;
-
+	#endif
 
 	//Reset the exit screen
 	gubGIOExitScreen = GAME_INIT_OPTIONS_SCREEN;
@@ -1060,7 +1186,11 @@ void BtnGIODifficultySelectionRightCallback( GUI_BUTTON *btn,INT32 reason )
 
 	if( reason & MSYS_CALLBACK_REASON_LBUTTON_REPEAT )
 	{
+		#ifdef JA2UB
+		if ( iCurrentDifficulty < 2 )
+		#else
 		if ( iCurrentDifficulty < 3 )
+		#endif
 		{
 			PlayButtonSound( giGIODifficultyButton[1], BUTTON_SOUND_CLICKED_ON );
 
@@ -1076,7 +1206,11 @@ void BtnGIODifficultySelectionRightCallback( GUI_BUTTON *btn,INT32 reason )
 	{
 		btn->uiFlags|=(BUTTON_CLICKED_ON);
 
+		#ifdef JA2UB
+		if ( iCurrentDifficulty < 2 )
+		#else
 		if ( iCurrentDifficulty < 3 )
+		#endif
 		{
 			PlayButtonSound( giGIODifficultyButton[1], BUTTON_SOUND_CLICKED_ON );
 
@@ -1496,7 +1630,38 @@ void NewTraitsNotPossibleMessageBoxCallBack( UINT8 bExitValue )
 		gubGameOptionScreenHandler = GIO_NOTHING;
 	}*/
 }
+#ifdef JA2UB
+void BtnGIOOffStyleCallback(GUI_BUTTON *btn,INT32 reason)
+{
+	if (!(btn->uiFlags & BUTTON_ENABLED))
+		return;
 
+	if( reason & MSYS_CALLBACK_REASON_LBUTTON_DWN )
+	{
+		RestoreExternBackgroundRect( (GIO_GAME_SETTING_X), (GIO_GAME_SETTING_Y + 10), 230, 40 );
+
+		ButtonList[ guiGameTextToggles[ GIO_TEXT_ON ] ]->uiFlags &= ~BUTTON_CLICKED_ON;
+		btn->uiFlags|=(BUTTON_CLICKED_ON);
+			
+		PlayButtonSound( guiGameTextToggles[ GIO_TEXT_OFF ], BUTTON_SOUND_CLICKED_ON );
+	}
+}
+void BtnGIOOnStyleCallback(GUI_BUTTON *btn,INT32 reason)
+{
+	if (!(btn->uiFlags & BUTTON_ENABLED))
+		return;
+
+	if( reason & MSYS_CALLBACK_REASON_LBUTTON_DWN )
+	{
+		RestoreExternBackgroundRect( (GIO_GAME_SETTING_X), (GIO_GAME_SETTING_Y + 10), 230, 40 );
+
+		ButtonList[ guiGameTextToggles[ GIO_TEXT_OFF ] ]->uiFlags &= ~BUTTON_CLICKED_ON;
+		btn->uiFlags|=(BUTTON_CLICKED_ON);
+			
+		PlayButtonSound( guiGameTextToggles[ GIO_TEXT_ON ], BUTTON_SOUND_CLICKED_ON );
+	}
+}
+#else
 void BtnGIORealisticStyleCallback(GUI_BUTTON *btn,INT32 reason)
 {
 	if (!(btn->uiFlags & BUTTON_ENABLED))
@@ -1527,6 +1692,7 @@ void BtnGIOScifiStyleCallback(GUI_BUTTON *btn,INT32 reason)
 		PlayButtonSound( guiGameStyleToggles[ GIO_SCI_FI ], BUTTON_SOUND_CLICKED_ON );
 	}
 }
+#endif
 
 void BtnGIOIronManOffCallback(GUI_BUTTON *btn,INT32 reason)
 {
@@ -1540,7 +1706,7 @@ void BtnGIOIronManOffCallback(GUI_BUTTON *btn,INT32 reason)
 		ButtonList[ guiGameSaveToggles[ GIO_IRON_MAN ] ]->uiFlags &= ~BUTTON_CLICKED_ON;
 		btn->uiFlags|=(BUTTON_CLICKED_ON);
 			
-		PlayButtonSound( guiGameStyleToggles[ GIO_CAN_SAVE ], BUTTON_SOUND_CLICKED_ON );
+		PlayButtonSound( guiGameSaveToggles[ GIO_CAN_SAVE ], BUTTON_SOUND_CLICKED_ON );
 	}
 }
 void BtnGIOIronManOnCallback(GUI_BUTTON *btn,INT32 reason)
@@ -1555,10 +1721,42 @@ void BtnGIOIronManOnCallback(GUI_BUTTON *btn,INT32 reason)
 		ButtonList[ guiGameSaveToggles[ GIO_CAN_SAVE ] ]->uiFlags &= ~BUTTON_CLICKED_ON;
 		btn->uiFlags|=(BUTTON_CLICKED_ON);
 			
-		PlayButtonSound( guiGameStyleToggles[ GIO_IRON_MAN ], BUTTON_SOUND_CLICKED_ON );
+		PlayButtonSound( guiGameSaveToggles[ GIO_IRON_MAN ], BUTTON_SOUND_CLICKED_ON );
 	}
 }
 
+#ifdef JA2UB
+void BtnGIORpcRandomCallback(GUI_BUTTON *btn,INT32 reason)
+{
+	if (!(btn->uiFlags & BUTTON_ENABLED))
+		return;
+
+	if( reason & MSYS_CALLBACK_REASON_LBUTTON_DWN )
+	{
+		RestoreExternBackgroundRect( (GIO_TERRORISTS_SETTING_X), (GIO_TERRORISTS_SETTING_Y + 10), 230, 40 );
+
+		ButtonList[ guiRpcOptionToggles[ GIO_TEX_AND_JOHN ] ]->uiFlags &= ~BUTTON_CLICKED_ON;
+		btn->uiFlags|=(BUTTON_CLICKED_ON);
+			
+		PlayButtonSound( guiRpcOptionToggles[ GIO_TEX_JOHN_RANDOM ], BUTTON_SOUND_CLICKED_ON );
+	}
+}
+void BtnGIORpcAllCallback(GUI_BUTTON *btn,INT32 reason)
+{
+	if (!(btn->uiFlags & BUTTON_ENABLED))
+		return;
+
+	if( reason & MSYS_CALLBACK_REASON_LBUTTON_DWN )
+	{
+		RestoreExternBackgroundRect( (GIO_TERRORISTS_SETTING_X), (GIO_TERRORISTS_SETTING_Y + 10), 230, 40 );
+
+		ButtonList[ guiRpcOptionToggles[ GIO_TEX_JOHN_RANDOM ] ]->uiFlags &= ~BUTTON_CLICKED_ON;
+		btn->uiFlags|=(BUTTON_CLICKED_ON);
+			
+		PlayButtonSound( guiRpcOptionToggles[ GIO_TEX_AND_JOHN ], BUTTON_SOUND_CLICKED_ON );
+	}
+}
+#else
 void BtnGIOTerroristsRandomCallback(GUI_BUTTON *btn,INT32 reason)
 {
 	if (!(btn->uiFlags & BUTTON_ENABLED))
@@ -1589,7 +1787,7 @@ void BtnGIOTerroristsAllCallback(GUI_BUTTON *btn,INT32 reason)
 		PlayButtonSound( guiTerroristsOptionToggles[ GIO_TERRORISTS_ALL ], BUTTON_SOUND_CLICKED_ON );
 	}
 }
-
+#endif
 void BtnGIODropAllOffCallback(GUI_BUTTON *btn,INT32 reason)
 {
 	if (!(btn->uiFlags & BUTTON_ENABLED))
@@ -1652,6 +1850,9 @@ void BtnGIOGunSettingToGCallback(GUI_BUTTON *btn,INT32 reason)
 	}
 }
 
+#ifdef JA2UB
+//off
+#else
 void BtnGIOWeaponCachesRandomCallback(GUI_BUTTON *btn,INT32 reason)
 {
 	if (!(btn->uiFlags & BUTTON_ENABLED))
@@ -1682,6 +1883,7 @@ void BtnGIOWeaponCachesAllCallback(GUI_BUTTON *btn,INT32 reason)
 		PlayButtonSound( guiWeaponCachesOptionToggles[ GIO_CACHES_ALL ], BUTTON_SOUND_CLICKED_ON );
 	}
 }
+#endif
 
 BOOLEAN		ExitGIOScreen()
 {
@@ -1739,12 +1941,20 @@ BOOLEAN		ExitGIOScreen()
 	}
 
 	// Destroy Game setting buttons
+	#ifdef JA2UB
+	for( cnt=0; cnt<NUM_TEXT_STYLES; cnt++)
+	{
+		RemoveButton( guiGameTextToggles[ cnt ] );
+		UnloadButtonImage( guiGameTextTogglesImage[ cnt ] );
+	}
+	#else
 	for( cnt=0; cnt<NUM_GAME_STYLES; cnt++)
 	{
 		RemoveButton( guiGameStyleToggles[ cnt ] );
 		UnloadButtonImage( guiGameStyleTogglesImage[ cnt ] );
 	}
-
+	#endif
+	
 	// Destroy Iron Man setting buttons
 	for( cnt=0; cnt<NUM_SAVE_OPTIONS; cnt++)
 	{
@@ -1753,11 +1963,20 @@ BOOLEAN		ExitGIOScreen()
 	}
 
 	// Destroy Terrorists setting buttons
+#ifdef JA2UB
+	for( cnt=0; cnt<NUM_RPC_UB_OPTIONS; cnt++)
+	{
+		RemoveButton( guiRpcOptionToggles[ cnt ] );
+		UnloadButtonImage( guiRpcOptionTogglesImage[ cnt ] );
+	}		
+#else
 	for( cnt=0; cnt<NUM_TERRORISTS_OPTIONS; cnt++)
 	{
 		RemoveButton( guiTerroristsOptionToggles[ cnt ] );
 		UnloadButtonImage( guiTerroristsOptionTogglesImage[ cnt ] );
-	}
+	}	
+#endif
+
 
 	// Destroy Inventory setting buttons
 	if (!is_networked)
@@ -1786,13 +2005,17 @@ BOOLEAN		ExitGIOScreen()
 		UnloadButtonImage( guiGunOptionTogglesImage[ cnt ] );
 	}
 
+	#ifdef JA2UB
+	//off
+	#else
 	// Destroy Weapon Caches setting buttons
 	for( cnt=0; cnt<NUM_CACHES_OPTIONS; cnt++)
 	{
 		RemoveButton( guiWeaponCachesOptionToggles[ cnt ] );
 		UnloadButtonImage( guiWeaponCachesOptionTogglesImage[ cnt ] );
 	}
-
+	#endif
+	
 	gfGIOButtonsAllocated = FALSE;
 
 	//If we are starting the game stop playing the music
@@ -1942,8 +2165,12 @@ BOOLEAN		RenderGIOScreen()
 	DisplayWrappedString( (GIO_GUN_SETTING_X - 6), (UINT16)(GIO_GUN_SETTING_Y-GIO_GAP_BN_SETTINGS + GIO_TITLE_DISTANCE), GIO_GUN_SETTING_WIDTH + 14, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ GIO_GUN_OPTIONS_TEXT ], FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED );
 
 	//Display the Weapon Caches Settings Title Text
+	#ifdef JA2UB
+	//off
+	#else
 	DisplayWrappedString( (GIO_CACHES_SETTING_X - 6), (UINT16)(GIO_CACHES_SETTING_Y-GIO_GAP_BN_SETTINGS + GIO_TITLE_DISTANCE), GIO_CACHES_SETTING_WIDTH + 14, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ GIO_CACHES_TITLE_TEXT ], FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED );
-
+	#endif
+	
 	return( TRUE );
 }
 
@@ -2061,19 +2288,35 @@ UINT8	GetCurrentTraitsOptionButtonSetting()
 	return( 0 );
 }
 
-UINT8	GetCurrentGameStyleButtonSetting()
+#ifdef JA2UB
+UINT8	GetCurrentTextStyleButtonSetting()
 {
 	UINT8	cnt;
 
-	for( cnt=0; cnt<NUM_GAME_STYLES; cnt++)
+	for( cnt=0; cnt<NUM_TEXT_STYLES; cnt++)
 	{
-		if( ButtonList[ guiGameStyleToggles[ cnt ] ]->uiFlags & BUTTON_CLICKED_ON )
+		if( ButtonList[ guiGameTextToggles[ cnt ] ]->uiFlags & BUTTON_CLICKED_ON )
 		{
 			return( cnt );
 		}
 	}
 	return( 0 );
 }
+#else
+UINT8	GetCurrentGameStyleButtonSetting()
+{
+	UINT8	cnt;
+
+	for( cnt=0; cnt<NUM_GAME_STYLES; cnt++)
+	{
+		if( ButtonList[ guiGameTextToggles[ cnt ] ]->uiFlags & BUTTON_CLICKED_ON )
+		{
+			return( cnt );
+		}
+	}
+	return( 0 );
+}
+#endif
 
 UINT8	GetCurrentGameSaveButtonSetting()
 {
@@ -2089,25 +2332,40 @@ UINT8	GetCurrentGameSaveButtonSetting()
 	return( 0 );
 }
 
-UINT8	GetCurrentTerroristsButtonSetting()
+#ifdef JA2UB
+UINT8	GetCurrentTexAndJohnButtonSetting()
 {
 	UINT8	cnt;
 
-	for( cnt=0; cnt<NUM_GAME_STYLES; cnt++)
+	for( cnt=0; cnt<NUM_RPC_UB_OPTIONS; cnt++)
 	{
-		if( ButtonList[ guiTerroristsOptionToggles[ cnt ] ]->uiFlags & BUTTON_CLICKED_ON )
+		if( ButtonList[ guiRpcOptionToggles[ cnt ] ]->uiFlags & BUTTON_CLICKED_ON )
 		{
 			return( cnt );
 		}
 	}
 	return( 0 );
 }
+#else
+UINT8	GetCurrentTerroristsButtonSetting()
+{
+	UINT8	cnt;
 
+	for( cnt=0; cnt<NUM_TERRORISTS_OPTIONS; cnt++)
+	{
+		if( ButtonList[ guiRpcOptionToggles[ cnt ] ]->uiFlags & BUTTON_CLICKED_ON )
+		{
+			return( cnt );
+		}
+	}
+	return( 0 );
+}
+#endif
 UINT8	GetCurrentDropAllButtonSetting()
 {
 	UINT8	cnt;
 
-	for( cnt=0; cnt<NUM_GAME_STYLES; cnt++)
+	for( cnt=0; cnt<NUM_DROPALL_OPTIONS; cnt++)
 	{
 		if( ButtonList[ guiDropAllOptionToggles[ cnt ] ]->uiFlags & BUTTON_CLICKED_ON )
 		{
@@ -2130,12 +2388,14 @@ UINT8	GetCurrentGunButtonSetting()
 	}
 	return( 0 );
 }
-
+#ifdef JA2UB
+//off
+#else
 UINT8	GetCurrentWeaponCachesButtonSetting()
 {
 	UINT8	cnt;
 
-	for( cnt=0; cnt<NUM_GAME_STYLES; cnt++)
+	for( cnt=0; cnt<NUM_CACHES_OPTIONS; cnt++)
 	{
 		if( ButtonList[ guiWeaponCachesOptionToggles[ cnt ] ]->uiFlags & BUTTON_CLICKED_ON )
 		{
@@ -2144,6 +2404,7 @@ UINT8	GetCurrentWeaponCachesButtonSetting()
 	}
 	return( 0 );
 }
+#endif
 
 UINT8	GetCurrentTimedTurnsButtonSetting()
 {
@@ -2163,8 +2424,19 @@ void DoneFadeOutForExitGameInitOptionScreen( void )
 {
 	// loop through and get the status of all the buttons
 	gGameOptions.fGunNut = GetCurrentGunButtonSetting();
+	
+	#ifdef JA2UB
+	gGameOptions.ubGameStyle = FALSE; 
+	gGameLegionOptions.Random_Manuel_Text = GetCurrentTextStyleButtonSetting();
+	#else
 	gGameOptions.ubGameStyle = GetCurrentGameStyleButtonSetting();
-	gGameOptions.ubDifficultyLevel = min( NUM_DIFF_SETTINGS, ( max( 1, (iCurrentDifficulty + 1)) ));
+	#endif
+
+	#ifdef JA2UB
+	gGameOptions.ubDifficultyLevel = min( NUM_DIFF_SETTINGS-1, ( max( 1, (iCurrentDifficulty + 1)) )); 
+	#else		
+	gGameOptions.ubDifficultyLevel = min( NUM_DIFF_SETTINGS, ( max( 1, (iCurrentDifficulty + 1)) )); 
+	#endif
 
 	if (is_networked)
 		gGameOptions.fTurnTimeLimit = TRUE;
@@ -2212,9 +2484,19 @@ void DoneFadeOutForExitGameInitOptionScreen( void )
 	// SANDRO - added following:
 	gGameOptions.ubMaxIMPCharacters = min( (gGameExternalOptions.iIMPMaleCharacterCount + gGameExternalOptions.iIMPFemaleCharacterCount), ( max( 1, iCurrentIMPNumberSetting) ));
 	gGameOptions.fNewTraitSystem = GetCurrentTraitsOptionButtonSetting();
+	
+	#ifdef JA2UB
+	gGameLegionOptions.TEX_AND_JOHN = GetCurrentTexAndJohnButtonSetting();
+	#else
 	gGameOptions.fEnableAllTerrorists = GetCurrentTerroristsButtonSetting();
+	#endif
+	
 	gGameOptions.fEnemiesDropAllItems = GetCurrentDropAllButtonSetting();
+	#ifdef JA2UB
+	gGameOptions.fEnableAllWeaponCaches = FALSE;
+	#else
 	gGameOptions.fEnableAllWeaponCaches = GetCurrentWeaponCachesButtonSetting();
+	#endif
 	gGameOptions.ubProgressSpeedOfItemsChoices = min( GIO_PROGRESS_VERY_FAST, iCurrentProgressSetting );
 
 	//	gubGIOExitScreen = INIT_SCREEN;

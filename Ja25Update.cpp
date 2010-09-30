@@ -123,8 +123,8 @@ typedef struct
 
 #define	NUM_MERCS_TO_USE_IN_PERCENT_STAT_INCREASE			6
 
-#define	MAX_STAT_INCREASE	
+#define	MAX_STAT_INCREASE	30
 
-#endif														30
+#endif														
 
 //******************************************************************************
