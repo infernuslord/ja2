@@ -184,6 +184,7 @@ profileEndElementHandle(void *userData, const XML_Char *name)
 		}
 		else if(strcmp(name, "PROFILE") == 0)
 		{
+	
 			pData->curElement = ELEMENT_LIST;
 
 			if(pData->curIndex < pData->maxArraySize)
@@ -193,6 +194,7 @@ profileEndElementHandle(void *userData, const XML_Char *name)
 		
 				if (!MercProfiles_TextOnly)
 				{
+					
 					wcscpy(tempProfiles[pData->curIndex].zName, pData->curProfile.zName); 
 					wcscpy(tempProfiles[pData->curIndex].zNickname, pData->curProfile.zNickname);		
 					
@@ -725,11 +727,11 @@ profileEndElementHandle(void *userData, const XML_Char *name)
 			pData->curProfile.usApproachFactor[3] = (UINT32) atol(pData->szCharData);
 		}
 		
-		else if(strcmp(name, "uiIndex") == 0)
+		else if(strcmp(name, "uiIndex") == 0 )
 		{
 
 			pData->curElement = ELEMENT;
-
+			
 			// Sets new index for writing.
 			pData->curIndex = (UINT32) atol(pData->szCharData);
 		}
@@ -754,6 +756,7 @@ BOOLEAN ReadInMercProfiles(STR fileName, BOOLEAN localizedVersion)
 	profileParseData pData;
 
 	MercProfiles_TextOnly = localizedVersion;
+	
 	DebugMsg(TOPIC_JA2, DBG_LEVEL_3, "Loading MercProfiles.xml" );
 
 	// Open merges file

@@ -7009,6 +7009,7 @@ BOOLEAN LoadTileGraphicForItem( INVTYPE *pItem, UINT32 *puiVo )
 			sprintf( zName, "p2item%d", ubGraphic );
 		}
 	}
+/*
 #ifdef JA2UB
 	else if ( pItem->ubGraphicType == 9 ) // UB Items
 	{
@@ -7022,6 +7023,7 @@ BOOLEAN LoadTileGraphicForItem( INVTYPE *pItem, UINT32 *puiVo )
 		}
 	}
 #endif
+*/
 	else
 	{
 		if ( ubGraphic < 10 )

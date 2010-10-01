@@ -132,6 +132,8 @@ typedef struct
 	BOOLEAN Random_Manuel_Text;
 	
 	BOOLEAN RISRAPORT;
+	
+	BOOLEAN LaptopQuestEnabled;
        
 } GAME_LEGION_OPTIONS;
 

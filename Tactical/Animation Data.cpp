@@ -828,12 +828,6 @@ BOOLEAN LoadAnimationSurface( UINT16 usSoldierID, UINT16 usSurfaceIndex, UINT16 
 {
 	AuxObjectData *pAuxData;
 
-	if (usSurfaceIndex == 251)
-	{
-		int a = 10;
-		a++;
-	}
-
 	// Check for valid surface
 	CHECKF( usSurfaceIndex < NUMANIMATIONSURFACETYPES );
 
@@ -953,13 +947,6 @@ BOOLEAN LoadAnimationSurface( UINT16 usSoldierID, UINT16 usSurfaceIndex, UINT16 
 
 BOOLEAN UnLoadAnimationSurface( UINT16 usSoldierID, UINT16 usSurfaceIndex )
 {
-
-	if (usSurfaceIndex == 251)
-	{
-		int a = 10;
-		a++;
-	}
-
 	// Decrement usage flag, only if this soldier has it currently tagged
 	if ( gbAnimUsageHistory[ usSurfaceIndex ][ usSoldierID ] > 0 )
 	{

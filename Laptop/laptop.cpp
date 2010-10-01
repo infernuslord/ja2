@@ -90,6 +90,7 @@
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
 #include "End Game.h"
+#include "legion cfg.h"
 #endif
 
 //forward declarations of common classes to eliminate includes
@@ -754,6 +755,7 @@ UINT32 LaptopScreenInit()
 #ifdef JA2UB	
 	//JA25 UB
 	//Set the internet as WORKING
+	if ( gGameLegionOptions.LaptopQuestEnabled == TRUE )
 	gubQuest[ QUEST_FIX_LAPTOP ] = QUESTNOTSTARTED;
 #endif
 
@@ -2796,7 +2798,7 @@ void HaventMadeImpMercEmailCallBack()
 {
 #ifdef JA2UB
 	//if the Laptop is NOT broken
-	if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTINPROGRESS )
+	if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTINPROGRESS && gGameLegionOptions.LaptopQuestEnabled == TRUE )
 	{
 		//if the player STILL hasnt made an imp merc yet
 		if( ( LaptopSaveInfo.fIMPCompletedFlag == FALSE ) && ( LaptopSaveInfo.fSentImpWarningAlready == FALSE ) )
@@ -3807,7 +3809,7 @@ void GoToWebPage(INT32 iPageId )
 	//	giRainDelayInternetSite = -1;
 #ifdef JA2UB
 	//if the laptop is broken
-if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTINPROGRESS )
+if( (gubQuest[ QUEST_FIX_LAPTOP ] != QUESTINPROGRESS) || (gGameLegionOptions.LaptopQuestEnabled != TRUE) )
 {
 #endif
 	switch(iPageId)

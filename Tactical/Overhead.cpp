@@ -121,6 +121,7 @@
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
 #include "Soldier Control.h"
+#include "legion cfg.h"
 #endif
 
 // OJW - 20090419
@@ -9430,7 +9431,7 @@ INT8 NumMercsOnPlayerTeam( )
 void HandleDisplayingOfPlayerLostDialogue( void )
 {
 	//if the laptop transmitter is broken, and the player doesnt have any other team members
-	if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTDONE &&  NumMercsOnPlayerTeam( ) == 0 )
+	if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTDONE &&  NumMercsOnPlayerTeam( ) == 0 && gGameLegionOptions.LaptopQuestEnabled == TRUE )
 	{
 		gJa25SaveStruct.ubDisplayPlayerLostMsgBox	= 1;	
 	}

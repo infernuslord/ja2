@@ -951,6 +951,7 @@ void UpdateJerryMiloInInitialSector()
 	}
 
 	//the internet part of the laptop isnt working.  It gets broken in the heli crash.
+	if ( gGameLegionOptions.LaptopQuestEnabled == TRUE )
 	StartQuest( QUEST_FIX_LAPTOP, -1, -1 );
 
 	//Record the initial sector as ours

@@ -597,7 +597,13 @@ void LoadWorldItemsFromMap( INT8 **hBuffer, float dMajorMapVersion, int ubMinorM
 				{ //no match, so don't add item to world
 					continue;
 				}
-/*
+/*				
+			
+				if ( Item[ dummyItem.object.usItem ].newinv == TRUE && gGameOptions.ubInventorySystem == INVENTORY_OLD && gGameOptions.ubInventorySystem == INVENTORY_OLD && gGameOptions.ubAttachmentSystem == ATTACHMENT_OLD )
+				{
+				RemoveItemFromPool( dummyItem.sGridNo, i, dummyItem.ubLevel );
+				}
+	
 				if ( !gGameOptions.fGunNut )
 				{
 					UINT16	usReplacement;

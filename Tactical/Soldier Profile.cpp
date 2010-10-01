@@ -522,6 +522,26 @@ BOOLEAN LoadMercProfiles(void)
 	FileClose( fptr );
 	//WriteMercStartingGearStats();
 	
+//--------------
+/*
+CHAR8						fileName[255];
+
+	//JA25 UB
+for( int i = 0; i < NUM_PROFILES; i++ )
+	{
+	strcpy(fileName, "TABLEDATA\\Profile\\prof03.xml");
+	
+	//sprintf( fileName, "TABLEDATA\\Profile\\prof%03d.xml", i );
+	
+	if ( FileExists(fileName) )
+	{
+		ReadInMercProfiles(fileName,FALSE,i,TRUE);
+	}
+
+	}
+*/
+//--------------
+	
 		RandomStats (); //random stats by Jazz
 
 	// decide which terrorists are active

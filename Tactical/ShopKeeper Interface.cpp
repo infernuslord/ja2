@@ -64,6 +64,7 @@
 #include "email.h"
 #include "interface Dialogue.h"
 #include "Ja25_Tactical.h"
+#include "legion cfg.h"
 #endif
 
 #include "BuildDefines.h"
@@ -8172,6 +8173,7 @@ void AttachLaptopTransmitterToLaptop( UINT8 ubExitValue )
 	//
 
 	//Mark the quest done
+	if ( gGameLegionOptions.LaptopQuestEnabled == TRUE )
 	EndQuest( QUEST_FIX_LAPTOP, -1, -1 );
 }
 #endif

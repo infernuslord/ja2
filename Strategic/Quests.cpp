@@ -41,6 +41,7 @@
 #include "Strategic Merc Handler.h"
 #include "laptop.h"
 #include "Ja25 Strategic Ai.h"
+#include "legion cfg.h"
 #endif
 
 #define TESTQUESTS
@@ -1396,7 +1397,7 @@ void InternalEndQuest( UINT8 ubQuest, INT16 sSectorX, INT16 sSectorY, BOOLEAN fU
 	
 #ifdef JA2UB	
 	//if the quest is the FIX LAPTOP quest
-	if( ubQuest == QUEST_FIX_LAPTOP )
+	if( ubQuest == QUEST_FIX_LAPTOP && gGameLegionOptions.LaptopQuestEnabled == TRUE )
 	{
 		//Set the fact that AIM and MERC should start selling
 		gJa25SaveStruct.fHaveAimandMercOffferItems = TRUE;

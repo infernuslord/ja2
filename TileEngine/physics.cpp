@@ -369,9 +369,9 @@ void RemoveAllPhysicsObjects( )
 void SimulateObject( REAL_OBJECT *pObject, real deltaT )
 {
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"SimulateObject");
+
 	if ( !PhysicsUpdateLife( pObject, (float)deltaT ) )
 	{
-		//		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"SimulateObject: don't update life, returning");
 		return;
 	}
 
@@ -486,10 +486,15 @@ BOOLEAN	PhysicsUpdateLife( REAL_OBJECT *pObject, real DeltaTime )
 
 	}
 
-	// End life if we are out of bounds....
-	if ( !GridNoOnVisibleWorldTile( pObject->sGridNo ) )
+	// WANNE.BMP: Only do this check on normal maps.
+	// When we do this check on Big Maps it always returns false and we got wrong physics when trowing items!
+	if (WORLD_COLS <= 160 && WORLD_ROWS <= 160)
 	{
-		pObject->fAlive = FALSE;
+		// End life if we are out of bounds....
+		if ( !GridNoOnVisibleWorldTile( pObject->sGridNo ) )
+		{
+			pObject->fAlive = FALSE;
+		}
 	}
 
 	if ( !pObject->fAlive )
@@ -1496,9 +1501,7 @@ vector_3 FindBestForceForTrajectory( INT32 sSrcGridNo, INT32 sGridNo,INT16 sStar
 	dRange = (float)GetRangeInCellCoordsFromGridNoDiff( sGridNo, sSrcGridNo );
 
 	//calculate force needed
-	{
-		dForce = (float)( 12.0 * ( sqrt( ( GRAVITY * dRange ) / sin( 2.0 * dzDegrees ) ) ) );
-	}
+	dForce = (float)( 12.0 * ( sqrt( ( GRAVITY * dRange ) / sin( 2.0 * dzDegrees ) ) ) );
 
 	do
 	{
@@ -1536,12 +1539,6 @@ vector_3 FindBestForceForTrajectory( INT32 sSrcGridNo, INT32 sGridNo,INT16 sStar
 		dForce = dForce - ( ( dPercentDiff ) / 2 );
 
 	} while( TRUE );
-
-	// OK, we have our force, calculate change to get through without collide
-	//if ( ChanceToGetThroughObjectTrajectory( sEndZ, pItem, &vPosition, &vForce, NULL ) == 0 )
-	{
-		//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"Chance to get through throw is 0." );
-	}
 
 	if ( pdMagForce )
 	{
@@ -2151,6 +2148,9 @@ FLOAT CalculateForceFromRange( INT16 sRange, FLOAT dDegrees )
 	CreateItem( HAND_GRENADE, 100, &gTempObject );
 
 	FindBestForceForTrajectory( sSrcGridNo, sDestGridNo, GET_SOLDIER_THROW_HEIGHT( 0 ), 0, dDegrees, &gTempObject, &sFinalGridNo, &dMagForce );
+
+	// WANNE: Problem is the FORCE!!
+	// dMagForce = 460.00;
 
 	return( dMagForce );
 }

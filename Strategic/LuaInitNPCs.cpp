@@ -103,6 +103,9 @@ static int l_SectorEnemy(lua_State *L);
 //Facts
 static int l_SetFactFalse(lua_State *L);
 static int l_SetFactTrue(lua_State *L);
+static int l_StartQuest(lua_State *L);
+static int l_EndQuest(lua_State *L);
+static int l_gubQuest(lua_State *L);
 
 static int lh_getIntegerFromTable(lua_State *L, const char * fieldname);
 static std::string lh_getStringFromTable(lua_State *L, const char * fieldname);;
@@ -196,6 +199,11 @@ void IniFunction(lua_State *L)
 	//Fact and Quest
 	lua_register(L, "SetFactTrue", l_SetFactTrue);
 	lua_register(L, "SetFactFalse", l_SetFactFalse);
+	//lua_register(L, "CheckFact", l_CheckFact);
+	lua_register(L, "CheckQuest", l_gubQuest);
+	lua_register(L, "StartQuest", l_StartQuest);
+	lua_register(L, "EndQuest", l_EndQuest);
+	lua_register(L, "gubQuest", l_gubQuest);
 
 #ifdef JA2UB	
 	//john
@@ -548,6 +556,73 @@ BOOLEAN LetLuaGameInit(UINT8 Init)
 	
 	return true;
 
+}
+
+
+static int l_gubQuest (lua_State *L)
+{
+UINT8  n = lua_gettop(L);
+int i;
+UINT8 quest;
+UINT8 Bool;
+INT16 sSectorX;
+INT16 sSectorY;
+	
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) quest = lua_tointeger(L,i);
+	}
+
+	if (gubQuest[ quest ] == QUESTNOTSTARTED)
+		Bool = 0;
+	else if (gubQuest[ quest ] == QUESTINPROGRESS)
+		Bool = 1;
+	else if (gubQuest[ quest ] == QUESTDONE)	
+		Bool = 2;
+	lua_pushinteger(L, Bool);
+		
+		
+return 1;
+}
+
+//set start quest
+static int l_StartQuest(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+UINT8 Quest;
+UINT16 X,Y;
+int i;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) Quest = lua_tointeger(L,i);
+		if (i == 2 ) X = lua_tointeger(L,i);
+		if (i == 3 ) Y = lua_tointeger(L,i);
+	}
+
+	StartQuest( Quest, X, Y );
+
+	return 0;
+}
+
+//set end quest
+static int l_EndQuest(lua_State *L)
+{
+UINT8 n = lua_gettop(L);
+UINT8 Quest;
+UINT16 X,Y;
+int i;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) Quest = lua_tointeger(L,i);
+		if (i == 2 ) X = lua_tointeger(L,i);
+		if (i == 3 ) Y = lua_tointeger(L,i);
+	}
+
+	EndQuest( Quest, X, Y );
+
+	return 0;
 }
 
 //Check merc is dead

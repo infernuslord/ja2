@@ -117,6 +117,7 @@
 #include "Ja25Update.h"
 #include "Map Screen Interface Bottom.h"
 #include "Strategic AI.h"
+#include "legion cfg.h"
 #endif
 
 #include "connect.h" //hayden added alot ""'s to get around client spawing random/different placed AI
@@ -6474,7 +6475,7 @@ void HandleEmailBeingSentWhenEnteringSector( INT16 sMapX, INT16 sMapY, INT8 bMap
 	//
 
 	//if the laptop transmiter is not working yet
-	if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTDONE && !fLaptopJustGotFixed )
+	if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTDONE && !fLaptopJustGotFixed && gGameLegionOptions.LaptopQuestEnabled == TRUE )
 	{
 		//we will send these emails later
 		return;

@@ -26,6 +26,7 @@
 #include "MapScreen Quotes.h"
 #include "email.h"
 #include "interface Dialogue.h"
+#include "legion cfg.h"
 #endif
 
 #include <list>
@@ -641,7 +642,7 @@ BOOLEAN AdjustCertainDealersInventory( )
 
 
 	//if the player hasnt done the "killed the annoying bloodcats" quest for betty, 
-	if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTDONE )
+	if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTDONE && gGameLegionOptions.LaptopQuestEnabled == TRUE )
 	{
 		//Guarntee 1 laptop transmitter to be at betty's
 		GuaranteeAtLeastXItemsOfIndex( ARMS_DEALER_BETTY, LAPTOP_TRANSMITTER , 1 ); //4500

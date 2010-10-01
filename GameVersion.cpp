@@ -29,7 +29,7 @@ CHAR16 zVersionLabel[256]		= { L"Beta v. 0.98" };
 
 	//RELEASE BUILD VERSION	
 	#ifdef JA2UB
-		CHAR16		zVersionLabel[256]		= { L"Release Unfinished Business v1.2 - v1.13.3726 Beta" };
+		CHAR16		zVersionLabel[256]		= { L"Release Unfinished Business v1.3 - v1.13.3726 Beta" };
 	#else
 		CHAR16		zVersionLabel[256]		= { L"Release v1.13.3726 Beta" };
 	#endif

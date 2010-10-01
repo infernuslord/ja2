@@ -542,6 +542,8 @@ void LoadGameLegionOptions()
 	gGameLegionOptions.StrategicMovementCostsXML = iniReader.ReadBoolean("Campaign","STRATEGIC_MOVEMENT_COSTS_XML", FALSE);
 	gGameLegionOptions.CampaignSector = iniReader.ReadBoolean("Campaign","MAKE_STRATEGIC_MOVEMENT_COSTS", FALSE);
 	
+	gGameLegionOptions.LaptopQuestEnabled = iniReader.ReadBoolean("Campaign","Laptop_Quest", TRUE);
+	
 	gGameLegionOptions.MercStartingGear25XML = TRUE;//iniReader.ReadBoolean("UB","USE_MERC_STARTING_GEAR_XML", FALSE);
 	gGameLegionOptions.MercStartingGear25XML = TRUE;//iniReader.ReadBoolean("UB","USE_MERC_STARTING_GEAR_XML", FALSE);
 	
@@ -550,6 +552,8 @@ void LoadGameLegionOptions()
 	gGameLegionOptions.LAPTOP_IMP_PASS_UB  = iniReader.ReadBoolean("Laptop","IMP_PASS_UB",  TRUE);
 
 	//gGameLegionOptions.RISRAPORT  = iniReader.ReadBoolean("Laptop","RIS_RAPORT",  TRUE);
+	
+	
 
 
 //	gGameLegionOptions.BobbyRayInventory_UB = iniReader.ReadBoolean("Unfinished Business","INIT_BOBBYRAY_INVENTORY", FALSE);

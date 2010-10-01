@@ -50,6 +50,7 @@
 #include "Ja25_Tactical.h"
 #include "Game Init.h"
 #include "interface Dialogue.h"
+#include "legion cfg.h"
 
 void HandleAddingTheEndGameEmails();
 void EndFadeToCredits( void );
@@ -551,7 +552,7 @@ void HandleEveryoneDoneTheirEndGameQuotes()
 	HandleTacticalUI( );
 
 	//if laptop is still BROKEN
-	if( gubQuest[ QUEST_FIX_LAPTOP ] == QUESTINPROGRESS )
+	if( gubQuest[ QUEST_FIX_LAPTOP ] == QUESTINPROGRESS && gGameLegionOptions.LaptopQuestEnabled == TRUE )
 	{
 		gfPlayersLaptopWasntWorkingAtEndOfGame = TRUE;
 

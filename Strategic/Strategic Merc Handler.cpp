@@ -48,6 +48,9 @@
 	#include "Town Militia.h"
 #endif
 
+#ifdef JA2UB
+#include "legion cfg.h"
+#endif
 
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -460,7 +463,7 @@ void MercDailyUpdate()
 #ifdef JA2UB
 
 						//if the Laptop is NOT broken
-						if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTINPROGRESS )
+						if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTINPROGRESS && gGameLegionOptions.LaptopQuestEnabled == TRUE )
 						{
 							//remove the Flag, so if the merc goes on another assignment, the player can leave an email.
 							pProfile->ubMiscFlags3 &= ~PROFILE_MISC_FLAG3_PLAYER_LEFT_MSG_FOR_MERC_AT_AIM;
