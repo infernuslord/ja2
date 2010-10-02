@@ -341,13 +341,13 @@ void HandleSectorSpecificUnLoadingOfMap( INT16 sMapX, INT16 sMapY, INT8 bMapZ );
 void MakeAllTeamMembersCrouchedThenStand();
 void HandleMovingTheEnemiesToBeNearPlayerWhenEnteringComplexMap();
 void HandleFortifiedDoor();
-void CreateAndAddMoneyObjectToGround( INT16 sGridNo, INT32 iEasyAmount, INT32 iNormalAmount, INT32 iHardAmount );
+void CreateAndAddMoneyObjectToGround( INT32 sGridNo, INT32 iEasyAmount, INT32 iNormalAmount, INT32 iHardAmount );
 void HandleGoingUpOrDownStairsForLoadScreensPurposes( INT16 sCurrentlyInSectorZ, INT16 sGoingToSectorZ );
 void HandleMovingEnemiesCloseToEntranceInFirstTunnelMap();
 void HandleMovingEnemiesCloseToEntranceInSecondTunnelMap();
 void HandleFirstPartOfTunnelFanSound();
 void HandlePowerGenFanSoundModification();
-BOOLEAN MoveEnemyFromGridNoToRoofGridNo( INT16 sSourceGridNo, INT16 sDestGridNo );
+BOOLEAN MoveEnemyFromGridNoToRoofGridNo( INT32 sSourceGridNo, INT32 sDestGridNo );
 void		HandleMovingEnemiesOntoRoofs();
 #endif
 
@@ -6901,7 +6901,7 @@ void HandleFortifiedDoor()
 	}
 }
 
-void CreateAndAddMoneyObjectToGround( INT16 sGridNo, INT32 iEasyAmount, INT32 iNormalAmount, INT32 iHardAmount )
+void CreateAndAddMoneyObjectToGround( INT32 sGridNo, INT32 iEasyAmount, INT32 iNormalAmount, INT32 iHardAmount )
 {
 	OBJECTTYPE	Object;
 	INT32				iCash=0;
@@ -7139,7 +7139,7 @@ void HandleMovingEnemiesOntoRoofs()
 
 
 
-BOOLEAN MoveEnemyFromGridNoToRoofGridNo( INT16 sSourceGridNo, INT16 sDestGridNo )
+BOOLEAN MoveEnemyFromGridNoToRoofGridNo( INT32 sSourceGridNo, INT32 sDestGridNo )
 {
 	SOLDIERTYPE *pSoldier=NULL;
 	INT32				cnt;

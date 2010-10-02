@@ -284,6 +284,22 @@ void New_UB_Inventory ()
 	MORRIS_INSTRUCTION_NOTE = 336;
 }
 
+//GridNo
+UINT32  SWITCHINMORRISAREA_GRIDNO = 15231;
+UINT32  SWITCHTOLAUNCHMISSLES_GRIDNO1 = 14268;
+UINT32  SWITCHTOLAUNCHMISSLES_GRIDNO2 = 15708;
+UINT32  RADIOLOCATORS_GRIDNO1 = 15070;
+UINT32  RADIOLOCATORS_GRIDNO2 = 14744;
+UINT32  POWERGENSECTOR_GRIDNO1 = 15100;
+UINT32  POWERGENSECTOR_GRIDNO2 = 12220;
+UINT32  POWERGENSECTOR_GRIDNO3 = 14155;
+UINT32  POWERGENSECTOR_GRIDNO4 = 13980;
+UINT32  POWERGENSECTOREXITGRID_GRIDNO1 = 19749;
+UINT32  POWERGENFANSOUND_GRIDNO1 = 10979;
+UINT32  POWERGENFANSOUND_GRIDNO2 = 19749;
+UINT32  STARTFANBACKUPAGAIN_GRIDNO = 10980;
+UINT32  STOPPOWERGENFAN_GRIDNO = 10980;
+	
 BOOLEAN	IsSoldierQualifiedMerc( SOLDIERTYPE *pSoldier )
 {
 	if( pSoldier->ubProfile == 	58	||  ///  GASTON
@@ -592,7 +608,6 @@ void HandleWhenCertainPercentageOfEnemiesDie()
 void StopPowerGenFan()
 {
 	UINT16 usTileIndex;
-	UINT16 usGridNo = 10980;
 	SOLDIERTYPE *pSoldier=NULL;
 
 	// ATE: If destroyed, don't go into here
@@ -650,20 +665,20 @@ void StopPowerGenFan()
 	// Remove it!
 	// Get index for it...
 	GetTileIndexFromTypeSubIndex( FIFTHOSTRUCT, (INT8)( 1 ), &usTileIndex );
-	RemoveStruct( usGridNo, usTileIndex );
+	RemoveStruct( STOPPOWERGENFAN_GRIDNO, usTileIndex );
 	
 
 	// Add the new one
 	// Get index for it...
 	GetTileIndexFromTypeSubIndex( FIFTHOSTRUCT, (INT8)( 7 ), &usTileIndex );
-	AddStructToHead( usGridNo, usTileIndex );
+	AddStructToHead( STOPPOWERGENFAN_GRIDNO, usTileIndex );
 
 	ApplyMapChangesToMapTempFile( FALSE );
 
 	//Recompile the movement costs since we have added a exit grid
-	RecompileLocalMovementCosts( usGridNo );
+	RecompileLocalMovementCosts( STOPPOWERGENFAN_GRIDNO );
 
-	gpWorldLevelData[ usGridNo ].uiFlags |= MAPELEMENT_REVEALED;
+	gpWorldLevelData[ STOPPOWERGENFAN_GRIDNO ].uiFlags |= MAPELEMENT_REVEALED;
 
 	// Re-render the world!
 	gTacticalStatus.uiFlags |= NOHIDE_REDUNDENCY;
@@ -689,7 +704,6 @@ void HandleStartingFanBackUp()
 void StartFanBackUpAgain()
 {
 	UINT16 usTileIndex;
-	UINT16 usGridNo=10980;
 
 	// ATE: If destroyed, don't go into here
 	if( gJa25SaveStruct.ubStateOfFanInPowerGenSector == PGF__BLOWN_UP )
@@ -715,20 +729,20 @@ void StartFanBackUpAgain()
 	// Remove it!
 	// Get index for it...
 	GetTileIndexFromTypeSubIndex( FIFTHOSTRUCT, (INT8)( 7 ), &usTileIndex );
-	RemoveStruct( usGridNo, usTileIndex );
+	RemoveStruct( STARTFANBACKUPAGAIN_GRIDNO, usTileIndex );
 	
 
 	// Add the new one
 	// Get index for it...
 	GetTileIndexFromTypeSubIndex( FIFTHOSTRUCT, (INT8)( 1 ), &usTileIndex );
-	AddStructToHead( usGridNo, usTileIndex );
+	AddStructToHead( STARTFANBACKUPAGAIN_GRIDNO, usTileIndex );
 
 	ApplyMapChangesToMapTempFile( FALSE );
 
 	//Recompile the movement costs since we have added a exit grid
-	RecompileLocalMovementCosts( usGridNo );
+	RecompileLocalMovementCosts( STARTFANBACKUPAGAIN_GRIDNO );
 
-	gpWorldLevelData[ usGridNo ].uiFlags |= MAPELEMENT_REVEALED;
+	gpWorldLevelData[ STARTFANBACKUPAGAIN_GRIDNO ].uiFlags |= MAPELEMENT_REVEALED;
 
 	// Re-render the world!
 	gTacticalStatus.uiFlags |= NOHIDE_REDUNDENCY;
@@ -813,7 +827,7 @@ void HandlePowerGenAlarm()
 
 void HandleAddingPowerGenFanSound()
 {
-	INT16 sGridNo;
+	UINT32 sGridNo;
 
 	//if its not already playing
 	if( gJa25SaveStruct.iPowerGenFanPositionSndID != -1 )
@@ -822,9 +836,9 @@ void HandleAddingPowerGenFanSound()
 	}
 
 	if( gbWorldSectorZ == 0 )
-		sGridNo = 10979;
+		sGridNo = POWERGENFANSOUND_GRIDNO1;
 	else
-		sGridNo = 19749;
+		sGridNo = POWERGENFANSOUND_GRIDNO2;
 
 	//Create the new ambient fan sound
 	//gJa25SaveStruct.iPowerGenFanPositionSndID = NewPositionSnd( sGridNo, POSITION_SOUND_STATIONATY_OBJECT, 0, POWER_GEN_FAN_SOUND );
@@ -855,7 +869,7 @@ void AddExitGridForFanToPowerGenSector()
 	ExitGrid.ubGotoSectorX = 14;
 	ExitGrid.ubGotoSectorY = MAP_ROW_J;
 	ExitGrid.ubGotoSectorZ = 1;
-	ExitGrid.usGridNo = 19749;
+	ExitGrid.usGridNo = POWERGENSECTOREXITGRID_GRIDNO1;
 
 	//Add the exit grid when the fan is either stopped or blown up
 	AddExitGridToWorld( PGF__FAN_EXIT_GRID_GRIDNO, &ExitGrid );
@@ -1312,18 +1326,18 @@ void HandleDeathInPowerGenSector( SOLDIERTYPE *pSoldier )
 	{
 		BOOLEAN fFoundValidEnemy=FALSE;
 		UINT8		ubNumFlagedEnemiesInSector=0;
-		INT16		sRandomSlotGridNo;
+		UINT32		sRandomSlotGridNo;
 		UINT8		uiCnt;
 		SOLDIERINITNODE	*pInitListSoldier;
 
 		#define NUM_ENEMIES_SLOTS			4
 
-		INT16	sEnemyPlacementGridNo[ NUM_ENEMIES_SLOTS ]=
+		UINT32	sEnemyPlacementGridNo[ NUM_ENEMIES_SLOTS ]=
 						{
-							15100,
-							12220,
-							14155,
-							13980,
+							POWERGENSECTOR_GRIDNO1,
+							POWERGENSECTOR_GRIDNO2,
+							POWERGENSECTOR_GRIDNO3,
+							POWERGENSECTOR_GRIDNO4,
 						};
 
 		//
@@ -1836,12 +1850,12 @@ void HandleShowingRadioLocatorsInMorrisArea()
 	HandleOpenControlPanelToRevealSwitchInMorrisArea();
 
 	//control panel locater
-	BeginMultiPurposeLocator( 15070, 0, TRUE );
+	BeginMultiPurposeLocator( RADIOLOCATORS_GRIDNO1, 0, TRUE );
 
 	//if we are not in combat
 	if( !((gTacticalStatus.uiFlags & TURNBASED) && (gTacticalStatus.uiFlags & INCOMBAT)) )
 	{
-		DelayedMercQuote( 14744, DQ__SHOW_RADIO_LOCATOR, GetWorldTotalSeconds() + 3 );
+		DelayedMercQuote( RADIOLOCATORS_GRIDNO2, DQ__SHOW_RADIO_LOCATOR, GetWorldTotalSeconds() + 3 );
 	}
 }
 
@@ -1881,10 +1895,10 @@ void HandlePlayerHittingSwitchToLaunchMissles()
 		if( pSoldier->bActive && pSoldier->stats.bLife >= OKLIFE && pSoldier->bInSector &&
 				pSoldier->sSectorX == 15 && pSoldier->sSectorY == 12 && pSoldier->bSectorZ == 3 )
 		{
-			if( PythSpacesAway( pSoldier->sGridNo, 14268 ) < PythSpacesAway( pSoldier->sGridNo, 15708 ) )
-				pSoldier->EVENT_InternalGetNewSoldierPath( 14268, RUNNING, TRUE, TRUE );
+			if( PythSpacesAway( pSoldier->sGridNo, SWITCHTOLAUNCHMISSLES_GRIDNO1 ) < PythSpacesAway( pSoldier->sGridNo, SWITCHTOLAUNCHMISSLES_GRIDNO2 ) )
+				pSoldier->EVENT_InternalGetNewSoldierPath( SWITCHTOLAUNCHMISSLES_GRIDNO1, RUNNING, TRUE, TRUE );
 			else
-				pSoldier->EVENT_InternalGetNewSoldierPath( 15708, RUNNING, TRUE, TRUE );
+				pSoldier->EVENT_InternalGetNewSoldierPath( SWITCHTOLAUNCHMISSLES_GRIDNO2, RUNNING, TRUE, TRUE );
 		}
 	}
 
@@ -1916,11 +1930,11 @@ void HandleOpenControlPanelToRevealSwitchInMorrisArea()
 
 		// first, find the switch item and turn off its trap level
 
-		if ( ItemTypeExistsAtLocation( 15231, SWITCH, 0, &iItemIndex ) )
+		if ( ItemTypeExistsAtLocation( SWITCHINMORRISAREA_GRIDNO, SWITCH, 0, &iItemIndex ) )
 		{
 			//gWorldItems[ iItemIndex ]->data.bTrap = 0;
 			gWorldItems[ iItemIndex ].object[0]->data.bTrap = 0;
-			GetItemPool( 15231, &pItemPool, 0 );
+			GetItemPool( SWITCHINMORRISAREA_GRIDNO, &pItemPool, 0 );
 			if ( pItemPool )
 			{
 				SetItemPoolVisibilityOn( pItemPool, ANY_VISIBILITY_VALUE, FALSE );
@@ -1928,13 +1942,13 @@ void HandleOpenControlPanelToRevealSwitchInMorrisArea()
 		}
 
 		//Open up the Control Panel so the switch is visibile
-		pStructure = FindStructure( 15231, STRUCTURE_GENERIC );
+		pStructure = FindStructure( SWITCHINMORRISAREA_GRIDNO, STRUCTURE_GENERIC );
 		if( pStructure == NULL )
 		{
 			return;
 		}
 
-		if( SwapStructureForPartnerForcingGraphicalChange( 15231, pStructure ) == NULL )
+		if( SwapStructureForPartnerForcingGraphicalChange( SWITCHINMORRISAREA_GRIDNO, pStructure ) == NULL )
 		{
 			//an error occured
 			return;

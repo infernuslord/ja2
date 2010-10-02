@@ -105,7 +105,7 @@ extern void RecompileLocalMovementCostsForWall( INT32 sGridNo, UINT8 ubOrientati
 void FatigueCharacter( SOLDIERTYPE *pSoldier );
 
 #ifdef JA2UB
-void HandleSeeingFortifiedDoor( INT16 sGridNo );//Ja25 UB
+void HandleSeeingFortifiedDoor( INT32 sGridNo );//Ja25 UB
 #endif
 
 #define NO_ALT_SOUND -1
@@ -221,13 +221,13 @@ void HandleBuldingDestruction( INT32 sGridNo, UINT8 ubOwner );
 
 #ifdef JA2UB
 //JA25 UB
-void HavePersonAtGridnoStop( INT16 sGridNo );
+void HavePersonAtGridnoStop( UINT32 sGridNo );
 BOOLEAN ShouldThePlayerStopWhenWalkingOnBiggensActionItem( UINT8 ubRecordNum );
 void HandleDestructionOfPowerGenFan();
-BOOLEAN IsFanGraphicInSectorAtThisGridNo( INT16 sGridNo );
-void HandleExplosionsInTunnelSector( INT16 sGridNo );
-void HandleSwitchToOpenFortifiedDoor( INT16 sGridNo );
-void HandleSeeingPowerGenFan( INT16 sGridNo );
+BOOLEAN IsFanGraphicInSectorAtThisGridNo( UINT32 sGridNo );
+void HandleExplosionsInTunnelSector( UINT32 sGridNo );
+void HandleSwitchToOpenFortifiedDoor( UINT32 sGridNo );
+void HandleSeeingPowerGenFan( UINT32 sGridNo );
 #endif
 
 INT32 GetFreeExplosion( void )
@@ -4334,7 +4334,7 @@ UINT8 DetermineFlashbangEffect( SOLDIERTYPE *pSoldier, INT8 ubExplosionDir, BOOL
 
 //-- UB
 
-void HavePersonAtGridnoStop( INT16 sGridNo )
+void HavePersonAtGridnoStop( UINT32 sGridNo )
 {
 	UINT8	ubID;
 
@@ -4370,7 +4370,7 @@ BOOLEAN ShouldThePlayerStopWhenWalkingOnBiggensActionItem( UINT8 ubRecordNum )
 }
 
 // This function checks if we should replace the fan graphic
-BOOLEAN IsFanGraphicInSectorAtThisGridNo( INT16 sGridNo )
+BOOLEAN IsFanGraphicInSectorAtThisGridNo( UINT32 sGridNo )
 {
 	// First check current sector......
 	if( gWorldSectorX == 13 && gWorldSectorY == MAP_ROW_J && gbWorldSectorZ == 0 )
@@ -4449,7 +4449,7 @@ void HandleDestructionOfPowerGenFan()
 	}
 }
 
-void HandleExplosionsInTunnelSector( INT16 sGridNo )
+void HandleExplosionsInTunnelSector( UINT32 sGridNo )
 {
 	//if this isnt the tunnel sectors
 	if( !( gWorldSectorX == 14 && ( gWorldSectorY == MAP_ROW_J || gWorldSectorY == MAP_ROW_K ) && gbWorldSectorZ == 1 ) )
@@ -4463,9 +4463,9 @@ void HandleExplosionsInTunnelSector( INT16 sGridNo )
 }
 
 
-void HandleSeeingFortifiedDoor( INT16 sGridNo )
+void HandleSeeingFortifiedDoor( INT32 sGridNo )
 {
-	INT16 sID=0;
+	INT32 sID=0;
 
 	//if this isnt the First level of the complex
 	if( !( gWorldSectorX == 15 && gWorldSectorY == MAP_ROW_K && gbWorldSectorZ == 1 ) )
@@ -4502,7 +4502,7 @@ void HandleSeeingFortifiedDoor( INT16 sGridNo )
 	}
 }
 
-void HandleSwitchToOpenFortifiedDoor( INT16 sGridNo )
+void HandleSwitchToOpenFortifiedDoor( UINT32 sGridNo )
 {
 	INT8 bID;
 
@@ -4523,7 +4523,7 @@ void HandleSwitchToOpenFortifiedDoor( INT16 sGridNo )
 	}
 }
 
-void HandleSeeingPowerGenFan( INT16 sGridNo )
+void HandleSeeingPowerGenFan( UINT32 sGridNo )
 {
 //	INT8 bID;
 	UINT8 ubPerson;

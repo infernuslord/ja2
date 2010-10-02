@@ -5771,6 +5771,7 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 					{
 						ScreenMsg( MSG_FONT_RED, MSG_CHAT, L"Failed to add map: %S.", zMapName );
 						ScreenMsg( FONT_MCOLOR_DKRED, MSG_INTERFACE, L"Map has already been visited." );
+						sBadSectorsList[iCol][iRow] = 0;
 					}
 					continue;
 				}
@@ -5784,6 +5785,7 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 			{
 				ScreenMsg( MSG_FONT_RED, MSG_CHAT, L"Failed to add map: %S.", zMapName );
 				ScreenMsg( FONT_MCOLOR_DKRED, MSG_INTERFACE, L"Map is the current sector." );
+				sBadSectorsList[iCol][iRow] = 0;
 			}
 			continue;
 		}
@@ -5860,9 +5862,9 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 				}
 				else
 				{
-					ScreenMsg( FONT_MCOLOR_WHITE, MSG_CHAT, L"dded New Underground : %S.", zMapName );
+					ScreenMsg( FONT_MCOLOR_WHITE, MSG_CHAT, L"Added New Underground : %S.", zMapName );
 					pSector = NewUndergroundNode( (UINT8)iCol, (UINT8)iRow, bLevel );
-				
+					sBadSectorsList[iCol][iRow] = 0;
 					if ( gGameLegionOptions.ADD_RANDOM_ENEMY_TO_SECTOR_UB == TRUE )
 						{
 						if ( SECTOR( iCol , iRow ) == SEC_H7 || SECTOR( iCol , iRow )  == SEC_H8  || SECTOR( iCol , iRow ) == SEC_H9  ||

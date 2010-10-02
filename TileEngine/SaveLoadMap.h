@@ -116,7 +116,7 @@ BOOLEAN ChangeStatusOfOpenableStructInUnloadedSector( UINT16 usSectorX, UINT16 u
 
 #ifdef JA2UB
 //ja25 ub
-void AddRemoveExitGridToUnloadedMapTempFile( UINT16 usGridNo, INT16 sSectorX, INT16 sSectorY, UINT8 ubSectorZ );
+void AddRemoveExitGridToUnloadedMapTempFile( UINT32 usGridNo, INT16 sSectorX, INT16 sSectorY, UINT8 ubSectorZ );
 #endif
 
 #endif
