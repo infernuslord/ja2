@@ -1347,7 +1347,8 @@ void HandleDialogue( )
 				{
 					//Trigger Jerry Milo's script record 10 ( call action 301 )
 					//AA 
-					
+					//if ( gGameLegionOptions.InGameHeliCrash == TRUE )
+					if ( gGameLegionOptions.JerryQuotes == TRUE )
 					DelayedMercQuote( 76 , 0xffff, 4 ); //JERRY
 
 					//End the ui Lock

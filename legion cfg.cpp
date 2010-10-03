@@ -534,6 +534,17 @@ void LoadGameLegionOptions()
 	gGameLegionOptions.INITIALHELIRANDOMTIMES[ 6 ]  = iniReader.ReadInteger("Unfinished Business","HeliRandomTimes7",  5630);
 
 	gGameLegionOptions.LOCATEGRIDNO  = iniReader.ReadInteger("Unfinished Business","InternalLocateGridNo",  15427);
+	
+	
+	//gGameLegionOptions.LOCATEGRIDNO2 = iniReader.ReadInteger("Unfinished Business","InternalLocateGridNo",  0);
+	
+	//if ( gGameLegionOptions.LOCATEGRIDNO == 0 )
+	//	gGameLegionOptions.LOCATEGRIDNO = gMapInformation.sNorthGridNo;
+	
+	gGameLegionOptions.InGameHeliCrash = iniReader.ReadBoolean("Unfinished Business","InGameHeliCrash", TRUE);
+	gGameLegionOptions.JerryQuotes = iniReader.ReadBoolean("Unfinished Business","JerryQuotes", TRUE);
+	gGameLegionOptions.InJerry = iniReader.ReadBoolean("Unfinished Business","Jerry", TRUE);	
+	gGameLegionOptions.JerryGridNo = iniReader.ReadInteger("Unfinished Business","JerryGridNo", 15109);		
 		
 	//Campaign Section
 	

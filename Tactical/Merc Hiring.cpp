@@ -277,7 +277,10 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 #ifdef JA2UB
 		//ja25ub
 		//set a flag so we know we are doing the heli crash
-		gfFirstTimeInGameHeliCrash = TRUE; //AA FALSE ??
+		if ( gGameLegionOptions.InGameHeliCrash == TRUE )
+			gfFirstTimeInGameHeliCrash = TRUE; //AA FALSE ??
+		else
+			gfFirstTimeInGameHeliCrash = FALSE;
 
 		// Set time of initial merc arrival in minutes
 #endif
@@ -911,21 +914,28 @@ void InitializeHeliGridnoAndTime( BOOLEAN fLoading )
 
 void InitJerryMiloInfo()
 {
+ if ( gGameLegionOptions.InJerry == TRUE )
+{
   //  return; //AA
 	//Set Jerry Milo's Gridno h7
 	gMercProfiles[ 76 ].sSectorX = JA2_5_START_SECTOR_X;
 	gMercProfiles[ 76 ].sSectorY = JA2_5_START_SECTOR_Y;
 	gMercProfiles[ 76 ].bSectorZ = 0;
 
-	gMercProfiles[ 76 ].sGridNo = 15109;
+	gMercProfiles[ 76 ].sGridNo = gGameLegionOptions.JerryGridNo; //15109;
 
 	gMercProfiles[ 76 ].fUseProfileInsertionInfo = TRUE;
 
 	gMercProfiles[ 76 ].ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
-	gMercProfiles[ 76 ].usStrategicInsertionData = 15109;
-
+	gMercProfiles[ 76 ].usStrategicInsertionData = gGameLegionOptions.JerryGridNo; //15109;
+	
+}
+	
+if ( gGameLegionOptions.InGameHeliCrash == TRUE )
+	{
 	//init Jerry Milo quotes
 	InitJerryQuotes();
+	}
 }
 
 
@@ -939,7 +949,9 @@ void UpdateJerryMiloInInitialSector()
     
 
 //	return; //AA
-    
+
+if ( gGameLegionOptions.InGameHeliCrash == TRUE )
+   { 
 	//if it is the first sector we are loading up, place Jerry in the map
 	if( !gfFirstTimeInGameHeliCrash )
 		return;
@@ -986,6 +998,7 @@ void UpdateJerryMiloInInitialSector()
 
 	//Lock the interface
 	guiPendingOverrideEvent = LU_BEGINUILOCK;
+	}
 }
 
 void AddItemToMerc( UINT8 ubNewMerc, INT16 sItemType )

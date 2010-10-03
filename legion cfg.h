@@ -134,6 +134,16 @@ typedef struct
 	BOOLEAN RISRAPORT;
 	
 	BOOLEAN LaptopQuestEnabled;
+	
+	BOOLEAN InGameHeliCrash;
+	
+	INT32 LOCATEGRIDNO2;
+	
+	BOOLEAN JerryQuotes;
+	
+	BOOLEAN InJerry;
+	
+	UINT32 JerryGridNo;
        
 } GAME_LEGION_OPTIONS;
 

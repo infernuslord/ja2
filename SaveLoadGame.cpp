@@ -147,6 +147,7 @@
 #ifdef JA2UB
 #include "Strategic Movement.h"
 #include "LuaInitNPCs.h"
+#include "Legion cfg.h"
 #endif
 
 #ifdef JA2UB
@@ -3055,6 +3056,7 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 
 #ifdef JA2UB	
 	//Reset Jerry Quotes  JA25UB
+	if ( gGameLegionOptions.JerryQuotes == TRUE )
 	HandleJerryMiloQuotes( TRUE );
 #endif
 

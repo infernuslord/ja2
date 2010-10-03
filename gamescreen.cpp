@@ -624,9 +624,17 @@ UINT32	MainGameScreenHandle(void)
 #ifdef JA2UB		
 		//if it is the first time in the game, and we are doing the heli crash code, locate to a different spot
 		if( gfFirstTimeInGameHeliCrash )
+		{
 			InternalLocateGridNo( gGameLegionOptions.LOCATEGRIDNO, TRUE ); // 15427
-		else
-			InternalLocateGridNo( gMapInformation.sNorthGridNo, TRUE );
+        }
+        else
+        {
+                     if ( gGameLegionOptions.InGameHeliCrash == TRUE )
+						InternalLocateGridNo( gMapInformation.sNorthGridNo, TRUE );
+                     else
+						InternalLocateGridNo( gGameLegionOptions.LOCATEGRIDNO, TRUE );
+			
+        }
 #else
 			InternalLocateGridNo( gMapInformation.sNorthGridNo, TRUE );
 #endif			

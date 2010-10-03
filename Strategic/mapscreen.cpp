@@ -130,7 +130,7 @@
 
 #include "Ja25 Strategic Ai.h"
 #include "MapScreen Quotes.h"
-
+#include "Legion cfg.h"
 #include "LuaInitNPCs.h"
 #endif
 
@@ -5346,6 +5346,7 @@ UINT32 MapScreenHandle(void)
 #ifdef JA2UB	
 	//JA25 UB
 	//Handle Jerry Milo quotes
+	if ( gGameLegionOptions.JerryQuotes == TRUE )
 	HandleJerryMiloQuotes( FALSE );
 #endif
 
@@ -5358,6 +5359,7 @@ UINT32 MapScreenHandle(void)
 #ifdef JA2UB
 		//JA25 UB
 		//specify that we are leaving mapscreen
+		if ( gGameLegionOptions.JerryQuotes == TRUE )
 		HandleJerryMiloQuotes( TRUE );
 #endif
 
@@ -5786,6 +5788,7 @@ UINT32 MapScreenHandle(void)
 	JA25_HandleUpdateOfStrategicAi();
 
 	//Should the msg box come up telling the user that they lost?
+	if (gGameLegionOptions.InGameHeliCrash == TRUE )
 	HandleWhenPlayerHasNoMercsAndNoLaptop(); //AA
 #endif
 

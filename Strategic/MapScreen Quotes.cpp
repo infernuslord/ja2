@@ -61,7 +61,7 @@
 
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
-
+#include "Legion cfg.h"
 
 
 #include "MapScreen Quotes.h"
@@ -127,6 +127,10 @@ void HandleJerryMiloQuotes( BOOLEAN fReset )
 		gusWaitingQuote = MILO_NO_QUOTE;
 		return;
 	}
+	
+//	if ( gGameLegionOptions.InGameHeliCrash == TRUE )
+//	{
+	
  //   return;//AA
 	if( gusWaitingQuote == MILO_NO_QUOTE )
 	{
@@ -161,6 +165,8 @@ void HandleJerryMiloQuotes( BOOLEAN fReset )
 
 		uiLastCount = uiCurrentTime;
 	}
+	
+//	}
 }
 
 BOOLEAN Internal_JerryMeloCharacterDialogue( UINT16 usQuoteNum )
@@ -448,7 +454,7 @@ void InitJerryQuotes()
 BOOLEAN HasJerryAlreadySaidTheMapScreenIntroSequence()
 {
    // return TRUE; //AA
-	if( HasJerryMiloSaidQuoteBefore( MILO_QUOTE__HEADED_TO_TRACONA_QUOTE ) )
+	if( HasJerryMiloSaidQuoteBefore( MILO_QUOTE__HEADED_TO_TRACONA_QUOTE ) || gGameLegionOptions.InGameHeliCrash == FALSE )
 	{
 		return( TRUE );
 	}

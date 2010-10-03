@@ -428,6 +428,8 @@ void InitStrategicLayer( void )
 #ifdef JA2UB	
 	//JA25 UB
 	//Reset Jerry Quotes
+	//if ( gGameLegionOptions.InGameHeliCrash == TRUE )
+	if ( gGameLegionOptions.JerryQuotes == TRUE )
 	HandleJerryMiloQuotes( TRUE ); //AA
 	
 	//Ja25 UB
