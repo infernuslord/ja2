@@ -502,6 +502,18 @@ BOOLEAN LoadMercProfiles(void)
 				tempGearCost += Item[ usItem ].usPrice;
 			}
 		}
+		
+		if(UsingNewInventorySystem() == false && gGameOptions.ubAttachmentSystem == ATTACHMENT_OLD )
+		{
+		for ( uiLoop2 = 0; uiLoop2< gMercProfiles[ uiLoop ].inv.size(); uiLoop2++ )
+		{
+			if( gMercProfiles[uiLoop].inv[ uiLoop2 ] == 97 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 1346 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 99 
+				|| gMercProfiles[uiLoop].inv[ uiLoop2 ] == 1347 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 584 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 551 ) //43
+			gMercProfiles[uiLoop].inv[ uiLoop2 ] = 129; //335	
+						
+		}	
+		}		
+						
 		//tais: added optional price modifier for gearkits, reads the xml tag mPriceMod from MercStartingGear.xml
 		if(gMercProfileGear[uiLoop][0].PriceModifier != 0 &&
 			gMercProfileGear[uiLoop][0].PriceModifier <= 200 &&
