@@ -338,7 +338,7 @@ void ShouldNpcBeAddedToSector( INT16 sMapX, INT16 sMapY, INT8 bMapZ );
 void HandlePlayerQuotesWhenEnteringFirstTunnelSector();
 void AddExitGridForFanToPowerGenSector();
 void HandleSectorSpecificUnLoadingOfMap( INT16 sMapX, INT16 sMapY, INT8 bMapZ );
-void MakeAllTeamMembersCrouchedThenStand();
+//void MakeAllTeamMembersCrouchedThenStand();
 void HandleMovingTheEnemiesToBeNearPlayerWhenEnteringComplexMap();
 void HandleFortifiedDoor();
 void CreateAndAddMoneyObjectToGround( INT32 sGridNo, INT32 iEasyAmount, INT32 iNormalAmount, INT32 iHardAmount );
@@ -6781,7 +6781,7 @@ void HandleSectorSpecificModificatioToMap( INT16 sMapX, INT16 sMapY, INT8 bMapZ,
 		HandleMovingEnemiesOntoRoofs();		
 	}
 }
-
+/*
 void MakeAllTeamMembersCrouchedThenStand()
 {
 	UINT8	cnt;
@@ -6801,7 +6801,7 @@ void MakeAllTeamMembersCrouchedThenStand()
 		}
 	}
 }
-
+*/
 void HandleMovingTheEnemiesToBeNearPlayerWhenEnteringComplexMap()
 {
 	SOLDIERTYPE *pSoldier=NULL;
