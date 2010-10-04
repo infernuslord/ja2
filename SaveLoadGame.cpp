@@ -151,7 +151,7 @@
 #endif
 
 #ifdef JA2UB
-void ConvertMercKnifeAndUmbrellaToBeWeapons( SOLDIERTYPE *pSoldier );
+void ConvertWeapons( SOLDIERTYPE *pSoldier );
 extern void MakeBadSectorListFromMapsOnHardDrive( BOOLEAN fDisplayMessages ); // ja25 UB
 #endif
 
@@ -4902,7 +4902,7 @@ BOOLEAN LoadSoldierStructure( HWFILE hFile )
 #endif
 			#ifdef JA2UB
 			//if the soldier has the NON weapon version of the merc knofe or merc umbrella
-			//ConvertMercKnifeAndUmbrellaToBeWeapons( &Menptr[ cnt ] );
+			ConvertWeapons( &Menptr[ cnt ] );
 			#endif
 			
 			// JA2Gold: fix next-to-previous attacker value
@@ -7286,13 +7286,26 @@ UINT32 CalcJA2EncryptionSet( SAVED_GAME_HEADER * pSaveGameHeader )
 }
 
 #ifdef JA2UB
-void ConvertMercKnifeAndUmbrellaToBeWeapons( SOLDIERTYPE *pSoldier )
+void ConvertWeapons( SOLDIERTYPE *pSoldier )
 {
 	INT32 iCnt;
 
 	for( iCnt=0; iCnt< NUM_INV_SLOTS; iCnt++)
 	{
 	
+	
+			if(UsingNewInventorySystem() == false && gGameOptions.ubAttachmentSystem == ATTACHMENT_OLD )
+		{
+			if( pSoldier->inv[ iCnt ].usItem == 97 || pSoldier->inv[ iCnt ].usItem == 1346 || pSoldier->inv[ iCnt ].usItem == 99 
+				|| pSoldier->inv[ iCnt ].usItem == 1347 || pSoldier->inv[ iCnt ].usItem == 584 || pSoldier->inv[ iCnt ].usItem == 551 ) 
+				pSoldier->inv[ iCnt ].usItem = 129; 	
+			
+			if( pSoldier->inv[ iCnt ].usItem == 117 || pSoldier->inv[ iCnt ].usItem ==  349 || pSoldier->inv[ iCnt ].usItem == 1263 )
+				pSoldier->inv[ iCnt ].usItem = 71; 				
+		}	
+		
+		
+/*	
 		if( pSoldier->inv[ iCnt ].usItem == 4499 )
 		{
 			pSoldier->inv[ iCnt ].usItem = 115;
@@ -7342,17 +7355,12 @@ void ConvertMercKnifeAndUmbrellaToBeWeapons( SOLDIERTYPE *pSoldier )
 		{
 			pSoldier->inv[ iCnt ].usItem = 336;
 		}
-		/*
-		if( pSoldier->inv[ iCnt ].usItem == SAM_GARVER_COMBAT_KNIFE_OLD )
-		{
-			pSoldier->inv[ iCnt ].usItem = SAM_GARVER_COMBAT_KNIFE;
-		}
-		*/
+
 		if( pSoldier->inv[ iCnt ].usItem == 4507 )
 		{
 			pSoldier->inv[ iCnt ].usItem = 70;
 		}
-		
+		*/
 	}
 }
 #endif

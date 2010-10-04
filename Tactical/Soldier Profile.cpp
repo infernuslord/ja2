@@ -508,9 +508,11 @@ BOOLEAN LoadMercProfiles(void)
 		for ( uiLoop2 = 0; uiLoop2< gMercProfiles[ uiLoop ].inv.size(); uiLoop2++ )
 		{
 			if( gMercProfiles[uiLoop].inv[ uiLoop2 ] == 97 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 1346 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 99 
-				|| gMercProfiles[uiLoop].inv[ uiLoop2 ] == 1347 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 584 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 551 ) //43
-			gMercProfiles[uiLoop].inv[ uiLoop2 ] = 129; //335	
-						
+				|| gMercProfiles[uiLoop].inv[ uiLoop2 ] == 1347 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 584 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 551 ) 
+				gMercProfiles[uiLoop].inv[ uiLoop2 ] = 129; 	
+			
+			if( gMercProfiles[uiLoop].inv[ uiLoop2 ] == 117 || gMercProfiles[uiLoop].inv[ uiLoop2 ] ==  349 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 1263 )
+				gMercProfiles[uiLoop].inv[ uiLoop2 ] = 71; 				
 		}	
 		}		
 						
