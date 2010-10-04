@@ -2036,7 +2036,7 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 				if ( gSoundProfileValue[ubCharacterNum].EnabledSound == TRUE )
 				{
 //#ifdef JA2UB
-					sprintf( zFileName,"SPEECH\\r_%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
+					sprintf( zFileName,"SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
 					if ( !FileExists( zFileName ) )
 					{
 						sprintf( zFileName,"SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
@@ -2049,7 +2049,7 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 					{
 //inshy: fix for UB-1.13 version only						sprintf( zFileName,"SPEECH\\r_%03d_%03d.wav",ubCharacterNum,usQuoteNum );
 //#ifdef JA2UB
-						sprintf( zFileName,"SPEECH\\r_%03d_%03d.wav",ubCharacterNum,usQuoteNum );
+						sprintf( zFileName,"SPEECH\\%03d_%03d.wav",ubCharacterNum,usQuoteNum );
 						
 					if ( !FileExists( zFileName ) )
 					{
