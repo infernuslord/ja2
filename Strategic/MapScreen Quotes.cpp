@@ -196,6 +196,9 @@ void JerryMiloSaidQuote( UINT32 uiQuoteID )
 
 BOOLEAN WillJerryMiloAllowThePlayerToCompressTimeAtBeginingOfGame()
 {
+
+if ( gGameLegionOptions.JerryQuotes == TRUE )
+{
 	//to speed things up, has jerry finished the intro speech?
 	if( HasJerryAlreadySaidTheMapScreenIntroSequence() )
 		return( TRUE );
@@ -250,7 +253,7 @@ BOOLEAN WillJerryMiloAllowThePlayerToCompressTimeAtBeginingOfGame()
 	{
 		return( FALSE );
 	}
-
+}
 	return( TRUE );
 }
 

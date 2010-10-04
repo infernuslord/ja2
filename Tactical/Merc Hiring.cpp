@@ -956,10 +956,14 @@ if ( gGameLegionOptions.InGameHeliCrash == TRUE )
 	if( !gfFirstTimeInGameHeliCrash )
 		return;
 
+	if ( gGameLegionOptions.InJerry == TRUE ) 
+	{
 	pSoldier = FindSoldierByProfileID( 76, FALSE ); //JERRY
 	if( pSoldier == NULL )
 	{
 		Assert( 0 );
+	}
+	
 	}
 
 	//the internet part of the laptop isnt working.  It gets broken in the heli crash.
@@ -968,7 +972,8 @@ if ( gGameLegionOptions.InGameHeliCrash == TRUE )
 
 	//Record the initial sector as ours
 	SectorInfo[ SEC_H7 ].fSurfaceWasEverPlayerControlled = TRUE;
-
+	if ( gGameLegionOptions.InJerry == TRUE ) 
+	{
 	//Set some variable so Jerry will be on the ground
 	pSoldier->fWaitingToGetupFromJA25Start = TRUE;
 	pSoldier->fIgnoreGetupFromCollapseCheck = TRUE;
@@ -983,10 +988,13 @@ if ( gGameLegionOptions.InGameHeliCrash == TRUE )
 		pSoldier->EVENT_InitNewSoldierAnim( STAND_FALLFORWARD_STOP, 1, TRUE );
 	else
 		pSoldier->EVENT_InitNewSoldierAnim( FALLBACKHIT_STOP, 1, TRUE );
-
+	}
 
 //Wont work cause it gets reset every frame
 	//make sure we can see Jerry
+	
+	if ( gGameLegionOptions.InJerry == TRUE ) 
+	{
 	pJerrySoldier = FindSoldierByProfileID(76, FALSE );//JERRY
 	if( pJerrySoldier != NULL )
 	{
@@ -995,6 +1003,7 @@ if ( gGameLegionOptions.InGameHeliCrash == TRUE )
 		pJerrySoldier->bVisible = TRUE;
 	}
 
+	}
 
 	//Lock the interface
 	guiPendingOverrideEvent = LU_BEGINUILOCK;

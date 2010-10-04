@@ -13563,7 +13563,7 @@ void TellPlayerWhyHeCantCompressTime( void )
 	//JA25 UB
 	else if( !WillJerryMiloAllowThePlayerToCompressTimeAtBeginingOfGame() )
 	{
-		//Have jerry say why the player cant compress time
+		//Have jerry say why the player cant compress time 
 		HaveJerrySayWhyPlayerCantTimeCompressAtBeginningOfGame();
 	}
 #endif
