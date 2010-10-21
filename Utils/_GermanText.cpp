@@ -133,6 +133,17 @@ Remove any LOOTF comment that has been checked, except maybe for "alt." (alterna
 
 07/2010 LootFragg
 */
+CHAR16  gszAimPages[ 6 ][ 20 ] =
+{
+	L"Seite 1/2", //0
+	L"Seite 2/2",
+	
+	L"Seite 1/3",
+	L"Seite 2/3",
+	L"Seite 3/3",
+	
+	L"Seite 1/1", //5
+};
 
 // by Jazz
 CHAR16 zGrod[][500] =

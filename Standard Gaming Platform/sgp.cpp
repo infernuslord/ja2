@@ -224,11 +224,14 @@ INT32 FAR PASCAL WindowProcedure(HWND hWindow, UINT16 Message, WPARAM wParam, LP
 		return(DefWindowProc(hWindow, Message, wParam, lParam));
 
 	// ATE: This is for older win95 or NT 3.51 to get MOUSE_WHEEL Messages
-	if ( Message == guiMouseWheelMsg )
-	{
-		QueueEvent(MOUSE_WHEEL, wParam, lParam);
-		return( 0L );
-	}
+	//if ( Message == guiMouseWheelMsg )
+	//{
+	//	QueueEvent(MOUSE_WHEEL, wParam, lParam);
+	//	return( 0L );
+	//}
+
+
+
  
 	switch(Message)
 	{
@@ -236,11 +239,11 @@ INT32 FAR PASCAL WindowProcedure(HWND hWindow, UINT16 Message, WPARAM wParam, LP
 		PostQuitMessage(0);
 		break;
 /*dnl kick this out, because in input.sgp MouseHandler() hook has priority so it will process same event twice, someone force MouseHandler() hook to always return unhandled events status so what ever mouse event you process in WindowProcedure() be aware that this event is already occur in MouseHandler() (mouse clicks, move etc.) Probably this is done because when you lost focus even if you click back on window region this will not restore them, so need condition in MouseHandler to restore window focus
-		case WM_MOUSEWHEEL:
-			{
-				QueueEvent(MOUSE_WHEEL, wParam, lParam);
-				break;
-			}
+//		case WM_MOUSEWHEEL:
+//			{
+//				QueueEvent(MOUSE_WHEEL, wParam, lParam);
+//				break;
+//			}
 */		
 #ifdef JA2
 	case WM_MOVE:

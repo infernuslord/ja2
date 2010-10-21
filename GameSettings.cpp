@@ -804,6 +804,10 @@ void LoadGameExternalOptions()
 	// Are enemy females restricted to Blackshirts only?
 	gGameExternalOptions.fRestrictFemaleEnemiesExceptElite	= iniReader.ReadBoolean("Graphics Settings","RESTRICT_FEMALE_ENEMIES_EXCEPT_ELITE",FALSE);
 
+	// *** ddd - BEGIN
+	// New setting to allow thin progressbar
+	gGameExternalOptions.fSmallSizeProgressbar				= iniReader.ReadBoolean("Graphics Settings", "SMALL_SIZE_PB", FALSE);
+	// *** ddd - END
 	
 	//################# Sound Settings #################
 	
@@ -1062,19 +1066,62 @@ void LoadGameExternalOptions()
 	gGameExternalOptions.fCivGroupName						= iniReader.ReadBoolean("Tactical Gameplay Settings","INDIVIDUAL_CIVILIAN_NAMES",FALSE);		
 
 	//Enemy Rank by Jazz
-	gGameExternalOptions.fEnemyRank						= iniReader.ReadBoolean("Tactical Gameplay Settings","INDIVIDUAL_ENEMY_RANK",FALSE);	
+	gGameExternalOptions.fEnemyRank							= iniReader.ReadBoolean("Tactical Gameplay Settings","INDIVIDUAL_ENEMY_RANK",FALSE);
+
+	// *** ddd - BEGIN
+	gGameExternalOptions.fExtMouseKeyEnabled				= iniReader.ReadBoolean("Tactical Interface Settings", "ENABLE_EXT_MOUSE_KEYS", FALSE);
+
+	// New setting to change stamina
+	gGameExternalOptions.uStaminaHit						= iniReader.ReadInteger("Tactical Interface Settings", "STAMINA_HIT", 10000);
 	
+	// Alternative system for aiming - progressive method depending on marksmash of Merc
+	gGameExternalOptions.bAltAimEnabled						= iniReader.ReadBoolean("Tactical Interface Settings","ALT_AIMING_ENABLED",FALSE);
+	
+	// Use aimed burst
+	gGameExternalOptions.bAimedBurstEnabled				= iniReader.ReadBoolean("Tactical Interface Settings","USE_AIMED_BURST",FALSE);
+			
+	// Penalcy for aimed burst
+	gGameExternalOptions.uAimedBurstPenalty				= iniReader.ReadInteger("Tactical Interface Settings","AIMING_BURST_PENALTY",2);
+	
+	// We could see all what can see militia
+	gGameExternalOptions.bWeSeeWhatMilitiaSeesAndViceVersa = iniReader.ReadBoolean("Tactical Interface Settings","WE_SEE_WHAT_MILITIA_SEES_AND_VICE_VERSA",TRUE);
+	
+	// Gun supressor can deterioration
+	gGameExternalOptions.bAllowWearSuppressor				= iniReader.ReadBoolean("Tactical Interface Settings","ALLOW_WEAR_SUPPRESSOR",FALSE);	
+	
+	// Civils don't make too much actions (for faster civils turn)
+	gGameExternalOptions.bLazyCivilians						= iniReader.ReadBoolean("Tactical Interface Settings","ALLOW_LAZY_CIVILIANS",FALSE);	
+	
+	// Chance to Say Annoying Phrase (you can just turn of it by button in game)
+	gGameExternalOptions.iChanceSayAnnoyingPhrase			= iniReader.ReadInteger("Tactical Interface Settings","CHANCE_SAY_ANNOYING_PHRASE",100);	
+	 
+	// New enemy AI for night battles
+	gGameExternalOptions.bNewTacticalAIBehavior				= iniReader.ReadBoolean("Tactical Interface Settings","NEW_AI_TACTICAL",FALSE);	
+	
+	// Heahshot penalty
+	gGameExternalOptions.uShotHeadPenalty					= iniReader.ReadFloat("Tactical Interface Settings","SHOT_HEAD_PENALTY",3,0,100);	
+	
+	// Modifer of damage for HEADSHOT
+	gGameExternalOptions.fShotHeadDivisor					= iniReader.ReadFloat("Tactical Interface Settings","SHOT_HEAD_DIVISOR",1.5,1,10);	
+
+	// Penalty for fire when you don't see enemy (when you see enemy because his see militya or ather merc)
+	gGameExternalOptions.iPenaltyShootUnSeen				= iniReader.ReadInteger("Tactical Interface Settings","SHOOT_UNSEEN_PENALTY",0,0,255);		
+	
+	// CtH/2 if the target are out of gun range or invisible for this merc
+	gGameExternalOptions.fOutOfGunRangeOrSight				= iniReader.ReadFloat("Tactical Interface Settings","OUT_OF_SIGHT_OR_GUN_RANGE",2,1,100);	
+	// *** ddd - END
+
 	// SANDRO - Improved camo applying and camo can be removed
-	gGameExternalOptions.fCamoRemoving					= iniReader.ReadBoolean("Tactical Gameplay Settings", "CAMO_REMOVING", TRUE);
+	gGameExternalOptions.fCamoRemoving						= iniReader.ReadBoolean("Tactical Gameplay Settings", "CAMO_REMOVING", TRUE);
 
 	// SANDRO - Enhanced close combat system
 	gGameExternalOptions.fEnhancedCloseCombatSystem			= iniReader.ReadBoolean("Tactical Gameplay Settings", "ENHANCED_CLOSE_COMBAT_SYSTEM", FALSE);
 
 	// SANDRO - give special Exp for completing quests
-	gGameExternalOptions.usAwardSpecialExpForQuests		= iniReader.ReadInteger("Tactical Gameplay Settings", "AWARD_SPECIAL_EXP_POINTS_FOR_COMPLETING_QUESTS", 100, 0, 5000);
+	gGameExternalOptions.usAwardSpecialExpForQuests			= iniReader.ReadInteger("Tactical Gameplay Settings", "AWARD_SPECIAL_EXP_POINTS_FOR_COMPLETING_QUESTS", 100, 0, 5000);
 
 	//tais: soldiers always wear any armour..
-	gGameExternalOptions.fSoldiersWearAnyArmour			= iniReader.ReadBoolean("Tactical Gameplay Settings", "SOLDIERS_ALWAYS_WEAR_ANY_ARMOR", FALSE);
+	gGameExternalOptions.fSoldiersWearAnyArmour				= iniReader.ReadBoolean("Tactical Gameplay Settings", "SOLDIERS_ALWAYS_WEAR_ANY_ARMOR", FALSE);
 
 	//################# Tactical Cover System Settings ##################
 

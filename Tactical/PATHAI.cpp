@@ -45,6 +45,9 @@
 #endif
 #include "connect.h"
 #include "PathAIDebug.h"
+
+#include "LOS.h"  //ddd
+
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -497,11 +500,29 @@ void AStarPathfinder::ResetAStarList()
 	//	SetAStarStatus(node, AStar_Init);
 	//	SetAStarG(node, 0);
 	//}
-	for (INT32 node = 0; node < WORLD_MAX; node++)
+	//comm by ddd{
+	//for (INT16 node = 0; node < WORLD_MAX; node++)
+	//{
+	//	SetAStarStatus(node, AStar_Init); //comm by ddd
+	//	SetAStarG(node, 0); //comm by ddd
+	//}
+	//comm by ddd}
+
+	//ddd{
+
+	INT16 node;
+	for (node = 0; node < (WORLD_MAX & ~3); node+=4) //ddd разворот цикла
 	{
-		SetAStarStatus(node, AStar_Init);
-		SetAStarG(node, 0);
+		AStarData[node].status = AStarData[node+1].status
+			= AStarData[node+2].status = AStarData[node+3].status = AStar_Init; 
+
+		AStarData[node+3].cost = AStarData[node+2].cost =
+		 AStarData[node+1].cost = AStarData[node].cost = 0;
 	}
+	for(node=(WORLD_MAX & ~3); node < WORLD_MAX; node++)
+	{AStarData[node].status = AStar_Init;  AStarData[node].cost = 0;}
+		////ddd}
+
 
 	//ClosedList.clear();
 	OpenHeap.clear();
@@ -805,13 +826,17 @@ int AStarPathfinder::GetPath(SOLDIERTYPE *s ,
 	trackNode.resize(1,current);
 	while (current != -1)
 	{
-		sizePath += GetNumSteps( current);
+		//sizePath += GetNumSteps( current); //comm by ddd
+		sizePath +=AStarData[current].numSteps;
 		while (sizePath > MAX_PATH_LIST_SIZE)
 		{
-			sizePath -= GetNumSteps( parent);
-			parent = GetAStarParent( parent);
+			//sizePath -= GetNumSteps( parent);//comm by ddd
+			sizePath -=AStarData[parent].numSteps;
+			//parent = GetAStarParent( parent);//comm by ddd
+			parent = AStarData[parent].parent;
 		}
-		current = GetAStarParent( current);
+		//current = GetAStarParent( current);
+		current = AStarData[current].parent ;
 		for(unsigned int i = 0; i<trackNode.size(); i++)
 		{
 			if(trackNode.at(i) == current)
@@ -900,7 +925,8 @@ int AStarPathfinder::GetPath(SOLDIERTYPE *s ,
 	// return path length : serves as a "successful" flag and a path length counter
 	return sizePath;
 }//end GetPath
-
+#pragma optimize("gpt",on)
+//__forceinline
 INT16 AStarPathfinder::AStar()
 {
 	HEAP<int, INT32> TopHeap(StartNode, 0);
@@ -1095,6 +1121,11 @@ void AStarPathfinder::ExecuteAStarLogic()
 			//an error code like diagonal door or obstruction was returned
 			continue;
 		}
+
+		//dddokno  здесь можно запретить вставать на оконные клетки ;)
+		//if (gubWorldMovementCosts[CurrentNode][direction][pSoldier->pathing.bLevel] == TRAVELCOST_JUMPABLEWINDOW)
+		//	continue;
+
 
 		if (gubWorldMovementCosts[CurrentNode][direction][pSoldier->pathing.bLevel] == TRAVELCOST_FENCE)
 		{
@@ -1315,6 +1346,12 @@ INT16 AStarPathfinder::CalcAP(int const terrainCost, UINT8 const direction)
 		//case TRAVELCOST_DOOR:		movementAPCost = APBPConstants[AP_MOVEMENT_FLAT]; break;
 
 		case TRAVELCOST_FENCE:		movementAPCost = APBPConstants[AP_JUMPFENCE]; break;
+			///dddokno{
+		case TRAVELCOST_JUMPABLEWINDOW:
+		case TRAVELCOST_JUMPABLEWINDOW_N:
+		case TRAVELCOST_JUMPABLEWINDOW_W:
+									movementAPCost = APBPConstants[AP_JUMPFENCE]; break;
+			///dddokno}
 
 		case TRAVELCOST_OBSTACLE:
 		default:					return -1;	// Cost too much to be considered!
@@ -1386,6 +1423,24 @@ INT16 AStarPathfinder::CalcAP(int const terrainCost, UINT8 const direction)
 				return -1;
 		}
 	}
+	//dddokno 
+	else if ( terrainCost == TRAVELCOST_JUMPABLEWINDOW
+		|| terrainCost == TRAVELCOST_JUMPABLEWINDOW_N
+		|| terrainCost == TRAVELCOST_JUMPABLEWINDOW_W )
+	{
+		switch(movementModeToUseForAPs)
+		{
+			case RUNNING:
+			case WALKING :
+			case SWATTING:
+				movementAPCost += APBPConstants[AP_CROUCH];
+				break;
+
+			default:
+				break;
+		}
+	}
+//dddokno 
 	else if (terrainCost == TRAVELCOST_NOT_STANDING)
 	{
 		switch(movementModeToUseForAPs)
@@ -1463,6 +1518,24 @@ int AStarPathfinder::CalcG(int* pPrevCost)
 				nextCost = gTileTypeMovementCost[ gpWorldLevelData[ CurrentNode ].ubTerrainID ];
 			}
 		}
+
+		//dddokno { проверить 2 условия 1 если след. тайл окно и надо будет перелезать через него
+		//2. если тек. тайл окно и надо перейти на другой тайл через окно.
+		else if ( nextCost == TRAVELCOST_JUMPABLEWINDOW
+			|| nextCost == TRAVELCOST_JUMPABLEWINDOW_N
+			|| nextCost == TRAVELCOST_JUMPABLEWINDOW_W)
+		{
+
+			// don't let anyone path diagonally through doors!
+			if (IsDiagonal(direction) == true)
+			{
+				return -1;
+			}
+			nextCost = gTileTypeMovementCost[ gpWorldLevelData[ CurrentNode ].ubTerrainID ];//?
+
+		}
+		//dddokno }
+
 		else if ( nextCost == TRAVELCOST_FENCE && fNonFenceJumper )
 		{
 			return -1;
@@ -2251,6 +2324,51 @@ bool AStarPathfinder::WantToTraverse()
 	{
 		return false;
 	}
+	
+	///ddd{ 
+	if(gGameExternalOptions.bNewTacticalAIBehavior)
+	{
+		//	по трупам не бегаем . ТОДО: в 80% случаев не бегаем?
+		if ( ( (gTacticalStatus.uiFlags & TURNBASED) && (gTacticalStatus.uiFlags & INCOMBAT) )
+				&& pSoldier->bTeam == ENEMY_TEAM 
+				//&& IsCorpseAtGridNo( CurrentNode, pSoldier->pathing.bLevel ) 
+				&& gubIsCorpseThere[CurrentNode]
+				)
+			return false;
+
+		//from niht ops	//элита AI не ходит по освещённым участкам, которые просматриваются противником
+		if( ( (gTacticalStatus.uiFlags & TURNBASED) && (gTacticalStatus.uiFlags & INCOMBAT) )
+			&& pSoldier->bTeam == ENEMY_TEAM && pSoldier->ubProfile == NO_PROFILE 
+			&& pSoldier->aiData.bAction != AI_ACTION_LEAVE_WATER_GAS
+			//&& (pSoldier->ubSoldierClass == SOLDIER_CLASS_ELITE 
+			//|| ( (pSoldier->ubSoldierClass == SOLDIER_CLASS_ARMY 
+			//		|| pSoldier->ubSoldierClass == SOLDIER_CLASS_ADMINISTRATOR) 
+			//		&& (BOOLEAN)(Random( 100 ) < 50)  ))
+			//&& InLightAtNight((INT16)CurrentNode, gpWorldLevelData[ CurrentNode ].sHeight)
+			&& gubWorldTileInLight[CurrentNode]
+			&& gubMerkCanSeeThisTile[CurrentNode]
+			)
+		{
+			return false;
+			//ScreenMsg( MSG_FONT_YELLOW, MSG_INTERFACE, L"svet!" );
+				/*INT32 tcnt = gTacticalStatus.Team[ gbPlayerNum ].bFirstID;
+				SOLDIERTYPE *tS;
+				// look for all mercs on the same team,
+				for ( tS = MercPtrs[ tcnt ]; tcnt <= gTacticalStatus.Team[ gbPlayerNum ].bLastID; tcnt++,tS++ )
+				{		
+					if ( tS->stats.bLife >= OKLIFE && tS->sGridNo != NOWHERE && tS->bInSector )
+						if ( SoldierTo3DLocationLineOfSightTest(
+							tS, tS->sGridNo, pSoldier->pathing.bLevel, 3, 
+							TRUE, CALC_FROM_WANTED_DIR ))
+						{
+							//if( pSoldier->ubSoldierClass == SOLDIER_CLASS_ELITE  )
+							 return false;
+							//else if ( Chance(35) ) return false;
+						}
+				}*/
+		}
+	}
+	///ddd}
 
 	return true;
 }//end CanTraverse
@@ -2353,7 +2471,14 @@ INT32 FindBestPath(SOLDIERTYPE *s , INT32 sDestination, INT8 ubLevel, INT16 usMo
 	s->sPlotSrcGrid = s->sGridNo;
 
 #ifdef USE_ASTAR_PATHS
+//ddd
+CHAR8 errorBuf[511]; UINT32 b,e;
+b=GetJA2Clock();//return s->sGridNo+6;
+	
 	int retVal = ASTAR::AStarPathfinder::GetInstance().GetPath(s, sDestination, ubLevel, usMovementMode, bCopy, fFlags);
+
+	e=GetJA2Clock();sprintf(errorBuf, "timefind bestpath= %d",e-b );LiveMessage(errorBuf);
+
 	if (retVal || TileIsOutOfBounds(sDestination)) {
 		return retVal;
 	}

@@ -2306,11 +2306,9 @@ BOOLEAN InitTempNpcQuoteInfoForNPCFromTempFile()
 
 
 	//loop through all the npc accounts and write the temp array to disk
-#ifdef JA2UB
-	for( usCnt1=0; usCnt1< ( NUM_PROFILES-FIRST_RPC ); usCnt1++)    //  GASTON
-#else
-	for( usCnt1=0; usCnt1< ( GASTON-FIRST_RPC ); usCnt1++)
-#endif
+	//for( usCnt1=0; usCnt1< ( GASTON-FIRST_RPC ); usCnt1++)
+	//new profiles by Jazz
+	for( usCnt1=0; usCnt1< NUM_PROFILES; usCnt1++)
 	{
 
 		memset( TempNpcQuote, 0, uiSizeOfTempArray );

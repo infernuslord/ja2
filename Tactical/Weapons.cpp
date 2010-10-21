@@ -1156,7 +1156,8 @@ void AdjustImpactByHitLocation( INT32 iImpact, UINT8 ubHitLocation, INT32 * piNe
 	{
 		case AIM_SHOT_HEAD:
 			// 1.5x damage from successful hits to the head!
-			*piImpactForCrits = HEAD_DAMAGE_ADJUSTMENT( iImpact );
+			//*piImpactForCrits = HEAD_DAMAGE_ADJUSTMENT( iImpact ); //comm by ddd
+			*piImpactForCrits = INT32(gGameExternalOptions.fShotHeadDivisor*iImpact);
 			*piNewImpact = *piImpactForCrits;
 			break;
 		case AIM_SHOT_LEGS:
@@ -1726,6 +1727,32 @@ BOOLEAN UseGun( SOLDIERTYPE *pSoldier , INT32 sTargetGridNo )
 		uiHitChance = CalcChanceToHitGun( pSoldier, sTargetGridNo, pSoldier->aiData.bAimTime, pSoldier->bAimShotLocation );
 	}
 	fCalculateCTHDuringGunfire = FALSE;
+
+//ddd{износ объектов с муззле флаш. silencer
+	if ( (Item[ usItemNum ].usItemClass == IC_GUN) && gGameExternalOptions.bAllowWearSuppressor)
+	{
+		OBJECTTYPE * pInHand = &(pSoldier->inv[pSoldier->ubAttackingHand]);
+		if ( IsFlashSuppressor(&pSoldier->inv[ pSoldier->ubAttackingHand ], pSoldier ) )
+		{
+			for (attachmentList::iterator iter = (*pInHand)[0]->attachments.begin(); iter != (*pInHand)[0]->attachments.end(); ++iter) 
+			{
+				if (Item[iter->usItem].hidemuzzleflash  ) 
+				{
+					OBJECTTYPE* pA=	&(*iter);
+					if ( (*pA)[0]->data.objectStatus >=USABLE)
+					{
+						INT16 ammoReliability = Item[(*pInHand)[0]->data.gun.usGunAmmoItem].bReliability;
+						INT16 uiDepreciateTest = BASIC_DEPRECIATE_CHANCE + 3 * 
+							(Item[ iter->usItem ].bReliability + ammoReliability);
+						if ( !PreRandom( uiDepreciateTest ) && ( pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.objectStatus > 1) )
+							(*pA)[0]->data.objectStatus--;
+						//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"rel =%d ",Item[ iter->usItem ].bReliability );
+					}
+				}
+			}
+		}
+	} //if ( Item[ usItemNum ].usItemClass == IC_GUN )
+//ddd}
 
 	//DIGICRAB: Barrel extender wear code
 	// Relocated from CalcChanceToHitGun
@@ -3881,7 +3908,9 @@ void WindowHit( INT32 sGridNo, UINT16 usStructureID, BOOLEAN fBlowWindowSouth, B
 	AniParams.uiFlags							= ANITILE_FORWARD;
 
 	pNode = CreateAnimationTile( &AniParams );
-
+	//dddokno{
+CompileWorldMovementCosts();
+//dddokno}
 	PlayJA2Sample( GLASS_SHATTER1 + Random(2), RATE_11025, MIDVOLUME, 1, SoundDir( sGridNo ) );
 
 }
@@ -4401,13 +4430,16 @@ UINT32 CalcChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTime,
 	}
 
 	// if shooter spent some extra time aiming and can see the target
-	if (iSightRange > 0 && ubAimTime && !pSoldier->bDoBurst )
+	//if (iSightRange > 0 && ubAimTime && !pSoldier->bDoBurst ) //comm by ddd
+	if (iSightRange > 0 && ubAimTime )
 	{
 		// CHRISL: Rather then a flat +10/click bonus, we're going to try a bonus that's based on MRK and Lvl which gets
 		//	progressivly less the more we aim.  Everything is based on the maxBonus that a merc can possibly get which
 		//	uses the equation: 20+(MRK/20*LVL)+Accuracy+(Sniper trait * 10).  This value is then split between the 8
 		//	possible AimTime's using a max aimTime bonus of 10.
 		INT16	bonusProgression[8] = {500,500,600,600,750,750,750,1000};
+		//FLOAT	maxBonus = 20+((FLOAT)iMarksmanship/20*pSoldier->stats.bExpLevel)+(Weapon[Item[pInHand->usItem].ubClassIndex].bAccuracy*2)+(NUM_SKILL_TRAITS( pSoldier, PROF_SNIPER )*10);
+
 		//////////////////////////////////////////////////////////////////
 		// SANDRO - old/new traits
 		FLOAT	maxBonus;
@@ -4420,7 +4452,15 @@ UINT32 CalcChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTime,
 				maxBonus = 20+((FLOAT)iMarksmanship/20*(EffectiveExpLevel(pSoldier)))+(Weapon[Item[pInHand->usItem].ubClassIndex].bAccuracy*2)+(NUM_SKILL_TRAITS( pSoldier, SNIPER_NT )*gSkillTraitValues.ubSNAimingBonusPerClick);
 		}
 		else
-			maxBonus = 20+((FLOAT)iMarksmanship/20*(EffectiveExpLevel(pSoldier)))+(Weapon[Item[pInHand->usItem].ubClassIndex].bAccuracy*2)+(NUM_SKILL_TRAITS( pSoldier, PROF_SNIPER_OT )*10);
+		{
+			//dddd!!{
+			FLOAT	maxBonus;
+			if(gGameExternalOptions.bAltAimEnabled) 
+				maxBonus = (20*(iMarksmanship/100))+((FLOAT)iMarksmanship/20*pSoldier->stats.bExpLevel)+(Weapon[Item[pInHand->usItem].ubClassIndex].bAccuracy*2)+(NUM_SKILL_TRAITS( pSoldier, PROF_SNIPER_OT )*10);
+			else 
+				maxBonus = 20+((FLOAT)iMarksmanship/20*pSoldier->stats.bExpLevel)+(Weapon[Item[pInHand->usItem].ubClassIndex].bAccuracy*2)+(NUM_SKILL_TRAITS( pSoldier, PROF_SNIPER_OT )*10);
+		}
+		//}ddd
 		//////////////////////////////////////////////////////////////////
 		INT8	maxClickBonus = 10;
 		FLOAT	aimTimeBonus;
@@ -4430,6 +4470,27 @@ UINT32 CalcChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTime,
 			maxBonus -= aimTimeBonus;
 			iChance += (INT32)floor(aimTimeBonus+.5);
 		}
+		///ddd{
+		//zilpin: aimed burst
+		//Reduce the aim time bonus based on weapon burst penalty, after the first shot.
+		//The burst penalty was already applied, but it also reduces the benefit of aiming.
+		if(gGameExternalOptions.bAimedBurstEnabled)
+		{
+			//if( pSoldier->bDoAutofire )
+			//	iChance -= Weapon[usInHand].AutoPenalty * pSoldier->bDoBurst * gGameExternalOptions.uAimedBurstPenalty;
+			//else if( pSoldier->bDoBurst>1 )
+			//	iChance -= Weapon[usInHand].ubBurstPenalty * pSoldier->bDoBurst * gGameExternalOptions.uAimedBurstPenalty;
+			if( pSoldier->bDoAutofire>0 && pSoldier->bDoBurst>1)
+				iChance -= Weapon[usInHand].AutoPenalty * pSoldier->bDoBurst * gGameExternalOptions.uAimedBurstPenalty;
+			//if( pSoldier->bDoAutofire>10 )
+			//	iChance -= Weapon[usInHand].AutoPenalty * pSoldier->bDoBurst * gGameExternalOptions.uAimedBurstPenalty;
+			//else 
+				if( pSoldier->bDoBurst>1  && pSoldier->bDoAutofire==0)
+				iChance -= Weapon[usInHand].ubBurstPenalty * pSoldier->bDoBurst * gGameExternalOptions.uAimedBurstPenalty;
+
+		}
+		///ddd}
+
 /*		if(highPowerScope == true)
 		{
 		{
@@ -4631,11 +4692,17 @@ UINT32 CalcChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTime,
 		DebugMsg(TOPIC_JA2,DBG_LEVEL_3,String("CalcChanceToHitGun: after to hit bonus - ubAimTime = %d, iSightRange = %d, iChance = %d ", ubAimTime, iSightRange, iChance));
 	}
 
+	//{штраф при стрельбе по наводке.
+	if ( pSoldier->aiData.bOppList[ubTargetID] != SEEN_CURRENTLY &&(pSoldier->flags.uiStatusFlags & SOLDIER_PC) 	)
+		iChance -=gGameExternalOptions.iPenaltyShootUnSeen;
+	//}dddd
+
 	// if aiming at the head, reduce chance to hit
 	if (ubAimPos == AIM_SHOT_HEAD)
 	{
 		// penalty of 3% per tile
-		iPenalty = 3 * iSightRange / 10;
+		//iPenalty = 3 * iSightRange / 10; //comm by ddd
+		iPenalty = INT32(gGameExternalOptions.uShotHeadPenalty * iSightRange / 10);
 		iChance -= iPenalty;
 	}
 	else if (ubAimPos == AIM_SHOT_LEGS)
@@ -4988,7 +5055,8 @@ UINT32 CalcChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTime,
 
 		// This won't cause the bullet to be off to the left or right, only make it
 		// drop in flight.
-		iChance /= 2;
+		//iChance /= 2; //ddd
+		iChance /= gGameExternalOptions.fOutOfGunRangeOrSight;
 	}
 	if ( iSightRange > (sDistVis * CELL_X_SIZE) )
 	{

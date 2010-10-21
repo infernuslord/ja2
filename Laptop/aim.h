@@ -2,7 +2,7 @@
 #define __AIM_H
 
 #include "Cursors.h"
-
+#include "Soldier Profile.h"
 
 //
 // AIM defines
@@ -12,8 +12,32 @@
 #define	AIMHISTORYFILE		"BINARYDATA\\AimHist.edt"
 #define AIM_HISTORY_LINE_SIZE 400 * 2
 
-#define		MAX_NUMBER_MERCS							40
-extern UINT8			AimMercArray[ MAX_NUMBER_MERCS ];
+//#define		MAX_NUMBER_MERCS							40
+
+extern UINT8 MAX_NUMBER_MERCS;
+
+extern UINT8			AimMercArray[ NUM_PROFILES ];//MAX_NUMBER_MERCS ];
+
+typedef struct
+{
+	UINT8   ubAimArrayID;
+	UINT8   uiIndex;
+	UINT8   ProfilId;
+	UINT8   AimBio;
+	
+}	AIM_AVAILABLE;
+
+typedef struct
+{
+	UINT8   ubAimArrayID;
+	UINT8   uiIndex;
+	UINT8   ProfilId;
+	UINT8   AimBio;
+	
+}	AIM_AVAILABLE_TEMP;
+
+extern AIM_AVAILABLE_TEMP gAimAvailabilityTemp[ NUM_PROFILES ];
+extern AIM_AVAILABLE gAimAvailability[ NUM_PROFILES ];
 
 #define		NUM_AIM_SCREENS								6
 

@@ -190,7 +190,7 @@ typedef PARSE_STAGE;
 //Sender Name List
 #define SENDERNAMELISTFILENAME					"SenderNameList.xml"
 
-#define QUOTEARRAYFILENAME					"QuoteArray.xml"
+#define QUOTEARRAYFILENAME					"MercQuote.xml"
 
 #define IMPPORTRAITS					"IMPPortraits.xml"
 
@@ -213,6 +213,9 @@ typedef PARSE_STAGE;
 
 #define INTROFILESFILENAME						"IntroFiles.xml"
 
+#define MERCAVAILABILITY	"MercAvailability.xml"
+
+#define AIMAVAILABILITY	"AimAvailability.xml"
 
 
 extern BOOLEAN ReadInItemStats(STR fileName, BOOLEAN localizedVersion);
@@ -410,6 +413,12 @@ extern void LoadIMPPortraitsTEMP();
 extern BOOLEAN ReadInSoundProfile( STR fileName );
 extern BOOLEAN WriteSoundProfile( STR fileName );
 
+//new profiles by Jazz	
+extern BOOLEAN ReadInMercAvailability(STR fileName, BOOLEAN localizedVersion);
+extern BOOLEAN WriteMercAvailability(STR fileName);
+
+extern BOOLEAN ReadInAimAvailability(STR fileName, BOOLEAN localizedVersion);
+extern BOOLEAN WriteAimAvailability(STR fileName);
 
 extern BOOLEAN WriteRandomStats( STR fileName);
 extern BOOLEAN ReadInRandomStats(STR fileName);

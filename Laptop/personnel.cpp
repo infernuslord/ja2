@@ -5294,7 +5294,8 @@ void DisplayDepartedCharName( INT32 iId, INT32 iSlot, INT32 iState )
 	}
 
 	//if the merc is an AIM merc
-	else if( iId < BIFF )
+	//else if( iId < BIFF )
+	else if ( gProfilesAIM[ iId ].ProfilId == iId )
 	{
 		//if dismissed
 		if( iState == DEPARTED_FIRED )
@@ -5304,7 +5305,8 @@ void DisplayDepartedCharName( INT32 iId, INT32 iSlot, INT32 iState )
 	}
 
 	//else if its a MERC merc
-	else if( iId >= BIFF && iId <= BUBBA )
+	//else if( iId >= BIFF && iId <= BUBBA )
+	else if ( gProfilesMERC[ iId ].ProfilId == iId )
 	{
 		if( iState == DEPARTED_FIRED )
 			swprintf( sString, L"%s", pPersonnelDepartedStateStrings[ DEPARTED_FIRED ] );
@@ -5312,7 +5314,8 @@ void DisplayDepartedCharName( INT32 iId, INT32 iSlot, INT32 iState )
 			swprintf( sString, L"%s", pPersonnelDepartedStateStrings[ DEPARTED_QUIT ] );
 	}
 	//must be a RPC
-	else
+	//else
+	else if ( gProfilesRPC[ iId ].ProfilId == iId )
 	{
 		if( iState == DEPARTED_FIRED )
 			swprintf( sString, L"%s", pPersonnelDepartedStateStrings[ DEPARTED_FIRED ] );

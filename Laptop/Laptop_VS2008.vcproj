@@ -872,6 +872,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\XML_AIMAvailability.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\XML_ConditionsForMercAvailability.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\XML_DeliveryMethods.cpp"
 				>
 			</File>

@@ -27,6 +27,8 @@ BOOLEAN RenderAimFacialIndex();
 
 BOOLEAN DisplayAimFIMugShot();
 
+extern UINT8 START_MERC;
+
 #endif
 
 

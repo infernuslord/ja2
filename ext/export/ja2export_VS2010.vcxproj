@@ -54,7 +54,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;VFS_STATIC;VFS_WITH_SLF;VFS_WITH_7ZIP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../VFS/include;../libpng;../zlib; src; src/ja2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../VFS/include;../libpng;../zlib;src;src/ja2</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>

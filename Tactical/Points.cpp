@@ -78,7 +78,18 @@ INT16 TerrainActionPoints( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bDir, INT8
 			}
 		}
 	}
-	if ( sSwitchValue == TRAVELCOST_NOT_STANDING )
+	//dddokno 
+	if ( sSwitchValue == TRAVELCOST_JUMPABLEWINDOW
+		|| sSwitchValue == TRAVELCOST_JUMPABLEWINDOW_N
+		|| sSwitchValue == TRAVELCOST_JUMPABLEWINDOW_W)
+	{
+		if (bDir & 1)
+				return -1;
+
+	}	
+	//ddd ^^^^^^если не ставить здесь условие, то при подходе к клетке с окном ,когда расст до клетки с окном 1
+	//получим милое сообщение, что путь заблокирован 
+	if ( sSwitchValue == TRAVELCOST_NOT_STANDING)// || sSwitchValue == TRAVELCOST_JUMPABLEWINDOW)
 	{
 		// use the cost of the terrain!
 		sSwitchValue = gTileTypeMovementCost[ gpWorldLevelData[ sGridNo ].ubTerrainID ];
@@ -156,6 +167,11 @@ INT16 TerrainActionPoints( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bDir, INT8
 
 		// cost for jumping a fence REPLACES all other AP costs!
 	case TRAVELCOST_FENCE		: 
+		//dddokno{
+	case TRAVELCOST_JUMPABLEWINDOW:
+	case TRAVELCOST_JUMPABLEWINDOW_N:
+	case TRAVELCOST_JUMPABLEWINDOW_W:
+		//dddokno}
 		if (!IS_MERC_BODY_TYPE( pSoldier ))
 		{
 			return -1;
@@ -1262,7 +1278,7 @@ INT16 CalcTotalAPsToAttack( SOLDIERTYPE *pSoldier, INT32 sGridNo, UINT8 ubAddTur
 			else
 				sAPCost += CalcAPsToBurst( pSoldier->CalcActionPoints( ), &(pSoldier->inv[HANDPOS]) );
 		}
-		else
+		//else //ddd comment for aimed burst
 		{
 			if (gGameExternalOptions.fIncreasedAimingCost )
 			{

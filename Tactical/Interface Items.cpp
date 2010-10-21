@@ -5917,11 +5917,9 @@ BOOLEAN HandleItemPointerClick( INT32 usMapPos )
 					EndItemPointer( );
 
 					// If we are giving it to somebody not on our team....
-#ifdef JA2UB
-					if ( MercPtrs[ ubSoldierID ]->ubProfile < FIRST_RPC /* || MercPtrs[ubSoldierID]->ubProfile >= GASTON */ || RPC_RECRUITED( MercPtrs[ ubSoldierID ] ) )
-#else
-					if ( MercPtrs[ ubSoldierID ]->ubProfile < FIRST_RPC || MercPtrs[ubSoldierID]->ubProfile >= GASTON || RPC_RECRUITED( MercPtrs[ ubSoldierID ] ) )
-#endif
+					//if ( MercPtrs[ ubSoldierID ]->ubProfile < FIRST_RPC || MercPtrs[ubSoldierID]->ubProfile >= GASTON || RPC_RECRUITED( MercPtrs[ ubSoldierID ] ) )
+					//new profiles by Jazz	
+					if ( gProfilesIMP[MercPtrs[ ubSoldierID ]->ubProfile].ProfilId == MercPtrs[ ubSoldierID ]->ubProfile || gProfilesAIM[MercPtrs[ ubSoldierID ]->ubProfile].ProfilId == MercPtrs[ ubSoldierID ]->ubProfile || gProfilesMERC[MercPtrs[ ubSoldierID ]->ubProfile].ProfilId == MercPtrs[ ubSoldierID ]->ubProfile || RPC_RECRUITED( MercPtrs[ ubSoldierID ] ) )			
 					{
 
 					}

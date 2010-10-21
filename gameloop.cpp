@@ -36,6 +36,11 @@
 #include "SaveLoadScreen.h"
 
 #include "Lua Interpreter.h"
+//**ddd direct link libraries
+#pragma comment (lib, "user32.lib")
+#pragma comment (lib, "gdi32.lib")
+#pragma comment (lib, "advapi32.lib")
+#pragma comment (lib, "shell32.lib")
 
 #ifdef JA2UB
 #include "legion cfg.h"
@@ -63,6 +68,8 @@ UINT8		gubCheckForFreeSpaceOnHardDriveCount=DONT_CHECK_FOR_FREE_SPACE;
 extern	BOOLEAN	DoSkiMessageBox( UINT8 ubStyle, STR16 zString, UINT32 uiExitScreen, UINT8 ubFlags, MSGBOX_CALLBACK ReturnCallback );
 
 extern void NotEnoughHardDriveSpaceForQuickSaveMessageBoxCallBack( UINT8 bExitValue );
+extern BOOLEAN gfTacticalPlacementGUIActive;
+extern BOOLEAN gfTacticalPlacementGUIDirty;
 extern BOOLEAN gfValidLocationsChanged;
 extern BOOLEAN	gfInMsgBox;
 extern BOOLEAN gfInChatBox; // OJW - 20090314 - new chatbox
@@ -122,6 +129,8 @@ BOOLEAN InitializeGame(void)
 	// Moved this up because some settings are used during other inits
 	LoadGameAPBPConstants();
 	LoadGameExternalOptions();
+	// Load new ini - SANDRO
+	LoadSkillTraitsExternalSettings();
 
 #ifdef JA2UB
 	LoadGameLegionOptions(); // JA25 UB
@@ -224,11 +233,20 @@ void GameLoop(void)
 	MusicPoll( FALSE );
 
 	//DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"GameLoop: check for mouse events");
-	while (DequeueSpecificEvent(&InputEvent, LEFT_BUTTON_REPEAT|RIGHT_BUTTON_REPEAT|LEFT_BUTTON_DOWN|LEFT_BUTTON_UP|RIGHT_BUTTON_DOWN|RIGHT_BUTTON_UP ) == TRUE )
+	//*** dddd
+	//while (DequeueSpecificEvent(&InputEvent, LEFT_BUTTON_REPEAT|RIGHT_BUTTON_REPEAT|LEFT_BUTTON_DOWN|LEFT_BUTTON_UP|RIGHT_BUTTON_DOWN|RIGHT_BUTTON_UP ) == TRUE )
+	while (DequeueSpecificEvent(&InputEvent, 
+		LEFT_BUTTON_REPEAT|RIGHT_BUTTON_REPEAT|
+		LEFT_BUTTON_DOWN|LEFT_BUTTON_UP|MIDDLE_BUTTON_UP|X1_BUTTON_UP|X2_BUTTON_UP|
+		RIGHT_BUTTON_DOWN|RIGHT_BUTTON_UP|MIDDLE_BUTTON_DOWN|X1_BUTTON_DOWN|X2_BUTTON_DOWN|
+		MOUSE_WHEEL_UP|MOUSE_WHEEL_DOWN) == TRUE )
 	{
 		// HOOK INTO MOUSE HOOKS
 	//DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("GameLoop: mouse event %d", InputEvent.usEvent ));
-		switch(InputEvent.usEvent)
+		MouseSystemHook(InputEvent.usEvent, (UINT16)MousePos.x ,(UINT16)MousePos.y ,_LeftButtonDown, _RightButtonDown);
+		
+
+	/*	switch(InputEvent.usEvent)
 	{
 			case LEFT_BUTTON_DOWN:
 				MouseSystemHook(LEFT_BUTTON_DOWN, (INT16)MousePos.x, (INT16)MousePos.y,_LeftButtonDown, _RightButtonDown);
@@ -248,7 +266,8 @@ void GameLoop(void)
 			case RIGHT_BUTTON_REPEAT:
 				MouseSystemHook(RIGHT_BUTTON_REPEAT, (INT16)MousePos.x, (INT16)MousePos.y,_LeftButtonDown, _RightButtonDown);
 				break;
-	}
+	}*/
+
 	}
 
 

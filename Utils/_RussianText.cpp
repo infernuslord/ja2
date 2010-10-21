@@ -109,6 +109,17 @@ FAST HELP TEXT -- Explains how the syntax of fast help text works.
 	SirTech uses the "@@@" notation.
 
 */
+CHAR16  gszAimPages[ 6 ][ 20 ] =
+{
+	L"Cтp. 1/2", //0
+	L"Cтp. 2/2",
+	
+	L"Cтp. 1/3",
+	L"Cтp. 2/3",
+	L"Cтp. 3/3",
+	
+	L"Cтp. 1/1", //5
+};
 
 // by Jazz
 CHAR16 zGrod[][500] =
@@ -408,7 +419,7 @@ STR16 pAssignmentStrings[] =
 	L"В пути",	// in transit - abbreviated form
 	L"Ремонт",	// repairing
 	L"Практика",	// training themselves  
-  L"Ополчение",		// training a town to revolt 
+	L"Ополчение",		// training a town to revolt 
 	L"Мобил.гр.", //training moving militia units		//M.Militia
 	L"Тренер",	// training a teammate
 	L"Ученик",	// being trained by someone else 
@@ -2642,7 +2653,7 @@ STR16 pBookMarkStrings[] =
 	L"Похороны",
 	L"Цветы",
 	L"Страховка",
-	L"Отмена",
+	L"Oтмeнa",
 };
 
 STR16 pBookmarkTitle[] =
@@ -3340,9 +3351,9 @@ STR16		AimPolicyText[] =
 
 STR16			AimMemberText[] =
 {
-	L"Левая кнопка мыши",
-	L"чтобы связаться с бойцом.",
-	L"Правая кнопка мыши",
+	L"Левый щелчок",
+	L"связаться с бойцом.",
+	L"Правый щелчок - ",
 	L"экран с фотографиями.",
 };
 
@@ -5245,90 +5256,90 @@ STR16 Additional113Text[]=
 
 STR16 sEnemyTauntsFireGun[]=
 {
-	L"Suck on this!",
-	L"Say hello to my lil' friend!",
-	L"Come get some!",
-	L"You're mine!",
-	L"Die!",
-	L"You scared, motherfucker?",
-	L"This will hurt!",
-	L"Come on you bastard!",
-	L"Come on! I don't got all day!",
-	L"Come to daddy!",
-	L"You'll be six feet under in no time!",
-	L"Gonna send ya home in a pine box, loser!",
-	L"Hey, wanna play?",
-	L"You should have stayed home, bitch!",
-	L"Sucker!",
+	L"Отведай ка гостинца!",
+	L"Поздоровайся с моим дружком!",
+	L"Иди и получи!",
+	L"Ты мой!",
+	L"Сдохни!",
+	L"Обосрался, говнюк?",
+	L"Будет больно!",
+	L"Давай, ублюдок!",
+	L"Давай! Не весь же день тягаться!",
+	L"Иди к папочке!",
+	L"Закопаю моментом!",
+	L"Домой поедешь в деревянном костюме, неудачник!",
+	L"Эй, сыграем?",
+	L"Сидел бы дома, мудила!",
+	L"С-сука!",
 };
 
 STR16 sEnemyTauntsFireLauncher[]=
 {
 
-	L"Barbecue time!",
-	L"I got a present for ya!",
-	L"Bam!",
-	L"Smile!",
+	L"Будет, будет... Шашлык из тебя будет!",
+	L"Держи подарочек!",
+	L"Бах!",
+	L"Улыбочку!",
 };
 
 STR16 sEnemyTauntsThrow[]=
 {
-	L"Catch!",
-	L"Here ya go!",
-	L"Pop goes the weasel.",
-	L"This one's for you.",
-	L"Muahaha!",
-	L"Catch this, swine!",
-	L"I like this.",
+	L"Лови!",
+	L"Держи!",
+	L"Бум-бах, ой-ой-ой! Умирает зайчик мой!",
+	L"Это тебе.",
+	L"Муа-ха-ха!",
+	L"Лови, свинтус!",
+	L"Обожаю этот момент.",
 };
 
 STR16 sEnemyTauntsChargeKnife[]=
 {
-	L"Gonna scalp ya, sucker!",
-	L"Come to papa.",
-	L"Show me your guts!",
-	L"I'll rip you to pieces!",
-	L"Motherfucker!",
+	L"Я сниму тебе скальп, лошара!",
+	L"Иди к папочке.",
+	L"Сейчас посмотрим на твои кишечки!",
+	L"Порву, как Тузик грелку!",
+	L"Мясо!",
 };
 
 STR16 sEnemyTauntsRunAway[]=
 {
-	L"We're in some real shit...",
-	L"They said join the army. Not for this shit!",
-	L"I've had enough!",
-	L"Oh my God!",
-	L"They ain't paying us enough for this shit..",
-	L"Mommy!",
-	L"I'll be back! With friends!",
+	L"Кажется, мы в дерьме...",
+	L"Мне говорили вступать в армию, а не в это дерьмо!",
+	L"С меня хватит!",
+	L"О мой Бог!",
+	L"Нам не доплачивают за это дерьмо, валим отсюда...",
+	L"Мамочка!",
+	L"Я вернусь! И нас будут тысячи!",
 
 };
 
 STR16 sEnemyTauntsSeekNoise[]=
 {
-	L"I heard that!",
-	L"Who's there?",
-	L"What was that?",
-	L"Hey! What the...",
+	L"Я тебя слышу!",
+	L"Кто здесь?",
+	L"Что это было?",
+	L"Эй! Какого...",
 
 };
 
 STR16 sEnemyTauntsAlert[]=
 {
-	L"They're here!",
-	L"Now the fun can start!",
-	L"I hoped this would never happen..",
+	L"Они здесь!",
+	L"Сейчас начнётся веселье!",
+	L"Я надеялся, что этого никогда не случится...",
 
 };
 
 STR16 sEnemyTauntsGotHit[]=
 {
-	L"Aaaggh!",
-	L"Ugh!",
-	L"This.. hurts!",
-	L"You fuck!",
-	L"You will regret.. uhh.. this.",
-	L"What the..!",
-	L"Now you have.. pissed me off.",
+	L"А-а-г-р-р!",
+	L"А-а-а!",
+	L"Как же... больно!",
+	L"Твою мать!",
+	L"Ты пожалеешь... у-м-хх... об этом.",
+	L"Что за!..",
+	L"Теперь ты меня... разозлил.",
 
 };
 

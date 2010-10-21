@@ -666,7 +666,8 @@ typedef struct
 	BOOLEAN singleshotrocketlauncher;
 	UINT16	discardedlauncheritem;
 	BOOLEAN brassknuckles;
-	UINT16  bloodieditem;
+	//*** ddd UINT16  bloodieditem;
+	INT16  bloodieditem;
 	BOOLEAN crowbar;
 	BOOLEAN glgrenade;
 	BOOLEAN flakjacket;

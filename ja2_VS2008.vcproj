@@ -62,7 +62,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Winmm.lib RakNetLibStatic.lib ws2_32.lib DbgHelp.lib"
-				OutputFile="$(OutDir)\JA2_EN_3353_VS2008_Debug.exe"
+				OutputFile="$(OutDir)\JA2_EN_Debug.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="Multiplayer\raknet"
 				IgnoreDefaultLibraryNames="libcmt"
@@ -141,7 +141,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Winmm.lib RakNetLibStatic.lib ws2_32.lib DbgHelp.lib"
-				OutputFile="$(OutDir)\JA2_EN_3642_VS2008.exe"
+				OutputFile="$(OutDir)\JA2_EN_Release.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="Multiplayer\raknet"
 				GenerateDebugInformation="false"
@@ -221,7 +221,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Winmm.lib RakNetLibStatic.lib ws2_32.lib DbgHelp.lib"
-				OutputFile="$(OutDir)\MapEditor_EN_3353_VS2008.exe"
+				OutputFile="$(OutDir)\MapEditor_EN_Release.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="Multiplayer\raknet"
 				GenerateDebugInformation="false"
@@ -299,7 +299,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Winmm.lib RakNetLibStatic.lib ws2_32.lib DbgHelp.lib"
-				OutputFile="$(OutDir)\MapEditor_EN_3353_VS2008_Debug.exe"
+				OutputFile="$(OutDir)\MapEditor_EN_Debug.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="Multiplayer\raknet"
 				IgnoreDefaultLibraryNames=""
@@ -379,7 +379,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Winmm.lib RakNetLibStatic.lib ws2_32.lib DbgHelp.lib"
-				OutputFile="$(OutDir)\JA2_EN_3353_VS2008_ReleaseDebugInfo.exe"
+				OutputFile="$(OutDir)\JA2_EN_ReleaseDebugInfo.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="Multiplayer\raknet"
 				GenerateDebugInformation="true"

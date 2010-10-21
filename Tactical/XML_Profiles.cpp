@@ -20,7 +20,7 @@
 	#include "XML.h"
 	#include "Soldier Profile.h"
 #endif
-
+		#include "Soldier Profile.h"
 //#define MAX_PROFILE_NAME_LENGTH 30
 
 struct
@@ -143,7 +143,18 @@ profileStartElementHandle(void *userData, const XML_Char *name, const XML_Char *
 				strcmp(name, "usApproachFactorFriendly") == 0 ||
 				strcmp(name, "usApproachFactorDirect") == 0 ||
 				strcmp(name, "usApproachFactorThreaten") == 0 ||
-				strcmp(name, "usApproachFactorRecruit") == 0
+				strcmp(name, "usApproachFactorRecruit") == 0 ||
+				
+				//new tag
+				strcmp(name, "Type")  == 0 ||
+				
+				strcmp(name, "sSectorX")  == 0 ||
+				strcmp(name, "sSectorY")  == 0 ||
+				strcmp(name, "bSectorZ")  == 0 ||
+				strcmp(name, "ubCivilianGroup")  == 0 ||
+				strcmp(name, "bTownAttachment")  == 0 ||
+				strcmp(name, "Type")  == 0 ||
+				strcmp(name, "Type")  == 0 
 				))
 		{
 			pData->curElement = ELEMENT_PROPERTY;
@@ -184,7 +195,6 @@ profileEndElementHandle(void *userData, const XML_Char *name)
 		}
 		else if(strcmp(name, "PROFILE") == 0)
 		{
-	
 			pData->curElement = ELEMENT_LIST;
 
 			if(pData->curIndex < pData->maxArraySize)
@@ -194,7 +204,6 @@ profileEndElementHandle(void *userData, const XML_Char *name)
 		
 				if (!MercProfiles_TextOnly)
 				{
-					
 					wcscpy(tempProfiles[pData->curIndex].zName, pData->curProfile.zName); 
 					wcscpy(tempProfiles[pData->curIndex].zNickname, pData->curProfile.zNickname);		
 					
@@ -264,6 +273,15 @@ profileEndElementHandle(void *userData, const XML_Char *name)
 
 					tempProfiles[pData->curIndex].bArmourAttractiveness = pData->curProfile.bArmourAttractiveness;
 					tempProfiles[pData->curIndex].bMainGunAttractiveness = pData->curProfile.bMainGunAttractiveness;
+					
+					tempProfiles[pData->curIndex].Type = pData->curProfile.Type;
+					
+					tempProfiles[pData->curIndex].sSectorX = pData->curProfile.sSectorX;
+					tempProfiles[pData->curIndex].sSectorY = pData->curProfile.sSectorY;
+					tempProfiles[pData->curIndex].bSectorZ = pData->curProfile.bSectorZ;
+					tempProfiles[pData->curIndex].ubCivilianGroup = pData->curProfile.ubCivilianGroup;
+					tempProfiles[pData->curIndex].bTown = pData->curProfile.bTown;
+					tempProfiles[pData->curIndex].bTownAttachment = pData->curProfile.bTownAttachment;
 
 					tempProfiles[pData->curIndex].fGoodGuy = pData->curProfile.fGoodGuy;
 					memcpy( &(tempProfiles[pData->curIndex].usApproachFactor), &(pData->curProfile.usApproachFactor), 4 * sizeof (UINT16));
@@ -727,14 +745,52 @@ profileEndElementHandle(void *userData, const XML_Char *name)
 			pData->curProfile.usApproachFactor[3] = (UINT32) atol(pData->szCharData);
 		}
 		
-		else if(strcmp(name, "uiIndex") == 0 )
+		else if(strcmp(name, "uiIndex") == 0)
 		{
 
 			pData->curElement = ELEMENT;
-			
+
 			// Sets new index for writing.
 			pData->curIndex = (UINT32) atol(pData->szCharData);
 		}
+		
+		else if(strcmp(name, "Type") == 0)
+		{
+			pData->curElement = ELEMENT;
+			pData->curProfile.Type = (UINT32) atol(pData->szCharData);
+		}
+		
+		else if(strcmp(name, "sSectorX") == 0)
+		{
+			pData->curElement = ELEMENT;
+			pData->curProfile.sSectorX = (UINT16) atol(pData->szCharData);
+		}	
+		else if(strcmp(name, "sSectorY") == 0)
+		{
+			pData->curElement = ELEMENT;
+			pData->curProfile.sSectorY = (UINT16) atol(pData->szCharData);
+		}			
+		else if(strcmp(name, "sSectorZ") == 0)
+		{
+			pData->curElement = ELEMENT;
+			pData->curProfile.bSectorZ = (INT8) atol(pData->szCharData);
+		}			
+		else if(strcmp(name, "ubCivilianGroup") == 0)
+		{
+			pData->curElement = ELEMENT;
+			pData->curProfile.ubCivilianGroup = (UINT8) atol(pData->szCharData);
+		}	
+		else if(strcmp(name, "bTown") == 0)
+		{
+			pData->curElement = ELEMENT;
+			pData->curProfile.bTown = (INT8) atol(pData->szCharData);
+		}	
+		else if(strcmp(name, "bTownAttachment") == 0)
+		{
+			pData->curElement = ELEMENT;
+			pData->curProfile.bTown = (INT8) atol(pData->szCharData);
+		}	
+		
 
 		pData->maxReadDepth--;
 	}
@@ -756,7 +812,6 @@ BOOLEAN ReadInMercProfiles(STR fileName, BOOLEAN localizedVersion)
 	profileParseData pData;
 
 	MercProfiles_TextOnly = localizedVersion;
-	
 	DebugMsg(TOPIC_JA2, DBG_LEVEL_3, "Loading MercProfiles.xml" );
 
 	// Open merges file
@@ -829,6 +884,44 @@ BOOLEAN WriteMercProfiles()
 			FilePrintf(hFile,"\t<PROFILE>\r\n");
 
 			FilePrintf(hFile,"\t\t<uiIndex>%d</uiIndex>\r\n",						cnt);
+			
+			if (cnt >= 0 && cnt < 40 )
+			{	
+				FilePrintf(hFile,"\t\t<Type>1</Type>\r\n");
+			}
+			else if (cnt >= 40 && cnt < 51 )
+			{	
+				FilePrintf(hFile,"\t\t<Type>2</Type>\r\n");
+			}
+			else if ( cnt >= FIRST_RPC && cnt < FIRST_NPC )
+			{	
+				FilePrintf(hFile,"\t\t<Type>3</Type>\r\n");
+			}
+			else if ( cnt >= FIRST_NPC && cnt < 160 )
+			{	
+				FilePrintf(hFile,"\t\t<Type>4</Type>\r\n");
+			}
+			else if ( cnt == 169 )
+			{	
+				FilePrintf(hFile,"\t\t<Type>4</Type>\r\n");
+			}	
+			else if ( cnt == 165 || cnt == 166 || cnt == 167 || cnt == 168 )
+			{	
+				FilePrintf(hFile,"\t\t<Type>2</Type>\r\n");
+			}
+			else if ( cnt == 51 || cnt == 52 || cnt == 53 || cnt == 54 || cnt == 55 || cnt == 56 )
+			{	
+				FilePrintf(hFile,"\t\t<Type>6</Type>\r\n");
+			}
+			else if ( cnt == 160 || cnt == 161 || cnt == 162 || cnt == 163 || cnt == 164 )
+			{	
+				FilePrintf(hFile,"\t\t<Type>5</Type>\r\n");
+			}
+			else 
+			{
+				FilePrintf(hFile,"\t\t<Type>0</Type>\r\n");			
+			}
+			
 
 			//////////////////////////////
 			// Write Character Name
@@ -1248,6 +1341,14 @@ BOOLEAN WriteMercProfiles()
 			FilePrintf(hFile,"\t\t<usApproachFactorDirect>%d</usApproachFactorDirect>\r\n", gMercProfiles[ cnt ].usApproachFactor[1]);
 			FilePrintf(hFile,"\t\t<usApproachFactorThreaten>%d</usApproachFactorThreaten>\r\n", gMercProfiles[ cnt ].usApproachFactor[2]);
 			FilePrintf(hFile,"\t\t<usApproachFactorRecruit>%d</usApproachFactorRecruit>\r\n", gMercProfiles[ cnt ].usApproachFactor[3]);
+			
+			FilePrintf(hFile,"\t\t<sSectorX>%d</sSectorX>\r\n", gMercProfiles[ cnt ].sSectorX);
+			FilePrintf(hFile,"\t\t<sSectorY>%d</sSectorY>\r\n", gMercProfiles[ cnt ].sSectorY);
+			FilePrintf(hFile,"\t\t<sSectorZ>%d</sSectorZ>\r\n", gMercProfiles[ cnt ].bSectorZ);
+			
+			FilePrintf(hFile,"\t\t<ubCivilianGroup>%d</ubCivilianGroup>\r\n", gMercProfiles[ cnt ].ubCivilianGroup);
+			FilePrintf(hFile,"\t\t<bTown>%d</bTown>\r\n", gMercProfiles[ cnt ].bTown);
+			FilePrintf(hFile,"\t\t<bTownAttachment>%d</bTownAttachment>\r\n", gMercProfiles[ cnt ].bTownAttachment);
 
 
 			FilePrintf(hFile,"\t</PROFILE>\r\n");

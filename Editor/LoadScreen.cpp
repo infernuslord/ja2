@@ -46,6 +46,8 @@
 	#include <vfs/Core/vfs.h>//dnl ch37 110909
 #endif
 
+INT16 gsMouseWheelDeltaValue;
+
 //===========================================================================
 
 BOOLEAN gfErrorCatch = FALSE;
@@ -1034,6 +1036,9 @@ UINT32 ProcessFileIO()
 				InitErrorCatchDialog();
 				return EDIT_SCREEN;
 			}
+
+			fNewMapSaved = TRUE;
+
 			return EDIT_SCREEN;
 		case INITIATE_MAP_LOAD: //draw load message
 			SaveFontSettings();

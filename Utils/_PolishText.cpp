@@ -110,6 +110,18 @@ FAST HELP TEXT -- Explains how the syntax of fast help text works.
 
 */
 
+CHAR16  gszAimPages[ 6 ][ 20 ] =
+{
+	L"Str. 1/2", //0
+	L"Str. 2/2",
+	
+	L"Str. 1/3",
+	L"Str. 2/3",
+	L"Str. 3/3",
+	
+	L"Str. 1/1", //5
+};
+
 // by Jazz: TODO.Translate
 CHAR16 zGrod[][500] =
 {

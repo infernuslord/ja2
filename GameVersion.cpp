@@ -13,12 +13,12 @@
 #ifdef JA2EDITOR
 
 //MAP EDITOR BUILD VERSION
-CHAR16 zVersionLabel[256]		= { L"Map Editor v1.13.3726 Beta" }; 
+CHAR16 zVersionLabel[256]		= { L"Map Editor v1.13.3785" }; 
 
 #elif defined JA2BETAVERSION
 
 //BETA/TEST BUILD VERSION
-CHAR16 zVersionLabel[256]		= { L"Debug v1.13.3726 Beta" }; 
+CHAR16 zVersionLabel[256]		= { L"Debug v1.13.3785" }; 
 
 #elif defined CRIPPLED_VERSION
 
@@ -29,14 +29,14 @@ CHAR16 zVersionLabel[256]		= { L"Beta v. 0.98" };
 
 	//RELEASE BUILD VERSION	
 	#ifdef JA2UB
-		CHAR16		zVersionLabel[256]		= { L"Release Unfinished Business v1.3 - v1.13.3726 Beta" };
+		CHAR16		zVersionLabel[256]		= { L"Release Unfinished Business v1.3 - v1.13.3785" };
 	#else
-		CHAR16		zVersionLabel[256]		= { L"Release v1.13.3726 Beta" };
+	CHAR16		zVersionLabel[256]		= { L"Release v1.13.3785" };
 	#endif
 
 #endif
 										
-CHAR8		czVersionNumber[16]	= { "Build 10.09.26" };		//YY.MM.DD
+CHAR8		czVersionNumber[16]	= { "Build 10.10.19" };		//YY.MM.DD
 CHAR16		zTrackingNumber[16]	= { L"Z" };
 	
 

@@ -63,11 +63,13 @@
     <ClInclude Include="pcx.h" />
     <ClInclude Include="PngLoader.h" />
     <ClInclude Include="RAD.H" />
+    <ClInclude Include="radbase.h" />
     <ClInclude Include="random.h" />
     <ClInclude Include="readdir.h" />
     <ClInclude Include="RegInst.h" />
     <ClInclude Include="sgp.h" />
     <ClInclude Include="sgp_auto_memory.h" />
+    <ClInclude Include="sgp_logger.h" />
     <ClInclude Include="shading.h" />
     <ClInclude Include="SMACK.H" />
     <ClInclude Include="soundman.h" />
@@ -125,6 +127,7 @@
     <ClCompile Include="readdir.cpp" />
     <ClCompile Include="RegInst.cpp" />
     <ClCompile Include="sgp.cpp" />
+    <ClCompile Include="sgp_logger.cpp" />
     <ClCompile Include="shading.cpp" />
     <ClCompile Include="soundman.cpp" />
     <ClCompile Include="STCI.cpp" />

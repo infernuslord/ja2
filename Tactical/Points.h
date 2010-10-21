@@ -364,4 +364,9 @@ INT16 GetAPsToUntrapDoor( SOLDIERTYPE *pSoldier );
 INT16 GetBasicAPsToPickupItem( SOLDIERTYPE *pSoldier );
 INT16 GetAPsToDisarmMine( SOLDIERTYPE *pSoldier );
 
+///ddd
+//#pragma once
+//INT16 EstimateActionPointCost( SOLDIERTYPE *pSoldier, INT16 sGridNo, INT8 bDir, UINT16 usMovementMode, INT8 bPathIndex, INT8 bPathLength );
+//#include "EstimateActionPointCost.inl"
+
 #endif

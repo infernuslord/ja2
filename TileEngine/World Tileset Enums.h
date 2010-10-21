@@ -4,7 +4,7 @@
 // Snap: NUM_TILESETS no longer limits the number of tilesets.
 // See gubNumSets in WorldDat.cpp
 
-#ifdef JA2UB
+#ifdef JA2UBMAPS
 enum
 {
 	TLS_GENERIC_1,

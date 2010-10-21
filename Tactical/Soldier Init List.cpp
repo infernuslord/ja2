@@ -53,6 +53,7 @@
 #include "Map Edgepoints.h"
 #include "Queen Command.h"
 
+#include "Map Edgepoints.h"
 BOOLEAN gfOriginalList = TRUE;
 
 SOLDIERINITNODE *gSoldierInitHead = NULL;
@@ -791,6 +792,20 @@ BOOLEAN AddPlacementToWorld( SOLDIERINITNODE *curr, GROUP *pGroup = NULL )
 		}
 		DebugMsg(TOPIC_JA2,DBG_LEVEL_3,String("AddPlacementToWorld: return true"));
 
+		/*
+		#ifdef JA2UB
+		INT32 iCnt;
+		for( iCnt=0; iCnt< NUM_ORIGINAL_INV_SLOTS; iCnt++)
+		{
+				if ( gGameOptions.ubInventorySystem == INVENTORY_OLD && gGameOptions.ubAttachmentSystem == ATTACHMENT_OLD )
+				{
+					if( pSoldier->inv[ iCnt ].usItem == 97 || pSoldier->inv[ iCnt ].usItem == 1346 || pSoldier->inv[ iCnt ].usItem == 99 
+						|| pSoldier->inv[ iCnt ].usItem == 1347 || pSoldier->inv[ iCnt ].usItem == 584 || pSoldier->inv[ iCnt ].usItem == 551 ) //43
+						pSoldier->inv[ iCnt ].usItem = 129; //335		
+				}
+		}	
+		#endif	
+		*/
 		return TRUE;
 	}
 	else
@@ -2147,8 +2162,14 @@ void AddProfilesUsingProfileInsertionData()
 	SOLDIERTYPE *pSoldier;
 	SOLDIERINITNODE * curr;
 
-	for( i = FIRST_RPC; i < ( PROF_HUMMER ); i++ )
+	//for( i = FIRST_RPC; i < ( PROF_HUMMER ); i++ )
+	//new profiles by Jazz
+	for( i = 0; i < NUM_PROFILES; i++ )
 	{
+	
+	if ( gProfilesRPC[i].ProfilId == i || gProfilesNPC[i].ProfilId == i ) 
+	{
+	
 		//Perform various checks to make sure the soldier is actually in the same sector, alive, and so on.
 		//More importantly, the flag to use profile insertion data must be set.
 		if( gMercProfiles[ i ].sSectorX != gWorldSectorX ||
@@ -2218,6 +2239,8 @@ void AddProfilesUsingProfileInsertionData()
 				}
 			}
 		}
+
+	}
 	}
 }
 

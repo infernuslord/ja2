@@ -15,6 +15,8 @@
 #include "UndergroundInit.h"
 #include <vfs/Core/vfs_debug.h>	// for CBasicException
 
+#include "connect.h"
+
 using namespace std;
 
 static bool locationStrToCoords(string str, INT16* x, INT16* y);
@@ -139,146 +141,151 @@ void LuaMines::InitializeMines()
 	m_log << "Calling 'InitializeMines'" << vfs::Log::endl;
 	
 
+	// WANNE: Init mines in a multiplayer game, only if we already received the server game difficulty level (ubDifficultyLevel > 0)!!
 	// set global, maybe pass as parameter instead?
-	AssertT(gGameOptions.ubDifficultyLevel > 0);
-	lua_pushinteger(m_L, gGameOptions.ubDifficultyLevel);
-	lua_setglobal(m_L, "difficultyLevel");
-	m_log << "global difficultyLevel=" << static_cast<int>(gGameOptions.ubDifficultyLevel) << vfs::Log::endl;
-
-	// quick fix for ini override option
-	lua_pushinteger(m_L, gGameExternalOptions.bWhichMineRunsOut);
-	lua_setglobal(m_L, "mineDepletionOverride");
-	m_log << "global mineDepletionOverride=" << static_cast<int>(gGameExternalOptions.bWhichMineRunsOut) << vfs::Log::endl;
-
-
-	// load and call lua function
-	lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_initMinesFuncID);
-	if (lua_pcall(m_L, 0, 1, 0) != 0)
+	if (!is_networked || gGameOptions.ubDifficultyLevel > 0)
 	{
-		string error(lua_tostring(m_L, -1));
-		lua_pop(m_L, 1);
-		SGP_THROW(error);
-	}
+		AssertT(gGameOptions.ubDifficultyLevel > 0);
+			lua_pushinteger(m_L, gGameOptions.ubDifficultyLevel);
+
+		lua_setglobal(m_L, "difficultyLevel");
+		m_log << "global difficultyLevel=" << static_cast<int>(gGameOptions.ubDifficultyLevel) << vfs::Log::endl;
+
+		// quick fix for ini override option
+		lua_pushinteger(m_L, gGameExternalOptions.bWhichMineRunsOut);
+		lua_setglobal(m_L, "mineDepletionOverride");
+		m_log << "global mineDepletionOverride=" << static_cast<int>(gGameExternalOptions.bWhichMineRunsOut) << vfs::Log::endl;
 
 
-	// The script is supposed to return an array of tables.
-	// Iterate over each table.
-	int currentTable = 1;	// first table, lua indexing is 1-based
-    while (1)
-    {
-		MINE_STATUS_TYPE mineStatus = MINE_STATUS_TYPE();
-
-		// load table
-        lua_pushinteger(m_L, currentTable);
-        lua_gettable(m_L, -2);
-        
-        if (lua_isnil(m_L, -1))
-			// done, no more tables
-            break;
-
-
-        lua_getfield(m_L, -1, "Location");
-        string loc = lua_tostring(m_L, -1);
-        lua_pop(m_L, 1);
-        
-        lua_getfield(m_L, -1, "Type");
-        mineStatus.ubMineType = lua_tointeger(m_L, -1);
-        lua_pop(m_L, 1);
-        
-        lua_getfield(m_L, -1, "MaxRemovalRate");
-        mineStatus.uiMaxRemovalRate = lua_tointeger(m_L, -1);
-        lua_pop(m_L, 1);
-        
-        lua_getfield(m_L, -1, "RemainingOreSupply");
-        mineStatus.uiRemainingOreSupply = lua_tointeger(m_L, -1);
-        lua_pop(m_L, 1);
-
-		lua_getfield(m_L, -1, "Infectible");
-        mineStatus.fInfectible = lua_tointeger(m_L, -1) != 0;
-        lua_pop(m_L, 1);
-
-
-		lua_getfield(m_L, -1, "AssociatedUnderground");
-		if (!lua_isnil(m_L, -1))
+		// load and call lua function
+		lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_initMinesFuncID);
+		if (lua_pcall(m_L, 0, 1, 0) != 0)
 		{
-			// again, this field is a table/array
-			int currentSubTable = 1; // first lua index
-			while (1)
+			string error(lua_tostring(m_L, -1));
+			lua_pop(m_L, 1);
+			SGP_THROW(error);
+		}
+
+
+		// The script is supposed to return an array of tables.
+		// Iterate over each table.
+		int currentTable = 1;	// first table, lua indexing is 1-based
+		while (1)
+		{
+			MINE_STATUS_TYPE mineStatus = MINE_STATUS_TYPE();
+
+			// load table
+			lua_pushinteger(m_L, currentTable);
+			lua_gettable(m_L, -2);
+	        
+			if (lua_isnil(m_L, -1))
+				// done, no more tables
+				break;
+
+
+			lua_getfield(m_L, -1, "Location");
+			string loc = lua_tostring(m_L, -1);
+			lua_pop(m_L, 1);
+	        
+			lua_getfield(m_L, -1, "Type");
+			mineStatus.ubMineType = lua_tointeger(m_L, -1);
+			lua_pop(m_L, 1);
+	        
+			lua_getfield(m_L, -1, "MaxRemovalRate");
+			mineStatus.uiMaxRemovalRate = lua_tointeger(m_L, -1);
+			lua_pop(m_L, 1);
+	        
+			lua_getfield(m_L, -1, "RemainingOreSupply");
+			mineStatus.uiRemainingOreSupply = lua_tointeger(m_L, -1);
+			lua_pop(m_L, 1);
+
+			lua_getfield(m_L, -1, "Infectible");
+			mineStatus.fInfectible = lua_tointeger(m_L, -1) != 0;
+			lua_pop(m_L, 1);
+
+
+			lua_getfield(m_L, -1, "AssociatedUnderground");
+			if (!lua_isnil(m_L, -1))
 			{
-				// get next array element
-				lua_pushinteger(m_L, currentSubTable);
-				lua_gettable(m_L, -2);
-				if (lua_isnil(m_L, -1))
-					// done
-					break;
-				string str(lua_tostring(m_L, -1));
-
-				AssociatedMineSector sector;
-				if (locationStringToCoordinates(str, &sector.x, &sector.y, &sector.z))
+				// again, this field is a table/array
+				int currentSubTable = 1; // first lua index
+				while (1)
 				{
-					sector.mineID = gMineStatus.size();
-					associatedMineSectors.push_back(sector);
+					// get next array element
+					lua_pushinteger(m_L, currentSubTable);
+					lua_gettable(m_L, -2);
+					if (lua_isnil(m_L, -1))
+						// done
+						break;
+					string str(lua_tostring(m_L, -1));
+
+					AssociatedMineSector sector;
+					if (locationStringToCoordinates(str, &sector.x, &sector.y, &sector.z))
+					{
+						sector.mineID = gMineStatus.size();
+						associatedMineSectors.push_back(sector);
+					}
+
+					lua_pop(m_L, 1);
+					currentSubTable++;
 				}
-
-				lua_pop(m_L, 1);
-				currentSubTable++;
+				lua_pop(m_L, 1);	// pop nil
 			}
-			lua_pop(m_L, 1);	// pop nil
+			lua_pop(m_L, 1);	// pop field or nil value
+
+
+			if (locationStrToCoords(loc, &mineStatus.sSectorX, &mineStatus.sSectorY))
+			{
+				// valid location, add new mine
+				mineStatus.fEmpty = mineStatus.uiMaxRemovalRate == 0;
+				mineStatus.fRunningOut = FALSE;
+				mineStatus.fWarnedOfRunningOut = FALSE;
+				mineStatus.fShutDown = FALSE;
+				mineStatus.fPrevInvadedByMonsters = FALSE;
+				mineStatus.fSpokeToHeadMiner = FALSE;
+				mineStatus.fMineHasProducedForPlayer = FALSE;
+				mineStatus.fQueenRetookProducingMine = FALSE;
+				mineStatus.fShutDownIsPermanent = FALSE;
+
+				// this was usually set to 0 except for the mine that is supposed to
+				// be running out (in which case the calculation below applies)
+				// TODO: see if this works for all mines
+				mineStatus.uiOreRunningOutPoint = mineStatus.uiRemainingOreSupply / 4;
+				
+				// gather associated town id from sector coordinates
+				int index = CALCULATE_STRATEGIC_INDEX(mineStatus.sSectorX, mineStatus.sSectorY);
+				mineStatus.bAssociatedTown = StrategicMap[index].bNameId;
+
+				gMineStatus.push_back(mineStatus);
+
+				// log
+				m_log << "create mine" << vfs::Log::endl;
+				m_log << "\tSector: " << string(1, 'A'-1+mineStatus.sSectorY) << mineStatus.sSectorX << vfs::Log::endl;
+				m_log << "\tType: " << (mineStatus.ubMineType ? "gold" : "silver") << vfs::Log::endl;
+				m_log << "\tMaxRemovalRate: " << mineStatus.uiMaxRemovalRate << vfs::Log::endl;
+				m_log << "\tRemainingOreSupply: " << mineStatus.uiRemainingOreSupply << vfs::Log::endl;
+				m_log << "\tOreRunningOutPoint: " << mineStatus.uiOreRunningOutPoint << vfs::Log::endl;
+				m_log << "\tInfectible: " << (mineStatus.fInfectible ? 1 : 0 ) << vfs::Log::endl;
+			}
+			else
+			{
+				m_log << "WARNING: not creating mine #" << currentTable << " due to bad location string ("
+					<< loc << ")" << vfs::Log::endl;
+			}
+
+			lua_pop(m_L, 1);  // pop this table
+			currentTable++;
 		}
-		lua_pop(m_L, 1);	// pop field or nil value
+
+		// update global
+		MAX_NUMBER_OF_MINES = gMineStatus.size();
 
 
-		if (locationStrToCoords(loc, &mineStatus.sSectorX, &mineStatus.sSectorY))
-		{
-			// valid location, add new mine
-			mineStatus.fEmpty = mineStatus.uiMaxRemovalRate == 0;
-			mineStatus.fRunningOut = FALSE;
-			mineStatus.fWarnedOfRunningOut = FALSE;
-			mineStatus.fShutDown = FALSE;
-			mineStatus.fPrevInvadedByMonsters = FALSE;
-			mineStatus.fSpokeToHeadMiner = FALSE;
-			mineStatus.fMineHasProducedForPlayer = FALSE;
-			mineStatus.fQueenRetookProducingMine = FALSE;
-			mineStatus.fShutDownIsPermanent = FALSE;
-
-			// this was usually set to 0 except for the mine that is supposed to
-			// be running out (in which case the calculation below applies)
-			// TODO: see if this works for all mines
-			mineStatus.uiOreRunningOutPoint = mineStatus.uiRemainingOreSupply / 4;
-			
-			// gather associated town id from sector coordinates
-			int index = CALCULATE_STRATEGIC_INDEX(mineStatus.sSectorX, mineStatus.sSectorY);
-			mineStatus.bAssociatedTown = StrategicMap[index].bNameId;
-
-			gMineStatus.push_back(mineStatus);
-
-			// log
-			m_log << "create mine" << vfs::Log::endl;
-			m_log << "\tSector: " << string(1, 'A'-1+mineStatus.sSectorY) << mineStatus.sSectorX << vfs::Log::endl;
-			m_log << "\tType: " << (mineStatus.ubMineType ? "gold" : "silver") << vfs::Log::endl;
-			m_log << "\tMaxRemovalRate: " << mineStatus.uiMaxRemovalRate << vfs::Log::endl;
-			m_log << "\tRemainingOreSupply: " << mineStatus.uiRemainingOreSupply << vfs::Log::endl;
-			m_log << "\tOreRunningOutPoint: " << mineStatus.uiOreRunningOutPoint << vfs::Log::endl;
-			m_log << "\tInfectible: " << (mineStatus.fInfectible ? 1 : 0 ) << vfs::Log::endl;
-		}
-		else
-		{
-			m_log << "WARNING: not creating mine #" << currentTable << " due to bad location string ("
-				<< loc << ")" << vfs::Log::endl;
-		}
-
-		lua_pop(m_L, 1);  // pop this table
-        currentTable++;
-    }
-
-	// update global
-	MAX_NUMBER_OF_MINES = gMineStatus.size();
+		lua_pop(m_L, 1);	// pop nil value
 
 
-	lua_pop(m_L, 1);	// pop nil value
-
-
-	lua_pop(m_L, 1);	// pop return value
+		lua_pop(m_L, 1);	// pop return value
+	}
 
 }
 

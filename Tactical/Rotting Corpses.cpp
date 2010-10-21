@@ -812,7 +812,12 @@ BOOLEAN TurnSoldierIntoCorpse( SOLDIERTYPE *pSoldier, BOOLEAN fRemoveMerc, BOOLE
 	Corpse.dYPos									= pSoldier->dYPos;
 	Corpse.bLevel									= pSoldier->pathing.bLevel;
 	Corpse.ubProfile							= pSoldier->ubProfile;
-
+///ddd{ для обнаружения трупов драниками.
+	if ( pSoldier->bTeam != gbPlayerNum )
+	Corpse.ubAIWarningValue = 1;
+		//def.ubAIWarningValue = 1; //not used value!
+///ddd}
+	
 	if ( Corpse.bLevel > 0 )
 	{
 		Corpse.sHeightAdjustment			= (INT16)( pSoldier->sHeightAdjustment - WALL_HEIGHT );
@@ -1922,7 +1927,7 @@ void LookForAndMayCommentOnSeeingCorpse( SOLDIERTYPE *pSoldier, INT32 sGridNo, U
 	SOLDIERTYPE		*pTeamSoldier;
 
 
-	if ( QuoteExp[ pSoldier->ubProfile ].QuoteExpHeadShotOnly == 1 )
+	if ( QuoteExp_HeadShotOnly[ pSoldier->ubProfile ] == 1 )
 	{
 	return;
 	}

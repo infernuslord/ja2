@@ -5144,7 +5144,7 @@ void RemoveProhibitedAttachments(SOLDIERTYPE* pSoldier, OBJECTTYPE* pObj, UINT16
 				//WarmSteel - erase null objects, we don't need them without the NAS.
 				iter = (*pObj)[0]->attachments.erase(iter);
 			} else {
-				if ((!ValidAttachment(iter->usItem, pObj) && !ValidLaunchable(iter->usItem, usItem)) || x >= OLD_MAX_ATTACHMENTS_101)
+				if ( (!ValidAttachment(iter->usItem, pObj) && !ValidLaunchable(iter->usItem, usItem) && !ValidLaunchable(iter->usItem, GetAttachedGrenadeLauncher(pObj)) ) || x >= OLD_MAX_ATTACHMENTS_101)
 				{
 					if ( !Item[iter->usItem].inseparable )
 					{

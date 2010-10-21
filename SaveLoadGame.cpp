@@ -124,7 +124,8 @@
 #include "BobbyRMailOrder.h"
 #include "Mercs.h"
 #include "INIReader.h"
-
+#include "mercs.h"
+#include "soldier Profile.h"
 #ifdef JA2UB
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
@@ -466,7 +467,6 @@ extern		BOOLEAN		gfHavePurchasedItemsFromTony;
 // Function Prototypes
 //
 /////////////////////////////////////////////////////
-
 BOOLEAN		SaveMercProfiles( HWFILE hFile );
 BOOLEAN		LoadSavedMercProfiles( HWFILE hwFile );
 
@@ -2406,12 +2406,13 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 	//
 	// Save the merc profiles
 	//
-	if( !SaveMercProfiles( hFile ) )
-	{
-		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing merc profiles");
-		goto FAILED_TO_SAVE;
-	}
-
+	
+		if( !SaveMercProfiles( hFile ) )
+		{
+			ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing merc profiles");
+			goto FAILED_TO_SAVE;
+		}
+	
 	#ifdef JA2BETAVERSION
 		SaveGameFilePosition( FileGetPos( hFile ), "Merc Profiles" );
 	#endif
@@ -2923,6 +2924,25 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 		goto FAILED_TO_SAVE;
 	}
 #endif
+	//New profiles by Jazz
+	if( !SaveNewMercsToSaveGameFile( hFile ) )
+	{
+		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing mercs profiles");
+		goto FAILED_TO_SAVE;
+	}
+	#ifdef JA2BETAVERSION
+	SaveGameFilePosition( FileGetPos( hFile ), "New Mercs Profiles" );
+	#endif
+	
+	//New system profiles by Jazz
+	if( !SaveNewSystemMercsToSaveGameFile( hFile ) )
+	{
+		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing new system mercs profiles");
+		goto FAILED_TO_SAVE;
+	}
+	#ifdef JA2BETAVERSION
+	SaveGameFilePosition( FileGetPos( hFile ), "New system Mercs Profiles" );
+	#endif	
 
 	//Close the saved game file
 	FileClose( hFile );
@@ -4283,9 +4303,8 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 		}
 	}
 
-
 	uiRelEndPerc += 1;
-	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Final Checks..." );
+	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Ja25 Tactical info" );
 	RenderProgressBar( 0, 100 );
 	uiRelStartPerc = uiRelEndPerc;
 
@@ -4310,7 +4329,44 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 		}
 
 	uiRelEndPerc += 1;
-	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Ja25 Tactical info" );
+	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Load New Mercs Prfiles..." );
+	RenderProgressBar( 0, 100 );
+	uiRelStartPerc = uiRelEndPerc;
+
+
+	if( guiCurrentSaveGameVersion >= 113 )
+	{
+		if( !LoadNewMercsFromLoadGameFile( hFile ) )
+		{
+			DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("LoadNewMercsFromLoadGameFile failed" ) );
+			FileClose( hFile );
+			return( FALSE );
+		}
+	}
+	#ifdef JA2BETAVERSION
+		LoadGameFilePosition( FileGetPos( hFile ), "Load Mercs Prfiles" );
+	#endif
+	
+	uiRelEndPerc += 1;
+	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Load New Sytem Mercs Prfiles..." );
+	RenderProgressBar( 0, 100 );
+	uiRelStartPerc = uiRelEndPerc;
+	
+	if( guiCurrentSaveGameVersion >= 113 )
+	{
+		if( !LoadNewSystemMercsToSaveGameFile( hFile ) )
+		{
+			DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("LoadNewSystemMercsToSaveGameFile failed" ) );
+			FileClose( hFile );
+			return( FALSE );
+		}
+	}
+	#ifdef JA2BETAVERSION
+		LoadGameFilePosition( FileGetPos( hFile ), "Load New Sytem Mercs Prfiles" );
+	#endif
+
+	uiRelEndPerc += 1;
+	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Final Checks..." );
 	RenderProgressBar( 0, 100 );
 	uiRelStartPerc = uiRelEndPerc;
 #endif
@@ -4613,12 +4669,6 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 	return( TRUE );
 }
 
-
-
-
-
-
-
 BOOLEAN SaveMercProfiles( HWFILE hFile )
 {
 	UINT16	cnt;
@@ -4633,8 +4683,6 @@ BOOLEAN SaveMercProfiles( HWFILE hFile )
 
 	return( TRUE );
 }
-
-
 
 BOOLEAN	LoadSavedMercProfiles( HWFILE hFile )
 {
@@ -4652,8 +4700,6 @@ BOOLEAN	LoadSavedMercProfiles( HWFILE hFile )
 
 	return( TRUE );
 }
-
-
 
 //Not saving any of these in the soldier struct
 

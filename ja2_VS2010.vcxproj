@@ -99,29 +99,37 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>bin\VS2010\$(Configuration)\</OutDir>
     <IntDir>build\VS2010\$(ProjectName)_$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)_debug</TargetName>
+    <TargetName>JA2_EN_Debug.exe</TargetName>
+    <TargetExt />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MapEditorD|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>bin\VS2010\$(Configuration)\</OutDir>
     <IntDir>build\VS2010\$(ProjectName)_$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName) Map Editor Debug</TargetName>
+    <TargetExt>
+    </TargetExt>
+    <TargetName>MapEditor_EN_Debug.exe</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>bin\VS2010\$(Configuration)\</OutDir>
     <IntDir>build\VS2010\$(ProjectName)_$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)_VS2010</TargetName>
+    <TargetName>JA2_EN_Release.exe</TargetName>
+    <TargetExt />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MapEditor|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>bin\VS2010\$(Configuration)\</OutDir>
     <IntDir>build\VS2010\$(ProjectName)_$(Configuration)\</IntDir>
+    <TargetName>MapEditor_EN_Release.exe</TargetName>
+    <TargetExt />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Relese_WithDebugInfo|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>bin\VS2010\$(Configuration)\</OutDir>
     <IntDir>build\VS2010\$(ProjectName)_$(Configuration)\</IntDir>
+    <TargetName>JA2_EN_ReleaseDebugInfo.exe</TargetName>
+    <TargetExt />
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -137,6 +145,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>Multiplayer\raknet;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Winmm.lib;RakNetLibStatic.lib;ws2_32.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)\JA2_EN_Debug.exe</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MapEditorD|Win32'">
@@ -153,6 +162,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>Multiplayer\raknet;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Winmm.lib;RakNetLibStatic.lib;ws2_32.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)\MapEditor_EN_Debug.exe</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -173,6 +183,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>Multiplayer\raknet;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Winmm.lib;RakNetLibStatic.lib;ws2_32.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)\JA2_EN_Release.exe</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MapEditor|Win32'">
@@ -193,6 +204,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>Multiplayer\raknet;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Winmm.lib;RakNetLibStatic.lib;ws2_32.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)\MapEditor_EN_Release.exe</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Relese_WithDebugInfo|Win32'">
@@ -214,6 +226,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>Multiplayer\raknet;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Winmm.lib;RakNetLibStatic.lib;ws2_32.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)\JA2_EN_ReleaseDebugInfo.exe</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

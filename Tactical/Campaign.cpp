@@ -1364,7 +1364,8 @@ void HandleUnhiredMercDeaths( INT32 iProfileID )
 #ifdef JA2UB
 		//ja25 ub
 #else
-		if( iProfileID < BIFF )
+	//	if( iProfileID < BIFF )
+		if ( gProfilesAIM[ iProfileID ].ProfilId == iProfileID )  //new profiles by Jazz
 		{
 			//send an email to the player telling the player that a merc died
 			AddEmailWithSpecialData(MERC_DIED_ON_OTHER_ASSIGNMENT, MERC_DIED_ON_OTHER_ASSIGNMENT_LENGTH, AIM_SITE, GetWorldTotalMin(), 0, iProfileID );

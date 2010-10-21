@@ -4992,7 +4992,9 @@ INT16 GetTownTrainPtsForCharacter( SOLDIERTYPE *pTrainer, UINT16 *pusMaxPts )
 	}
 
 	// RPCs get a small training bonus for being more familiar with the locals and their customs/needs than outsiders
-	if( pTrainer->ubProfile >= FIRST_RPC )
+	//new profiles by Jazz
+	//if( pTrainer->ubProfile >= FIRST_RPC )
+	if ( gProfilesRPC[pTrainer->ubProfile].ProfilId == pTrainer->ubProfile || gProfilesNPC[pTrainer->ubProfile].ProfilId == pTrainer->ubProfile )
 	{
 		sTrainingBonus += gGameExternalOptions.ubRpcBonusToTrainMilitia;
 	}

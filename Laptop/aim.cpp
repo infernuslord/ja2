@@ -18,8 +18,14 @@
 #endif
 
 #include "LocalizedStrings.h"
+#include "Soldier Profile.h"
 
-UINT8			AimMercArray[ MAX_NUMBER_MERCS ];
+UINT8 MAX_NUMBER_MERCS = 0;
+
+UINT8			AimMercArray[ NUM_PROFILES ]; //MAX_NUMBER_MERCS ];
+
+AIM_AVAILABLE_TEMP gAimAvailabilityTemp[ NUM_PROFILES ];
+AIM_AVAILABLE gAimAvailability[ NUM_PROFILES ];
 
 UINT8			gCurrentAimPage[ NUM_AIM_SCREENS ] =
 {

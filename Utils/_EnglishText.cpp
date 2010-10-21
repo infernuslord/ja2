@@ -109,6 +109,17 @@ FAST HELP TEXT -- Explains how the syntax of fast help text works.
 	SirTech uses the "@@@" notation.
 
 */
+CHAR16  gszAimPages[ 6 ][ 20 ] =
+{
+	L"Page 1/2", //0
+	L"Page 2/2",
+	
+	L"Page 1/3",
+	L"Page 2/3",
+	L"Page 3/3",
+	
+	L"Page 1/1", //5
+};
 
 // by Jazz:
 CHAR16 zGrod[][500] =

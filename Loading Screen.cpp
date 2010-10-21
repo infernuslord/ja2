@@ -289,6 +289,15 @@ UINT8 GetLoadScreenID(INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ)
 			return LOADINGSCREEN_CAVE;
 		default:
 
+    /*
+    case 1:
+    case 2:
+    case 3:
+         return LOADINGSCREEN_CAVE;
+    break;
+	return LOADINGSCREEN_CAVE;
+   default:
+   */
 #else
 		// Basement Level 1
 		case 1:

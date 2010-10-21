@@ -218,7 +218,7 @@ BOOLEAN ExecuteStrategicEvent( STRATEGICEVENT *pEvent )
 			DailyUpdateOfMercSite( (UINT16)GetWorldDay() );
 			break;
 	case EVENT_DAY3_ADD_EMAIL_FROM_SPECK:
-			if(!bMercDayOne)
+			if ( gGameExternalOptions.fMercDayOne == FALSE && gGameExternalOptions.fAllMercsAvailable == FALSE )
 			{
 			#ifdef JA2UB
 			//No JA25 UB

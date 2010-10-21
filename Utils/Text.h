@@ -48,7 +48,7 @@ enum
 //Ja25 UB
 extern	STR16	gzNewLaptopMessages[];
 extern	STR16	zNewTacticalMessages[];
-
+extern CHAR16  gszAimPages[ 6 ][ 20 ];
 extern CHAR16		zGrod[][500];
 extern STR16 pCreditsJA2113[];
 extern CHAR16 ShortItemNames[MAXITEMS][80];

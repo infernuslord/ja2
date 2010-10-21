@@ -30,6 +30,7 @@
 	#include "Interactive Tiles.h"
 	#include "PATHAI.H"
 	#include "SkillCheck.h" // added by SANDRO
+	#include "message.H" //ddd
 #endif
 
 //forward declarations of common classes to eliminate includes
@@ -2542,6 +2543,188 @@ void HandleUICursorRTFeedback( SOLDIERTYPE *pSoldier )
 	}
 
 }
+
+
+/* good code from lesh
+BOOLEAN CanSoldierAffordAimTime( SOLDIERTYPE *pSoldier, INT16 usMapPos, INT8 bAimTime )
+{
+	INT8		maxAimLevels;
+	INT16		sAPCosts;
+
+	maxAimLevels = AllowedAimingLevels(pSoldier);
+
+	if ( bAimTime < REFINE_AIM_1 || bAimTime > maxAimLevels )
+		return FALSE;
+	
+	sAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, bAimTime );
+	
+	if ( !EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
+		return FALSE;
+
+	return TRUE;
+}
+
+BOOLEAN CanSoldierAffordPunching( SOLDIERTYPE *pSoldier, INT16 usMapPos, INT8 bRefineTime )
+{
+	INT16		sAPCosts;
+
+	if ( bRefineTime < REFINE_PUNCH_1 || bRefineTime > REFINE_PUNCH_2 )
+		return FALSE;
+	
+	sAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, bRefineTime );
+	
+	if ( !EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
+		return FALSE;
+
+	return TRUE;
+}
+
+BOOLEAN CanSoldierAffordKnifing( SOLDIERTYPE *pSoldier, INT16 usMapPos, INT8 bRefineTime )
+{
+	INT16		sAPCosts;
+
+	if ( bRefineTime < REFINE_KNIFE_1 || bRefineTime > REFINE_KNIFE_2 )
+		return FALSE;
+	
+	sAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, bRefineTime );
+	
+	if ( !EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
+		return FALSE;
+
+	return TRUE;
+}
+
+BOOLEAN CanSoldierAffordBurstBullets( SOLDIERTYPE *pSoldier, INT16 usMapPos )
+{
+	INT16		sAPCosts;
+	INT8		bSaveDoAutofire;
+
+	if ( pSoldier->bDoAutofire < 1 )
+	{
+		pSoldier->bDoAutofire = 1;
+		return FALSE;
+	}
+	
+	if ( pSoldier->bDoAutofire > pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft )
+	{
+		pSoldier->bDoAutofire = pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft;
+		return FALSE;
+	}
+
+	sAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, 0);
+
+	if ( !EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
+		return FALSE;
+	
+	return TRUE;
+}
+
+
+void HandleWheelAdjustCursor( SOLDIERTYPE *pSoldier, INT16 sMapPos, INT16 sDelta )
+{
+	UINT8					ubCursor;
+	INT8					bFutureAim;	
+	
+	ubCursor =  GetActionModeCursor( pSoldier );
+
+	// 'snap' cursor to target tile....
+	if ( gfUIFullTargetFound )
+	{
+		sMapPos = MercPtrs[ gusUIFullTargetID ]->sGridNo;
+	}
+
+	switch( ubCursor )
+	{
+		case TARGETCURS:
+			// warn if bad chance to get through
+			if ( gfUIFullTargetFound &&
+				!HandleCheckForBadChangeToGetThrough( pSoldier, MercPtrs[ gusUIFullTargetID ],
+							MercPtrs[ gusUIFullTargetID ]->sGridNo , MercPtrs[ gusUIFullTargetID ]->pathing.bLevel ) )
+			{
+				return;
+			}
+
+			if ( pSoldier->bDoBurst && !pSoldier->bDoAutofire )
+			{
+			}
+			else if( pSoldier->bDoAutofire )
+			{
+				// AUTOFIRE section
+				INT16 sCurAPCosts, sFutureAPCost;
+
+				if(pSoldier->flags.autofireLastStep)
+				{
+					pSoldier->flags.autofireLastStep = FALSE;
+				}
+
+				// change burst length until AP difference is shown
+				sCurAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+				do
+				{
+					pSoldier->bDoAutofire += sDelta;
+					sFutureAPCost = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+				} while ( CanSoldierAffordBurstBullets( pSoldier, sMapPos ) && (sFutureAPCost - sCurAPCosts) == 0 );
+				
+				// complement burst by adding bullets, until next bullet produce AP difference
+				sFutureAPCost = sCurAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+				while ( CanSoldierAffordBurstBullets( pSoldier, sMapPos ) && (sFutureAPCost - sCurAPCosts) == 0 )
+				{
+					pSoldier->bDoAutofire += 1;	// now it goes as future burst length
+					sFutureAPCost = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+				}
+
+				// display red numbers, if it is last possible burst ap spenditure
+				pSoldier->flags.autofireLastStep = !CanSoldierAffordBurstBullets( pSoldier, sMapPos );
+				
+				// restore last iteration bullet count (before ap difference)
+				pSoldier->bDoAutofire--;
+			}
+			else
+			{
+				// SINGLE SHOT section
+				bFutureAim = pSoldier->aiData.bShownAimTime + sDelta;
+				
+				if ( CanSoldierAffordAimTime( pSoldier, sMapPos, bFutureAim) )
+				{
+					pSoldier->aiData.bShownAimTime += sDelta;
+					// display yellow circle, if it is last possible aim level
+					gfDisplayFullCountRing = !CanSoldierAffordAimTime( pSoldier, sMapPos, bFutureAim + 1);
+					
+				}
+			}
+			break;
+			
+		case PUNCHCURS:
+			// PUNCHING section
+			bFutureAim = pSoldier->aiData.bShownAimTime + sDelta * REFINE_PUNCH_2;	// possibly dirty hack
+			
+			if ( CanSoldierAffordPunching( pSoldier, sMapPos, bFutureAim) )
+			{
+				pSoldier->aiData.bShownAimTime += sDelta * REFINE_PUNCH_2;
+				// display yellow circle, if it is last possible aim level
+				gfDisplayFullCountRing = !CanSoldierAffordPunching( pSoldier, sMapPos, bFutureAim + 1);
+			}
+			break;
+		
+		case KNIFECURS:
+			// KNIFING section
+			bFutureAim = pSoldier->aiData.bShownAimTime + sDelta * REFINE_KNIFE_2;	// possibly dirty hack
+			
+			if ( CanSoldierAffordKnifing( pSoldier, sMapPos, bFutureAim) )
+			{
+				pSoldier->aiData.bShownAimTime += sDelta * REFINE_KNIFE_2;
+				// display yellow circle, if it is last possible aim level
+				gfDisplayFullCountRing = !CanSoldierAffordKnifing( pSoldier, sMapPos, bFutureAim + 1);
+			}
+			break;
+
+	};
+}
+
+
+
+
+*/
 // HEADROCK HAM B2.7: This function gives us an "approximate" CTH bar, that doesn't show the exact value of
 // CTH unless the character is well-trained. The worse trained a character is, the wilder the speculation.
 
@@ -2621,4 +2804,1420 @@ UINT32 ChanceToHitApproximation( SOLDIERTYPE * pSoldier, UINT32 uiChance )
 
 	// Something went wrong. Return 50, as in "God Knows"
 	return (50);
+}
+
+
+/* //почти отлаженный  хедроковский код. доделать прицелы для кулака и ножыга
+void HandleWheelAdjustCursor( SOLDIERTYPE *pSoldier, INT16 sMapPos, INT16 sDelta )
+{
+	UINT16					usInHand;
+	INT16					sAPCosts;
+	INT8					bFutureAim;
+	UINT8					ubCursor;
+	SOLDIERTYPE				*pTSoldier;
+	INT16					sGridNo;
+	INT8					bTargetLevel;
+
+
+	usInHand = pSoldier->inv[HANDPOS].usItem;
+
+	ubCursor =	GetActionModeCursor( pSoldier );
+
+	UINT8 maxAimLevels = AllowedAimingLevels(pSoldier);
+
+	// 'snap' cursor to target tile....
+	if ( gfUIFullTargetFound )
+	{
+		sMapPos = MercPtrs[ gusUIFullTargetID ]->sGridNo;
+	}
+
+
+	switch( ubCursor )
+	{
+		case TARGETCURS:
+
+			// CHECK IF GUY HAS IN HAND A WEAPON
+			if ( pSoldier->bDoBurst && !pSoldier->bDoAutofire)
+			{
+				// Do nothing!
+				// pSoldier->aiData.bShownAimTime = REFINE_AIM_BURST;
+			}
+			else if(pSoldier->bDoAutofire)
+			{
+				INT16	sCurAPCosts;
+
+				if(pSoldier->bDoAutofire==1 && sDelta<0) return;
+
+				if(pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft > pSoldier->bDoAutofire )
+				{
+					//Calculate how many bullets we need to fire to add at least one more AP
+					sAPCosts = sCurAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+					while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && sAPCosts <= sCurAPCosts && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft > pSoldier->bDoAutofire)	//Increment the bullet count until we run out of APs or we spend the whole AP
+					{
+						pSoldier->bDoAutofire++;
+						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+					}
+
+					//we've stepped over the border and used up one more ap, now let's make sure that it is spent to maximize the bullets
+
+					sCurAPCosts = sAPCosts;
+
+					do
+					{
+						pSoldier->bDoAutofire+=sDelta;
+						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+					}
+					while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && sAPCosts == sCurAPCosts && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire);
+					pSoldier->bDoAutofire--;
+
+					sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+
+					if(!EnoughPoints( pSoldier, sAPCosts, 0, FALSE ))		//We've not enough points to fire those bullets
+					{
+						pSoldier->flags.autofireLastStep = TRUE;
+						pSoldier->bDoAutofire--;
+					}
+					else
+						pSoldier->flags.autofireLastStep = FALSE; //both last step conditions are false
+				}
+				else
+				{
+					if(sDelta<0) 
+					{
+						pSoldier->flags.autofireLastStep = FALSE;
+					pSoldier->bDoAutofire--;
+					}
+					else
+					pSoldier->flags.autofireLastStep = TRUE;
+				}
+			}
+			else //single shoot
+			{
+				sGridNo					= sMapPos;
+				bTargetLevel	= (INT8)gsInterfaceLevel;
+
+				// Look for a target here...
+				if ( gfUIFullTargetFound )
+				{
+					// Get target soldier, if one exists
+					pTSoldier = MercPtrs[ gusUIFullTargetID ];
+					sGridNo = pTSoldier->sGridNo;
+					bTargetLevel = pSoldier->pathing.bLevel;
+
+					if ( !HandleCheckForBadChangeToGetThrough( pSoldier, pTSoldier, sGridNo , bTargetLevel ) )
+						return;
+				}
+
+				bFutureAim = (INT8)( pSoldier->aiData.bShownAimTime + sDelta );
+				if(bFutureAim <0)return;
+
+				if ( bFutureAim <= maxAimLevels )
+				{
+					sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, (INT8)(bFutureAim ) );
+
+					// Determine if we can afford!
+					if ( EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
+					{
+						pSoldier->aiData.bShownAimTime+= sDelta;
+						if ( pSoldier->aiData.bShownAimTime > maxAimLevels )
+							pSoldier->aiData.bShownAimTime = maxAimLevels;
+						gfDisplayFullCountRing = FALSE;
+					}
+					
+					else // Else - goto first level!
+						gfDisplayFullCountRing = TRUE;
+				}
+				else
+					gfDisplayFullCountRing = TRUE;
+
+			}
+			break;
+
+
+		case PUNCHCURS:
+
+			bFutureAim = (INT8)( pSoldier->aiData.bShownAimTime + REFINE_PUNCH_2 );
+
+			if ( bFutureAim <= REFINE_PUNCH_2 )
+			{
+				sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, (INT8)(bFutureAim / 2) );
+
+				// Determine if we can afford!
+				if ( EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
+				{
+					pSoldier->aiData.bShownAimTime+= (sDelta*REFINE_PUNCH_2);
+
+					if ( pSoldier->aiData.bShownAimTime > REFINE_PUNCH_2 )
+					{
+						pSoldier->aiData.bShownAimTime = REFINE_PUNCH_2;
+					}
+				}
+				// Else - goto first level!
+				else
+				{
+					if ( !gfDisplayFullCountRing )
+					{
+						gfDisplayFullCountRing = TRUE;
+					}
+					else
+					{
+						pSoldier->aiData.bShownAimTime = REFINE_PUNCH_1;
+						gfDisplayFullCountRing = FALSE;
+					}
+				}
+			}
+			else
+			{
+				if ( !gfDisplayFullCountRing )
+				{
+					gfDisplayFullCountRing = TRUE;
+				}
+				else
+				{
+					pSoldier->aiData.bShownAimTime = REFINE_PUNCH_1;
+					gfDisplayFullCountRing = FALSE;
+				}
+			}
+			break;
+
+
+		case KNIFECURS:
+
+			bFutureAim = (INT8)( pSoldier->aiData.bShownAimTime + (sDelta*REFINE_KNIFE_2) );
+
+			if ( bFutureAim <= REFINE_KNIFE_2 )
+			{
+				sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, (INT8)(bFutureAim / 2) );
+
+				// Determine if we can afford!
+				if ( EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
+				{
+					pSoldier->aiData.bShownAimTime+= REFINE_KNIFE_2;
+
+					if ( pSoldier->aiData.bShownAimTime > REFINE_KNIFE_2 )
+					{
+						pSoldier->aiData.bShownAimTime = REFINE_KNIFE_2;
+					}
+				}
+				// Else - goto first level!
+				else
+				{
+					if ( !gfDisplayFullCountRing )
+					{
+						gfDisplayFullCountRing = TRUE;
+					}
+					else
+					{
+						pSoldier->aiData.bShownAimTime = REFINE_KNIFE_1;
+						gfDisplayFullCountRing = FALSE;
+					}
+				}
+			}
+			else
+			{
+				if ( !gfDisplayFullCountRing )
+				{
+					gfDisplayFullCountRing = TRUE;
+				}
+				else
+				{
+					pSoldier->aiData.bShownAimTime = REFINE_KNIFE_1;
+					gfDisplayFullCountRing = FALSE;
+				}
+			}
+			break;
+
+		case TOSSCURS:
+
+			//IncrementAimCubeUI( );
+			break;
+
+		default:
+
+			ErasePath( TRUE );
+
+	}
+}
+*/
+
+
+
+void HandleWheelAdjustCursor( SOLDIERTYPE *pSoldier, INT32 sMapPos, INT32 sDelta, INT16 brstmode )
+{
+	UINT16					usInHand;
+	INT16					sAPCosts;
+	INT8					bFutureAim;
+	UINT8					ubCursor;
+	SOLDIERTYPE				*pTSoldier;
+	INT16					sGridNo;
+	INT8					bTargetLevel;
+
+
+	usInHand = pSoldier->inv[HANDPOS].usItem;
+
+	ubCursor =	GetActionModeCursor( pSoldier );
+
+	UINT8 maxAimLevels = AllowedAimingLevels(pSoldier);
+
+	// 'snap' cursor to target tile....
+	if ( gfUIFullTargetFound )
+		sMapPos = MercPtrs[ gusUIFullTargetID ]->sGridNo;
+	
+	int aimlevelchange = 1;
+	int maxAimCanAfford = 0;
+	int oldAim = pSoldier->aiData.bShownAimTime;
+	int hitChance = 0;
+	int maxCtH = 0; //maximum chance to hit
+	int minAimForCtH = 0;  //minimum AP needed to get maximum CtH
+	switch( ubCursor )
+	{
+		case TARGETCURS:
+
+//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"cbef=%d",CalcChanceToHitGun( pSoldier, sMapPos, pSoldier->aiData.bShownAimTime, pSoldier->bAimShotLocation ) );
+		if(pSoldier->bDoAutofire && (gfKeyState[18] || brstmode) ) //накрутка кол-ва пулей в очереди
+			{
+				INT16	sCurAPCosts;
+
+				if(pSoldier->bDoAutofire==1 && sDelta<0) return;
+
+				if(pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft > pSoldier->bDoAutofire )
+				{
+					//Calculate how many bullets we need to fire to add at least one more AP
+					sAPCosts = sCurAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+					while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && sAPCosts <= sCurAPCosts && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft > pSoldier->bDoAutofire)	//Increment the bullet count until we run out of APs or we spend the whole AP
+					{
+						pSoldier->bDoAutofire++;
+						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+					}
+
+					//we've stepped over the border and used up one more ap, now let's make sure that it is spent to maximize the bullets
+
+					sCurAPCosts = sAPCosts;
+
+					do
+					{
+						pSoldier->bDoAutofire+=sDelta;
+						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+					}
+					while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && sAPCosts == sCurAPCosts && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire);
+					pSoldier->bDoAutofire--;
+
+					sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+
+					if(!EnoughPoints( pSoldier, sAPCosts, 0, FALSE ))		//We've not enough points to fire those bullets
+					{
+						pSoldier->flags.autofireLastStep = TRUE;
+						pSoldier->bDoAutofire--;
+					}
+					else
+						pSoldier->flags.autofireLastStep = FALSE; //both last step conditions are false
+				}
+				else
+				{
+					if(sDelta<0) 
+					{
+						pSoldier->flags.autofireLastStep = FALSE;
+					pSoldier->bDoAutofire--;
+					}
+					else
+					pSoldier->flags.autofireLastStep = TRUE;
+				}
+				return;
+			}
+///////////////////////////////
+				sGridNo					= sMapPos;
+				bTargetLevel	= (INT8)gsInterfaceLevel;
+
+				// Look for a target here...
+				if ( gfUIFullTargetFound )
+				{
+					// Get target soldier, if one exists
+					pTSoldier = MercPtrs[ gusUIFullTargetID ];
+					sGridNo = pTSoldier->sGridNo;
+					bTargetLevel = pSoldier->pathing.bLevel;
+
+					if ( !HandleCheckForBadChangeToGetThrough( pSoldier, pTSoldier, sGridNo , bTargetLevel ) )
+					{
+						return;
+					}
+				}
+
+
+				bFutureAim = maxAimLevels;
+
+				//Find the actual maximum aim that can be done.				
+				while( bFutureAim > 0 ){
+					//Can afford this many?
+					sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, bFutureAim );
+					if( !maxAimCanAfford && EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) ){
+						maxAimCanAfford = bFutureAim;
+					}
+					//Find the least amount of aiming needed to get maximum CtH
+					//Give some slack, but don't let the slack accumulate.
+					//dd???{
+					//hitChance = CalcChanceToHitGun( pSoldier, sMapPos, bFutureAim, pSoldier->bAimShotLocation );
+					//if( hitChance >= maxCtH - 3){
+					//	minAimForCtH = bFutureAim;
+					//	if(hitChance >= maxCtH) maxCtH = hitChance;
+					//}
+					//ddd???}
+					//Loop to 0.
+					--bFutureAim;
+				}
+
+				bFutureAim = oldAim + sDelta;
+				if( bFutureAim < REFINE_AIM_1 ) return;
+
+
+				//Do it.
+				if( bFutureAim < REFINE_AIM_1 ){
+					//Went too low.  Set to max aim.
+					bFutureAim = maxAimCanAfford;
+					gfDisplayFullCountRing = TRUE;
+				}else if( bFutureAim <= maxAimCanAfford ){
+					//Aim level is doable.  No modification needed.
+					gfDisplayFullCountRing = FALSE;
+				}else{
+					//Aim too high.  Give indicator that is is maxed, then reset aim refinement.
+					if ( gfDisplayFullCountRing )
+						return;
+					else{
+						//Display ring to indicate maximum aim reached.
+						bFutureAim = oldAim;
+						gfDisplayFullCountRing = TRUE;
+					}
+				}
+				//Apply.
+				pSoldier->aiData.bShownAimTime = bFutureAim;
+
+//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"caft=%d",CalcChanceToHitGun( pSoldier, sMapPos, pSoldier->aiData.bShownAimTime, pSoldier->bAimShotLocation ) );
+			break;
+
+
+		case PUNCHCURS:
+
+			bFutureAim = (INT8)( pSoldier->aiData.bShownAimTime + (sDelta*REFINE_PUNCH_2) );
+if(bFutureAim<0) return;
+			if ( bFutureAim <= REFINE_PUNCH_2 )
+			{
+				sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, (INT8)(bFutureAim / 2) );
+
+				// Determine if we can afford!
+				if ( EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
+				{
+					pSoldier->aiData.bShownAimTime+= (sDelta*REFINE_PUNCH_2);
+					if ( pSoldier->aiData.bShownAimTime > REFINE_PUNCH_2 )
+						pSoldier->aiData.bShownAimTime = REFINE_PUNCH_2;
+					gfDisplayFullCountRing = FALSE;
+				}
+				else
+					gfDisplayFullCountRing = TRUE;
+			}
+			else
+				gfDisplayFullCountRing = TRUE;
+			
+			break;
+							
+
+
+		case KNIFECURS:
+
+			bFutureAim = (INT8)( pSoldier->aiData.bShownAimTime + (sDelta*REFINE_KNIFE_2) );
+if(bFutureAim<0) return;
+			if ( bFutureAim <= REFINE_KNIFE_2 )
+			{
+				sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, (INT8)(bFutureAim / 2) );
+
+				// Determine if we can afford!
+				if ( EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
+				{
+					pSoldier->aiData.bShownAimTime+= REFINE_KNIFE_2;
+					if ( pSoldier->aiData.bShownAimTime > REFINE_KNIFE_2 )
+						pSoldier->aiData.bShownAimTime = REFINE_KNIFE_2;
+					gfDisplayFullCountRing = FALSE;
+				}
+				else
+					gfDisplayFullCountRing = TRUE;
+			}
+			else
+				gfDisplayFullCountRing = TRUE;
+
+			break;
+
+		case TOSSCURS:
+
+			//IncrementAimCubeUI( );
+			break;
+
+		default:
+
+			ErasePath( TRUE );
+
+	}
+
+}
+
+//обработка колеса без прицельной очереди if прицельная очередь отключена в .ини
+void HandleWheelAdjustCursorWOAB( SOLDIERTYPE *pSoldier, INT32 sMapPos, INT32 sDelta )
+{
+	UINT16					usInHand;
+	INT16					sAPCosts;
+	INT8					bFutureAim;
+	UINT8					ubCursor;
+	SOLDIERTYPE				*pTSoldier;
+	INT32					sGridNo;
+	INT8					bTargetLevel;
+
+
+	usInHand = pSoldier->inv[HANDPOS].usItem;
+
+	ubCursor =	GetActionModeCursor( pSoldier );
+
+	UINT8 maxAimLevels = AllowedAimingLevels(pSoldier);
+
+	// 'snap' cursor to target tile....
+	if ( gfUIFullTargetFound )
+	{
+		sMapPos = MercPtrs[ gusUIFullTargetID ]->sGridNo;
+	}
+
+
+	switch( ubCursor )
+	{
+		case TARGETCURS:
+
+			// CHECK IF GUY HAS IN HAND A WEAPON
+			if ( pSoldier->bDoBurst && !pSoldier->bDoAutofire)
+			{
+				// Do nothing!
+				// pSoldier->aiData.bShownAimTime = REFINE_AIM_BURST;
+			}
+			else if(pSoldier->bDoAutofire)
+			{
+				INT16	sCurAPCosts;
+
+				if(pSoldier->bDoAutofire==1 && sDelta<0) return;
+
+				if(pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft > pSoldier->bDoAutofire )
+				{
+					//Calculate how many bullets we need to fire to add at least one more AP
+					sAPCosts = sCurAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+					while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && sAPCosts <= sCurAPCosts && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft > pSoldier->bDoAutofire)	//Increment the bullet count until we run out of APs or we spend the whole AP
+					{
+						pSoldier->bDoAutofire++;
+						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+					}
+
+					//we've stepped over the border and used up one more ap, now let's make sure that it is spent to maximize the bullets
+
+					sCurAPCosts = sAPCosts;
+
+					do
+					{
+						pSoldier->bDoAutofire+=sDelta;
+						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+					}
+					while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && sAPCosts == sCurAPCosts && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire);
+					pSoldier->bDoAutofire--;
+
+					sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+
+					if(!EnoughPoints( pSoldier, sAPCosts, 0, FALSE ))		//We've not enough points to fire those bullets
+					{
+						pSoldier->flags.autofireLastStep = TRUE;
+						pSoldier->bDoAutofire--;
+					}
+					else
+						pSoldier->flags.autofireLastStep = FALSE; //both last step conditions are false
+				}
+				else
+				{
+					if(sDelta<0) 
+					{
+						pSoldier->flags.autofireLastStep = FALSE;
+					pSoldier->bDoAutofire--;
+					}
+					else
+					pSoldier->flags.autofireLastStep = TRUE;
+				}
+			}
+			else //single shoot
+			{
+				sGridNo					= sMapPos;
+				bTargetLevel	= (INT8)gsInterfaceLevel;
+
+				// Look for a target here...
+				if ( gfUIFullTargetFound )
+				{
+					// Get target soldier, if one exists
+					pTSoldier = MercPtrs[ gusUIFullTargetID ];
+					sGridNo = pTSoldier->sGridNo;
+					bTargetLevel = pSoldier->pathing.bLevel;
+
+					if ( !HandleCheckForBadChangeToGetThrough( pSoldier, pTSoldier, sGridNo , bTargetLevel ) )
+						return;
+				}
+
+				bFutureAim = (INT8)( pSoldier->aiData.bShownAimTime + sDelta );
+				if(bFutureAim <0)return;
+
+				if ( bFutureAim <= maxAimLevels )
+				{
+					sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, (INT8)(bFutureAim ) );
+
+					// Determine if we can afford!
+					if ( EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
+					{
+						pSoldier->aiData.bShownAimTime+= sDelta;
+						if ( pSoldier->aiData.bShownAimTime > maxAimLevels )
+							pSoldier->aiData.bShownAimTime = maxAimLevels;
+						gfDisplayFullCountRing = FALSE;
+					}
+					
+					else // Else - goto first level!
+						gfDisplayFullCountRing = TRUE;
+				}
+				else
+					gfDisplayFullCountRing = TRUE;
+
+			}
+			break;
+
+		case PUNCHCURS:
+
+			bFutureAim = (INT8)( pSoldier->aiData.bShownAimTime + (sDelta*REFINE_PUNCH_2) );
+if(bFutureAim<0) return;
+			if ( bFutureAim <= REFINE_PUNCH_2 )
+			{
+				sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, (INT8)(bFutureAim / 2) );
+
+				// Determine if we can afford!
+				if ( EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
+				{
+					pSoldier->aiData.bShownAimTime+= (sDelta*REFINE_PUNCH_2);
+					if ( pSoldier->aiData.bShownAimTime > REFINE_PUNCH_2 )
+						pSoldier->aiData.bShownAimTime = REFINE_PUNCH_2;
+					gfDisplayFullCountRing = FALSE;
+				}
+				else
+					gfDisplayFullCountRing = TRUE;
+			}
+			else
+				gfDisplayFullCountRing = TRUE;
+			
+			break;
+							
+
+
+		case KNIFECURS:
+
+			bFutureAim = (INT8)( pSoldier->aiData.bShownAimTime + (sDelta*REFINE_KNIFE_2) );
+if(bFutureAim<0) return;
+			if ( bFutureAim <= REFINE_KNIFE_2 )
+			{
+				sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, (INT8)(bFutureAim / 2) );
+
+				// Determine if we can afford!
+				if ( EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
+				{
+					pSoldier->aiData.bShownAimTime+= REFINE_KNIFE_2;
+					if ( pSoldier->aiData.bShownAimTime > REFINE_KNIFE_2 )
+						pSoldier->aiData.bShownAimTime = REFINE_KNIFE_2;
+					gfDisplayFullCountRing = FALSE;
+				}
+				else
+					gfDisplayFullCountRing = TRUE;
+			}
+			else
+				gfDisplayFullCountRing = TRUE;
+
+			break;
+	
+		case TOSSCURS:
+
+			//IncrementAimCubeUI( );
+			break;
+
+		default:
+
+			ErasePath( TRUE );
+
+	}
+}
+
+// WANNE: Shows the target cursor over the enemy soldier
+UINT8 HandleActivatedTargetCursor( SOLDIERTYPE *pSoldier, INT16 sMapPos, BOOLEAN fShowAPs, BOOLEAN fRecalc, UINT32 uiCursorFlags )
+{
+	UINT8							switchVal;
+	BOOLEAN							fEnoughPoints = TRUE;
+	UINT8							bFutureAim;
+	INT16							sAPCosts;
+	INT16							sAPCostsMin;
+	UINT16							usCursor=0;
+	BOOLEAN							fMaxPointLimitHit = FALSE;
+	UINT16							usInHand;
+
+	UINT16	reverse = 0;
+
+	UINT8 maxAimLevels = AllowedAimingLevels(pSoldier);
+
+		usInHand = pSoldier->inv[ HANDPOS ].usItem;
+
+		if ( Item[ usInHand ].usItemClass != IC_THROWING_KNIFE )
+		{
+			// If we are in realtime, follow!
+			if ( ( !( gTacticalStatus.uiFlags & INCOMBAT ) ) )
+			{
+				if ( ( gAnimControl[ MercPtrs[ gusSelectedSoldier ]->usAnimState ].uiFlags & ANIM_STATIONARY ) )
+				{
+					if ( gUITargetShotWaiting )
+					{
+						guiPendingOverrideEvent = CA_MERC_SHOOT;
+					}
+				}
+
+				//SoldierFollowGridNo( pSoldier, sMapPos );
+			}
+
+			// Check if we are reloading
+			if ( ( ( gTacticalStatus.uiFlags & REALTIME ) || !( gTacticalStatus.uiFlags & INCOMBAT ) ) )
+			{
+				if ( pSoldier->flags.fReloading || pSoldier->flags.fPauseAim )
+				{
+					return( ACTION_TARGET_RELOADING );
+				}
+
+			}
+		}
+
+
+		// Determine where we are shooting / aiming
+		//if ( fRecalc )
+		{
+			DetermineCursorBodyLocation( (UINT8)gusSelectedSoldier, TRUE, TRUE );
+		}
+
+		if ( gTacticalStatus.uiFlags & TURNBASED && ( gTacticalStatus.uiFlags & INCOMBAT ) )
+		{
+			if(pSoldier->bDoAutofire)
+			{
+
+				if(pSoldier->bDoAutofire == 1) //try to maximize the # of bullets because 1 may not be optimal
+				{
+					INT16 sCurAPCosts, sAPCosts;
+
+					sCurAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+
+					do
+					{
+						pSoldier->bDoAutofire++;
+						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+					}
+					while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && sAPCosts == sCurAPCosts && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire);
+					pSoldier->bDoAutofire--;
+				}
+
+				gfUIAutofireBulletCount = TRUE;
+				gsBulletCount = pSoldier->bDoAutofire;
+				gsTotalBulletCount = pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft;
+
+				if(pSoldier->flags.autofireLastStep) //set the orange tint on the numbers if we at the last step
+					gTintBulletCounts = TRUE;
+				else
+					gTintBulletCounts = FALSE;
+
+			}
+			else
+				gfUIAutofireBulletCount = FALSE;
+
+			gsCurrentActionPoints = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, (INT8)(pSoldier->aiData.bShownAimTime ) );
+			gfUIDisplayActionPoints = TRUE;
+			gfUIDisplayActionPointsCenter = TRUE;
+
+			while(!EnoughPoints( pSoldier, gsCurrentActionPoints, 0 , FALSE ) && pSoldier->bDoAutofire > 1) //oops, we don't have enough points if we are in auto-fire try to decrease bulletcount
+			{
+				pSoldier->bDoAutofire--;
+				gsCurrentActionPoints = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, (INT8)(pSoldier->aiData.bShownAimTime ) );
+			}
+
+			// If we don't have any points and we are at the first refine, do nothing but warn!
+			if ( !EnoughPoints( pSoldier, gsCurrentActionPoints, 0 , FALSE ) )
+			{
+				gfUIDisplayActionPointsInvalid = TRUE;
+
+				fMaxPointLimitHit = TRUE;
+			}
+			else
+			{
+				// WANNE: How oft increased?
+				bFutureAim = (INT8)( pSoldier->aiData.bShownAimTime + 1 );
+
+				if ( bFutureAim <= maxAimLevels )
+				{
+					if (reverse == 0)
+					{
+						// WANNE: Current AP costs for targeting
+						sAPCosts = MinAPsToAttack( pSoldier, sMapPos, TRUE ) + ( bFutureAim	);
+
+						//gsCurrentActionPoints = sAPCosts;
+
+						// Determine if we can afford!
+						if ( !EnoughPoints( pSoldier, (INT16)sAPCosts, 0 , FALSE ) )
+						{
+							fEnoughPoints = FALSE;
+						}
+					}
+					else
+					{
+						sAPCosts = MinAPsToAttack( pSoldier, sMapPos, TRUE ) + maxAimLevels - (bFutureAim + 1);
+
+						gsCurrentActionPoints = sAPCosts;
+
+						sAPCostsMin = MinAPsToAttack( pSoldier, sMapPos, TRUE );
+						if (sAPCosts < sAPCostsMin)
+						{
+							fEnoughPoints = FALSE;
+						}
+					}
+
+					//// Determine if we can afford!
+					//if ( !EnoughPoints( pSoldier, (INT16)sAPCosts, 0 , FALSE ) )
+					//{
+					//	fEnoughPoints = FALSE;
+					//}
+
+				}
+
+			}
+		}
+
+		if ( ( ( gTacticalStatus.uiFlags & REALTIME ) || !( gTacticalStatus.uiFlags & INCOMBAT ) ) )
+		{
+			if ( !pSoldier->flags.fPauseAim )
+			{
+				if ( COUNTERDONE( TARGETREFINE )	)
+				{
+					// Reset counter
+					RESETCOUNTER( TARGETREFINE );
+
+					pSoldier->bDoBurst;
+					/* zilpin: aimed burst
+					if ( pSoldier->bDoBurst )
+					{
+						pSoldier->aiData.bShownAimTime = REFINE_AIM_BURST;
+					}
+					else
+					*/
+					{
+						pSoldier->aiData.bShownAimTime++;
+
+						if ( pSoldier->aiData.bShownAimTime > maxAimLevels )
+						{
+							pSoldier->aiData.bShownAimTime = maxAimLevels;
+						}
+						else
+						{
+							if ( pSoldier->aiData.bShownAimTime % 2 )
+							{
+								PlayJA2Sample( TARG_REFINE_BEEP, RATE_11025, MIDVOLUME, 1, MIDDLEPAN );
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if ( fRecalc )
+		{
+			if ( gusUIFullTargetID != NOBODY )
+			{
+				if ( SoldierToSoldierBodyPartChanceToGetThrough( pSoldier, MercPtrs[ gusUIFullTargetID ], pSoldier->bAimShotLocation ) < OK_CHANCE_TO_GET_THROUGH )
+				{
+					gfCannotGetThrough = TRUE;
+				}
+				else
+				{
+					gfCannotGetThrough = FALSE;
+				}
+			}
+			else
+			{
+				if ( SoldierToLocationChanceToGetThrough( pSoldier, sMapPos, (INT8) gsInterfaceLevel, pSoldier->bTargetCubeLevel, NOBODY ) < OK_CHANCE_TO_GET_THROUGH )
+				{
+					gfCannotGetThrough = TRUE;
+				}
+				else
+				{
+					gfCannotGetThrough = FALSE;
+				}
+			}
+		}
+
+		// OK, if we begin to move, reset the cursor...
+		if ( uiCursorFlags & MOUSE_MOVING )
+		{
+			//gfCannotGetThrough = FALSE;
+		}
+
+		if ( pSoldier->flags.fDoSpread && pSoldier->bDoAutofire) //approximate spread-auto costs
+		{
+			if(gbNumBurstLocations > pSoldier->bDoAutofire)
+			{
+				INT16	sAPCosts;
+
+				do
+				{
+					pSoldier->bDoAutofire++;
+					sAPCosts = CalcTotalAPsToAttack( pSoldier, gsBurstLocations[0].sGridNo, TRUE, 0);
+				}
+				while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire && gbNumBurstLocations >= pSoldier->bDoAutofire);
+				pSoldier->bDoAutofire--;
+
+				gsCurrentActionPoints = CalcTotalAPsToAttack( pSoldier, gsBurstLocations[0].sGridNo, TRUE, 0 );
+			}
+		}
+
+		if ( fMaxPointLimitHit )
+		{
+			// Check if we're in burst mode!
+			if ( pSoldier->bDoBurst )
+			{
+				usCursor = ACTION_TARGETREDBURST_UICURSOR;
+			}
+			else if ( Item[ usInHand ].usItemClass == IC_THROWING_KNIFE )
+			{
+				usCursor = RED_THROW_UICURSOR;
+			}
+			else
+			{
+				usCursor = ACTION_TARGETRED_UICURSOR;
+			}
+		}
+		else if ( pSoldier->bDoBurst )
+		{
+			if ( pSoldier->flags.fDoSpread )
+			{
+				usCursor = ACTION_TARGETREDBURST_UICURSOR;
+			}
+			else
+			{
+				usCursor = ACTION_TARGETCONFIRMBURST_UICURSOR;
+
+				// HEADROCK HAM B1: Burst cursor now shows multiple CTH bars (one for each bullet)
+				// and also a Targetted Bodypart indicator.
+				if(pSoldier->bDoAutofire == 0 && gGameSettings.fOptions[ TOPTION_CTH_CURSOR ])
+				{
+					if (gGameExternalOptions.ubNewCTHBars == 1 || gGameExternalOptions.ubNewCTHBars == 2)
+					{
+						// Burst mode only
+						OBJECTTYPE * pInHand;
+						pInHand = &(pSoldier->inv[pSoldier->ubAttackingHand]);
+						// Burst size
+						gbCtHBurstCount = GetShotsPerBurst(pInHand);
+						UINT8 i, saveDoBurst;
+						// Save original burst value (should be 1 always, before the burst has been fired, but
+						// this is just a failsafe
+						saveDoBurst = pSoldier->bDoBurst;
+
+						// For each bullet in the burst
+						for (i=0;i<gbCtHBurstCount;i++)
+						{
+							//AXP 29.03.2007: Rooftop CtH fix. See below.
+							INT8 bTempTargetLevel = pSoldier->bTargetLevel;
+							pSoldier->bTargetLevel = (INT8) gsInterfaceLevel;
+
+							// Calculate hit chance (using the current bDoBurst for burst-penalty calculations)
+							UINT32 uiHitChance;
+							//uiHitChance = CalcChanceToHitGun( pSoldier, sMapPos, pSoldier->aiData.bShownAimTime, pSoldier->bAimShotLocation );//comm by ddd
+
+							///dddd{very bad code...
+							if( (bFutureAim <=1) && (i!=0) )
+								uiHitChance = CalcChanceToHitGun( pSoldier, sMapPos, pSoldier->aiData.bShownAimTime-1, pSoldier->bAimShotLocation );
+							else uiHitChance = CalcChanceToHitGun( pSoldier, sMapPos,pSoldier->aiData.bShownAimTime, pSoldier->bAimShotLocation );
+							//dddd}
+							// HEADROCK HAM B2.7: CTH approximation?
+							if (gGameExternalOptions.fApproximateCTH)
+							{	
+								uiHitChance = ChanceToHitApproximation( pSoldier, uiHitChance );
+							}
+							
+
+							pSoldier->bTargetLevel = bTempTargetLevel;
+
+							// Put result (burst CTH) into the array
+							gbCtH[i] = (gbCtH[i]+uiHitChance)/2;
+
+							// Increase burst size, so that the next time we run CalcChanceToHitGun we'll get a lower
+							// result, based on our Burst Penalty
+							pSoldier->bDoBurst++;
+						}
+						// Reset original burst status
+						pSoldier->bDoBurst = saveDoBurst;
+						// Activate CTH bar display
+						gfUICtHBar = TRUE;
+					}
+					else // One "BASE CTH" bar, JA2 1.13 vanilla
+					{
+						//AXP 29.03.2007: Rooftop CtH fix. See below.
+						INT8 bTempTargetLevel = pSoldier->bTargetLevel;
+						pSoldier->bTargetLevel = (INT8) gsInterfaceLevel;
+
+						UINT32 uiHitChance;
+						uiHitChance = CalcChanceToHitGun( pSoldier, sMapPos, pSoldier->aiData.bShownAimTime, pSoldier->bAimShotLocation );
+						// HEADROCK HAM B2.7: CTH approximation?
+						if (gGameExternalOptions.fApproximateCTH)
+						{	
+							uiHitChance = ChanceToHitApproximation( pSoldier, uiHitChance );
+						}
+
+						pSoldier->bTargetLevel = bTempTargetLevel;
+
+						gfUICtHBar = TRUE;
+						gbCtH[0] = (gbCtH[0]+uiHitChance)/2;
+						gbCtHBurstCount = 1;
+					}
+				}
+
+				// HEADROCK HAM B2: Now autofire will show both its starting CTH and the CTH of the last
+				// bullet in the volley.
+				
+				else if(pSoldier->bDoAutofire > 0 && gGameSettings.fOptions[ TOPTION_CTH_CURSOR ])
+				{
+					if (gGameExternalOptions.ubNewCTHBars == 1 || gGameExternalOptions.ubNewCTHBars == 3)
+					{
+						gbCtHBurstCount = 1;
+
+						//AXP 29.03.2007: Rooftop CtH fix. See below.
+						INT8 bTempTargetLevel = pSoldier->bTargetLevel;
+						pSoldier->bTargetLevel = (INT8) gsInterfaceLevel;
+						
+						UINT32 uiHitChance;
+						// Calculate CTH for the first bullet
+						uiHitChance = CalcChanceToHitGun( pSoldier, sMapPos, pSoldier->aiData.bShownAimTime, pSoldier->bAimShotLocation );
+
+						///dddd{very bad code...
+						//if(pSoldier->aiData.bShownAimTime <= REFINE_AIM_1)
+						//	uiHitChance = CalcChanceToHitGun( pSoldier, sMapPos, pSoldier->aiData.bShownAimTime, pSoldier->bAimShotLocation );
+						//else
+							//uiHitChance = CalcChanceToHitGun( pSoldier, sMapPos, 1+pSoldier->aiData.bShownAimTime/2, pSoldier->bAimShotLocation );
+						//dddd}
+						// HEADROCK HAM B2.7: CTH approximation?
+						if (gGameExternalOptions.fApproximateCTH)
+						{	
+							uiHitChance = ChanceToHitApproximation( pSoldier, uiHitChance );
+						}
+
+						// CTH for the first bullet is entered into this array, and later displayed
+						gbCtH[0] = (gbCtH[0]+uiHitChance)/2;
+
+						// Fool the CTH formula into thinking we're already firing the last bullet in the volley,
+						// by artificially altering bDoBurst (which tracks actual burst progression). The CTH formula
+						// calculates Auto Penalty based on bDoBurst - (Autopen * (bDoBurst-1), basically).
+						UINT8 saveDoBurst = pSoldier->bDoBurst;
+						pSoldier->bDoBurst = pSoldier->bDoAutofire;
+						//ddd
+						uiHitChance = CalcChanceToHitGun( pSoldier, sMapPos, pSoldier->aiData.bShownAimTime, pSoldier->bAimShotLocation );
+						///dddd{very bad code...
+						//if(pSoldier->aiData.bShownAimTime <= REFINE_AIM_1)
+						//	uiHitChance = CalcChanceToHitGun( pSoldier, sMapPos, pSoldier->aiData.bShownAimTime, pSoldier->bAimShotLocation );
+						//else
+						//	uiHitChance = CalcChanceToHitGun( pSoldier, sMapPos, 1+pSoldier->aiData.bShownAimTime/2, pSoldier->bAimShotLocation );
+						//dddd}
+
+						// HEADROCK HAM B2.7: CTH approximation?
+						if (gGameExternalOptions.fApproximateCTH)
+						{	
+							uiHitChance = ChanceToHitApproximation( pSoldier, uiHitChance );
+						}
+
+						pSoldier->bTargetLevel = bTempTargetLevel;
+						// Return Burst State to original value
+						pSoldier->bDoBurst = saveDoBurst;
+
+						// CTH for the last bullet is entered into this array and later displayed.
+						gbCtH[1] = (gbCtH[1]+uiHitChance)/2;
+				
+						// Flag to tell the program to draw two CTH bars.
+						gbCtHAutoFire = TRUE;
+						gfUICtHBar = TRUE;
+					}
+				}
+			}
+		}
+		else
+		{
+			//DIGICRAB: Graphical CtH
+			if(gGameSettings.fOptions[ TOPTION_CTH_CURSOR ])
+			{
+				//AXP 29.03.2007: Rooftop CtH fix. Temporarily set soldier targetlevel to the real interface
+				//level (selected with TAB), so the first shot after switching TL is calculated correctly
+				INT8 bTempTargetLevel = pSoldier->bTargetLevel;
+				pSoldier->bTargetLevel = (INT8) gsInterfaceLevel;
+
+				UINT32 uiHitChance;
+				uiHitChance = CalcChanceToHitGun( pSoldier, sMapPos, (INT8)(pSoldier->aiData.bShownAimTime ), pSoldier->bAimShotLocation );
+				// HEADROCK HAM B2.7: CTH approximation?
+				if (gGameExternalOptions.fApproximateCTH)
+				{	
+					uiHitChance = ChanceToHitApproximation( pSoldier, uiHitChance );
+				}
+
+				pSoldier->bTargetLevel = bTempTargetLevel;
+
+				gfUICtHBar = TRUE;
+				gbCtHBurstCount = 1;
+				gbCtH[0] = (gbCtH[0]+uiHitChance)/2;
+			}
+
+		}
+
+
+		//zilpin: aimed burst
+		//This block for aim levels will now be run for everything except full-auto.
+		//This may have unforeseen consequences!
+		//Don't know if grenade launchers, or thrown items, or special cases may now accidentally run this when they should not.
+		//If you are looking for where to implement aiming for full-auto, I beg you, I implore you, please don't perform such abomination.
+		switchVal = pSoldier->aiData.bShownAimTime;
+		if( !pSoldier->bDoAutofire ){
+			switch( switchVal )
+			{
+				case REFINE_AIM_1:
+
+					if ( Item[ usInHand ].usItemClass == IC_THROWING_KNIFE )
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_THROWAIMYELLOW1_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+							usCursor = ACTION_THROWAIM1_UICURSOR;
+						}
+						else
+						{
+							usCursor = ACTION_THROWAIMCANT1_UICURSOR;
+						}
+					}
+					else
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_TARGETAIMYELLOW1_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+							usCursor = ACTION_TARGETAIM1_UICURSOR;
+						}
+						else
+						{
+							usCursor = ACTION_TARGETAIMCANT1_UICURSOR;
+						}
+					}
+					break;
+
+				case REFINE_AIM_2:
+
+					if ( Item[ usInHand ].usItemClass == IC_THROWING_KNIFE )
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_THROWAIMYELLOW2_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+								usCursor =	ACTION_THROWAIM3_UICURSOR;
+						}
+						else
+						{
+								usCursor = ACTION_THROWAIMCANT2_UICURSOR;
+						}
+					}
+					else
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_TARGETAIMYELLOW2_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+								usCursor =	ACTION_TARGETAIM3_UICURSOR;
+						}
+						else
+						{
+								usCursor = ACTION_TARGETAIMCANT2_UICURSOR;
+						}
+					}
+					break;
+
+				case REFINE_AIM_3:
+
+					if ( Item[ usInHand ].usItemClass == IC_THROWING_KNIFE )
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_THROWAIMYELLOW3_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+							usCursor = ACTION_THROWAIM5_UICURSOR;
+						}
+						else
+						{
+							usCursor = ACTION_THROWAIMCANT3_UICURSOR;
+						}
+					}
+					else
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_TARGETAIMYELLOW3_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+							usCursor = ACTION_TARGETAIM5_UICURSOR;
+						}
+						else
+						{
+							usCursor = ACTION_TARGETAIMCANT3_UICURSOR;
+						}
+					}
+					break;
+
+				case REFINE_AIM_4:
+
+					if ( Item[ usInHand ].usItemClass == IC_THROWING_KNIFE )
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_THROWAIMYELLOW4_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+							usCursor = ACTION_THROWAIM7_UICURSOR;
+						}
+						else
+						{
+							usCursor = ACTION_THROWAIMCANT4_UICURSOR;
+						}
+					}
+					else
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_TARGETAIMYELLOW4_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+							usCursor = ACTION_TARGETAIM7_UICURSOR;
+						}
+						else
+						{
+							usCursor = ACTION_TARGETAIMCANT4_UICURSOR;
+						}
+					}
+					break;
+
+				case REFINE_AIM_5:
+
+					if ( Item[ usInHand ].usItemClass == IC_THROWING_KNIFE )
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_THROWAIMFULL_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+							usCursor =	ACTION_THROWAIM9_UICURSOR;
+						}
+						else
+						{
+							usCursor =	ACTION_THROWAIMCANT5_UICURSOR;
+						}
+					}
+					else
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_TARGETAIMFULL_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+							usCursor =	ACTION_TARGETAIM9_UICURSOR;
+						}
+						else
+						{
+							usCursor =	ACTION_TARGETAIMCANT5_UICURSOR;
+						}
+					}
+					break;
+
+				case REFINE_AIM_MID1:
+
+					//usCursor =	ACTION_TARGETAIM2_UICURSOR;
+					if ( Item[ usInHand ].usItemClass == IC_THROWING_KNIFE )
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_THROWAIMYELLOW1_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+							usCursor = ACTION_THROWAIM2_UICURSOR;
+						}
+						else
+						{
+							usCursor = ACTION_THROWAIMCANT1_UICURSOR;
+						}
+					}
+					else
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_TARGETAIMYELLOW1_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+							usCursor = ACTION_TARGETAIM2_UICURSOR;
+						}
+						else
+						{
+							usCursor = ACTION_TARGETAIMCANT1_UICURSOR;
+						}
+					}
+					break;
+
+				case REFINE_AIM_MID2:
+
+					//usCursor = ACTION_TARGETAIM4_UICURSOR;
+					if ( Item[ usInHand ].usItemClass == IC_THROWING_KNIFE )
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_THROWAIMYELLOW3_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+								usCursor =	ACTION_THROWAIM4_UICURSOR;
+						}
+						else
+						{
+								usCursor = ACTION_THROWAIMCANT3_UICURSOR;
+						}
+					}
+					else
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_TARGETAIMYELLOW3_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+								usCursor =	ACTION_TARGETAIM4_UICURSOR;
+						}
+						else
+						{
+								usCursor = ACTION_TARGETAIMCANT3_UICURSOR;
+						}
+					}
+
+					break;
+
+				case REFINE_AIM_MID3:
+
+					//usCursor = ACTION_TARGETAIM6_UICURSOR;
+
+					if ( Item[ usInHand ].usItemClass == IC_THROWING_KNIFE )
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_THROWAIMYELLOW4_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+							usCursor = ACTION_THROWAIM6_UICURSOR;
+						}
+						else
+						{
+							usCursor = ACTION_THROWAIMCANT4_UICURSOR;
+						}
+					}
+					else
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_TARGETAIMYELLOW4_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+							usCursor = ACTION_TARGETAIM6_UICURSOR;
+						}
+						else
+						{
+							usCursor = ACTION_TARGETAIMCANT4_UICURSOR;
+						}
+					}
+
+					break;
+
+				case REFINE_AIM_MID4:
+					//usCursor =	ACTION_TARGETAIM8_UICURSOR;
+					if ( Item[ usInHand ].usItemClass == IC_THROWING_KNIFE )
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_THROWAIMFULL_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+							usCursor = ACTION_THROWAIM8_UICURSOR;
+						}
+						else
+						{
+							usCursor = ACTION_THROWAIMCANT5_UICURSOR;
+						}
+					}
+					else
+					{
+						if ( gfDisplayFullCountRing )
+						{
+							usCursor = ACTION_TARGETAIMFULL_UICURSOR;
+						}
+						else if ( fEnoughPoints )
+						{
+							usCursor = ACTION_TARGETAIM8_UICURSOR;
+						}
+						else
+						{
+							usCursor = ACTION_TARGETAIMCANT5_UICURSOR;
+						}
+					}
+					break;
+			}
+		}
+
+		if ( !fMaxPointLimitHit )
+		{
+			// Remove flash flag!
+			RemoveCursorFlags( gUICursors[ usCursor ].usFreeCursorName, CURSOR_TO_FLASH );
+			RemoveCursorFlags( gUICursors[ usCursor ].usFreeCursorName, CURSOR_TO_PLAY_SOUND );
+
+			if ( gfCannotGetThrough	)
+			{
+				SetCursorSpecialFrame( gUICursors[ usCursor ].usFreeCursorName, 1 );
+			}
+			else
+			{
+				if ( !InRange( pSoldier, sMapPos ) )
+				{
+					// OK, make buddy flash!
+					SetCursorFlags( gUICursors[ usCursor ].usFreeCursorName, CURSOR_TO_FLASH );
+					SetCursorFlags( gUICursors[ usCursor ].usFreeCursorName, CURSOR_TO_PLAY_SOUND );
+				}
+				else
+				{
+					SetCursorSpecialFrame( gUICursors[ usCursor ].usFreeCursorName, 0 );
+				}
+			}
+		}
+		return( (UINT8)usCursor );
 }

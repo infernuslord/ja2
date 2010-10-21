@@ -597,6 +597,27 @@ typedef struct
 	UINT32	usAttachmentDropRate;
 	INT16   iMaxEnemyAttachments;
 
+	//** ddd
+	//enable ext mouse key
+	BOOLEAN fExtMouseKeyEnabled;
+	// for small progress bar
+	BOOLEAN fSmallSizeProgressbar;
+	// stamina multiplier (for all weapons eg knife fist gun
+	INT32 uStaminaHit;
+	//enable ext mouse key
+	BOOLEAN bAltAimEnabled;	
+	BOOLEAN bAimedBurstEnabled;	
+	INT16 uAimedBurstPenalty;
+	BOOLEAN	bWeSeeWhatMilitiaSeesAndViceVersa;
+	BOOLEAN	bAllowWearSuppressor;
+	BOOLEAN	bLazyCivilians;
+	INT16 iChanceSayAnnoyingPhrase;
+	BOOLEAN	bNewTacticalAIBehavior;
+	FLOAT uShotHeadPenalty;
+	FLOAT fShotHeadDivisor;
+	INT16 iPenaltyShootUnSeen;
+
+	FLOAT fOutOfGunRangeOrSight;
 	// WANNE: Always use "prof.dat".
 	BOOLEAN fUseDifficultyBasedProfDat;
 

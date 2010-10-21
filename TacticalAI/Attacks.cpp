@@ -21,6 +21,7 @@
 #include "environment.h"
 #include "lighting.h"
 #include "Sound Control.h"
+#include "message.h"
 #endif
 
 extern INT16 DirIncrementer[8];
@@ -114,6 +115,36 @@ void LoadWeaponIfNeeded(SOLDIERTYPE *pSoldier)
 		pSoldier->inv[HANDPOS].AttachObject( pSoldier,&gTempObject,FALSE);
 	}
 }
+
+// FROM SB JA2005
+void ResetWeaponMode( SOLDIERTYPE * pSoldier )
+{
+	// ATE: Don't do this if in a fire amimation.....
+	if ( gAnimControl[ pSoldier->usAnimState ].uiFlags & ANIM_FIRE )
+	{
+		return;
+	}
+
+	pSoldier->bWeaponMode = WM_NORMAL;
+
+//<DR>
+	pSoldier->aiData.bShownAimTime = REFINE_AIM_1;
+
+	//!pSoldier->aiData.ubBurstAP = 0; //SB reset long burst length
+	//^^^^такого свойства нет, добавлять в солжер контрол.х
+//	gfDisplayFullCountRing = FALSE;
+//	gfDisplayFullCountRingBurst = FALSE;
+//</DR>
+//	pSoldier->bDoBurst = Weapon[Item[pSoldier->inv[HANDPOS].usItem].ubClassIndex].mode[WM_NORMAL].usROF > 0;
+
+//	DirtyMercPanelInterface( pSoldier, DIRTYLEVEL2 );
+//	gfUIForceReExamineCursorData = TRUE;
+
+//	gfShowBurstLength = Weapon[Item[pSoldier->inv[HANDPOS].usItem].ubClassIndex].mode[pSoldier->bWeaponMode].usROF > 0;
+//	gfShowBurstLength = Weapon[Item[pSoldier->inv[HANDPOS].usItem].ubClassIndex].mode[pSoldier->bWeaponMode].ubBullets > 1;
+
+}
+//</SB>
 
 void CalcBestShot(SOLDIERTYPE *pSoldier, ATTACKTYPE *pBestShot, BOOLEAN shootUnseen)
 {
@@ -254,9 +285,11 @@ void CalcBestShot(SOLDIERTYPE *pSoldier, ATTACKTYPE *pBestShot, BOOLEAN shootUns
 
 		if ( TANK( pSoldier ) )
 		{
+			// WANNE: Removed theCalcAimingLevelsAvailableWithAP() left for tanks, because otherwise they do not shoot anymore!
 			// HEADROCK HAM 3.6: Calculation must take into account APBP constants and other aiming modifications!
-			INT8 bAPsLeft = pSoldier->bActionPoints - ubMinAPcost;
-			ubMaxPossibleAimTime = CalcAimingLevelsAvailableWithAP( pSoldier, pOpponent->sGridNo, bAPsLeft );
+			//INT8 bAPsLeft = pSoldier->bActionPoints - ubMinAPcost;
+			//ubMaxPossibleAimTime = CalcAimingLevelsAvailableWithAP( pSoldier, pOpponent->sGridNo, bAPsLeft );
+			ubMaxPossibleAimTime = pSoldier->bActionPoints - ubMinAPcost;
 
 			// always burst
 			if ( ubMaxPossibleAimTime < ubBurstAPs )

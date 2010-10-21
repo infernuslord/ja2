@@ -91,58 +91,58 @@ STR16 gzIMPSkillTraitsTextNewMinor[]=
 //these texts are for help popup windows, describing trait properties
 STR16 gzIMPMajorTraitsHelpTextsAutoWeapons[]=
 {
-	L"+%d%s Chance to Hit with Assault Rifles\n",
-	L"+%d%s Chance to Hit with SMGs\n",
-	L"+%d%s Chance to Hit with LMGs\n",
-	L"-%d%s APs needed to fire with LMGs on autofire or burst mode\n",
-	L"-%d%s APs needed to ready light machine guns\n",
-	L"Auto fire/burst chance to hit penalty is reduced by %d%s\n",
-	L"Reduced chance for shooting unwanted bullets on autofire\n",
+	L"+%d%s к шансу поразить из автомата\n",
+	L"+%d%s к шансу поразить из пистолет-пулемёта\n",
+	L"+%d%s к шансу поразить из ручного пулемёта\n",
+	L"-%d%s ОД на стрельбу из ручного пулемёта в режиме очереди или очереди с отсечкой\n",
+	L"-%d%s ОД на вскидку ручного пулемёта\n",
+	L"Штраф на шанс попадания в автоматическом режиме огня и в режиме очереди понижен на %d%s\n",
+	L"Понижен шанс лишних выстрелов при автоматической стрельбе\n",
 
 };
 STR16 gzIMPMajorTraitsHelpTextsHeavyWeapons[]=
 {
-	L"-%d%s APs needed to fire grenade launchers\n",
-	L"-%d%s APs needed to fire rocket launchers\n",
-	L"+%d%s chance to hit with grenade launchers\n",
-	L"+%d%s chance to hit with rocket launchers\n",
-	L"-%d%s APs needed to fire mortar\n",
-	L"Reduce penalty for mortar CtH by %d%s\n",
-	L"+%d%s damage to tanks with heavy weapons, grenades and explosives\n",
-	L"+%d%s damage to other targets with heavy weapons\n",
+	L"-%d%s ОД на стрельбу из гранатомёта\n",
+	L"-%d%s ОД на стрельбу из реактивного гранатомёта\n",
+	L"+%d%s к шансу поразить из гранатомёта\n",
+	L"+%d%s к шансу поразить из реактивного гранатомёта\n",
+	L"-%d%s ОД на залп из миномёта\n",
+	L"Понижен штраф на шанс попадания при стрельбе с миномёта на %d%s\n",
+	L"+%d%s к урону танкам от поражения из тяжёлого оружия, гранат и взрывчатки\n",
+	L"+%d%s к урону иным целям из тяжёлого оружия\n",
 
 };
 STR16 gzIMPMajorTraitsHelpTextsSniper[]=
 {
-	L"+%d%s Chance to Hit with Sniper Rifles\n",
-	L"-%d%s effective range to target with all weapons\n",
-	L"+%d%s aiming bonus per aim click (except for handguns)\n",
-	L"+%d%s damage on shot",
-	L" plus",
-	L" per every aim click",
-	L" after first",
-	L" after second",
-	L" after third",
-	L" after fourth",
-	L" after fifth",
-	L" after sixth",
-	L" after seventh",
-	L"-%d%s APs needed to chamber a round with bolt-action rifles \n",
-	L"Adds one more aim click for rifle-type guns\n",
-	L"Adds %d more aim clicks for rifle-type guns\n",
+	L"+%d%s к шансу попасть из снайперской винтовки\n",
+	L"-%d%s эффективной дальности до цели для всего вида оружия\n",	//-%d%s effective range to target with all weapons
+	L"+%d%s к бонусу прицеливания на каджый щелчок мыши (особенно к пистолетам)\n",
+	L"+%d%s к повреждению от выстрела",	//+%d%s damage on shot
+	L" плюс",
+	L" с каждым кликом",
+	L" после первого",
+	L" после второго",
+	L" после третьего",
+	L" после четвёртого",
+	L" после пятого",
+	L" после шестого",
+	L" после седьмого",
+	L"-%d%s ОД на передёргивание затвора у полуавтоматических винтовок\n",
+	L"Плюс 1 клик-прицеливания к оружию типа винтовки\n",
+	L"Плюс %d клик-прицеливания к оружию типа винтовки\n",
 
 };
 STR16 gzIMPMajorTraitsHelpTextsRanger[]=
 {
-	L"+%d%s Chance to Hit with Rifles\n",
-	L"+%d%s Chance to Hit with Shotguns\n",
-	L"-%d%s APs needed to pump Shotguns\n",
-	L"+%d%s group travelling speed between sectors if traveling by foot\n",
-	L"+%d%s group travelling speed between sectors if traveling in vehicle (except helicopter)\n",
-	L"-%d%s less energy spent for travelling between sectors\n",
-	L"-%d%s weather penalties\n",
-	L"+%d%s camouflage effectiveness\n",
-	L"-%d%s worn out speed of camouflage by water or time\n",
+	L"+%d%s к шансу поразить из винтовки\n",
+	L"+%d%s к шансу поразить из ружья\n",
+	L"-%d%s ОД на перезарядку ружья\n",
+	L"+%d%s к скорости передвижения группы между секторами, если идти пешком\n",
+	L"+%d%s к скорости передвижения группы между секторами, \nесли передвигаться на транспорте (в особенности на вертолёте)\n",
+	L"-%d%s к затрате энергии при переходе между секторами\n",	//меньше тратит сил
+	L"-%d%s на штраф погодных условий\n",
+	L"+%d%s к эффективности камуфляжа\n",
+	L"-%d%s на скорость ухудшения камуфляжа от воды и времени\n",
 
 };
 STR16 gzIMPMajorTraitsHelpTextsGunslinger[]=

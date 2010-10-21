@@ -40,8 +40,9 @@
 
 #include "connect.h"
 
-UINT8	NUMBER_OF_MERCS;
-UINT8	LAST_MERC_ID;
+UINT8	NUMBER_OF_MERCS = 0;
+UINT8	LAST_MERC_ID = -1;
+UINT8 NUMBER_OF_BAD_MERCS = -1;
 
 #define		MERC_TEXT_FONT									FONT12ARIAL
 #define		MERC_TEXT_COLOR									FONT_MCOLOR_WHITE
@@ -132,52 +133,21 @@ UINT8	LAST_MERC_ID;
 #define		MERC__AMOUNT_OF_MONEY_FOR_BUBBA								6000
 #define		MERC__DAY_WHEN_BUBBA_CAN_BECOME_AVAILABLE			10
 
-
-enum
-{
-	MERC_ARRIVES_BUBBA,
-	MERC_ARRIVES_LARRY,
-	MERC_ARRIVES_NUMB,
-#ifdef JA2UB
-	//MERC_ARRIVES_TEX,
-	//MERC_ARRIVES_BIGGENS,
-#else
-	MERC_ARRIVES_TEX,
-	MERC_ARRIVES_BIGGENS,
-#endif
-	MERC_ARRIVES_COUGAR,
-	MERC_ARRIVES_GASTON,
-	MERC_ARRIVES_STOGIE,
-
-	NUM_MERC_ARRIVALS,
-};
-
-typedef struct
-{
-	UINT16	usMoneyPaid;
-	UINT16	usDay;
-	UINT8		ubMercArrayID;
-
-}	CONTITION_FOR_MERC_AVAILABLE;
-
-CONTITION_FOR_MERC_AVAILABLE gConditionsForMercAvailability[ NUM_MERC_ARRIVALS ] =
+CONTITION_FOR_MERC_AVAILABLE_TEMP gConditionsForMercAvailabilityTemp[ NUM_PROFILES ];
+CONTITION_FOR_MERC_AVAILABLE gConditionsForMercAvailability[ NUM_PROFILES ]; //NUM_MERC_ARRIVALS ]; //=
+/*
 {
 	5000, 8,	6,	//BUBBA
 	10000, 15, 7,	//Larry
 	15000, 20, 9,	//Numb
-#ifdef JA2UB
-//	16000, 21, 10,	//Tex
-//	18000, 23, 11,	//Biggens
-#else
 	16000, 21, 10,	//Tex
 	18000, 23, 11,	//Biggens
-#endif
 	20000, 25, 12,	//Cougar
 	25000, 30, 13,	//Gaston
 	26000, 31, 14,	//Stogie
 
 };
-
+*/
 
 enum
 {
@@ -208,7 +178,7 @@ UINT32		guiMercBackGround;
 UINT32		guiMercVideoFaceBackground;
 UINT32		guiMercVideoPopupBackground;
 
-UINT8			gubMercArray[ MAX_NUMBER_OF_MERCS ];
+UINT8			gubMercArray[ NUM_PROFILES ]; //MAX_NUMBER_OF_MERCS
 UINT8			gubCurMercIndex;
 
 INT32			iMercPopUpBox = -1;
@@ -312,6 +282,8 @@ MOUSE_REGION		gMercSiteSubTitleMouseRegion;
 void MercSiteSubTitleRegionCallBack(MOUSE_REGION * pRegion, INT32 iReason );
 
 
+BOOLEAN LoadNewMercsFromLoadGameFile( HWFILE hFile );
+BOOLEAN SaveNewMercsToSaveGameFile( HWFILE hFile );
 
 
 //*******************************
@@ -360,22 +332,65 @@ INT8			IsSpeckQuoteImportantQuote( UINT32 uiQuoteNum );
 #endif
 //ppp
 
+BOOLEAN SaveNewMercsToSaveGameFile( HWFILE hFile )
+{
+	UINT32	uiNumBytesWritten;
+
+	FileWrite( hFile, &gConditionsForMercAvailability, sizeof( gConditionsForMercAvailability), &uiNumBytesWritten );
+	if( uiNumBytesWritten != sizeof( gConditionsForMercAvailability ) )
+	{
+		return( FALSE );
+	}
+
+	return( TRUE );
+}
+
+BOOLEAN LoadNewMercsFromLoadGameFile( HWFILE hFile )
+{
+	UINT32	uiNumBytesRead;
+
+	FileRead( hFile, &gConditionsForMercAvailability, sizeof( gConditionsForMercAvailability ), &uiNumBytesRead );
+	if( uiNumBytesRead != sizeof( gConditionsForMercAvailability ) )
+	{
+		return( FALSE );
+	}
+
+	return( TRUE );
+}
 
 
 void GameInitMercs()
 {
+
+UINT8 i;
+
+NUMBER_OF_MERCS = 0;
+LAST_MERC_ID = -1;
+NUMBER_OF_BAD_MERCS = -1;
+
+	for(i=0; i<NUM_PROFILES; i++)
+	{
+		if ( gConditionsForMercAvailability[i].ProfilId != 0 )
+		{
+			NUMBER_OF_MERCS = NUMBER_OF_MERCS + 1;
+			LAST_MERC_ID = LAST_MERC_ID + 1;
+			gubMercArray[ i ] = gConditionsForMercAvailability[i].ProfilId;
+		}
+	}
+	
+	for(i=0; i<NUM_PROFILES; i++)
+	{
+		if ( gConditionsForMercAvailability[i].StartMercsAvailable == TRUE && gConditionsForMercAvailability[i].NewMercsAvailable == FALSE )
+			NUMBER_OF_BAD_MERCS = NUMBER_OF_BAD_MERCS + 1;
+	}
+	
 //	for(i=0; i<NUMBER_OF_MERCS; i++)
 //		gubMercArray[ i ] = i+BIFF;
 
 	// WANNE - MP: Initialize the the variables for single player
-#ifdef JA2UB
-	NUMBER_OF_MERCS = 13;//15;
-	LAST_MERC_ID = 12; //14
-#else
-	NUMBER_OF_MERCS = 15;
-	LAST_MERC_ID = 14;
-#endif
-
+//	NUMBER_OF_MERCS = 15;
+//	LAST_MERC_ID = 14;
+/*
 	//can now be out of order
 	gubMercArray[ 0 ] = BIFF;
 	gubMercArray[ 1 ] = HAYWIRE;
@@ -387,26 +402,6 @@ void GameInitMercs()
 	gubMercArray[ 7 ] = LARRY_NORMAL;		//if changing this values, change in GetMercIDFromMERCArray()
 	gubMercArray[ 8 ] = LARRY_DRUNK;		//if changing this values, change in GetMercIDFromMERCArray()
 	gubMercArray[ 9 ] = NUMB;
-#ifdef JA2UB
-	//gubMercArray[ 10 ] = TEX;
-	//gubMercArray[ 11 ] = BIGGENS;
-	gubMercArray[ 10 ] = 48;//COUGAR;
-	gubMercArray[ 11 ] = 58;//GASTON;
-	gubMercArray[ 12 ] = 59;//STOGIE;
-	gubMercArray[ 13 ] = 57;//hayden
-	gubMercArray[ 14 ] = 58;
-	gubMercArray[ 15 ] = 59;
-	gubMercArray[ 16 ] = 60;
-	gubMercArray[ 17 ] = 61;
-	gubMercArray[ 18 ] = 63;
-	gubMercArray[ 19 ] = 66;
-	gubMercArray[ 20 ] = 67;
-	gubMercArray[ 21 ] = 68;
-	gubMercArray[ 22 ] = 69;
-	gubMercArray[ 23 ] = 70;
-	gubMercArray[ 24 ] = 72;
-	gubMercArray[ 25 ] = 64;
-#else
 	gubMercArray[ 10 ] = TEX;
 	gubMercArray[ 11 ] = BIGGENS;
 	gubMercArray[ 12 ] = COUGAR;
@@ -425,8 +420,7 @@ void GameInitMercs()
 	gubMercArray[ 25 ] = 70;
 	gubMercArray[ 26 ] = 72;		
 	gubMercArray[ 27 ] = 64;
-#endif
-
+*/
 	LaptopSaveInfo.gubPlayersMercAccountStatus = MERC_NO_ACCOUNT;
 	gubCurMercIndex = 0;
 
@@ -1094,13 +1088,33 @@ void DailyUpdateOfMercSite( UINT16 usDate)
 UINT8 GetMercIDFromMERCArray(UINT8 ubMercID)
 {
 	//if it is one of the regular MERCS
+	
+	if ( gConditionsForMercAvailability[ ubMercID ].uiIndex == ubMercID && gConditionsForMercAvailability[ ubMercID ].Drunk == FALSE && gConditionsForMercAvailability[ ubMercID ].DrunkID == 0 ) 
+	{
+		return( gubMercArray[ ubMercID ] );
+	}	
+	
+	/*
 	if( ubMercID <= 6 )
 	{
 		return( gubMercArray[ ubMercID ] );
 	}
-
+	*/
+	
 	//if it is Larry, determine if it Stoned larry or straight larry
-	else if( ( ubMercID == 7 ) || ( ubMercID == 8 ) )
+	else if( gConditionsForMercAvailability[ ubMercID ].uiIndex == ubMercID && gConditionsForMercAvailability[ ubMercID ].Drunk == TRUE && gConditionsForMercAvailability[ ubMercID ].DrunkID > 0 )
+	{
+		if ( HasLarryRelapsed() )
+		{
+			return( gubMercArray[ gConditionsForMercAvailability[ ubMercID ].DrunkID ] );
+		}
+		else
+		{
+			return( gubMercArray[ gConditionsForMercAvailability[ ubMercID ].uiIndex ] );
+		}
+	}
+	
+	/*else if( ( ubMercID == 7 ) || ( ubMercID == 8 ) )
 	{
 		if ( HasLarryRelapsed() )
 		{
@@ -1111,9 +1125,9 @@ UINT8 GetMercIDFromMERCArray(UINT8 ubMercID)
 			return( gubMercArray[ 7 ] );
 		}
 	}
-
+	*/
 	//if it is one of the newer mercs
-	else if( ubMercID <= LAST_MERC_ID )
+	else if( ubMercID <= NUM_PROFILES ) //LAST_MERC_ID )
 	{
 		return( gubMercArray[ ubMercID ] );
 	}
@@ -2332,7 +2346,7 @@ BOOLEAN IsMercMercAvailable( UINT8 ubMercID )
 	UINT8	cnt;
 
 	//loop through the array of mercs
-	for( cnt=0; cnt<LaptopSaveInfo.gubLastMercIndex; cnt++ )
+	for( cnt=0; cnt<NUM_PROFILES; cnt++ ) //LaptopSaveInfo.gubLastMercIndex; cnt++ )
 	{
 		//if this is the merc
 		if( GetMercIDFromMERCArray( cnt ) == ubMercID )
@@ -2726,12 +2740,15 @@ BOOLEAN AreAnyOfTheNewMercsAvailable()
 	if( LaptopSaveInfo.fNewMercsAvailableAtMercSite )
 		return( FALSE );
 
-	for(i=(LARRY_NORMAL-BIFF); i<=LaptopSaveInfo.gubLastMercIndex; i++)
+	//for(i=(LARRY_NORMAL-BIFF); i<=LaptopSaveInfo.gubLastMercIndex; i++)
+	for(i=0; i<=NUM_PROFILES; i++)
 	{
-		ubMercID = GetMercIDFromMERCArray( i );
-
-		if( IsMercMercAvailable( ubMercID ) )
-			return( TRUE );
+		if ( gConditionsForMercAvailability[i].NewMercsAvailable == FALSE ) // off && gProfilesMERC[i].ProfilId != 0 )
+		{
+			ubMercID = GetMercIDFromMERCArray( i );
+			if( IsMercMercAvailable( ubMercID ) ) 
+				return( TRUE );
+		}
 	}
 
 	return( FALSE );
@@ -2741,10 +2758,34 @@ void ShouldAnyNewMercMercBecomeAvailable()
 {
 	BOOLEAN fNewMercAreAvailable = FALSE;
 
+	UINT8 i;
+	BOOLEAN Stop = FALSE;
+	
 	//Kaiden: Added this if test to make sure that the "New Mercs Available"
 	// e-mail doesn't show up and no unneccessary checks are made when you
 	// have the ALL_MERCS_AT_MERC set to TRUE in the INI file.
+	
 	if(!gGameExternalOptions.fAllMercsAvailable)
+	{
+		for(i=0; i<NUM_PROFILES; i++)
+		{
+			if ( Stop == FALSE )
+			{	
+			if ( gConditionsForMercAvailability[i].ProfilId != 0 && gConditionsForMercAvailability[i].NewMercsAvailable == FALSE && gConditionsForMercAvailability[i].StartMercsAvailable == FALSE )
+			{
+				
+				if( CanMercBeAvailableYet( gConditionsForMercAvailability[i].uiIndex ) )
+					{
+						fNewMercAreAvailable = TRUE;
+						Stop = TRUE;
+					}
+			}
+			}
+		}	
+	}
+	
+	
+/*	if(!gGameExternalOptions.fAllMercsAvailable)
 		{
 			//for bubba
 			//	if( GetMercIDFromMERCArray( LaptopSaveInfo.gubLastMercIndex ) == GUMPY )
@@ -2804,20 +2845,20 @@ void ShouldAnyNewMercMercBecomeAvailable()
 			{
 				fNewMercAreAvailable = TRUE;
 			}
-
+*/
 			//if there is a new merc available
 			if( fNewMercAreAvailable )
 			{
 				//Set up an event to add the merc in x days
 				AddStrategicEvent( EVENT_MERC_SITE_NEW_MERC_AVAILABLE, GetMidnightOfFutureDayInMinutes( 1 ) + 420 + Random( 3 * 60 ), 0 );
 			}
-		}
+	//	}
 }
 
 BOOLEAN CanMercBeAvailableYet( UINT8 ubMercToCheck )
 {
 	//if the merc is already available
-	if( gConditionsForMercAvailability[ ubMercToCheck ].ubMercArrayID <= LaptopSaveInfo.gubLastMercIndex )
+	if( gConditionsForMercAvailability[ ubMercToCheck ].ubMercArrayID ) //<= LaptopSaveInfo.gubLastMercIndex )
 		return( FALSE );
 
 	//if the merc is already hired
@@ -2837,8 +2878,45 @@ BOOLEAN CanMercBeAvailableYet( UINT8 ubMercToCheck )
 void NewMercsAvailableAtMercSiteCallBack( )
 {
 	BOOLEAN fSendEmail=FALSE;
+	
+	BOOLEAN Stop = FALSE;
+	UINT8 i;
+
+		for(i=0; i<NUM_PROFILES; i++)
+		{
+		
+		if ( Stop == FALSE )
+		{			
+		if ( gConditionsForMercAvailability[i].ProfilId != 0 && gConditionsForMercAvailability[i].NewMercsAvailable == FALSE && gConditionsForMercAvailability[i].StartMercsAvailable == FALSE )
+			{
+				gConditionsForMercAvailability[i].NewMercsAvailable = TRUE;
+				
+				if( CanMercBeAvailableYet( gConditionsForMercAvailability[i].uiIndex ) )
+					{
+					
+					if ( gConditionsForMercAvailability[ gConditionsForMercAvailability[i].uiIndex ].Drunk == TRUE )
+					{
+						LaptopSaveInfo.gubLastMercIndex = gConditionsForMercAvailability[gConditionsForMercAvailability[i].DrunkID].uiIndex;
+					}
+					else
+					{
+						LaptopSaveInfo.gubLastMercIndex++;
+					}
+
+				//	LaptopSaveInfo.gubLastMercIndex++;
+					gConditionsForMercAvailability[gConditionsForMercAvailability[i].uiIndex].NewMercsAvailable = TRUE;
+					LaptopSaveInfo.ubLastMercAvailableId = gConditionsForMercAvailability[i].uiIndex;
+					gConditionsForMercAvailability[i].StartMercsAvailable = TRUE;
+					fSendEmail = TRUE;
+					Stop = TRUE;
+					}
+			}
+		}
+	}
+		
 //	if( GetMercIDFromMERCArray( LaptopSaveInfo.gubLastMercIndex ) == BUBBA )
-	{
+		
+/*	{
 		if( CanMercBeAvailableYet( MERC_ARRIVES_BUBBA ) )
 		{
 			LaptopSaveInfo.gubLastMercIndex++;
@@ -2910,6 +2988,7 @@ void NewMercsAvailableAtMercSiteCallBack( )
 		LaptopSaveInfo.ubLastMercAvailableId = MERC_ARRIVES_STOGIE;
 		fSendEmail = TRUE;
 	}
+*/
 #ifdef JA2UB
 //no UB
 #else

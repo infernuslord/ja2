@@ -106,7 +106,15 @@ INT32		giMenuAnchorX, giMenuAnchorY;
 
 
 #define PROG_BAR_START_X			5
-#define PROG_BAR_START_Y			2
+//*ddd
+//#define PROG_BAR_START_Y			2
+
+//**ddd{ 
+//поставить дефайн в 0 если использовать большой прогресс бар
+//#define fSmallSizeProgressbar 1
+INT32 HEIGHT_PROGRESSBAR, PROG_BAR_START_Y;
+//ddd}
+
 
 BOOLEAN	gfProgBarActive		= FALSE;
 UINT8		gubProgNumEnemies		= 0;
@@ -280,6 +288,18 @@ BOOLEAN InitializeTacticalInterface(	)
 		InitOldInventorySystem();
 		InitializeSMPanelCoordsOld();
 	}
+
+//*ddd{ 
+	if( gGameExternalOptions.fSmallSizeProgressbar )
+	{
+		HEIGHT_PROGRESSBAR	= 7;
+		PROG_BAR_START_Y	= 0;
+	}
+	else{
+		HEIGHT_PROGRESSBAR	= 20;
+		PROG_BAR_START_Y	= 2;
+	}
+//*ddd}
 
 /*	OK i need to initialize coords here
  *	Isnt it cool
@@ -1800,11 +1820,10 @@ void DrawSelectedUIAboveGuy( UINT16 usSoldierID )
 			mprintf( sX, sY, NameStr );
 		}
 		}
-#ifdef JA2UB
-		if ( pSoldier->ubProfile < FIRST_RPC /* || pSoldier->ubProfile >= GASTON */ || RPC_RECRUITED( pSoldier ) || AM_AN_EPC( pSoldier ) || ( pSoldier->flags.uiStatusFlags & SOLDIER_VEHICLE ) )
-#else
-		if ( pSoldier->ubProfile < FIRST_RPC || pSoldier->ubProfile >= GASTON || RPC_RECRUITED( pSoldier ) || AM_AN_EPC( pSoldier ) || ( pSoldier->flags.uiStatusFlags & SOLDIER_VEHICLE ) )
-#endif
+
+//		if ( pSoldier->ubProfile < FIRST_RPC || pSoldier->ubProfile >= GASTON || RPC_RECRUITED( pSoldier ) || AM_AN_EPC( pSoldier ) || ( pSoldier->flags.uiStatusFlags & SOLDIER_VEHICLE ) )
+		//new profiles by Jazz	
+		if ( gProfilesIMP[pSoldier->ubProfile].ProfilId == pSoldier->ubProfile || gProfilesAIM[pSoldier->ubProfile].ProfilId == pSoldier->ubProfile || gProfilesMERC[pSoldier->ubProfile].ProfilId == pSoldier->ubProfile || RPC_RECRUITED( pSoldier ) || AM_AN_EPC( pSoldier ) || ( pSoldier->flags.uiStatusFlags & SOLDIER_VEHICLE ))			
 		{
 			// Adjust for bars!
 
@@ -3312,10 +3331,40 @@ void CreateTopMessage( UINT32 uiSurface, UINT8 ubType, STR16 psString )
 	FLOAT		dNumStepsPerEnemy, dLength, dCurSize;
 
 	INT16		iProgBarLength = SCREEN_WIDTH - 13;
-
+	//*ddd{
+	STR fn;
+	//*ddd}
 	memset( &VObjectDesc, 0, sizeof( VObjectDesc ) );
 	VObjectDesc.fCreateFlags = VOBJECT_CREATE_FROMFILE;
 
+	//* ddd {
+	switch (iResolution)
+	{
+	case 0:	//640
+			fn = "INTERFACE\\rect.sti";
+		break;
+	case 1:	//800
+			if (gGameExternalOptions.fSmallSizeProgressbar)
+				fn = "INTERFACE\\rect_800x600Thin.sti";
+			else
+				fn = "INTERFACE\\rect_800x600.sti";
+		break;
+	case 2:
+			fn = "INTERFACE\\rect_1024x768.sti";
+		break;
+	default:
+			AssertMsg( 0, "Invalid resolution");
+			return;
+		break;
+	}//switch
+	FilenameForBPP(fn, VObjectDesc.ImageFile);
+	if( !AddVideoObject( &VObjectDesc, &uiBAR ) )	{ sprintf(fn, "Missing %s", fn);
+		AssertMsg(0, fn );	}
+	//*ddd }
+
+
+	//* crappy code commented ddd
+	/*
 	if (iResolution == 0)
 	{
 	FilenameForBPP("INTERFACE\\rect.sti", VObjectDesc.ImageFile);
@@ -3330,11 +3379,38 @@ void CreateTopMessage( UINT32 uiSurface, UINT8 ubType, STR16 psString )
 	}
 
 	if( !AddVideoObject( &VObjectDesc, &uiBAR ) )
-		AssertMsg(0, "Missing INTERFACE\\rect.sti" );
+		 AssertMsg(0, "Missing INTERFACE\\rect.sti" );
+	*/
 
 	//if ( gGameOptions.fTurnTimeLimit )
 	//{
 
+	//* ddd {
+	switch (iResolution)
+	{
+	case 0:	//640
+			fn = "INTERFACE\\timebargreen.sti";
+		break;
+	case 1:	//800
+		if (gGameExternalOptions.fSmallSizeProgressbar)
+			fn = "INTERFACE\\timebargreen_800x600Thin.sti";
+		else
+			fn = "INTERFACE\\timebargreen_800x600.sti";
+		break;
+	case 2:
+			fn = "INTERFACE\\timebargreen_1024x768.sti";
+		break;
+	default:
+			AssertMsg( 0, "Invalid resolution");
+			return;
+		break;
+	}//switch
+	FilenameForBPP(fn, VObjectDesc.ImageFile);
+	if( !AddVideoObject( &VObjectDesc, &uiPLAYERBAR ) ){ sprintf(fn, "Missing %s", fn);
+		AssertMsg(0, fn );	}
+	//*ddd }
+
+	/* commented
 	if (iResolution == 0)
 	{
 		FilenameForBPP("INTERFACE\\timebargreen.sti", VObjectDesc.ImageFile);
@@ -3346,6 +3422,10 @@ void CreateTopMessage( UINT32 uiSurface, UINT8 ubType, STR16 psString )
 		FilenameForBPP("INTERFACE\\timebargreen_800x600.sti", VObjectDesc.ImageFile);
 		if( !AddVideoObject( &VObjectDesc, &uiPLAYERBAR ) )
 			AssertMsg(0, "Missing INTERFACE\\timebargreen_800x600.sti" );
+		if (SMALL_SIZE_PROGRESSBAR)
+			fn = "INTERFACE\\timebargreen_800x600Thin.sti";
+		else
+			fn = "INTERFACE\\timebargreen_800x600.sti";
 	}
 	else if (iResolution == 2)
 	{
@@ -3353,7 +3433,40 @@ void CreateTopMessage( UINT32 uiSurface, UINT8 ubType, STR16 psString )
 		if( !AddVideoObject( &VObjectDesc, &uiPLAYERBAR ) )
 			AssertMsg(0, "Missing INTERFACE\\timebargreen_1024x768.sti" );
 	}
+	else
+	{
+		AssertMsg( 0, "Invalid resolution");
+		return;
+	}
 
+	*/
+
+	//* ddd {
+	switch (iResolution)
+	{
+	case 0:	//640
+			fn = "INTERFACE\\timebaryellow.sti";
+		break;
+	case 1:	//800
+		if (gGameExternalOptions.fSmallSizeProgressbar)
+			fn = "INTERFACE\\timebaryellow_800x600Thin.sti";
+		else
+			fn = "INTERFACE\\timebaryellow_800x600.sti";
+		break;
+	case 2:
+			fn = "INTERFACE\\timebaryellow_1024x768.sti";
+		break;
+	default:
+			AssertMsg( 0, "Invalid resolution");
+			return;
+		break;
+	}//switch
+	FilenameForBPP(fn, VObjectDesc.ImageFile);
+	if( !AddVideoObject( &VObjectDesc, &uiINTBAR ) ){ sprintf(fn, "Missing %s", fn);
+		AssertMsg(0, fn );	}		
+	//*ddd }
+
+	/*
 	if (iResolution == 0)
 	{
 	FilenameForBPP("INTERFACE\\timebaryellow.sti", VObjectDesc.ImageFile);
@@ -3368,13 +3481,26 @@ void CreateTopMessage( UINT32 uiSurface, UINT8 ubType, STR16 psString )
 	}
 	else if (iResolution == 2)
 	{
-		FilenameForBPP("INTERFACE\\timebaryellow_1024x768.sti", VObjectDesc.ImageFile);
-		if( !AddVideoObject( &VObjectDesc, &uiINTBAR ) )
-			AssertMsg(0, "Missing INTERFACE\\timebaryellow_1024x768.sti" );
+		//*ddd FilenameForBPP("INTERFACE\\timebaryellow_1024x768.sti", VObjectDesc.ImageFile);
+		//*ddd if( !AddVideoObject( &VObjectDesc, &uiINTBAR ) )
+		//*ddd	AssertMsg(0, "Missing INTERFACE\\timebaryellow_1024x768.sti" );
+		fn = "INTERFACE\\timebaryellow_1024x768.sti";
 	}
+	else
+	{
+		AssertMsg( 0, "Invalid resolution");
+		return;
+	}
+	
+	FilenameForBPP(fn, VObjectDesc.ImageFile);
+	if( !AddVideoObject( &VObjectDesc, &uiINTBAR ) )
+		AssertMsg(0, String( "Missing %s", VObjectDesc.ImageFile) );
+	*/
 
 	// Change dest buffer
-	SetFontDestBuffer( uiSurface , 0, 0, SCREEN_WIDTH , 20, FALSE );
+	//*ddd
+	//SetFontDestBuffer( uiSurface , 0, 0, SCREEN_WIDTH , 20, FALSE );
+	SetFontDestBuffer( uiSurface , 0, 0, SCREEN_WIDTH , HEIGHT_PROGRESSBAR, FALSE );
 	SetFont( TINYFONT1 );
 
 	switch( ubType )
@@ -3399,7 +3525,7 @@ void CreateTopMessage( UINT32 uiSurface, UINT8 ubType, STR16 psString )
 			BltVideoObjectFromIndex( uiSurface, uiINTBAR, 0, 0, 0, VO_BLT_SRCTRANSPARENCY, NULL );
 
 			SetFontBackground( FONT_MCOLOR_BLACK );
-			SetFontForeground( FONT_MCOLOR_BLACK );
+			SetFontForeground( FONT_MCOLOR_WHITE );
 			SetFontShadow( NO_SHADOW );
 			uiBarToUseInUpDate = uiINTBAR;
 			break;
@@ -3416,7 +3542,7 @@ void CreateTopMessage( UINT32 uiSurface, UINT8 ubType, STR16 psString )
 			//	BltVideoObjectFromIndex( uiSurface, uiPLAYERBAR, 13, 0, 0, VO_BLT_SRCTRANSPARENCY, NULL );
 			//}
 			SetFontBackground( FONT_MCOLOR_BLACK );
-			SetFontForeground( FONT_MCOLOR_BLACK );
+			SetFontForeground( FONT_MCOLOR_WHITE );
 			SetFontShadow( NO_SHADOW );
 			uiBarToUseInUpDate = uiPLAYERBAR;
 			break;
@@ -3541,7 +3667,12 @@ void CreateTopMessage( UINT32 uiSurface, UINT8 ubType, STR16 psString )
 	}
 
 	// Draw text....
-	FindFontCenterCoordinates( SCREEN_WIDTH/2, 7, 1, 1, psString, TINYFONT1, &sX, &sY );
+	//*ddd FindFontCenterCoordinates( SCREEN_WIDTH/2, 7, 1, 1, psString, TINYFONT1, &sX, &sY );
+	if(gGameExternalOptions.fSmallSizeProgressbar)
+		FindFontCenterCoordinates( SCREEN_WIDTH/2, 2, 1, 1, psString, TINYFONT1, &sX, &sY );
+	else
+		FindFontCenterCoordinates( SCREEN_WIDTH/2, 7, 1, 1, psString, TINYFONT1, &sX, &sY );
+
 	mprintf( sX, sY, psString );
 
 	// Change back...
@@ -3691,7 +3822,8 @@ void HandleTopMessages( )
 		}
 
 		// Set redner viewport value
-		gsVIEWPORT_WINDOW_START_Y = 20;
+		//* ddd gsVIEWPORT_WINDOW_START_Y = 20;
+		gsVIEWPORT_WINDOW_START_Y = HEIGHT_PROGRESSBAR;
 
 		// Check if we have scrolled...
 		if ( gTopMessage.sWorldRenderX != gsRenderCenterX || gTopMessage.sWorldRenderY != gsRenderCenterY )
@@ -3706,9 +3838,15 @@ void HandleTopMessages( )
 
 			// Redner!
 			BltFx.SrcRect.iLeft = 0;
-			BltFx.SrcRect.iTop	= 20 - gTopMessage.bYPos;
+			//* ddd BltFx.SrcRect.iTop	= 20 - gTopMessage.bYPos;
+			if(gGameExternalOptions.fSmallSizeProgressbar)
+				BltFx.SrcRect.iTop  = 0;
+			else
+				BltFx.SrcRect.iTop  = 20 - gTopMessage.bYPos;
+
 			BltFx.SrcRect.iRight = SCREEN_WIDTH ;
-			BltFx.SrcRect.iBottom = 20;
+			//*ddd BltFx.SrcRect.iBottom = 20;
+			BltFx.SrcRect.iBottom = HEIGHT_PROGRESSBAR;
 
 			BltVideoSurface( FRAME_BUFFER, gTopMessage.uiSurface, 0,
 																		0, 0,
@@ -3716,15 +3854,22 @@ void HandleTopMessages( )
 
 			// Save to save buffer....
 			BltFx.SrcRect.iLeft = 0;
-			BltFx.SrcRect.iTop	= 0;
+			//* ddd BltFx.SrcRect.iTop	= 0;
+			if(gGameExternalOptions.fSmallSizeProgressbar)
+				BltFx.SrcRect.iTop  = 0;
+			else
+				BltFx.SrcRect.iTop  = 20 - gTopMessage.bYPos;
+
 			BltFx.SrcRect.iRight = SCREEN_WIDTH;
-			BltFx.SrcRect.iBottom = 20;
+			//*ddd BltFx.SrcRect.iBottom = 20;
+			BltFx.SrcRect.iBottom = HEIGHT_PROGRESSBAR;
 
 			BltVideoSurface( guiSAVEBUFFER, FRAME_BUFFER, 0,
 																		0, 0,
 																		VS_BLT_SRCSUBRECT, &BltFx );
 
-			InvalidateRegion( 0, 0, SCREEN_WIDTH, 20 );
+			//*ddd InvalidateRegion( 0, 0, SCREEN_WIDTH, 20 );
+			InvalidateRegion( 0, 0, SCREEN_WIDTH, HEIGHT_PROGRESSBAR );
 
 			gfTopMessageDirty = FALSE;
 		}

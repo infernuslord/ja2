@@ -322,15 +322,27 @@ BOOLEAN InitMainMenu( )
 
 	if (iResolution == 0)
 	{
-		FilenameForBPP("LOADSCREENS\\MainMenuBackGround.sti", VObjectDesc.ImageFile);
+		FilenameForBPP("INTERFACE\\MM24Background.sti", VObjectDesc.ImageFile);
+		if ( !FileExists(VObjectDesc.ImageFile) )
+		{		
+		FilenameForBPP("Loadscreens\\MainMenuBackGround.sti", VObjectDesc.ImageFile);		
+		}	
 	}
 	else if (iResolution == 1)
 	{
-		FilenameForBPP("LOADSCREENS\\MainMenuBackGround_800x600.sti", VObjectDesc.ImageFile);
+		FilenameForBPP("INTERFACE\\MM24Background_800x600.sti", VObjectDesc.ImageFile);
+		if ( !FileExists(VObjectDesc.ImageFile) )
+		{
+		FilenameForBPP("Loadscreens\\MainMenuBackGround_800x600.sti", VObjectDesc.ImageFile);		
+		}
 	}
 	else if (iResolution == 2)
 	{
-		FilenameForBPP("LOADSCREENS\\MainMenuBackGround_1024x768.sti", VObjectDesc.ImageFile);
+		FilenameForBPP("INTERFACE\\MM24Background_1024x768.sti", VObjectDesc.ImageFile);	
+		if ( !FileExists(VObjectDesc.ImageFile) )
+		{
+		FilenameForBPP("Loadscreens\\MainMenuBackGround_1024x768.sti", VObjectDesc.ImageFile);		
+		}
 	}
 
 	CHECKF(AddVideoObject(&VObjectDesc, &guiMainMenuBackGroundImage ));

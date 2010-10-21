@@ -88,6 +88,12 @@
 #include "Map Information.h"
 #include "Soldier Control.h"
 #include "DisplayCover.h"
+	//ddd оптимизация для хода драников
+	#include "aiinternals.h"
+	//#include "los.h"
+	//#include "structure wrap.h"
+	//#include "DisplayCover.h"
+	//ddd оптимизация для хода драников
 #endif
 
 #include "teamturns.h"
@@ -401,6 +407,10 @@ BOOLEAN				gfUserTurnRegionActive = FALSE;
 BOOLEAN	fRightButtonDown = FALSE;
 BOOLEAN	fLeftButtonDown = FALSE;
 BOOLEAN fIgnoreLeftUp		= FALSE;
+///*** dddd
+BOOLEAN	fMiddleButtonDown = FALSE;
+BOOLEAN	fX1ButtonDown = FALSE;
+BOOLEAN	fX2ButtonDown = FALSE;
 
 BOOLEAN	gUITargetReady = FALSE;
 BOOLEAN	gUITargetShotWaiting = FALSE;
@@ -1260,6 +1270,59 @@ UINT32 UIHandleEndTurn( UI_EVENT *pUIEvent )
 			SaveGame( SAVE__END_TURN_NUM, L"End Turn Auto Save" );
 		}
 
+	////ddd оптимизация для хода драников
+	if ( (gTacticalStatus.uiFlags & TURNBASED) && (gTacticalStatus.uiFlags & INCOMBAT ) )	
+	{
+//UINT32		uiStartTime, uiEndTime;
+//uiStartTime = GetJA2Clock();
+
+
+	 memset( gubWorldTileInLight, FALSE, sizeof( gubWorldTileInLight ) );
+ 	 memset( gubIsCorpseThere, FALSE, sizeof( gubIsCorpseThere ) );
+ 	 memset( gubMerkCanSeeThisTile, FALSE, sizeof( gubMerkCanSeeThisTile ) );
+ 	 //развертка цикла. при изменении WORLD_MAX на др.знач. необходимо будет подчищать хвосты! ибо опасный код!!! ;)
+	 for(INT16 i=0; i<WORLD_MAX ;i+=4) 
+	 {
+	  gubWorldTileInLight[i] = InLightAtNight(i, gpWorldLevelData[ i ].sHeight);
+	  gubIsCorpseThere[i] = IsCorpseAtGridNo( i, gpWorldLevelData[ i ].sHeight );
+	  gubWorldTileInLight[i+1] = InLightAtNight(i+1, gpWorldLevelData[ i+1 ].sHeight);
+	  gubIsCorpseThere[i+1] = IsCorpseAtGridNo( i+1, gpWorldLevelData[ i+1 ].sHeight );
+	  gubWorldTileInLight[i+2] = InLightAtNight(i+2, gpWorldLevelData[ i+2 ].sHeight);
+	  gubIsCorpseThere[i+2] = IsCorpseAtGridNo( i+2, gpWorldLevelData[ i+2 ].sHeight );
+	  gubWorldTileInLight[i+3] = InLightAtNight(i+3, gpWorldLevelData[ i+3 ].sHeight);
+	  gubIsCorpseThere[i+3] = IsCorpseAtGridNo( i+3, gpWorldLevelData[ i+3 ].sHeight );
+	 }
+
+	INT32 tcnt = gTacticalStatus.Team[ gbPlayerNum ].bFirstID;
+	SOLDIERTYPE *tS;
+
+	INT16	sXOffset, sYOffset;
+	INT16	sGridNo;UINT16	usSightLimit=0;
+
+	for ( tS = MercPtrs[ tcnt ]; tcnt <= gTacticalStatus.Team[ gbPlayerNum ].bLastID; tcnt++,tS++ )
+		if ( tS->stats.bLife >= OKLIFE && tS->sGridNo != NOWHERE && tS->bInSector )
+		{
+			//loop through all the gridnos that we are interested in
+			for (sYOffset = -30; sYOffset <= 30; sYOffset++)
+				for (sXOffset = -30; sXOffset <= 30; sXOffset++)
+				{
+					sGridNo = tS->sGridNo + sXOffset + (MAXCOL * sYOffset);
+					if ( sGridNo <= 0 || sGridNo >= WORLD_MAX ) continue;
+					//usSightLimit = tS->GetMaxDistanceVisible(sGridNo, FALSE, CALC_FROM_WANTED_DIR);
+					if(gubMerkCanSeeThisTile[sGridNo]==0)
+						gubMerkCanSeeThisTile[sGridNo]=//SoldierToVirtualSoldierLineOfSightTest( tS, sGridNo, FALSE, ANIM_STAND, TRUE, usSightLimit );
+								SoldierToVirtualSoldierLineOfSightTest( tS, sGridNo, tS->pathing.bLevel, 
+																		ANIM_STAND, TRUE, CALC_FROM_WANTED_DIR);
+
+				}//fo
+		}//if
+/////////////////////////////////////////////////////////////////////////////
+//uiEndTime = GetJA2Clock();
+//ScreenMsg( 144,0, L"t=%d",uiEndTime - uiStartTime );
+//
+	}
+	//ddd оптимизация для хода драников**
+		
 		// End our turn!
 		if (is_server || !is_client)
 		{
@@ -4594,6 +4657,9 @@ void SetMovementModeCursor( SOLDIERTYPE *pSoldier )
 				break;
 
 			case SWATTING:
+				///ddd quick fix for losed cursor {
+			case SWATTING_WK:
+				///ddd quick fix for losed cursor }
 				guiNewUICursor = MOVE_SWAT_UICURSOR;
 				break;
 
@@ -5717,11 +5783,10 @@ BOOLEAN IsValidTalkableNPC( UINT8 ubSoldierID, BOOLEAN fGive , BOOLEAN fAllowMer
 			return( FALSE	);
 		}
 	}
-#ifdef JA2UB
-	if ( pSoldier->ubProfile != NO_PROFILE && pSoldier->ubProfile >= FIRST_RPC /* &&  pSoldier->ubProfile < GASTON*/ && !RPC_RECRUITED( pSoldier ) && !AM_AN_EPC( pSoldier ) )
-#else
-	if ( pSoldier->ubProfile != NO_PROFILE && pSoldier->ubProfile >= FIRST_RPC && pSoldier->ubProfile < GASTON && !RPC_RECRUITED( pSoldier ) && !AM_AN_EPC( pSoldier ) )
-#endif
+
+//	if ( pSoldier->ubProfile != NO_PROFILE && pSoldier->ubProfile >= FIRST_RPC && pSoldier->ubProfile < GASTON && !RPC_RECRUITED( pSoldier ) && !AM_AN_EPC( pSoldier ) )
+	//new profiles by Jazz	
+	if ( pSoldier->ubProfile != NO_PROFILE && ( gProfilesRPC[pSoldier->ubProfile].ProfilId == pSoldier->ubProfile || gProfilesNPC[pSoldier->ubProfile].ProfilId == pSoldier->ubProfile ) && !RPC_RECRUITED( pSoldier ) && !AM_AN_EPC( pSoldier ) )	
 	{
 		fValidGuy = TRUE;
 	}

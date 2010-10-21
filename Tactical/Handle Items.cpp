@@ -1577,11 +1577,27 @@ void HandleSoldierThrowItem( SOLDIERTYPE *pSoldier, INT32 sGridNo )
 			// Draw item depending on distance from buddy
 			if ( GetRangeFromGridNoDiff( sGridNo, pSoldier->sGridNo ) < MIN_LOB_RANGE )
 			{
-				pSoldier->usPendingAnimation = LOB_ITEM;
+				
+				//ddd вожможно еще надо добавить условие проверки на класс кидаемого предмета - гранаты
+				if( (pSoldier->pThrowParams->ubActionCode == THROW_ARM_ITEM) && 
+					( (pSoldier->ubBodyType == BIGMALE) || (pSoldier->ubBodyType == REGMALE) ) )
+					pSoldier->usPendingAnimation = LOB_GRENADE_STANCE;
+				else
+					pSoldier->usPendingAnimation = LOB_ITEM;
+				
 			}
 			else
-			{
-				pSoldier->usPendingAnimation = THROW_ITEM;
+			{  //ddd вожможно еще надо добавить условие проверки на класс кидаемого предмета - гранаты
+				//INT32 uiItemClass; //такой код тоже работает. фальшвеер и граната из одного класса?
+				//	uiItemClass= Item[ pSoldier->inv[HANDPOS].usItem ].usItemClass;
+				//if( (uiItemClass == IC_GRENADE) && 
+
+
+				if( (pSoldier->pThrowParams->ubActionCode == THROW_ARM_ITEM) && 
+					( (pSoldier->ubBodyType == BIGMALE) || (pSoldier->ubBodyType == REGMALE) ) )
+					pSoldier->usPendingAnimation = THROW_GRENADE_STANCE;
+				else
+					pSoldier->usPendingAnimation = THROW_ITEM;
 			}
 
 		}
@@ -4112,11 +4128,9 @@ void SoldierGiveItemFromAnimation( SOLDIERTYPE *pSoldier )
 
 		// Switch on target...
 		// Are we a player dude.. ( target? )
-#ifdef JA2UB
-		if ( ubProfile < FIRST_RPC || RPC_RECRUITED( pTSoldier ) ) //|| ubProfile >=  GASTON )
-#else
-		if ( ubProfile < FIRST_RPC || RPC_RECRUITED( pTSoldier ) || ubProfile >= GASTON )
-#endif
+	//	if ( ubProfile < FIRST_RPC || RPC_RECRUITED( pTSoldier ) || ubProfile >= GASTON )
+		//new profiles by Jazz		
+		if ( ( gProfilesAIM[ubProfile].ProfilId == ubProfile || gProfilesMERC[ubProfile].ProfilId == ubProfile || gProfilesIMP[ubProfile].ProfilId == ubProfile ) || RPC_RECRUITED( pTSoldier ) )			
 		{
 			fToTargetPlayer = TRUE;
 		}

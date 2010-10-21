@@ -68,6 +68,8 @@
 	#include "LoadScreen.h"//dnl ch30 150909
 	#include "Interface Cursors.h"
 	#include "Simple Render Utils.h"//dnl ch54 111009
+///ddd
+	#include "gamesettings.h"
 #endif
 
 #define	SET_MOVEMENTCOST( a, b, c, d )				( ( gubWorldMovementCosts[ a ][ b ][ c ] < d ) ? ( gubWorldMovementCosts[ a ][ b ][ c ] = d ) : 0 );
@@ -144,7 +146,7 @@ void DestroyTileSurfaces( void );
 void ProcessTilesetNamesForBPP(void);
 BOOLEAN IsRoofVisibleForWireframe( INT32 sMapPos );
 
-#ifdef JA2UB
+#ifdef JA2UBMAPS
 INT32						giOldTilesetUsed;
 #endif
 
@@ -163,7 +165,11 @@ INT32						*gpDirtyData;
 UINT32					gSurfaceMemUsage;
 //UINT8						gubWorldMovementCosts[ WORLD_MAX ][MAXDIR][2];
 UINT8 (*gubWorldMovementCosts)[MAXDIR][2] = NULL;//dnl ch43 260909
-
+//ddd для убыстрения поиска освещенных участков в патхаи.
+BOOLEAN						gubWorldTileInLight[ MAX_ALLOWED_WORLD_MAX ];
+BOOLEAN						gubIsCorpseThere[ MAX_ALLOWED_WORLD_MAX ];
+INT32						gubMerkCanSeeThisTile[ MAX_ALLOWED_WORLD_MAX ];
+//ddd
 // set to nonzero (locs of base gridno of structure are good) to have it defined by structure code
 INT16		gsRecompileAreaTop = 0;
 INT16		gsRecompileAreaLeft = 0;
@@ -279,7 +285,7 @@ BOOLEAN InitializeWorld( )
 	gSurfaceMemUsage = 0;
 	giCurrentTilesetID = -1;
 	
-	#ifdef JA2UB
+	#ifdef JA2UBMAPS
 	giOldTilesetUsed = -1;
 	#endif
 
@@ -410,7 +416,7 @@ BOOLEAN LoadTileSurfaces( char ppTileSurfaceFilenames[][32], UINT8 ubTilesetID )
 	
 		// ATE: Set flag indicating to use another default
 		// tileset
-	#ifdef JA2UB
+	#ifdef JA2UBMAPS
 		// 1 ) If we are going from JA2 to JA25
 		if ( giOldTilesetUsed < DEFAULT_JA25_TILESET && ubTilesetID >= DEFAULT_JA25_TILESET )
 		{
@@ -487,7 +493,7 @@ BOOLEAN LoadTileSurfaces( char ppTileSurfaceFilenames[][32], UINT8 ubTilesetID )
 					if ( !gbDefaultSurfaceUsed[ uiLoop ] )
 					{
 					
-						#ifdef JA2UB
+						#ifdef JA2UBMAPS
 						if( ubTilesetID < DEFAULT_JA25_TILESET && uiLoop != SPECIALTILES )
 						{
 							strcpy( TileSurfaceFilenames[uiLoop], gTilesets[ TLS_GENERIC_1 ].TileSurfaceFilenames[uiLoop] );//(char *)(ppTileSurfaceFilenames + (65 * uiLoop)) );
@@ -570,7 +576,7 @@ BOOLEAN AddTileSurface( STR8  cFilename, UINT32 ubType, UINT8 ubTilesetID, BOOLE
 
 	// OK, if we were not the default tileset, set value indicating that!
 	
-	#ifdef JA2UB
+	#ifdef JA2UBMAPS
 	// OK, if we were not the default tileset, set value indicating that!
 	if ( ubTilesetID != TLS_GENERIC_1 && ubTilesetID != 0 )
 	{
@@ -760,7 +766,7 @@ void CompileWorldTerrainIDs( void )
 
 			// ATE: CRAPOLA! Special case stuff here for the friggen pool since art was fu*ked up
 			
-			#ifdef JA2UB
+			#ifdef JA2UBMAPS
 			if ( giCurrentTilesetID == TEMP_19 )
 			#else
 			if ( giCurrentTilesetID == TLS_BALIME_MUSEUM )
@@ -797,6 +803,48 @@ void CompileWorldTerrainIDs( void )
 		}
 	}
 }
+
+///dddokno {
+#pragma optimize("gpt",on)
+__forceinline
+BOOLEAN IsNotRestrictedWindow(STRUCTURE *	pStructure)
+{	
+
+	if (	(pStructure->fFlags & STRUCTURE_WALLNWINDOW) && gGameExternalOptions.fCanJumpThroughWindows
+			&& !(pStructure->fFlags & STRUCTURE_SPECIAL)
+			&& (pStructure->fFlags & STRUCTURE_OPEN)
+			&& (pStructure->pDBStructureRef->pDBStructure->bPartnerDelta == NO_PARTNER_STRUCTURE)		)
+	{
+		//ручная проверка на заколоченые окна ;( {
+		//build_13.sti - заколоченные окна ндекс: 
+		
+		LEVELNODE *pNode = NULL;// STRUCTURE	*pBase=NULL;
+		UINT32 uiTileType=0; UINT16 usIndex =0;
+		//pBase = FindStructure( pStructure->sGridNo, STRUCTURE_WALLNWINDOW );
+		//if(pBase!= NULL)
+			pNode = FindLevelNodeBasedOnStructure( pStructure->sGridNo, pStructure );
+		//pNode = gpWorldLevelData[ pStructure->sGridNo ].pStructHead;
+		if(pNode != NULL)
+			GetTileType( pNode->usIndex, &uiTileType );
+
+		UINT16 RestrSubIndex;
+		GetSubIndexFromTileIndex( pNode->usIndex, (UINT16 *)&RestrSubIndex );
+
+		//этот тип окон не содержится в 0 тайлсете, проверка нулевого тайлсета в этом случае не нужна
+		if ( _stricmp( gTilesets[ giCurrentTilesetID ].TileSurfaceFilenames[ uiTileType ], "build_13.sti" ) == 0 
+			//&& ( pNode->usIndex == 814 || pNode->usIndex == 816 || pNode->usIndex == 817 || pNode->usIndex == 823) -запрещает только в конкретном тайлсете ;( в другом не сработает
+			&& (RestrSubIndex == 40 || RestrSubIndex == 41 || RestrSubIndex == 37 || RestrSubIndex == 38 
+				|| RestrSubIndex == 43 || RestrSubIndex == 44 || RestrSubIndex == 46 || RestrSubIndex == 47) //номера фреймов в стишке
+			
+			)
+			return FALSE;
+
+		return TRUE;
+	}
+
+	return FALSE;
+}
+///dddokno }
 
 void CompileTileMovementCosts( INT32 usGridNo )
 {
@@ -908,6 +956,235 @@ void CompileTileMovementCosts( INT32 usGridNo )
 					}
 					// all other passable structures do not block movement in any way
 				}
+				
+				//dddokno{ =============================================================
+				else if ( IsNotRestrictedWindow(pStructure)
+							//почти универсальное условие, но становятся проходными окна, на которых
+							//навешаны деревяшки ;( видимо, придется вручную прописывать исключения
+							//(pStructure->fFlags & STRUCTURE_WALLNWINDOW) && gGameExternalOptions.fCanJumpThroughWindows
+							// && !(pStructure->fFlags & STRUCTURE_SPECIAL)
+							// && (pStructure->fFlags & STRUCTURE_OPEN)
+							//&& (pStructure->pDBStructureRef->pDBStructure->bPartnerDelta == NO_PARTNER_STRUCTURE)
+						)
+				{
+	
+					// standard door
+					switch( pStructure->ubWallOrientation )
+					{
+						case OUTSIDE_TOP_LEFT:
+								SET_CURRMOVEMENTCOST( NORTHEAST, TRAVELCOST_WALL );
+								SET_CURRMOVEMENTCOST( NORTH, TRAVELCOST_JUMPABLEWINDOW );
+								SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_WALL );
+
+								SET_MOVEMENTCOST( usGridNo + WORLD_COLS, SOUTHEAST, 0, TRAVELCOST_WALL );
+								SET_MOVEMENTCOST( usGridNo + WORLD_COLS, SOUTH, 0, TRAVELCOST_JUMPABLEWINDOW_N );
+								SET_MOVEMENTCOST( usGridNo + WORLD_COLS, SOUTHWEST, 0, TRAVELCOST_WALL );
+
+								// DO CORNERS
+								SET_MOVEMENTCOST( usGridNo - 1, NORTHWEST, 0, TRAVELCOST_WALL );
+								SET_MOVEMENTCOST( usGridNo + 1, NORTHEAST, 0, TRAVELCOST_WALL );
+								SET_MOVEMENTCOST( usGridNo + WORLD_COLS - 1, SOUTHWEST, 0, TRAVELCOST_WALL );
+								SET_MOVEMENTCOST( usGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_WALL );
+
+							break;
+
+						case INSIDE_TOP_LEFT:
+							SET_CURRMOVEMENTCOST( NORTHEAST, TRAVELCOST_WALL );
+							SET_CURRMOVEMENTCOST( NORTH, TRAVELCOST_JUMPABLEWINDOW );
+							SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_WALL );
+
+							SET_MOVEMENTCOST( usGridNo + WORLD_COLS, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
+							SET_MOVEMENTCOST( usGridNo + WORLD_COLS, SOUTH, 0, TRAVELCOST_JUMPABLEWINDOW_N );
+							SET_MOVEMENTCOST( usGridNo + WORLD_COLS, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
+
+							// DO CORNERS
+							SET_MOVEMENTCOST( usGridNo - 1, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
+							SET_MOVEMENTCOST( usGridNo + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
+							SET_MOVEMENTCOST( usGridNo + WORLD_COLS - 1, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
+							SET_MOVEMENTCOST( usGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
+
+							break;
+
+						case OUTSIDE_TOP_RIGHT:
+								SET_CURRMOVEMENTCOST( SOUTHWEST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( WEST, TRAVELCOST_JUMPABLEWINDOW );
+								SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_OBSTACLE );
+
+								SET_MOVEMENTCOST( usGridNo + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( usGridNo + 1, EAST, 0, TRAVELCOST_JUMPABLEWINDOW_W );
+								SET_MOVEMENTCOST( usGridNo + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
+
+								// DO CORNERS
+								SET_MOVEMENTCOST( usGridNo - WORLD_COLS + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( usGridNo - WORLD_COLS, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( usGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( usGridNo + WORLD_COLS, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
+
+							
+							break;
+
+						case INSIDE_TOP_RIGHT:
+							SET_CURRMOVEMENTCOST( SOUTHWEST, TRAVELCOST_OBSTACLE );
+							SET_CURRMOVEMENTCOST( WEST, TRAVELCOST_JUMPABLEWINDOW );
+							SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_OBSTACLE );
+
+							SET_MOVEMENTCOST( usGridNo + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
+							SET_MOVEMENTCOST( usGridNo + 1, EAST, 0, TRAVELCOST_JUMPABLEWINDOW_W );
+							SET_MOVEMENTCOST( usGridNo + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
+
+							// DO CORNERS
+							SET_MOVEMENTCOST( usGridNo - WORLD_COLS + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
+							SET_MOVEMENTCOST( usGridNo - WORLD_COLS, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
+							SET_MOVEMENTCOST( usGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
+							SET_MOVEMENTCOST( usGridNo + WORLD_COLS, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
+
+							break;
+
+
+						/*switch( pStructure->ubWallOrientation )
+						{
+							case OUTSIDE_TOP_LEFT: //3 \# - клетка внутри помещения, стена наружу
+							case INSIDE_TOP_LEFT: //1 -клетка снаружи помещения  \№ стена внутрь
+								SET_CURRMOVEMENTCOST( NORTH, TRAVELCOST_JUMPABLEWINDOW );
+								SET_CURRMOVEMENTCOST( NORTHEAST, TRAVELCOST_OBSTACLE);
+								SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( SOUTHEAST, TRAVELCOST_OBSTACLE);
+								SET_CURRMOVEMENTCOST( SOUTH, TRAVELCOST_JUMPABLEWINDOW);
+								SET_CURRMOVEMENTCOST( SOUTHWEST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( WEST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_OBSTACLE );
+								//?
+								FORCE_SET_MOVEMENTCOST( sGridNo - WORLD_COLS, NORTH, 0, TRAVELCOST_NONE );
+								SET_MOVEMENTCOST( sGridNo - WORLD_COLS + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( sGridNo + 1, EAST, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( sGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
+								FORCE_SET_MOVEMENTCOST( sGridNo + WORLD_COLS, SOUTH, 0, TRAVELCOST_NONE );
+								SET_MOVEMENTCOST( sGridNo + WORLD_COLS - 1, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( sGridNo - 1, WEST, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( sGridNo - WORLD_COLS - 1, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
+								
+
+
+								break;
+
+							case OUTSIDE_TOP_RIGHT: //4 #/	//клетка внутри помещения, стена наружу
+
+							case INSIDE_TOP_RIGHT: 
+
+								//2 #/ 
+								//. стена стоит на правом нижн. краю и смотрит на ЮВ
+								// клетка находится снаружи помещения, стена внутри клетки
+
+
+								SET_CURRMOVEMENTCOST( NORTH, TRAVELCOST_OBSTACLE );				
+								SET_CURRMOVEMENTCOST( NORTHEAST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_JUMPABLEWINDOW );
+								SET_CURRMOVEMENTCOST( SOUTHEAST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( SOUTH, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( SOUTHWEST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( WEST, TRAVELCOST_JUMPABLEWINDOW );
+								SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_OBSTACLE );
+								//?
+								// set values for the tiles EXITED from this location
+								SET_MOVEMENTCOST( sGridNo - WORLD_COLS, NORTH, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( sGridNo - WORLD_COLS + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
+								// make sure no obstacle costs exists before changing path cost to 0
+								if ( gubWorldMovementCosts[ sGridNo + 1 ][ EAST ][ 0 ] < TRAVELCOST_BLOCKED )
+								{
+									FORCE_SET_MOVEMENTCOST( sGridNo + 1, EAST, 0, TRAVELCOST_NONE );
+								}
+								SET_MOVEMENTCOST( sGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( sGridNo + WORLD_COLS, SOUTH, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( sGridNo + WORLD_COLS - 1, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
+								if ( gubWorldMovementCosts[ sGridNo - 1 ][ WEST ][ 0 ] < TRAVELCOST_BLOCKED )
+								{
+									FORCE_SET_MOVEMENTCOST( sGridNo - 1, WEST, 0, TRAVELCOST_NONE );
+								}
+								SET_MOVEMENTCOST( sGridNo - WORLD_COLS - 1, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
+
+
+								break;
+							default:
+								// corners aren't jumpable
+								for (ubDirLoop=0; ubDirLoop < NUM_WORLD_DIRECTIONS; ubDirLoop++)
+								{
+									SET_CURRMOVEMENTCOST( ubDirLoop, TRAVELCOST_OBSTACLE );
+								}
+								break;*/
+						}		
+
+		
+		
+		//************************************старый почти работающий код. тока аи иногда тупит ))
+					//if ( (pStructure->fFlags & STRUCTURE_WALLNWINDOW) //&& !(pStructure->fFlags & STRUCTURE_SPECIAL) 
+					//	 && (pStructure->fFlags & STRUCTURE_WALLSTUFF)==0 )
+					//if(pStructure->pDBStructureRef->pDBStructure->bPartnerDelta == NO_PARTNER_STRUCTURE)
+
+			/*									// jumpable!
+						switch( pStructure->ubWallOrientation )
+						{
+							case OUTSIDE_TOP_LEFT:
+							case INSIDE_TOP_LEFT:
+								// can be jumped north and south
+								SET_CURRMOVEMENTCOST( NORTH, TRAVELCOST_FENCE );
+								SET_CURRMOVEMENTCOST( NORTHEAST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( SOUTHEAST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( SOUTH, TRAVELCOST_FENCE );
+								SET_CURRMOVEMENTCOST( SOUTHWEST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( WEST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_OBSTACLE );
+								// set values for the tiles EXITED from this location
+								FORCE_SET_MOVEMENTCOST( sGridNo - WORLD_COLS, NORTH, 0, TRAVELCOST_NONE );
+								SET_MOVEMENTCOST( sGridNo - WORLD_COLS + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( sGridNo + 1, EAST, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( sGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
+								FORCE_SET_MOVEMENTCOST( sGridNo + WORLD_COLS, SOUTH, 0, TRAVELCOST_NONE );
+								SET_MOVEMENTCOST( sGridNo + WORLD_COLS - 1, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( sGridNo - 1, WEST, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( sGridNo - WORLD_COLS - 1, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
+								break;
+
+							case OUTSIDE_TOP_RIGHT:
+							case INSIDE_TOP_RIGHT:
+								// can be jumped east and west
+								SET_CURRMOVEMENTCOST( NORTH, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( NORTHEAST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_FENCE );
+								SET_CURRMOVEMENTCOST( SOUTHEAST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( SOUTH, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( SOUTHWEST, TRAVELCOST_OBSTACLE );
+								SET_CURRMOVEMENTCOST( WEST, TRAVELCOST_FENCE );
+								SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_OBSTACLE );
+								// set values for the tiles EXITED from this location
+								SET_MOVEMENTCOST( sGridNo - WORLD_COLS, NORTH, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( sGridNo - WORLD_COLS + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
+								// make sure no obstacle costs exists before changing path cost to 0
+								if ( gubWorldMovementCosts[ sGridNo + 1 ][ EAST ][ 0 ] < TRAVELCOST_BLOCKED )
+								{
+									FORCE_SET_MOVEMENTCOST( sGridNo + 1, EAST, 0, TRAVELCOST_NONE );
+								}
+								SET_MOVEMENTCOST( sGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( sGridNo + WORLD_COLS, SOUTH, 0, TRAVELCOST_OBSTACLE );
+								SET_MOVEMENTCOST( sGridNo + WORLD_COLS - 1, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
+								if ( gubWorldMovementCosts[ sGridNo - 1 ][ WEST ][ 0 ] < TRAVELCOST_BLOCKED )
+								{
+									FORCE_SET_MOVEMENTCOST( sGridNo - 1, WEST, 0, TRAVELCOST_NONE );
+								}
+								SET_MOVEMENTCOST( sGridNo - WORLD_COLS - 1, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
+								break;
+
+							//default:
+								// corners aren't jumpable
+								for (ubDirLoop=0; ubDirLoop < NUM_WORLD_DIRECTIONS; ubDirLoop++)
+								{
+									SET_CURRMOVEMENTCOST( ubDirLoop, TRAVELCOST_OBSTACLE );
+								}
+								break;
+						}//switch*/
+				}//}if dddokno==============================================================================
+				
 				else if (pStructure->fFlags & STRUCTURE_BLOCKSMOVES)
 				{
 					if ( (pStructure->fFlags & STRUCTURE_FENCE) && !(pStructure->fFlags & STRUCTURE_SPECIAL) )
@@ -3469,7 +3746,7 @@ void TrashMapTile(INT16 MapTile)
 BOOLEAN LoadMapTileset( INT32 iTilesetID )
 {
 
-#ifdef JA2UB
+#ifdef JA2UBMAPS
 giOldTilesetUsed = giCurrentTilesetID;
 #endif
 

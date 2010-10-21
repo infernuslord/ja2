@@ -147,4 +147,5 @@ BOOLEAN FindFenceDirection( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bStarting
 BOOLEAN FindLowerLevelFence( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bStartingDir, INT8 *pbDirection ); 
 BOOLEAN FindWindowJumpDirection( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bStartingDir, INT8 *pbDirection );
 
+
 #endif

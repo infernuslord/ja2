@@ -39,9 +39,9 @@
 	#include "Soldier Create.h"
 	#include "GameVersion.h"
 	#include "Campaign Types.h"
+	#include "GameSettings.h"
 #endif
 
-#include "GameSettings.h"
 #include <vfs/Core/vfs.h>
 #include <vfs/Core/vfs_file_raii.h>
 
@@ -2156,6 +2156,8 @@ void SummaryLoadMapCallback( GUI_BUTTON *btn, INT32 reason )
 		SetFont( FONT10ARIAL );
 		SetFontForeground( FONT_LTKHAKI );
 		SetFontShadow( FONT_NEARBLACK );
+
+		fNewMapSaved = TRUE;
 
 		//swprintf( str, L"Loading map:  %s...", gszDisplayName );
 		//mprintf( MAP_LEFT, MAP_BOTTOM+100, str );

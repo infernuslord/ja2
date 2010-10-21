@@ -134,6 +134,9 @@ extern SOLDIERTYPE *gpSMCurrentMerc;
 extern INT32 gsOverItemsGridNo;
 extern INT16 gsOverItemsLevel;
 extern BOOLEAN	gfUIShowExitSouth;
+extern BOOLEAN	fMiddleButtonDown;
+extern BOOLEAN	fX1ButtonDown;
+extern BOOLEAN	fX2ButtonDown;
 
 extern INT32	giStartingMemValue;
 
@@ -185,7 +188,7 @@ SOLDIERTYPE *gpExchangeSoldier2;
 BOOLEAN ConfirmActionCancel( INT32 usMapPos, INT32 usOldMapPos );
 
 BOOLEAN	gfNextFireJam = FALSE;
-
+INT16 brstmode = 0; //dddd
 extern INT16 ITEMDESC_START_X;
 extern INT16 ITEMDESC_START_Y;
 #include "fresh_header.h"
@@ -249,10 +252,19 @@ extern void DetermineWhichMilitiaControlMenusCanBeShown( void ); //lalien
 // The_Bob - real time sneaking, 01-06-09
 extern BOOLEAN WeSeeNoOne(void); // Needed to control entering turn-based with ctrl-x
 
+void	QueryTBMButton( UINT32 *puiNewEvent );
+void	QueryTBWheel( UINT32 *puiNewEvent );
+void	QueryTBX1Button( UINT32 *puiNewEvent );
+void	QueryTBX2Button( UINT32 *puiNewEvent );
+
 void	GetTBMouseButtonInput( UINT32 *puiNewEvent )
 {
 	QueryTBLeftButton( puiNewEvent );
 	QueryTBRightButton( puiNewEvent );
+	QueryTBWheel( puiNewEvent );
+	QueryTBMButton( puiNewEvent  );
+	QueryTBX1Button( puiNewEvent  );
+	QueryTBX2Button( puiNewEvent  );
 }
 
 void	QueryTBLeftButton( UINT32 *puiNewEvent )
@@ -1104,6 +1116,8 @@ void GetTBMousePositionInput( UINT32 *puiNewEvent )
 					if ( MercPtrs[ gusUIFullTargetID ]->bTeam != gbPlayerNum )
 					{
 						fOnValidGuy = TRUE;
+						//ddd сброс флажка, отвечающего за режим прицеливания\регулировки очереди (прицельная очередь) 
+						brstmode = 0;
 					}
 					else
 					{
@@ -2618,6 +2632,47 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 					}
 #endif
 				}
+				//ddd{ удалить закомментированный текст за ненадобностью.
+//				else if(_KeyDown( SHIFT ))
+//				{
+//INT16		sGridNo;
+//STRUCTURE *			pStructure;
+
+//GetMouseMapPos( &sGridNo );
+//ScreenMsg( FONT_MCOLOR_LTYELLOW,0, L"gubMerkCanSeeThisTile=%d,gubWorldTileInLight=%d,los=%d",gubMerkCanSeeThisTile[sGridNo],gubWorldTileInLight[sGridNo],gGameSettings.ubSizeOfLOS);
+//
+
+				//	SOLDIERTYPE *pjSoldier;
+				//	BOOLEAN	fNearHeigherLevel;
+				//	BOOLEAN	fNearLowerLevel;
+				//	INT8	bDirection;
+
+				//	if ( GetSoldier( &pjSoldier, gusSelectedSoldier ) )
+				//	{
+				//		// CHRISL: Turn off manual jumping while wearing a backpack
+				//		if(UsingNewInventorySystem() == true && pjSoldier->inv[BPACKPOCKPOS].exists() == true)
+				//			break;
+
+				//		// Make sure the merc is not collapsed!
+				//		if (!IsValidStance(pjSoldier, ANIM_CROUCH) )
+				//		{
+				//			if ( pjSoldier->bCollapsed && pjSoldier->bBreath < OKBREATH )
+				//			{
+				//				ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_UI_FEEDBACK, gzLateLocalizedString[ 4 ], pjSoldier->name );
+				//			}
+
+				//			break;
+				//		}
+				//	GetMercOknoDirection( pjSoldier->ubID, &fNearLowerLevel, &fNearHeigherLevel );
+				//	if ( FindOknoDirection( pjSoldier, pjSoldier->sGridNo, pjSoldier->ubDirection, &bDirection ) )
+				//		{
+				//			BeginSoldierOkno( pjSoldier );
+				//		}
+
+
+				//	}
+
+				//}//ddd}
 				else
 				{
 					SOLDIERTYPE *pjSoldier;
@@ -6405,5 +6460,310 @@ void StackAndSort( BOOLEAN fRestrictToAmmo )
 		NotifySoldiersToLookforItems( );
 		//HandleAllReachAbleItemsInTheSector( gWorldSectorX, gWorldSectorY, gbWorldSectorZ );
 		ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, pImpButtonText[11] );
+	}
+}
+
+
+
+void	QueryTBMButton( UINT32 *puiNewEvent )
+{
+	INT32	sMapPos;
+
+	if ( gViewportRegion.uiFlags & MSYS_MOUSE_IN_AREA )
+	{
+		if (!GetMouseMapPos( &sMapPos ) )
+			return;
+		
+		if (gViewportRegion.ButtonState & MSYS_MIDDLE_BUTTON) // MID MOUSE BUTTON
+		{
+			if ( !fMiddleButtonDown )
+			{
+				fMiddleButtonDown = TRUE;
+				//RESETCOUNTER( RMOUSECLICK_DELAY_COUNTER );
+			}
+		}
+		else if ( fMiddleButtonDown )
+		{
+			if ( _KeyDown( ALT ) )
+			{
+				//переключение режима огня
+				if ( ( gpItemPointer == NULL ) &&
+					( ( gsCurInterfacePanel != SM_PANEL ) || ( ButtonList[ iSMPanelButtons[ BURSTMODE_BUTTON ] ]->uiFlags & BUTTON_ENABLED ) ) )
+					SetBurstMode();
+			}
+			else
+			{//*puiNewEvent = LC_LOOK;
+				if(gCurrentUIMode == CONFIRM_ACTION_MODE)
+				brstmode=(brstmode==1)?0:1;
+				else{
+				ErasePath( TRUE );
+				*puiNewEvent = LC_ON_TERRAIN;
+				}
+			}
+
+			fMiddleButtonDown = FALSE;
+			// Reset counter
+			//RESETCOUNTER( RMOUSECLICK_DELAY_COUNTER );
+		}
+	}
+}//void	QueryTBMButton( UINT32 *puiNewEvent )
+
+void	QueryTBWheel( UINT32 *puiNewEvent )
+{
+	SOLDIERTYPE	*pSoldier;
+	UINT16		usMapPos=0;
+	UINT8		bID;
+
+	// stub
+	if ( gViewportRegion.uiFlags & MSYS_MOUSE_IN_AREA )
+	{
+		if ( gViewportRegion.WheelState != 0 )
+		{
+			//printf("wheel %d\n", gViewportRegion.WheelState);
+			//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"wheel %d", gViewportRegion.WheelState);
+			if ( gpItemPointer == NULL )
+			{
+				// ATE:
+				if ( gusSelectedSoldier != NOBODY )
+				{
+					// Switch on UI mode
+					switch( gCurrentUIMode )
+					{
+
+						case MOVE_MODE:
+						case CONFIRM_MOVE_MODE:
+											
+								if ( !( gTacticalStatus.uiFlags & ENGAGED_IN_CONV )	&&
+									( ( gsCurInterfacePanel != SM_PANEL ) || ( ButtonList[ iSMPanelButtons[ NEXTMERC_BUTTON ] ]->uiFlags & BUTTON_ENABLED ) ) )
+								{
+										if ( gViewportRegion.WheelState > 0 )
+										{
+											//change stance ->DOWN
+											if ( _KeyDown( ALT ) )
+											{	if ( (gusSelectedSoldier != NOBODY) && ( gpItemPointer == NULL ) )
+												GotoLowerStance(MercPtrs[ gusSelectedSoldier ]);
+												break;
+											}
+											if ( gusSelectedSoldier != NOBODY )
+											{ 
+												bID = FindPrevActiveAndAliveMerc( MercPtrs[ gusSelectedSoldier ], TRUE, TRUE );
+												HandleLocateSelectMerc( bID, LOCATEANDSELECT_MERC );
+												// Center to guy....
+												LocateSoldier( gusSelectedSoldier, SETLOCATOR );
+											}
+										}
+										else
+										{
+								
+											//change stance ->UP
+											if ( _KeyDown( ALT ) )
+											{	if ( (gusSelectedSoldier != NOBODY) && ( gpItemPointer == NULL ) )
+													GotoHeigherStance( MercPtrs[ gusSelectedSoldier ] );
+												break;
+											}
+
+											//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"wheel %d", gViewportRegion.WheelState);
+											if ( gusSelectedSoldier != NOBODY )
+											{ //Select next merc
+												bID = FindNextMercInTeamPanel( MercPtrs[ gusSelectedSoldier ], FALSE, FALSE );
+												HandleLocateSelectMerc( bID, LOCATEANDSELECT_MERC );
+												// Center to guy....
+												LocateSoldier( gusSelectedSoldier, SETLOCATOR );
+											}
+										}
+										//*puiNewEvent = M_ON_TERRAIN; ????????????????
+								}
+
+						case IDLE_MODE:
+						case ACTION_MODE:
+						case LOCKOURTURN_UI_MODE:
+						case LOOKCURSOR_MODE:
+						case LOCKUI_MODE:
+						case TALKCURSOR_MODE:
+						case MENU_MODE:
+						case HANDCURSOR_MODE:
+
+							break;
+
+						case CONFIRM_ACTION_MODE:
+
+								if ( GetSoldier( &pSoldier, gusSelectedSoldier ) )
+								{
+									if(	gGameExternalOptions.bAimedBurstEnabled )
+										HandleWheelAdjustCursor( pSoldier, usMapPos, -gViewportRegion.WheelState,brstmode );
+									else
+										HandleWheelAdjustCursorWOAB( pSoldier, usMapPos, -gViewportRegion.WheelState);
+								}
+								break;
+					}
+				}
+			}
+			ResetWheelState( &gViewportRegion );
+		}
+	}
+}
+
+void QueryTBX1Button( UINT32 *puiNewEvent  )
+{
+	INT32	sMapPos;
+	if ( gViewportRegion.uiFlags & MSYS_MOUSE_IN_AREA )
+	{
+		if (!GetMouseMapPos( &sMapPos ) )
+			return;
+		
+		if (gViewportRegion.ButtonState & MSYS_X1_BUTTON) // MID MOUSE BUTTON
+		{
+			if ( !fX1ButtonDown )
+			{
+				fX1ButtonDown = TRUE;
+				//RESETCOUNTER( RMOUSECLICK_DELAY_COUNTER );
+			}
+		}
+		else if ( fX1ButtonDown )
+		{
+			//*puiNewEvent = LC_LOOK;
+			fX1ButtonDown = FALSE;
+			if ( !_KeyDown( ALT ) && !_KeyDown( SHIFT ))
+					UIHandleChangeLevel( NULL );
+			else if( _KeyDown( SHIFT ) )
+			{
+					SOLDIERTYPE *pjSoldier;
+					BOOLEAN	fNearHeigherLevel;
+					BOOLEAN	fNearLowerLevel;
+					INT8	bDirection;
+
+					if ( GetSoldier( &pjSoldier, gusSelectedSoldier ) )
+					{
+						// CHRISL: Turn off manual jumping while wearing a backpack
+						if(UsingNewInventorySystem() == true && pjSoldier->inv[BPACKPOCKPOS].exists() == true)
+							return;
+
+						// Make sure the merc is not collapsed!
+						if (!IsValidStance(pjSoldier, ANIM_CROUCH) )
+						{
+							if ( pjSoldier->bCollapsed && pjSoldier->bBreath < OKBREATH )
+							{
+								ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_UI_FEEDBACK, gzLateLocalizedString[ 4 ], pjSoldier->name );
+							}
+
+							return;
+						}
+					GetMercOknoDirection( pjSoldier->ubID, &fNearLowerLevel, &fNearHeigherLevel );
+					if ( FindWindowJumpDirection( pjSoldier, pjSoldier->sGridNo, pjSoldier->ubDirection, &bDirection ) )
+						{
+							pjSoldier->BeginSoldierClimbWindow();
+						}
+
+
+					}
+			}
+			else if (_KeyDown( ALT ) )
+			{
+				SOLDIERTYPE *pjSoldier;
+				if ( GetSoldier( &pjSoldier, gusSelectedSoldier ) )
+				{
+					BOOLEAN	fNearHeigherLevel;
+					BOOLEAN	fNearLowerLevel;
+					INT8	bDirection;
+						// CHRISL: Turn off manual jumping while wearing a backpack
+					if(UsingNewInventorySystem() == true && pjSoldier->inv[BPACKPOCKPOS].exists() == true)
+							return;
+
+					// Make sure the merc is not collapsed!
+					if (!IsValidStance(pjSoldier, ANIM_CROUCH) )
+					{
+						if ( pjSoldier->bCollapsed && pjSoldier->bBreath < OKBREATH )
+							ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_UI_FEEDBACK, gzLateLocalizedString[ 4 ], pjSoldier->name );
+						return;
+					}
+
+					GetMercClimbDirection( pjSoldier->ubID, &fNearLowerLevel, &fNearHeigherLevel );
+
+					if ( fNearLowerLevel )
+						pjSoldier->BeginSoldierClimbDownRoof( );
+					
+					if ( fNearHeigherLevel )
+						pjSoldier->BeginSoldierClimbUpRoof(	);
+					
+					if ( FindFenceJumpDirection( pjSoldier, pjSoldier->sGridNo, pjSoldier->ubDirection, &bDirection ) )
+						pjSoldier->BeginSoldierClimbFence(	);
+				}
+				
+			}//else
+
+		}
+	}
+}
+void QueryTBX2Button( UINT32 *puiNewEvent  )
+{
+	INT32	sMapPos;
+	if ( gViewportRegion.uiFlags & MSYS_MOUSE_IN_AREA )
+	{
+		if (!GetMouseMapPos( &sMapPos ) )
+			return;
+		
+		if (gViewportRegion.ButtonState & MSYS_X2_BUTTON) // MID MOUSE BUTTON
+		{
+			if ( !fX2ButtonDown )
+			{
+				fX2ButtonDown = TRUE;
+				//RESETCOUNTER( RMOUSECLICK_DELAY_COUNTER );
+			}
+		}
+		else if ( fX2ButtonDown )
+		{
+			fX2ButtonDown = FALSE;
+
+			if ( _KeyDown( ALT ) )
+				AutoReload( MercPtrs[ gusSelectedSoldier ] );
+			else
+			// Toggle squad's stealth mode.....
+			// For each guy on squad...
+			{
+				SOLDIERTYPE				*pTeamSoldier;
+				INT8					bLoop;
+				BOOLEAN					fStealthOn = FALSE;
+
+				// Check if at least one guy is on stealth....
+				for (bLoop=gTacticalStatus.Team[gbPlayerNum].bFirstID, pTeamSoldier=MercPtrs[bLoop]; bLoop <= gTacticalStatus.Team[gbPlayerNum].bLastID; bLoop++, pTeamSoldier++)
+				{
+					if ( OK_CONTROLLABLE_MERC( pTeamSoldier ) && pTeamSoldier->bAssignment == CurrentSquad( ) )
+					{
+						if ( pTeamSoldier->bStealthMode )
+						{
+							fStealthOn = TRUE;
+						}
+					}
+				}
+
+				fStealthOn = !fStealthOn;
+
+				for (bLoop=gTacticalStatus.Team[gbPlayerNum].bFirstID, pTeamSoldier=MercPtrs[bLoop]; bLoop <= gTacticalStatus.Team[gbPlayerNum].bLastID; bLoop++, pTeamSoldier++)
+				{
+					if ( OK_CONTROLLABLE_MERC( pTeamSoldier ) && pTeamSoldier->bAssignment == CurrentSquad( ) && !AM_A_ROBOT( pTeamSoldier ) )
+					{
+						if ( gpSMCurrentMerc != NULL && bLoop == gpSMCurrentMerc->ubID )
+						{
+							gfUIStanceDifferent = TRUE;
+						}
+
+						pTeamSoldier->bStealthMode = fStealthOn;
+					}
+				}
+
+				fInterfacePanelDirty = DIRTYLEVEL2;
+
+				// OK, display message
+				if ( fStealthOn )
+				{
+					ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, pMessageStrings[ MSG_SQUAD_ON_STEALTHMODE ] );
+				}
+				else
+				{
+					ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, pMessageStrings[ MSG_SQUAD_OFF_STEALTHMODE ] );
+				}
+			}
+		}
+		
 	}
 }

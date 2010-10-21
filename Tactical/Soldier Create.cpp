@@ -3325,7 +3325,8 @@ UINT8 GetLocationModifier( UINT8 ubSoldierClass )
 						break;
 
 					default:
-						Assert( 0 );
+					        ubLocationModifier = 0;
+					//	Assert( 0 );
 						break;
 				}
 		}

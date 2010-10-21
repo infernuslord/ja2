@@ -9,6 +9,12 @@ extern BOOLEAN sSPEECH[NUM_PROFILES];
 
 extern void LoadGameLegionOptions();
 
+#ifdef WFconvertUB
+extern void WFtoUB();
+extern void MercProfilesConvertToDat ();
+extern void ConvertBinaryData170to254 ();
+#endif
+
 typedef struct
 { 
   BOOLEAN			  CamoFaceLegion[256];

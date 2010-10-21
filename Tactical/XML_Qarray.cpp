@@ -163,7 +163,7 @@ BOOLEAN ReadInQarray(QARRAY_VALUES *pQarray, STR fileName)
 
 	qarrayParseData pData;
 
-	DebugMsg(TOPIC_JA2, DBG_LEVEL_3, "Loading Qarray.xml" );
+	DebugMsg(TOPIC_JA2, DBG_LEVEL_3, "Loading MercQuote.xml" );
 
 	
 	// Open file
@@ -201,7 +201,7 @@ BOOLEAN ReadInQarray(QARRAY_VALUES *pQarray, STR fileName)
 	{
 		CHAR8 errorBuf[511];
 
-		sprintf(errorBuf, "XML Parser Error in Quotearray.xml: %s at line %d", XML_ErrorString(XML_GetErrorCode(parser)), XML_GetCurrentLineNumber(parser));
+		sprintf(errorBuf, "XML Parser Error in MercQuote.xml: %s at line %d", XML_ErrorString(XML_GetErrorCode(parser)), XML_GetCurrentLineNumber(parser));
 		LiveMessage(errorBuf);
 
 		MemFree(lpcBuffer);

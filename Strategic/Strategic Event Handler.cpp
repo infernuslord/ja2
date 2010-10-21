@@ -815,16 +815,17 @@ void HandleEarlyMorningEvents( void )
 	UINT32					uiAmount;
 
 	// loop through all *NPCs* and reset "default response used recently" flags
-#ifdef JA2UB
-	for (cnt = FIRST_RPC; cnt < NUM_PROFILES; cnt++)  //GASTON
-#else
-	for (cnt = FIRST_RPC; cnt < GASTON; cnt++)
-#endif
+	//for (cnt = FIRST_RPC; cnt < GASTON; cnt++)
+	for (cnt = 0; cnt < NUM_PROFILES; cnt++)
 	{
+		//new profiles by Jazz
+		if ( gProfilesRPC[cnt].ProfilId == cnt || gProfilesNPC[cnt].ProfilId == cnt || gProfilesVehicle[cnt].ProfilId == cnt )
+		{
 		gMercProfiles[cnt].bFriendlyOrDirectDefaultResponseUsedRecently = FALSE;
 		gMercProfiles[cnt].bRecruitDefaultResponseUsedRecently = FALSE;
 		gMercProfiles[cnt].bThreatenDefaultResponseUsedRecently = FALSE;
 		gMercProfiles[cnt].ubMiscFlags2 &= (~PROFILE_MISC_FLAG2_BANDAGED_TODAY);
+		}
 	}
 	// reset Father Walker's drunkenness level!
 	gMercProfiles[ FATHER ].bNPCData = (INT8) Random( 4 );

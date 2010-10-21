@@ -6,6 +6,11 @@
 //JA2/Unfinished Business
 #define JA2UB
 
+//Unfinished Business - Titles (ja2set.dat)
+#define JA2UBMAPS
+
+//#define WFconvertUB
+
 // Map Editor version - you should use the MapEditor configuration instead of messing with these defines (ChrisL)
 //#define JA2BETAVERSION
 //#define JA2EDITOR

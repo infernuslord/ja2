@@ -117,7 +117,7 @@ void InitEngineTilesets( )
 		FileClose( hfile );
 	}
 
-	#ifdef JA2UB
+	#ifdef JA2UBMAPS
 	gTilesets[ TLS_CAVES_1 ].MovementCostFnc			= (TILESET_CALLBACK)SetTilesetTwoTerrainValues;
 	gTilesets[ TLS_AIRSTRIP ].MovementCostFnc			= (TILESET_CALLBACK)SetTilesetThreeTerrainValues;
 	gTilesets[ TLS_DEAD_AIRSTRIP ].MovementCostFnc		= (TILESET_CALLBACK)SetTilesetThreeTerrainValues;
@@ -205,6 +205,17 @@ void ExportTilesets(vfs::Path const& filename)
 				xmlw.addAttributeToNextValue("index",(int)cnt2);
 				xmlw.addValue("file",std::string(zName));
 			}
+
+			// Set into database
+			strcpy( gTilesets[ cnt ].TileSurfaceFilenames[ cnt2 ], zName );
+//ddd{ добавляем в индекс 250 файл окоп.
+//		if((cnt==0)&&(cnt2+1 == uiNumFiles))
+//		{ strcpy( gTilesets[ cnt ].TileSurfaceFilenames[ 151 ], "okop.sti" );
+//				xmlw.AddAttributeToNextValue("index",(int)151); //for exp in xml
+//				xmlw.AddValue("file",std::string("okop.sti"));
+//		}
+//ddd}
+			
 		}
 		xmlw.closeNode(); // Files
 		xmlw.closeNode(); // tileset

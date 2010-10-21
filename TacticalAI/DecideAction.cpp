@@ -850,9 +850,34 @@ INT8 DecideActionGreen(SOLDIERTYPE *pSoldier)
 
 	}
 
+//ddd{
+	if(gGameExternalOptions.bNewTacticalAIBehavior 
+		&& !( (gTacticalStatus.uiFlags & TURNBASED) && (gTacticalStatus.uiFlags & INCOMBAT) ) 
+		&& pSoldier->bTeam == ENEMY_TEAM)
+	{
 
+		INT32				cnt;
+		ROTTING_CORPSE *	pCorpse;
 
-
+		for ( cnt = 0; cnt < giNumRottingCorpse; cnt++ )
+		{
+			pCorpse = &(gRottingCorpse[ cnt ] );
+			
+			if ( pCorpse->fActivated && pCorpse->def.ubAIWarningValue > 0 )
+				if ( PythSpacesAway( pSoldier->sGridNo, pCorpse->def.sGridNo ) <= 5 )//приделать сравнение переменно дальности видения (smaxvid ?)
+				{
+					//проверить, находится ли труп в поле зрения драника.мента?
+					if ( SoldierTo3DLocationLineOfSightTest( pSoldier, pCorpse->def.sGridNo, pSoldier->pathing.bLevel, 3, TRUE, CALC_FROM_WANTED_DIR ) )
+					{
+						ScreenMsg( MSG_FONT_YELLOW, MSG_INTERFACE, L"Warning: enemy corpse found!!!" );
+						//pCorpse->def.ubAIWarningValue=0;
+						gRottingCorpse[ cnt ].def.ubAIWarningValue=0;
+						return( AI_ACTION_RED_ALERT );
+					}
+				}
+		}
+	}
+//ddd}
 
 	////////////////////////////////////////////////////////////////////////////
 	// POINT PATROL: move towards next point unless getting a bit winded
@@ -2209,7 +2234,10 @@ INT8 DecideActionRed(SOLDIERTYPE *pSoldier, UINT8 ubUnconsciousOK)
 		if (BestThrow.ubPossible)
 		{
 			// if firing mortar make sure we have room
-			if ( Item[pSoldier->inv[ BestThrow.bWeaponIn ].usItem].mortar )
+			//if ( Item[pSoldier->inv[ BestThrow.bWeaponIn ].usItem].mortar ) //comm by ddd
+			if (Item[pSoldier->inv[ BestThrow.bWeaponIn ].usItem].mortar 
+				|| Item[pSoldier->inv[ BestThrow.bWeaponIn ].usItem].grenadelauncher 
+				|| Item[pSoldier->inv[ BestThrow.bWeaponIn ].usItem].flare )
 			{
 				ubOpponentDir = GetDirectionFromGridNo( BestThrow.sTarget, pSoldier );
 
@@ -2468,6 +2496,11 @@ INT8 DecideActionRed(SOLDIERTYPE *pSoldier, UINT8 ubUnconsciousOK)
 	////////////////////////////////////////////////////////////////////////////
 	if ( ubCanMove && InLightAtNight( pSoldier->sGridNo, pSoldier->pathing.bLevel ) && pSoldier->aiData.bOrders != STATIONARY )
 	{
+		//ddd чтобы убегали, когда подсветят фальшвейером ночью
+		if(gGameExternalOptions.bNewTacticalAIBehavior)
+			pSoldier->aiData.bAction = AI_ACTION_LEAVE_WATER_GAS;
+		//ddd
+
 		pSoldier->aiData.usActionData = FindNearbyDarkerSpot( pSoldier );
 		if (!TileIsOutOfBounds(pSoldier->aiData.usActionData))
 		{
@@ -3941,7 +3974,9 @@ INT16 ubMinAPCost;
 				{
 					// look around for a worthy target (which sets BestShot.ubPossible)
 					BOOLEAN shootUnseen = FALSE;
-					if (gGameOptions.ubDifficultyLevel > DIF_LEVEL_MEDIUM )
+					///ddd
+					//if (gGameOptions.ubDifficultyLevel > DIF_LEVEL_MEDIUM ) //comm by ddd
+					if (gGameOptions.ubDifficultyLevel > DIF_LEVEL_MEDIUM || gGameExternalOptions.bNewTacticalAIBehavior)
 						shootUnseen = TRUE;
 
 					CalcBestShot(pSoldier,&BestShot,shootUnseen);

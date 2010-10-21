@@ -3062,6 +3062,15 @@ BOOLEAN SOLDIERTYPE::EVENT_InitNewSoldierAnim( UINT16 usNewState, UINT16 usStart
 			// Set new state to be animation to move to new stance
 			usNewState = END_SWAT;
 		}
+		///***ddd{
+		if( (this->usAnimState == SWATTING_WK || this->usAnimState == SWAT_BACKWARDS 
+			|| this->usAnimState == SWAT_BACKWARDS_NOTHING || this->usAnimState == SWAT_BACKWARDS_WK)
+			&& usNewState == CROUCHING )
+		{
+			// Set new state to be animation to move to new stance
+			usNewState = END_SWAT;
+		}
+		///***ddd}
 
 		if( this->usAnimState == WALKING && usNewState == STANDING && this->stats.bLife < INJURED_CHANGE_THREASHOLD && this->ubBodyType <= REGFEMALE && !this->MercInWater( ) )
 		{
@@ -3155,7 +3164,9 @@ BOOLEAN SOLDIERTYPE::EVENT_InitNewSoldierAnim( UINT16 usNewState, UINT16 usStart
 		// OK, if we have reverse set, do the side step!
 		if ( this->bReverse )
 		{
-			if ( usNewState == WALKING || usNewState == RUNNING || usNewState == SWATTING )
+			if ( usNewState == WALKING || usNewState == RUNNING || usNewState == SWATTING
+				//*** ddd
+				|| usNewState == SWATTING_WK)
 			{
 				// CHECK FOR SIDEWAYS!
 				if ( this->ubDirection == gPurpendicularDirection[ this->ubDirection ][ this->pathing.usPathingData[ this->pathing.usPathIndex ] ] )
@@ -3167,7 +3178,19 @@ BOOLEAN SOLDIERTYPE::EVENT_InitNewSoldierAnim( UINT16 usNewState, UINT16 usStart
 				{
 					if ( gAnimControl[ this->usAnimState ].ubEndHeight == ANIM_CROUCH )
 					{
-						usNewState = SWAT_BACKWARDS;
+						//*** ddd 
+						UINT16 usItem = this->inv[ HANDPOS ].usItem;
+						
+						if( this->inv[ HANDPOS ].exists() == true && Item[ usItem ].usItemClass == IC_GUN && Item[ usItem ].twohanded && !Item[usItem].rocketlauncher)   
+							usNewState = SWAT_BACKWARDS;
+						else
+							usNewState = SWAT_BACKWARDS_NOTHING;
+						// движение назад вприсядку с ножом ;)
+						if( this->inv[ HANDPOS ].exists() == true && 
+							//(this->ubBodyType == BIGMALE || this->ubBodyType == REGFEMALE )&&
+							(Item[ usItem ].usItemClass == IC_BLADE || Item[ usItem ].usItemClass == IC_THROWING_KNIFE)   )
+							usNewState = SWAT_BACKWARDS_WK;
+																		
 					}
 					else
 					{
@@ -3176,6 +3199,26 @@ BOOLEAN SOLDIERTYPE::EVENT_InitNewSoldierAnim( UINT16 usNewState, UINT16 usStart
 					}
 				}
 			}
+			//***08.12.2008*** добавлена анимация переката -стырено ;) ddd
+			else if( usNewState == CRAWLING 
+				&& this->ubDirection == 
+				gPurpendicularDirection[ this->ubDirection ][ this->pathing.usPathingData
+				[ this->pathing.usPathIndex  ] ])
+			{
+				if( QuickestDirection( this->ubDirection, this->pathing.usPathingData[ this->pathing.usPathIndex] ) > 0 )
+					usNewState = ROLL_PRONE_R;
+				else if( QuickestDirection( this->ubDirection, this->pathing.usPathingData[ this->pathing.usPathIndex ] ) < 0 )
+					usNewState = ROLL_PRONE_L;
+
+				if( usNewState != CRAWLING )
+				{
+					if( this->ubDirection % 2 == 0 )
+						gAnimControl[usNewState].dMovementChange = (FLOAT)0.8;
+					else
+						gAnimControl[usNewState].dMovementChange = (FLOAT)1.1;
+				}
+			}///
+
 		}
 
 		// ATE: Patch hole for breath collapse for roofs, fences
@@ -4234,6 +4277,13 @@ void SOLDIERTYPE::SetSoldierGridNo( INT32 sNewGridNo, BOOLEAN fForceRemove )
 		}
                    */
 
+		//dddokno{ ???????
+		//if ( IsOknoFencePresentAtGridno( sNewGridNo ) )
+		//{
+		//	this->sZLevelOverride = TOPMOST_Z_LEVEL;
+		//}
+		//dddokno}
+		
 		// Add/ remove tree if we are near it
 		// CheckForFullStructures( this );
 
@@ -4639,7 +4689,11 @@ UINT16 SelectFireAnimation( SOLDIERTYPE *pSoldier, UINT8 ubHeight )
 	// Check for rocket laucncher....
 	if ( Item[pSoldier->inv[ HANDPOS ].usItem].rocketlauncher )
 	{
-		return( SHOOT_ROCKET );
+		//***ddd if shoot crouched
+		if(ubHeight == ANIM_STAND)
+			return( SHOOT_ROCKET );
+		if(ubHeight == ANIM_CROUCH)
+			return( SHOOT_ROCKET_CROUCHED );
 	}
 
 	// Check for mortar....
@@ -4819,7 +4873,16 @@ UINT16 SOLDIERTYPE::GetMoveStateBasedOnStance( UINT8 ubStanceHeight )
 		}
 		else
 		{
-			return( SWATTING );
+			//***ddd
+			// т.к. пока отрисован 1 бодитайп, остальные добавить
+			UINT16 usItem = this->inv[ HANDPOS ].usItem;
+			if( this->inv[ HANDPOS ].exists() == true && 
+				//(this->ubBodyType == BIGMALE || this->ubBodyType == REGFEMALE )&&
+				(Item[ usItem ].usItemClass == IC_BLADE || Item[ usItem ].usItemClass == IC_THROWING_KNIFE)   )
+				return( SWATTING_WK );
+			else 
+				return( SWATTING );
+			
 		}
 		break;
 
@@ -7767,7 +7830,7 @@ void AdjustAniSpeed( SOLDIERTYPE *pSoldier )
 		}
 	}
 
-
+	//pSoldier->sAniDelay =1;//for max speed uncomment //ddd
 	RESETTIMECOUNTER( pSoldier->timeCounters.UpdateCounter, pSoldier->sAniDelay );
 }
 
@@ -7840,6 +7903,9 @@ void CalculateSoldierAniSpeed( SOLDIERTYPE *pSoldier, SOLDIERTYPE *pStatsSoldier
 		break;
 
 	case SWATTING:
+	//***ddd
+	case SWATTING_WK:
+	case SWAT_BACKWARDS_WK:
 
 		// Adjust based on body type
 		if ( pStatsSoldier->ubBodyType <= REGFEMALE )
@@ -9178,11 +9244,10 @@ UINT8 SOLDIERTYPE::SoldierTakeDamage( INT8 bHeight, INT16 sLifeDeduct, INT16 sBr
 			}
 		}
 	}
-#ifdef JA2UB
-	if ((ubAttacker != NOBODY) && (Menptr[ubAttacker].bTeam == OUR_TEAM) && (this->ubProfile != NO_PROFILE) && (this->ubProfile >= FIRST_RPC ))
-#else
-	if ((ubAttacker != NOBODY) && (Menptr[ubAttacker].bTeam == OUR_TEAM) && (this->ubProfile != NO_PROFILE) && (this->ubProfile >= FIRST_RPC && this->ubProfile < GASTON ))
-#endif
+
+//	if ((ubAttacker != NOBODY) && (Menptr[ubAttacker].bTeam == OUR_TEAM) && (this->ubProfile != NO_PROFILE) && (this->ubProfile >= FIRST_RPC && this->ubProfile < GASTON ))
+		//new profiles by Jazz	
+	if ( (ubAttacker != NOBODY) && (Menptr[ubAttacker].bTeam == OUR_TEAM) && (this->ubProfile != NO_PROFILE) && gProfilesRPC[this->ubProfile].ProfilId == this->ubProfile || gProfilesNPC[this->ubProfile].ProfilId == this->ubProfile )			
 	{
 		gMercProfiles[this->ubProfile].ubMiscFlags |= PROFILE_MISC_FLAG_WOUNDEDBYPLAYER;
 		if (this->ubProfile == 114)
@@ -9484,11 +9549,20 @@ BOOLEAN SOLDIERTYPE::InternalDoMercBattleSound( UINT8 ubBattleSoundID, INT8 bSpe
 	// Adjust based on morale...
 	if ( ubBattleSoundID == BATTLE_SOUND_OK1 && pSoldier->aiData.bMorale < LOW_MORALE_BATTLE_SND_THREASHOLD )
 	{
-		ubBattleSoundID = BATTLE_SOUND_LOWMARALE_OK1;
+		//ddd {
+			if(Chance(gGameExternalOptions.iChanceSayAnnoyingPhrase) )
+				ubBattleSoundID = BATTLE_SOUND_LOWMARALE_OK1;
+	///ddd }
+
+		//ubBattleSoundID = BATTLE_SOUND_LOWMARALE_OK1;
 	}
 	if ( ubBattleSoundID == BATTLE_SOUND_ATTN1 && pSoldier->aiData.bMorale < LOW_MORALE_BATTLE_SND_THREASHOLD )
 	{
-		ubBattleSoundID = BATTLE_SOUND_LOWMARALE_ATTN1;
+			//ddd {
+			if(Chance(gGameExternalOptions.iChanceSayAnnoyingPhrase) )
+				ubBattleSoundID = BATTLE_SOUND_LOWMARALE_ATTN1;
+
+		//ubBattleSoundID = BATTLE_SOUND_LOWMARALE_ATTN1;
 	}
 
 	ubSoundID = ubBattleSoundID;
@@ -9498,6 +9572,11 @@ BOOLEAN SOLDIERTYPE::InternalDoMercBattleSound( UINT8 ubBattleSoundID, INT8 bSpe
 	{
 		if( gGameSettings.fOptions[ TOPTION_MUTE_CONFIRMATIONS ] )
 			return( TRUE );
+	//ddd {
+			if(!Chance(gGameExternalOptions.iChanceSayAnnoyingPhrase) )
+				return( TRUE );
+	///ddd }
+			
 		//else a speech sound is to be played
 		else
 			fSpeechSound = TRUE;
@@ -11231,11 +11310,9 @@ void SOLDIERTYPE::EVENT_SoldierBeginFirstAid( INT32 sGridNo, UINT8 ubDirection )
 		// OK, check if we should play quote...
 		if ( pTSoldier->bTeam != gbPlayerNum )
 		{
-#ifdef JA2UB
-			if ( pTSoldier->ubProfile != NO_PROFILE && pTSoldier->ubProfile >= FIRST_RPC /*&& pTSoldier->ubProfile < GASTON */ && !RPC_RECRUITED( pTSoldier ) )
-#else
-			if ( pTSoldier->ubProfile != NO_PROFILE && pTSoldier->ubProfile >= FIRST_RPC && pTSoldier->ubProfile < GASTON && !RPC_RECRUITED( pTSoldier ) )
-#endif
+//			if ( pTSoldier->ubProfile != NO_PROFILE && pTSoldier->ubProfile >= FIRST_RPC && pTSoldier->ubProfile < GASTON && !RPC_RECRUITED( pTSoldier ) )
+			//new profiles by Jazz	
+			if ( pTSoldier->ubProfile != NO_PROFILE && ( gProfilesRPC[pTSoldier->ubProfile].ProfilId == pTSoldier->ubProfile || gProfilesNPC[pTSoldier->ubProfile].ProfilId == pTSoldier->ubProfile ) && !RPC_RECRUITED( pTSoldier )  )			
 			{
 				fRefused = PCDoesFirstAidOnNPC( pTSoldier->ubProfile );
 			}

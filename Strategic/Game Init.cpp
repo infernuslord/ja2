@@ -70,7 +70,8 @@
 #include "text.h"
 #include "connect.h"
 #include "XML.h"
-
+#include "mercs.h"
+#include "aim.h"
 #ifdef JA2UB
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
@@ -429,8 +430,11 @@ void InitStrategicLayer( void )
 	//JA25 UB
 	//Reset Jerry Quotes
 	//if ( gGameLegionOptions.InGameHeliCrash == TRUE )
+	InitJerryQuotes();	
 	if ( gGameLegionOptions.JerryQuotes == TRUE )
+	{
 	HandleJerryMiloQuotes( TRUE ); //AA
+	}
 	
 	//Ja25 UB
 	InitJa25StrategicAi( );
@@ -790,6 +794,28 @@ BOOLEAN InitNewGame( BOOLEAN fReset )
 	//	New_UB_Inventory ();
 #endif
 
+	UINT8 i;
+	//reset mercs profiles
+	for(i=0; i<NUM_PROFILES; i++)
+	{
+		gConditionsForMercAvailability[i].ProfilId = gConditionsForMercAvailabilityTemp[i].ProfilId;
+		gConditionsForMercAvailability[i].usMoneyPaid = gConditionsForMercAvailabilityTemp[i].usMoneyPaid;
+		gConditionsForMercAvailability[i].usDay = gConditionsForMercAvailabilityTemp[i].usDay;
+		gConditionsForMercAvailability[i].ubMercArrayID = gConditionsForMercAvailabilityTemp[i].ubMercArrayID;
+		gConditionsForMercAvailability[i].NewMercsAvailable = gConditionsForMercAvailabilityTemp[i].NewMercsAvailable;
+		gConditionsForMercAvailability[i].StartMercsAvailable = gConditionsForMercAvailabilityTemp[i].StartMercsAvailable;
+		gConditionsForMercAvailability[i].Drunk = gConditionsForMercAvailabilityTemp[i].Drunk;
+		gConditionsForMercAvailability[i].DrunkID = gConditionsForMercAvailabilityTemp[i].DrunkID;
+		gConditionsForMercAvailability[i].MercBio = gConditionsForMercAvailabilityTemp[i].MercBio;
+	}
+	
+	for(i=0; i<NUM_PROFILES; i++)
+	{
+		gAimAvailability[i].ProfilId = gAimAvailabilityTemp[i].ProfilId;
+		gAimAvailability[i].ubAimArrayID = gAimAvailabilityTemp[i].ubAimArrayID;
+		gAimAvailability[i].AimBio = gAimAvailabilityTemp[i].AimBio;
+	}
+	
 /*
 	if ( gubScreenCount == 2 )
 	{

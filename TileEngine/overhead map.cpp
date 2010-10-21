@@ -140,7 +140,7 @@ void InitNewOverheadDB( UINT8 ubTilesetID )
 
 		if ( hVObject == NULL )
 		{
-			#ifdef JA2UB
+			#ifdef JA2UBMAPS
 			if( ubTilesetID < DEFAULT_JA25_TILESET )
 			{
 				// TRY loading from default directory

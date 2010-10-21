@@ -285,7 +285,9 @@ void MercDailyUpdate()
 			{
 			}
 			//if the character is an RPC
-			else if( pSoldier->ubProfile >= FIRST_RPC && pSoldier->ubProfile < FIRST_NPC )
+			//else if( pSoldier->ubProfile >= FIRST_RPC && pSoldier->ubProfile < FIRST_NPC )
+			//new profiles by Jazz
+			else if ( gProfilesRPC[pSoldier->ubProfile].ProfilId == pSoldier->ubProfile )
 			{
 				INT16	sSalary = gMercProfiles[ pSoldier->ubProfile ].sSalary;
 				INT32	iMoneyOwedToMerc = 0;
@@ -488,7 +490,8 @@ void MercDailyUpdate()
 			if( IsProfileIdAnAimOrMERCMerc( (UINT8)cnt ) )
 			{
 				// check to see if he goes on another assignment
-				if (cnt < MAX_NUMBER_MERCS)
+				//if (cnt < MAX_NUMBER_MERCS)
+				if ( gProfilesAIM[ cnt ].ProfilId == cnt ) //new profiles by Jazz
 				{
 					// A.I.M. merc
 					uiChance = 2 * pProfile->bExpLevel;
@@ -496,7 +499,7 @@ void MercDailyUpdate()
 					// player has now had a chance to hire him, so he'll eligible to get killed off on another job
 					pProfile->ubMiscFlags3 |= PROFILE_MISC_FLAG3_PLAYER_HAD_CHANCE_TO_HIRE;
 				}
-				else
+				else if ( gProfilesMERC[ cnt ].ProfilId == cnt ) //new profiles by Jazz
 				{
 					// M.E.R.C. merc - very rarely get other work
 					uiChance = 1 * pProfile->bExpLevel;

@@ -520,6 +520,8 @@ UINT32		guiVideoTitleBar;
 INT32			iAimMembersBoxId = -1;
 
 UINT8			gbCurrentSoldier = 0;
+UINT8			gbCurrentSoldierBio = 0;
+
 UINT8			gbCurrentIndex = 0;
 
 UINT8			gubVideoConferencingMode;
@@ -924,6 +926,8 @@ BOOLEAN EnterAIMMembers()
 	if(gGameExternalOptions.gfUseNewStartingGearInterface) CreateKitSelectionButtons();
 
 	gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+	gbCurrentSoldier = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
+	gbCurrentSoldierBio = gAimAvailability[AimMercArray[gbCurrentIndex]].AimBio;
 
 	gfStopMercFromTalking = FALSE;
 	gubVideoConferencingMode = (UINT8)giCurrentSubPage;
@@ -1353,7 +1357,8 @@ BOOLEAN	UpdateMercInfo(void)
 		}
 		if(!g_bUseXML_Strings)
 		{
-			LoadMercBioInfo( gbCurrentSoldier, MercInfoString, AdditionalInfoString);
+		//	LoadMercBioInfo( gbCurrentSoldier, MercInfoString, AdditionalInfoString);
+			LoadMercBioInfo( gbCurrentSoldierBio, MercInfoString, AdditionalInfoString);
 		}
 		else
 		{
@@ -1400,7 +1405,8 @@ BOOLEAN	UpdateMercInfo(void)
 		}
 		if(!g_bUseXML_Strings)
 		{
-			LoadMercBioInfo( gbCurrentSoldier, MercInfoString, AdditionalInfoString);
+//			LoadMercBioInfo( gbCurrentSoldier, MercInfoString, AdditionalInfoString);
+			LoadMercBioInfo( gbCurrentSoldierBio, MercInfoString, AdditionalInfoString);
 		}
 		else
 		{
@@ -1728,15 +1734,15 @@ void BtnWeaponboxSelectOneButtonCallback(GUI_BUTTON *btn,INT32 reason)
 	{
 		if (btn->uiFlags & BUTTON_CLICKED_ON)
 		{
-			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
-
+//			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+			gbCurrentSoldier = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
 			//tais: handle selected kit
 			WeaponKitSelectionUpdate(0);
 
 			btn->uiFlags &= (~BUTTON_CLICKED_ON );
 			gfRedrawScreen = TRUE;
-			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
-
+//			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+			gbCurrentSoldier = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
 			gubVideoConferencingMode = AIM_VIDEO_NOT_DISPLAYED_MODE;
 			InvalidateRegion(btn->Area.RegionTopLeftX, btn->Area.RegionTopLeftY, btn->Area.RegionBottomRightX, btn->Area.RegionBottomRightY);
 		}
@@ -1759,14 +1765,15 @@ void BtnWeaponboxSelectTwoButtonCallback(GUI_BUTTON *btn,INT32 reason)
 	{
 		if (btn->uiFlags & BUTTON_CLICKED_ON)
 		{
-			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
-
+//			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+			gbCurrentSoldier = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
 			//tais: handle selected kit
 			WeaponKitSelectionUpdate(1);
 
 			btn->uiFlags &= (~BUTTON_CLICKED_ON );
 			gfRedrawScreen = TRUE;
-			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+//			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+			gbCurrentSoldier = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
 
 			gubVideoConferencingMode = AIM_VIDEO_NOT_DISPLAYED_MODE;
 			InvalidateRegion(btn->Area.RegionTopLeftX, btn->Area.RegionTopLeftY, btn->Area.RegionBottomRightX, btn->Area.RegionBottomRightY);
@@ -1789,14 +1796,15 @@ void BtnWeaponboxSelectThreeButtonCallback(GUI_BUTTON *btn,INT32 reason)
 	{
 		if (btn->uiFlags & BUTTON_CLICKED_ON)
 		{
-			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
-
+//			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+			gbCurrentSoldier = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
 			//tais: handle selected kit
 			WeaponKitSelectionUpdate(2);
 
 			btn->uiFlags &= (~BUTTON_CLICKED_ON );
 			gfRedrawScreen = TRUE;
-			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+//			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+			gbCurrentSoldier = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
 
 			gubVideoConferencingMode = AIM_VIDEO_NOT_DISPLAYED_MODE;
 			InvalidateRegion(btn->Area.RegionTopLeftX, btn->Area.RegionTopLeftY, btn->Area.RegionBottomRightX, btn->Area.RegionBottomRightY);
@@ -1819,14 +1827,16 @@ void BtnWeaponboxSelectFourButtonCallback(GUI_BUTTON *btn,INT32 reason)
 	{
 		if (btn->uiFlags & BUTTON_CLICKED_ON)
 		{
-			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+//			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+			gbCurrentSoldier = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
 
 			//tais: handle selected kit
 			WeaponKitSelectionUpdate(3);
 
 			btn->uiFlags &= (~BUTTON_CLICKED_ON );
 			gfRedrawScreen = TRUE;
-			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+//			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+			gbCurrentSoldier = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
 
 			gubVideoConferencingMode = AIM_VIDEO_NOT_DISPLAYED_MODE;
 			InvalidateRegion(btn->Area.RegionTopLeftX, btn->Area.RegionTopLeftY, btn->Area.RegionBottomRightX, btn->Area.RegionBottomRightY);
@@ -1855,7 +1865,8 @@ void BtnWeaponboxSelectFiveButtonCallback(GUI_BUTTON *btn,INT32 reason)
 
 			btn->uiFlags &= (~BUTTON_CLICKED_ON );
 			gfRedrawScreen = TRUE;
-			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+//			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+			gbCurrentSoldier = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
 
 			gubVideoConferencingMode = AIM_VIDEO_NOT_DISPLAYED_MODE;
 			InvalidateRegion(btn->Area.RegionTopLeftX, btn->Area.RegionTopLeftY, btn->Area.RegionBottomRightX, btn->Area.RegionBottomRightY);
@@ -1870,6 +1881,9 @@ void BtnWeaponboxSelectFiveButtonCallback(GUI_BUTTON *btn,INT32 reason)
 
 void BtnPreviousButtonCallback(GUI_BUTTON *btn,INT32 reason)
 {
+
+BOOLEAN Stop = FALSE;
+
 	if(reason & MSYS_CALLBACK_REASON_LBUTTON_DWN )
 	{
 		btn->uiFlags |= BUTTON_CLICKED_ON;
@@ -1890,7 +1904,9 @@ void BtnPreviousButtonCallback(GUI_BUTTON *btn,INT32 reason)
 
 			gfRedrawScreen = TRUE;
 
-			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+//			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+			gbCurrentSoldier = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId; 			
+			gbCurrentSoldierBio = gAimAvailability[AimMercArray[gbCurrentIndex]].AimBio;
 
 			gubVideoConferencingMode = AIM_VIDEO_NOT_DISPLAYED_MODE;
 			InvalidateRegion(btn->Area.RegionTopLeftX, btn->Area.RegionTopLeftY, btn->Area.RegionBottomRightX, btn->Area.RegionBottomRightY);
@@ -1939,6 +1955,9 @@ void BtnContactButtonCallback(GUI_BUTTON *btn,INT32 reason)
 
 void BtnNextButtonCallback(GUI_BUTTON *btn,INT32 reason)
 {
+
+BOOLEAN Stop = FALSE;
+
 	if(reason & MSYS_CALLBACK_REASON_LBUTTON_DWN )
 	{
 		btn->uiFlags |= BUTTON_CLICKED_ON;
@@ -1951,12 +1970,15 @@ void BtnNextButtonCallback(GUI_BUTTON *btn,INT32 reason)
 			btn->uiFlags &= (~BUTTON_CLICKED_ON );
 			InitCreateDeleteAimPopUpBox(AIM_POPUP_DELETE, NULL, NULL, 0, 0, 0);
 
-			if( gbCurrentIndex < MAX_NUMBER_MERCS-1 )
+			if( gbCurrentIndex < MAX_NUMBER_MERCS -1 )
 				gbCurrentIndex++;
 			else
 				gbCurrentIndex = 0;
 
-			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+//			gbCurrentSoldier = AimMercArray[gbCurrentIndex];
+			gbCurrentSoldier = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId; 
+			
+			gbCurrentSoldierBio = gAimAvailability[AimMercArray[gbCurrentIndex]].AimBio;
 
 			gfRedrawScreen = TRUE;
 
@@ -2391,7 +2413,8 @@ if (LaptopSaveInfo.iCurrentBalance == 4500001) {
 	unsigned hired = 0;
 	while (hired < gGameExternalOptions.ubGameMaximumNumberOfPlayerMercs) {
 		if (AimMemberHireMerc()) {
-    	  giIdOfLastHiredMerc = AimMercArray[gbCurrentIndex];
+//    	  giIdOfLastHiredMerc = AimMercArray[gbCurrentIndex];
+		  giIdOfLastHiredMerc = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
 		  ++hired;
 		}
 		++gbCurrentIndex;
@@ -2435,7 +2458,8 @@ if (LaptopSaveInfo.iCurrentBalance == 4500001) {
 					SpecifyDisabledButtonStyle( giBuyEquipmentButton[0], DISABLED_STYLE_NONE );
 					SpecifyDisabledButtonStyle( giBuyEquipmentButton[1], DISABLED_STYLE_NONE );
 
-					giIdOfLastHiredMerc = AimMercArray[gbCurrentIndex];
+//					giIdOfLastHiredMerc = AimMercArray[gbCurrentIndex];
+					giIdOfLastHiredMerc = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
 				}
 			}
 /*
@@ -2469,7 +2493,8 @@ if (LaptopSaveInfo.iCurrentBalance == 4500001) {
 INT8 AimMemberHireMerc()
 {
 	MERC_HIRE_STRUCT HireMercStruct;
-	UINT8		ubCurrentSoldier = AimMercArray[gbCurrentIndex];
+//	UINT8		ubCurrentSoldier = AimMercArray[gbCurrentIndex];
+	UINT8		ubCurrentSoldier =  gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
 	INT8		bReturnCode;
 	INT16		sSoldierID=0;
 	INT8		bTypeOfContract=0;
@@ -4898,7 +4923,8 @@ BOOLEAN QuickHireMerc()
 {
 	INT8	bReturnCode;
 	MERC_HIRE_STRUCT HireMercStruct;
-	UINT8		ubCurrentSoldier = AimMercArray[gbCurrentIndex];
+//	UINT8		ubCurrentSoldier = AimMercArray[gbCurrentIndex];
+	UINT8	ubCurrentSoldier = 	gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
 
 	giContractAmount = 0;
 

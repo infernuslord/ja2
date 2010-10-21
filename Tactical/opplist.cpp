@@ -890,11 +890,15 @@ void HandleSight(SOLDIERTYPE *pSoldier, UINT8 ubSightFlags)
 		{
 			// update our team's public knowledge
 			RadioSightings(pSoldier,EVERYBODY, pSoldier->bTeam );
-
+/*  comm by ddd
 #ifdef WE_SEE_WHAT_MILITIA_SEES_AND_VICE_VERSA
 			RadioSightings(pSoldier,EVERYBODY, MILITIA_TEAM);
-#endif
-
+#endif*/
+//ddd{
+if(gGameExternalOptions.bWeSeeWhatMilitiaSeesAndViceVersa) 
+RadioSightings(pSoldier,EVERYBODY, MILITIA_TEAM);
+				
+//ddd}
 			// if it's our local player's merc
 			if (PTR_OURTEAM)
 				// revealing roofs and looking for items handled here, too
@@ -1069,6 +1073,7 @@ INT16 TeamNoLongerSeesMan( UINT8 ubTeam, SOLDIERTYPE *pOpponent, UINT8 ubExclude
 	 return(FALSE);	 // that's all I need to know, get out of here
 	}
 
+/* comm by ddd
 #ifdef WE_SEE_WHAT_MILITIA_SEES_AND_VICE_VERSA
 	if ( bIteration == 0 )
 	{
@@ -1084,6 +1089,26 @@ INT16 TeamNoLongerSeesMan( UINT8 ubTeam, SOLDIERTYPE *pOpponent, UINT8 ubExclude
 		}
 	}
 #endif
+*/
+//ddd
+if(gGameExternalOptions.bWeSeeWhatMilitiaSeesAndViceVersa)
+{
+	if ( bIteration == 0 )
+	{
+		if ( ubTeam == gbPlayerNum && gTacticalStatus.Team[ MILITIA_TEAM ].bTeamActive )
+		{
+			// check militia team as well
+			return( TeamNoLongerSeesMan( MILITIA_TEAM, pOpponent, ubExcludeID, 1 ) );
+		}
+		else if ( ubTeam == MILITIA_TEAM && gTacticalStatus.Team[ gbPlayerNum ].bTeamActive )
+		{
+			// check player team as well
+			return( TeamNoLongerSeesMan( gbPlayerNum, pOpponent, ubExcludeID, 1 ) );
+		}
+	}
+
+}
+//ddd
 
  // none of my friends is currently seeing the guy, so return success
  return(TRUE);
@@ -1364,16 +1389,30 @@ void EndMuzzleFlash( SOLDIERTYPE * pSoldier )
 	SOLDIERTYPE *		pOtherSoldier;
 
 	pSoldier->flags.fMuzzleFlash = FALSE;
-
+/*comm by ddd
 #ifdef WE_SEE_WHAT_MILITIA_SEES_AND_VICE_VERSA
 	if ( pSoldier->bTeam != gbPlayerNum && pSoldier->bTeam != MILITIA_TEAM )
 #else
 	if ( pSoldier->bTeam != gbPlayerNum )
 #endif
+
 	{
 		pSoldier->bVisible = 0; // indeterminate state
 	}
+*/	
 
+//ddd{
+if(gGameExternalOptions.bWeSeeWhatMilitiaSeesAndViceVersa)	
+{	if ( pSoldier->bTeam != gbPlayerNum && pSoldier->bTeam != MILITIA_TEAM )
+		pSoldier->bVisible = 0; // indeterminate state
+}
+else
+{
+	if ( pSoldier->bTeam != gbPlayerNum )
+		pSoldier->bVisible = 0; // indeterminate state
+}
+//ddd}
+	
 	for (uiLoop = 0; uiLoop < guiNumMercSlots; uiLoop++)
 	{
 		pOtherSoldier = MercSlots[ uiLoop ];
@@ -1391,6 +1430,7 @@ void EndMuzzleFlash( SOLDIERTYPE * pSoldier )
 					}
 
 					// else this person is still seen, if the looker is on our side or the militia the person should stay visible
+/* comm by ddd
 #ifdef WE_SEE_WHAT_MILITIA_SEES_AND_VICE_VERSA
 					else if ( pOtherSoldier->bTeam == gbPlayerNum || pOtherSoldier->bTeam == MILITIA_TEAM )
 #else
@@ -1400,6 +1440,19 @@ void EndMuzzleFlash( SOLDIERTYPE * pSoldier )
 					{
 						pSoldier->bVisible = TRUE; // yes, still seen
 					}
+*/					
+					//ddd{
+					else if(gGameExternalOptions.bWeSeeWhatMilitiaSeesAndViceVersa)
+					{
+						if ( pOtherSoldier->bTeam == gbPlayerNum || pOtherSoldier->bTeam == MILITIA_TEAM )
+							{pSoldier->bVisible = TRUE;} // yes, still seen
+					}
+					else
+					{
+						if ( pOtherSoldier->bTeam == gbPlayerNum )
+							pSoldier->bVisible = TRUE; // yes, still seen
+					}
+					//ddd}
 				}
 			}
 		}
@@ -1749,6 +1802,7 @@ void HandleManNoLongerSeen( SOLDIERTYPE * pSoldier, SOLDIERTYPE * pOpponent, INT
 			*pbPublOL = SEEN_THIS_TURN;
 
 			// ATE: Set visiblity to 0
+/*comm by ddd			
 #ifdef WE_SEE_WHAT_MILITIA_SEES_AND_VICE_VERSA
 			if ( (pSoldier->bTeam == gbPlayerNum || pSoldier->bTeam == MILITIA_TEAM) && !(pOpponent->bTeam == gbPlayerNum || pOpponent->bTeam == MILITIA_TEAM ) )
 #else
@@ -1757,6 +1811,18 @@ void HandleManNoLongerSeen( SOLDIERTYPE * pSoldier, SOLDIERTYPE * pOpponent, INT
 			{
 				pOpponent->bVisible = 0;
 			}
+*/			
+//ddd{
+if(gGameExternalOptions.bWeSeeWhatMilitiaSeesAndViceVersa)
+{ if ( (pSoldier->bTeam == gbPlayerNum || pSoldier->bTeam == MILITIA_TEAM) && !(pOpponent->bTeam == gbPlayerNum || pOpponent->bTeam == MILITIA_TEAM ) )
+	pOpponent->bVisible = 0;
+}
+else
+{ if ( pSoldier->bTeam == gbPlayerNum && pOpponent->bTeam != gbPlayerNum )
+	pOpponent->bVisible = 0;
+}
+//ddd}
+
 		}
 	}
 #ifdef TESTOPPLIST
@@ -2511,8 +2577,22 @@ void ManSeesMan(SOLDIERTYPE *pSoldier, SOLDIERTYPE *pOpponent, INT32 sOppGridNo,
 		// man is seeing an opponent AGAIN whom he has seen at least once before
 		gbSeenOpponents[pSoldier->ubID][pOpponent->ubID] = TRUE;
 
+//ddd{
+BOOLEAN SEE_MENT = FALSE;
 
+if(gGameExternalOptions.bWeSeeWhatMilitiaSeesAndViceVersa)
+{
+	if ( ( PTR_OURTEAM || (pSoldier->bTeam == MILITIA_TEAM) ) && (pOpponent->bVisible <= 0))
+	SEE_MENT = TRUE;
+}
+else
+{
+	if (PTR_OURTEAM && (pOpponent->bVisible <= 0))
+	SEE_MENT = TRUE;
+}
+//ddd}
 
+/*comm by ddd
 	// if looker is on local team, and the enemy was invisible or "maybe"
 	// visible just prior to this
 #ifdef WE_SEE_WHAT_MILITIA_SEES_AND_VICE_VERSA
@@ -2520,6 +2600,8 @@ void ManSeesMan(SOLDIERTYPE *pSoldier, SOLDIERTYPE *pOpponent, INT32 sOppGridNo,
 #else
 	if (PTR_OURTEAM && (pOpponent->bVisible <= 0))
 #endif
+*/
+if(SEE_MENT)
 	{
 		// if opponent was truly invisible, not just turned off temporarily (FALSE)
 		if (pOpponent->bVisible == -1)
@@ -2674,6 +2756,7 @@ void OtherTeamsLookForMan(SOLDIERTYPE *pOpponent)
 
 	//NumMessage("OtherTeamsLookForMan, guy#",oppPtr->guynum);
 
+/* comm by ddd	
 	// if the guy we're looking for is NOT on our team AND is currently visible
 #ifdef WE_SEE_WHAT_MILITIA_SEES_AND_VICE_VERSA
 	if ((pOpponent->bTeam != gbPlayerNum && pOpponent->bTeam != MILITIA_TEAM) && (pOpponent->bVisible >= 0 && pOpponent->bVisible < 2) && pOpponent->stats.bLife)
@@ -2684,7 +2767,19 @@ void OtherTeamsLookForMan(SOLDIERTYPE *pOpponent)
 		// assume he's no longer visible, until one of our mercs sees him again
 		pOpponent->bVisible = 0;
 	}
-
+*/	
+//ddd{
+if(gGameExternalOptions.bWeSeeWhatMilitiaSeesAndViceVersa)
+{	
+	if ((pOpponent->bTeam != gbPlayerNum && pOpponent->bTeam != MILITIA_TEAM) && (pOpponent->bVisible >= 0 && pOpponent->bVisible < 2) && pOpponent->stats.bLife)
+		pOpponent->bVisible = 0;
+}
+else
+{
+if ((pOpponent->bTeam != gbPlayerNum) && (pOpponent->bVisible >= 0 && pOpponent->bVisible < 2) && pOpponent->stats.bLife)
+pOpponent->bVisible = 0;
+}
+//ddd}
 #ifdef TESTOPPLIST
 	DebugMsg( TOPIC_JA2OPPLIST, DBG_LEVEL_3,
 			String("OTHERTEAMSLOOKFORMAN ID %d(%S) team %d side %d",pOpponent->ubID,pOpponent->name,pOpponent->bTeam,pOpponent->bSide ));
@@ -3171,11 +3266,24 @@ void BetweenTurnsVisibilityAdjustments(void)
 	{
 		if (pSoldier->bActive && pSoldier->bInSector && pSoldier->stats.bLife)
 		{
+			//ddd{
+			BOOLEAN SEE_MENT = FALSE;
+			if (gGameExternalOptions.bWeSeeWhatMilitiaSeesAndViceVersa)
+			{if (!PTR_OURTEAM && pSoldier->bTeam != MILITIA_TEAM)
+			SEE_MENT = TRUE;
+			}
+			else
+			{ if (!PTR_OURTEAM) SEE_MENT = TRUE;
+			}
+			//ddd}
+/*comm by ddd
 #ifdef WE_SEE_WHAT_MILITIA_SEES_AND_VICE_VERSA
 			if (!PTR_OURTEAM && pSoldier->bTeam != MILITIA_TEAM)
 #else
 			if (!PTR_OURTEAM)
 #endif
+				*/
+			if(SEE_MENT)
 			{
 				// check if anyone on our team currently sees him (exclude NOBODY)
 				if (TeamNoLongerSeesMan(gbPlayerNum,pSoldier,NOBODY,0))
@@ -3334,6 +3442,8 @@ void SaySeenQuote( SOLDIERTYPE *pSoldier, BOOLEAN fSeenCreature, BOOLEAN fVirgin
 				TacticalCharacterDialogue( pSoldier, QUOTE_SEE_ENEMY );
 			}
 #else
+	//ddd TacticalCharacterDialogue( pSoldier, QUOTE_SEE_ENEMY );
+		if(Chance(gGameExternalOptions.iChanceSayAnnoyingPhrase) )
 			TacticalCharacterDialogue( pSoldier, QUOTE_SEE_ENEMY );
 #endif
 		}
@@ -4377,7 +4487,9 @@ void DebugSoldierPage3( )
 		ubLine++;
 
 		// OPIONION OF SELECTED MERC
-		if ( gusSelectedSoldier != NOBODY && ( MercPtrs[ gusSelectedSoldier ]->ubProfile < FIRST_NPC ) && pSoldier->ubProfile != NO_PROFILE )
+		//if ( gusSelectedSoldier != NOBODY && ( MercPtrs[ gusSelectedSoldier ]->ubProfile < FIRST_NPC ) && pSoldier->ubProfile != NO_PROFILE )
+		//new profiles by Jazz	
+		if ( gusSelectedSoldier != NOBODY && ( gProfilesIMP[MercPtrs[ gusSelectedSoldier ]->ubProfile].ProfilId == MercPtrs[ gusSelectedSoldier ]->ubProfile || gProfilesRPC[MercPtrs[ gusSelectedSoldier ]->ubProfile].ProfilId == MercPtrs[ gusSelectedSoldier ]->ubProfile || gProfilesAIM[MercPtrs[ gusSelectedSoldier ]->ubProfile].ProfilId == MercPtrs[ gusSelectedSoldier ]->ubProfile || gProfilesMERC[MercPtrs[ gusSelectedSoldier ]->ubProfile].ProfilId == MercPtrs[ gusSelectedSoldier ]->ubProfile ) && pSoldier->ubProfile != NO_PROFILE )
 		{
 			SetFontShade(LARGEFONT1, FONT_SHADE_GREEN);
 			gprintf( 0, LINE_HEIGHT * ubLine, L"NPC Opinion:");
@@ -5940,6 +6052,13 @@ UINT8 CalcEffVolume(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bLevel, UINT8 ubN
 
  // effective volume fades over distance beyond 1 tile away
  iEffVolume -= (iDistance - 1);
+
+ //ddd{ цивилы плохо слышат ;)
+ if(gGameExternalOptions.bLazyCivilians)
+ 	if (pSoldier->bTeam == CIV_TEAM && pSoldier->ubBodyType != CROW )
+		if (pSoldier->ubCivilianGroup == 0 && pSoldier->ubProfile == NO_PROFILE)
+			iEffVolume =-100;
+	//ddd}
 
 	/*
 	if (pSoldier->bTeam == CIV_TEAM && pSoldier->ubBodyType != CROW )

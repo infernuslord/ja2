@@ -183,7 +183,8 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 #ifdef JA2UB
 	//JA25 UB
 	//MErc mercs come with an umbrella
-	if( ( ubCurrentSoldier >= 40 && ubCurrentSoldier <= 50 ) || ubCurrentSoldier == 58 /*GASTON*/ || ubCurrentSoldier == 59 /*STOGIE*/ )
+	if ( gProfilesMERC[ubCurrentSoldier].ProfilId == ubCurrentSoldier )
+//	if( ( ubCurrentSoldier >= 40 && ubCurrentSoldier <= 50 ) || ubCurrentSoldier == 58 /*GASTON*/ || ubCurrentSoldier == 59 /*STOGIE*/ )
 	{
 		AddItemToMerc( iNewIndex, MERC_UMBRELLA ); //4507
 	}
@@ -192,14 +193,16 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 	if( gJa25SaveStruct.fHaveAimandMercOffferItems )
 	{
 		//if its an aim merc
-		if( ubCurrentSoldier < 40 )
+		//if( ubCurrentSoldier < 40 )
+		if ( gProfilesAIM[ubCurrentSoldier].ProfilId == ubCurrentSoldier )
 		{
 			//give the mercs one of the promo items
 			AddItemToMerc( iNewIndex, SAM_GARVER_COMBAT_KNIFE ); //4506
 		}
 
 		// if its a merc merc
-		else if( ubCurrentSoldier <= 50 || ubCurrentSoldier == 58 /*GASTON*/ || ubCurrentSoldier == 59 /*STOGIE*/ )
+		else 	if ( gProfilesMERC[ubCurrentSoldier].ProfilId == ubCurrentSoldier )
+		//else if( ubCurrentSoldier <= 50 || ubCurrentSoldier == 58 /*GASTON*/ || ubCurrentSoldier == 59 /*STOGIE*/ )
 		{
 			//give the mercs one of the promo items
 			AddItemToMerc( iNewIndex, CHE_GUEVARA_CANTEEN ); //4504
@@ -346,7 +349,8 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 
 
 	//if the merc is an AIM merc
-	if( ubCurrentSoldier < 40 )
+	//if( ubCurrentSoldier < 40 )
+	if ( gProfilesAIM[ ubCurrentSoldier ].ProfilId == ubCurrentSoldier ) //new profiles by Jazz
 	{
 
 		pSoldier->ubWhatKindOfMercAmI = MERC_TYPE__AIM_MERC;
@@ -375,11 +379,8 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 		pSoldier->usMedicalDeposit = gMercProfiles[ pSoldier->ubProfile ].sMedicalDepositAmount;
 	}
 	//if the merc is from M.E.R.C.
-#ifdef JA2UB
-	else if( ( ubCurrentSoldier >= BIFF && ubCurrentSoldier <= BUBBA ) || ( ubCurrentSoldier == 58 || ubCurrentSoldier == 59 ) ) // gaston stogie
-#else
-	else if( ( ubCurrentSoldier >= BIFF && ubCurrentSoldier <= BUBBA ) || ubCurrentSoldier >= GASTON )
-#endif
+	//else if( ( ubCurrentSoldier >= BIFF && ubCurrentSoldier <= BUBBA ) || ubCurrentSoldier >= GASTON )
+	else if ( gProfilesMERC[ ubCurrentSoldier ].ProfilId == ubCurrentSoldier ) //new profiles by Jazz
 	{
 		pSoldier->ubWhatKindOfMercAmI = MERC_TYPE__MERC;
 		//pSoldier->iTotalContractCharge = -1;
@@ -392,7 +393,8 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 		if(!is_client)AddHistoryToPlayersLog(HISTORY_HIRED_MERC_FROM_MERC, ubCurrentSoldier, GetWorldTotalMin(), -1, -1 );
 	}
 	//If the merc is from IMP, (ie a player character)
-	else if( ( ubCurrentSoldier >= 51 ) && ( ubCurrentSoldier < 57 ) )
+	//else if( ( ubCurrentSoldier >= 51 ) && ( ubCurrentSoldier < 57 ) )
+	else if ( gProfilesIMP[ ubCurrentSoldier ].ProfilId == ubCurrentSoldier ) //new profiles by Jazz
 	{
 		pSoldier->ubWhatKindOfMercAmI = MERC_TYPE__PLAYER_CHARACTER;
 		//pSoldier->iTotalContractCharge = -1;

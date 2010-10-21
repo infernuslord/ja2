@@ -75,7 +75,7 @@ RPC_SMALL_FACE_VALUES gRPCSmallFaceValues[ ] =
 	0,	0,	0,	0,		// THE RAT	( 62 )
 	8,	7,	8,	23,		//					( 63 )
 	8,	8,	8,	22,		// SLAY			( 64 )
-	0,	0,	0,	0,		//					( 65 )
+	13,	6,	12,	22,		//					( 65 )ddd
 	9,	4,	7,	22,		// DYNAMO		( 66 )
 	8,	8,	8,	25,		// SHANK		( 67 )
 	4,	6,	5,	22,		// IGGY			( 68 )
@@ -292,14 +292,14 @@ INT32	InternalInitFace( UINT8 usMercProfileID, UINT8 ubSoldierID, UINT32 uiInitF
 		{
 			if( gMercProfiles[ 64 ].bSkillTrait2 == RANGER_NT )
 			{
-				sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
+				sprintf( VObjectDesc.ImageFile, "FACES\\B64c.sti" );
 			}
 		}
 		else
 		{
 			if( gMercProfiles[ 64 ].bSkillTrait2 == CAMOUFLAGED_OT )
 			{
-				sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
+				sprintf( VObjectDesc.ImageFile, "FACES\\B64c.sti" );
 			}
 		}
 		}

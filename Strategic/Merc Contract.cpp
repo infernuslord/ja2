@@ -1112,7 +1112,9 @@ void NotifyPlayerOfMercDepartureAndPromptEquipmentPlacement( SOLDIERTYPE *pSoldi
 	}
 
 	//if the character is an RPC
-	if( pSoldier->ubProfile >= FIRST_RPC && pSoldier->ubProfile < FIRST_NPC )
+	//if( pSoldier->ubProfile >= FIRST_RPC && pSoldier->ubProfile < FIRST_NPC )
+	//new profiles by Jazz
+	if ( gProfilesRPC[pSoldier->ubProfile].ProfilId == pSoldier->ubProfile )
 	{
 		if( gMercProfiles[ pSoldier->ubProfile ].bSex == MALE )
 		{

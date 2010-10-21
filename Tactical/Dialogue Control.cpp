@@ -55,6 +55,7 @@
 	#include "end game.h"
 	#include "los.h"
 	#include "qarray.h"
+	#include "Soldier Profile.h"
 #endif
 #include <vector>
 #include "Auto Resolve.h"
@@ -1978,11 +1979,9 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 			sprintf( zFileName,"NPCDATA\\%03d.EDT", ubCharacterNum );
 		}
 	}
-#ifdef JA2UB
-	else if ( ubCharacterNum >= FIRST_RPC && /* ubCharacterNum <  GASTON  && */
-#else
-	else if ( ubCharacterNum >= FIRST_RPC && ubCharacterNum < GASTON &&
-#endif
+	//else if ( ubCharacterNum >= FIRST_RPC && ubCharacterNum < GASTON &&
+	//new profiles by Jazz
+	else if ( ( gProfilesRPC[ubCharacterNum].ProfilId == ubCharacterNum || gProfilesNPC[ubCharacterNum].ProfilId == ubCharacterNum || gProfilesVehicle[ubCharacterNum].ProfilId == ubCharacterNum ) &&	
 			( !( gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
 			|| ProfileCurrentlyTalkingInDialoguePanel( ubCharacterNum )
 			|| (gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_FORCENPCQUOTE) )
@@ -2026,11 +2025,10 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 		if ( fWavFile )
 		{
 			#ifdef RUSSIAN
-#ifdef JA2UB
-				if( ubCharacterNum >= FIRST_RPC && /* ubCharacterNum < GASTON  && */ gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
-#else
-				if( ubCharacterNum >= FIRST_RPC && ubCharacterNum < GASTON && gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
-#endif
+			//	if( ubCharacterNum >= FIRST_RPC && ubCharacterNum < GASTON && gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
+				//new profiles by Jazz
+				if ( ( gProfilesRPC[ubCharacterNum].ProfilId == ubCharacterNum || gProfilesNPC[ubCharacterNum].ProfilId == ubCharacterNum || gProfilesVehicle[ubCharacterNum].ProfilId == ubCharacterNum ) && gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )	
+
 				{
 //inshy: fix for UB-1.13 version only					sprintf( zFileName,"SPEECH\\r_%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
 				if ( gSoundProfileValue[ubCharacterNum].EnabledSound == TRUE )

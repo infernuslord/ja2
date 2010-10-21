@@ -5204,11 +5204,13 @@ BOOLEAN WildernessSectorWithAllProfiledNPCsNotSpokenWith( INT16 sSectorX, INT16 
 	MERCPROFILESTRUCT *		pProfile;
 	BOOLEAN fFoundSomebody = FALSE;
 
-#ifdef JA2UB
-	for ( ubProfile = FIRST_RPC; ubProfile < NUM_PROFILES; ubProfile++ ) // GASTON
-#else
-	for ( ubProfile = FIRST_RPC; ubProfile < GASTON; ubProfile++ )
-#endif
+	
+	//for ( ubProfile = FIRST_RPC; ubProfile < GASTON; ubProfile++ )
+	//new profiles by Jazz
+	for ( ubProfile = 0; ubProfile < NUM_PROFILES; ubProfile++ )
+	{
+	
+	if ( gProfilesRPC[ubProfile].ProfilId == ubProfile || gProfilesNPC[ubProfile].ProfilId == ubProfile || gProfilesVehicle[ubProfile].ProfilId == ubProfile)	
 	{
 		pProfile = &gMercProfiles[ ubProfile ];
 
@@ -5219,7 +5221,8 @@ BOOLEAN WildernessSectorWithAllProfiledNPCsNotSpokenWith( INT16 sSectorX, INT16 
 		}
 
  		// skip vehicles
-		if ( ubProfile >= PROF_HUMMER && ubProfile <= PROF_HELICOPTER )
+		//if ( ubProfile >= PROF_HUMMER && ubProfile <= PROF_HELICOPTER )
+		if ( gProfilesVehicle[ubProfile].ProfilId == ubProfile )
 		{
 			continue;
 		}
@@ -5241,8 +5244,14 @@ BOOLEAN WildernessSectorWithAllProfiledNPCsNotSpokenWith( INT16 sSectorX, INT16 
 				return( FALSE );
 			}
 		}
+
+	}
+	else
+	{
+		return( FALSE );
 	}
 
+	}
 
 	return( fFoundSomebody );
 }

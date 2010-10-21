@@ -67,6 +67,8 @@
 
 #include "Interface.h"
 #include "Strategic Town Loyalty.h"
+#include "Soldier Profile.h"
+#include "aim.h"
 
 #ifdef JA2UB
 #include "Ja25_Tactical.h"
@@ -916,8 +918,61 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		}
 #endif
 
+	//new profiles by Jazz	
+	strcpy(fileName, directoryName);
+	strcat(fileName, MERCAVAILABILITY);
+	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+	SGP_THROW_IFFALSE(ReadInMercAvailability(fileName,FALSE), MERCAVAILABILITY);
+	
+#ifndef ENGLISH
+		AddLanguagePrefix(fileName);
+		if ( FileExists(fileName) )
+		{
+			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+			if(!ReadInMercAvailability(fileName,TRUE))
+				return FALSE;
+		}
+#endif
+
 	
 	LoadIMPPortraitsTEMP();
+
+	strcpy(fileName, directoryName);
+	strcat(fileName, MERCAVAILABILITY);
+	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+	SGP_THROW_IFFALSE(ReadInMercAvailability(fileName,FALSE), MERCAVAILABILITY);
+	
+#ifndef ENGLISH
+		AddLanguagePrefix(fileName);
+		if ( FileExists(fileName) )
+		{
+			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+			if(!ReadInMercAvailability(fileName,TRUE))
+				return FALSE;
+		}
+#endif
+	UINT32 i;
+		for(i=0; i<NUM_PROFILES; i++)
+		{
+			gAimAvailability[i].ProfilId = -1;
+		}
+
+
+	//new profiles by Jazz	
+	strcpy(fileName, directoryName);
+	strcat(fileName, AIMAVAILABILITY);
+	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+	SGP_THROW_IFFALSE(ReadInAimAvailability(fileName,FALSE), AIMAVAILABILITY);
+	
+#ifndef ENGLISH
+		AddLanguagePrefix(fileName);
+		if ( FileExists(fileName) )
+		{
+			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+			if(!ReadInAimAvailability(fileName,TRUE))
+				return FALSE;
+		}
+#endif
 
 #ifdef JA2UB	
 	//if ( OldNew == TRUE )

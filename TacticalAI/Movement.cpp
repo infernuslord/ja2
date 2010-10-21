@@ -7,7 +7,7 @@
 	#include "overhead.h"
 	#include "worldman.h"
 	#include "pathai.h"
-	#include "points.h"
+	//#include "points.h"
 	#include "message.h"
 	#include "Smell.h"
 	#include "mapscreen.h"

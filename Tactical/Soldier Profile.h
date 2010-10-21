@@ -11,6 +11,13 @@ extern INT16 gsTerroristSector[][5][2];
 extern BOOLEAN	gfPotentialTeamChangeDuringDeath;
 
 extern MERCPROFILESTRUCT gMercProfiles[ NUM_PROFILES ];
+
+#ifdef WFconvertUB
+extern MERCPROFILESTRUCT_OLD_WF gMercProfilesWF[ NUM_PROFILES ];
+extern MERCPROFILESTRUCT_OLD_WF gMercProfilesUB[ NUM_PROFILES ];
+extern MERCPROFILESTRUCT_OLD_WF gMercProfilesOut[ NUM_PROFILES ];
+#endif
+
 extern MERCPROFILEGEAR gMercProfileGear[ NUM_PROFILES ][ NUM_MERCSTARTINGGEAR_KITS ];
 
 
@@ -19,6 +26,49 @@ extern MERCPROFILEGEAR gMercProfileGear[ NUM_PROFILES ][ NUM_MERCSTARTINGGEAR_KI
 //use this to sort out the above define
 BOOLEAN IsProfileIdAnAimOrMERCMerc( UINT8 ubProfileID );
 //enums for the mercs 
+
+//new profiles by Jazz-------------------------------
+typedef struct
+{
+	UINT8 ProfilId;
+} AIM_PROFIL;
+
+typedef struct
+{
+	UINT8 ProfilId;
+} MERC_PROFIL;
+
+typedef struct
+{
+	UINT8 ProfilId;
+} NPC_PROFIL;
+
+typedef struct
+{
+	UINT8 ProfilId;
+} RPC_PROFIL;
+
+typedef struct
+{
+	UINT8 ProfilId;
+} VEHICLE_PROFIL;
+
+typedef struct
+{
+	UINT8 ProfilId;
+} IMP_PROFIL;
+
+extern AIM_PROFIL  gProfilesAIM[ NUM_PROFILES ];
+extern MERC_PROFIL gProfilesMERC[ NUM_PROFILES ];
+extern NPC_PROFIL  gProfilesNPC[ NUM_PROFILES ];
+extern RPC_PROFIL  gProfilesRPC[ NUM_PROFILES ];
+extern VEHICLE_PROFIL  gProfilesVehicle[ NUM_PROFILES ];
+extern IMP_PROFIL gProfilesIMP[NUM_PROFILES];
+
+extern BOOLEAN SaveNewSystemMercsToSaveGameFile( HWFILE hFile );
+extern BOOLEAN LoadNewSystemMercsToSaveGameFile( HWFILE hFile );
+//---------------------------------------------------
+
 enum NPCIDs
 {
 	BIFF = 40,
@@ -172,7 +222,9 @@ enum NPCIDs
 	TEX,
 	BIGGENS,
 	NPC169,
-#endif
+#endif	
+	NPC170 = NPC169 + 84,
+
 } ;
 
 BOOLEAN LoadMercProfiles(void);
@@ -294,6 +346,15 @@ typedef struct
 	UINT16		usApproachFactor[4];
 
 	INT8 bMercOpinion[75];
+	
+	UINT32 Type;
+	
+	UINT16 sSectorX;
+	UINT16 sSectorY;
+	INT8	bSectorZ;
+	UINT8 ubCivilianGroup;
+	INT8 bTown;
+	INT8 bTownAttachment;
 
 } TEMPPROFILETYPE;
 

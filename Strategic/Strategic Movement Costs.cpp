@@ -5803,7 +5803,8 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 				{
 					// ATE: This has been changed, if a campaign sector, just remove flag...
 					SectorInfo[ ( SECTOR( iCol , iRow ) ) ].fCampaignSector = FALSE;
-					//continue;
+					sBadSectorsList[iCol][iRow] = 0;
+					continue;
 				}
 			}
 			else
@@ -5817,7 +5818,8 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 					{
 						// ATE: This has been changed, if a campaign sector, just remove flag...
 						pSector->fCampaignSector = FALSE;
-						//continue;
+						sBadSectorsList[iCol][iRow] = 0;
+						continue;
 					}
 				}
 			}

@@ -2023,7 +2023,8 @@ void HandleLocateToGuyAsHeWalks( SOLDIERTYPE *pSoldier )
 	}
 }
 
-
+#pragma optimize("gpt",on)
+__forceinline
 BOOLEAN HandleGotoNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving, BOOLEAN fInitialMove, UINT16 usAnimState )
 {
 	INT16							sAPCost;
@@ -6436,7 +6437,9 @@ BOOLEAN CheckForEndOfCombatMode( BOOLEAN fIncrementTurnsNotSeen )
 				// Double check by seeing if we have any active enemies in sector!
 				if ( NumEnemyInSectorNotDeadOrDying( ) > 0 )
 				{
-					SayQuoteFromAnyBodyInSector( QUOTE_WARNING_OUTSTANDING_ENEMY_AFTER_RT );
+					//comm by ddd SayQuoteFromAnyBodyInSector( QUOTE_WARNING_OUTSTANDING_ENEMY_AFTER_RT );
+					if(Chance(gGameExternalOptions.iChanceSayAnnoyingPhrase) )
+						SayQuoteFromAnyBodyInSector( QUOTE_WARNING_OUTSTANDING_ENEMY_AFTER_RT );
 				}
 			}
 		}
@@ -8499,7 +8502,9 @@ SOLDIERTYPE *InternalReduceAttackBusyCount( )
 		// Display quote!
 		if ( !AM_AN_EPC( MercPtrs[ gTacticalStatus.ubItemsSeenOnAttackSoldier ] ) )
 		{
-			TacticalCharacterDialogueWithSpecialEvent( MercPtrs[ gTacticalStatus.ubItemsSeenOnAttackSoldier ], (UINT16)( QUOTE_SPOTTED_SOMETHING_ONE + Random( 2 ) ), DIALOGUE_SPECIAL_EVENT_SIGNAL_ITEM_LOCATOR_START, gTacticalStatus.usItemsSeenOnAttackGridNo, 0 );
+			//ddd TacticalCharacterDialogueWithSpecialEvent( MercPtrs[ gTacticalStatus.ubItemsSeenOnAttackSoldier ], (UINT16)( QUOTE_SPOTTED_SOMETHING_ONE + Random( 2 ) ), DIALOGUE_SPECIAL_EVENT_SIGNAL_ITEM_LOCATOR_START, gTacticalStatus.sItemsSeenOnAttackGridNo, 0 );
+			if(Chance(gGameExternalOptions.iChanceSayAnnoyingPhrase) )
+				TacticalCharacterDialogueWithSpecialEvent( MercPtrs[ gTacticalStatus.ubItemsSeenOnAttackSoldier ], (UINT16)( QUOTE_SPOTTED_SOMETHING_ONE + Random( 2 ) ), DIALOGUE_SPECIAL_EVENT_SIGNAL_ITEM_LOCATOR_START, gTacticalStatus.usItemsSeenOnAttackGridNo, 0 );
 		}
 		else
 		{

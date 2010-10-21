@@ -887,8 +887,14 @@ BOOLEAN AdjustToNextAnimationFrame( SOLDIERTYPE *pSoldier )
 
 				//CODE: BEGINHOPFENCE
 				// MOVE TWO FACGIN GRIDNOS
-				sNewGridNo = NewGridNo( pSoldier->sGridNo, DirectionInc( pSoldier->ubDirection ) );
-				sNewGridNo = NewGridNo( sNewGridNo, DirectionInc( pSoldier->ubDirection ) );
+				sNewGridNo = NewGridNo( (INT16)pSoldier->sGridNo, (UINT16)( DirectionInc( pSoldier->ubDirection ) ) );
+				//dddokno{
+					if ( gubWorldMovementCosts[ sNewGridNo ][ (UINT8)pSoldier->pathing.usPathingData[ pSoldier->pathing.usPathIndex ] ][ pSoldier->pathing.bLevel ] == TRAVELCOST_FENCE )
+						sNewGridNo = NewGridNo( (INT16)sNewGridNo, (UINT16)( DirectionInc( pSoldier->ubDirection ) ) );
+				//dddokno}
+
+				//comm by ddd
+				//sNewGridNo = NewGridNo( (INT16)sNewGridNo, (UINT16)( DirectionInc( pSoldier->ubDirection ) ) );
 				pSoldier->sForcastGridno = sNewGridNo;
 				break;
 
@@ -1542,7 +1548,9 @@ BOOLEAN AdjustToNextAnimationFrame( SOLDIERTYPE *pSoldier )
 
 				// CODE: GIVE ITEM
 				SoldierGiveItemFromAnimation( pSoldier );
-				if (pSoldier->ubProfile != NO_PROFILE && pSoldier->ubProfile >= FIRST_NPC )
+			//	if (pSoldier->ubProfile != NO_PROFILE && pSoldier->ubProfile >= FIRST_NPC )
+				//new profiles by Jazz	
+				if (pSoldier->ubProfile != NO_PROFILE && gProfilesNPC[pSoldier->ubProfile].ProfilId == pSoldier->ubProfile && gProfilesVehicle[pSoldier->ubProfile].ProfilId == pSoldier->ubProfile )
 				{
 					TriggerNPCWithGivenApproach( pSoldier->ubProfile, APPROACH_DONE_GIVING_ITEM, FALSE );
 				}

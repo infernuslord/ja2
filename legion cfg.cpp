@@ -127,9 +127,199 @@ void RandomAddEnemy( UINT8 SectorX, UINT8 SectorY, UINT8 Level );
 
 void RandomStats ();
 
+#ifdef WFconvertUB
+void WFtoUB ();
+void MercProfilesConvertToDat ();
+void ConvertBinaryData170to254 ();
+#endif
+
 BOOLEAN sUSTAW[500]; //legion2
 BOOLEAN sNPCSPEECH[NUM_PROFILES]; //legion2
 BOOLEAN sSPEECH[NUM_PROFILES]; //legion2
+
+BOOLEAN JA2EncryptedFileWriteNEW( HWFILE hFile, PTR pDest, UINT32 uiBytesToWrite, UINT32 *puiBytesWritten );
+BOOLEAN JA2EncryptedFileReadNEW( HWFILE hFile, PTR pDest, UINT32 uiBytesToRead, UINT32 *puiBytesRead );
+
+
+//#define ROTATION_ARRAY_SIZE 46
+UINT8 ubRotationArrayNew[46] = { 132, 235, 125, 99, 15, 220, 140, 89, 205, 132, 254, 144, 217, 78, 156, 58, 215, 76, 163, 187, 55, 49, 65, 48, 156, 140, 201, 68, 184, 13, 45, 69, 102, 185, 122, 225, 23, 250, 160, 220, 114, 240, 64, 175, 057, 233 };
+
+BOOLEAN JA2EncryptedFileReadNEW( HWFILE hFile, PTR pDest, UINT32 uiBytesToRead, UINT32 *puiBytesRead )
+{
+	UINT32	uiLoop;
+	UINT8		ubArrayIndex = 0;
+	//UINT8		ubLastNonBlank = 0;
+	UINT8		ubLastByte = 0;
+	UINT8		ubLastByteForNextLoop;
+	BOOLEAN	fRet;
+	UINT8 *	pMemBlock;
+
+	fRet = FileRead( hFile, pDest, uiBytesToRead, puiBytesRead );
+	if ( fRet )
+	{
+		pMemBlock = (UINT8 *)pDest;
+		for ( uiLoop = 0; uiLoop < *puiBytesRead; uiLoop++ )
+		{
+		//	ubLastByteForNextLoop = pMemBlock[ uiLoop ];
+		//	pMemBlock[ uiLoop ] -= (ubLastByte + ubRotationArrayNew[ ubArrayIndex ]);
+		//	ubArrayIndex++;
+		//	if ( ubArrayIndex >= ROTATION_ARRAY_SIZE )
+		//	{
+		//		ubArrayIndex = 0;
+		//	}
+		//	ubLastByte = ubLastByteForNextLoop;
+		}
+	}
+
+	return( fRet );
+}
+
+
+BOOLEAN JA2EncryptedFileWriteNEW( HWFILE hFile, PTR pDest, UINT32 uiBytesToWrite, UINT32 *puiBytesWritten )
+{
+	UINT32	uiLoop;
+	UINT8		ubArrayIndex = 0;
+	//UINT8		ubLastNonBlank = 0;
+	UINT8		ubLastByte = 0;//, ubTemp;
+	UINT8 * pMemBlock;
+	BOOLEAN	fRet;
+
+	pMemBlock = (UINT8 *) MemAlloc( uiBytesToWrite );
+
+	if ( !pMemBlock )
+	{
+		return( FALSE );
+	}
+	memset( pMemBlock, 0, uiBytesToWrite );
+
+
+	memcpy( pMemBlock, pDest, uiBytesToWrite );
+	for ( uiLoop = 0; uiLoop < uiBytesToWrite; uiLoop++ )
+	{
+		//ubTemp = pMemBlock[ uiLoop ];
+	//	pMemBlock[ uiLoop ] += ubLastByte + ubRotationArrayNew[ ubArrayIndex ];
+	//	ubArrayIndex++;
+	//	if ( ubArrayIndex >= ROTATION_ARRAY_SIZE )
+	//	{
+	//		ubArrayIndex = 0;
+	//	}
+	//	ubLastByte = pMemBlock[ uiLoop ];
+
+	}
+
+	fRet = FileWrite( hFile, pMemBlock, uiBytesToWrite, puiBytesWritten );
+
+	MemFree( pMemBlock );
+
+	return( fRet );
+
+}
+
+#ifdef WFconvertUB
+
+void ConvertBinaryData170to254 ()
+{
+	HWFILE fptr1;
+	HWFILE fptr2;
+	UINT32 uiLoop;
+	UINT32	uiNumBytesRead;
+	CHAR8	zFileName[255];
+	
+	fptr1 = FileOpen("binarydata\\JA25PROF.dat", FILE_ACCESS_READ, FALSE );  					
+	
+	for(uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
+	{
+	JA2EncryptedFileRead ( fptr1, &gMercProfilesWF[uiLoop], sizeof( MERCPROFILESTRUCT_OLD_WF ), &uiNumBytesRead );	
+	}
+	FileClose( fptr1 );	
+	
+	fptr2 = FileOpen("binarydata\\JA25PROF-Out.dat", FILE_ACCESS_WRITE, FALSE );  	
+	for(uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
+	{	
+	JA2EncryptedFileWrite ( fptr2, &gMercProfilesWF[uiLoop], sizeof( MERCPROFILESTRUCT_OLD_WF ), &uiNumBytesRead );
+	}
+	FileClose( fptr2 );
+
+}
+
+void MercProfilesConvertToDat ()
+{
+	HWFILE fptr1;
+	HWFILE fptr2;
+	UINT32 uiLoop;
+	UINT32	uiNumBytesRead;
+	CHAR8	zFileName[255];
+	
+	fptr1 = FileOpen("binarydata\\JA25PROF.dat", FILE_ACCESS_READ, FALSE );  					
+	
+	for(uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
+	{
+
+	JA2EncryptedFileRead ( fptr1, &gMercProfilesWF[uiLoop], sizeof( MERCPROFILESTRUCT_OLD_WF ), &uiNumBytesRead );	
+	}
+	FileClose( fptr1 );	
+	
+	for(uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
+	{
+	
+	sprintf( zFileName, "TEMP2\\Mercs%03d.dat", uiLoop );	
+	
+	fptr2 = FileOpen(zFileName, FILE_ACCESS_WRITE, FALSE );  
+	
+
+	
+	JA2EncryptedFileWriteNEW ( fptr2, &gMercProfilesWF[uiLoop], sizeof( MERCPROFILESTRUCT_OLD_WF ), &uiNumBytesRead );
+	
+	FileClose( fptr2 );
+	
+	}
+
+
+}
+
+void WFtoUB ()
+{
+	HWFILE fptr1;
+	HWFILE fptr2;
+	HWFILE fptr3;
+	STR8 pFileNameWF = "TEMP2\\Prof-WF.dat";
+	STR8 pFileNameUB = "TEMP2\\Prof-UB.dat";
+	STR8 pFileNameJA2 = "TEMP2\\Prof-JA2.dat";
+	STR8 pFileNameOut = "TEMP2\\Prof-Out.dat";
+	
+	UINT32 uiLoop, uiLoop2;
+	UINT32	uiNumBytesRead;
+
+	fptr1 = FileOpen("TEMP2\\Prof-WF.dat", FILE_ACCESS_READ, FALSE );  
+	for(uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
+	{
+	JA2EncryptedFileRead ( fptr1, &gMercProfilesWF[uiLoop], sizeof( MERCPROFILESTRUCT_OLD_WF ), &uiNumBytesRead );
+	}
+	FileClose( fptr1 );
+	
+	fptr2 = FileOpen("TEMP2\\Prof-UB.dat", FILE_ACCESS_READ, FALSE );  
+	for(uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
+	{
+	JA2EncryptedFileRead ( fptr2, &gMercProfilesUB[uiLoop], sizeof( MERCPROFILESTRUCT_OLD_WF ), &uiNumBytesRead );
+	}
+	FileClose( fptr2 );
+	
+	fptr3 = FileOpen("TEMP2\\Prof-Out.dat", FILE_ACCESS_WRITE, FALSE );
+	for(uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
+	{
+		if ( uiLoop < 51 )
+		{
+			JA2EncryptedFileWrite ( fptr3, &gMercProfilesWF[uiLoop], sizeof( MERCPROFILESTRUCT_OLD_WF ), &uiNumBytesRead );
+		}
+		else if ( uiLoop >= 51 )
+		{
+			JA2EncryptedFileWrite ( fptr3, &gMercProfilesUB[uiLoop], sizeof( MERCPROFILESTRUCT_OLD_WF ), &uiNumBytesRead );		
+		}
+	}
+	FileClose( fptr3 );
+
+}
+#endif
 
 void RandomStats ()
 {

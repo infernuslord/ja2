@@ -48,8 +48,9 @@
 	#include "Tactical Save.h"
 	#include "Campaign Types.h"
 	#include "GameSettings.h" // added by SANDRO
+	#include "Soldier Profile.h"
 #endif
-
+	#include "Soldier Profile.h"
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -148,11 +149,9 @@ NPCQuoteInfo * LoadQuoteFile( UINT8 ubNPC )
 		// use a copy of Herve's data file instead!
 		sprintf( zFileName, "NPCData\\%03d.npc", HERVE );
 	}
-#ifdef JA2UB
-	else if ( ubNPC < FIRST_RPC || /*ubNPC >= GASTON || */ (ubNPC < FIRST_NPC && gMercProfiles[ ubNPC ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED ) )
-#else
-	else if ( ubNPC < FIRST_RPC || ubNPC >= GASTON || (ubNPC < FIRST_NPC && gMercProfiles[ ubNPC ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED ) )
-#endif
+	//else if ( ubNPC < FIRST_RPC || ubNPC >= GASTON || (ubNPC < FIRST_NPC && gMercProfiles[ ubNPC ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED ) )
+	//new profiles by Jazz
+	else if ( gProfilesIMP[ubNPC].ProfilId == ubNPC || gProfilesAIM[ubNPC].ProfilId == ubNPC || gProfilesMERC[ubNPC].ProfilId == ubNPC || ( gProfilesRPC[ubNPC].ProfilId == ubNPC && gMercProfiles[ ubNPC ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED ) )	
 	{
 		sprintf( zFileName, "NPCData\\000.npc", ubNPC );
 	}
@@ -318,7 +317,9 @@ BOOLEAN EnsureQuoteFileLoaded( UINT8 ubNPC )
 		fLoadFile = TRUE;
 	}
 
-	if ( ubNPC >= FIRST_RPC && ubNPC < FIRST_NPC )
+//	if ( ubNPC >= FIRST_RPC && ubNPC < FIRST_NPC )
+	//new profiles by Jazz		
+	if ( ( gProfilesRPC[ubNPC].ProfilId == ubNPC ) )			
 	{
 		if (gMercProfiles[ ubNPC ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED)
 		{
@@ -428,23 +429,33 @@ BOOLEAN RefreshNPCScriptRecord( UINT8 ubNPC, UINT8 ubRecord )
 	{
 		// we have some work to do...
 		// loop through all PCs, and refresh their copy of this record
-		for ( ubLoop = 0; ubLoop < FIRST_RPC; ubLoop++ ) // need more finesse here
+		//for ( ubLoop = 0; ubLoop < FIRST_RPC; ubLoop++ ) // need more finesse here
+		//new profiles by Jazz
+		for ( ubLoop = 0; ubLoop < NUM_PROFILES; ubLoop++ ) // need more finesse here		
 		{
+			//new profiles by Jazz		
+			if ( gProfilesIMP[ubLoop].ProfilId == ubLoop || gProfilesAIM[ubLoop].ProfilId == ubLoop || gProfilesMERC[ubLoop].ProfilId == ubLoop )	
 			RefreshNPCScriptRecord( ubLoop, ubRecord );
 		}
 #ifdef JA2UB
 //no UB
 #else
-		for ( ubLoop = GASTON; ubLoop < NUM_PROFILES; ubLoop++ ) // need more finesse here
+	//	for ( ubLoop = GASTON; ubLoop < NUM_PROFILES; ubLoop++ ) // need more finesse here
+		if ( gProfilesMERC[ubLoop].ProfilId == ubLoop )	
 		{
 			RefreshNPCScriptRecord( ubLoop, ubRecord );
 		}
 #endif
-		for ( ubLoop = FIRST_RPC; ubLoop < FIRST_NPC; ubLoop++ )
+		//new profiles by Jazz	
+		//for ( ubLoop = FIRST_RPC; ubLoop < FIRST_NPC; ubLoop++ )
+		for ( ubLoop = 0; ubLoop < NUM_PROFILES; ubLoop++ )
 		{
+			if ( gProfilesRPC[ubLoop].ProfilId == ubLoop )	
+			{
 			if ( gMercProfiles[ ubNPC ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED && gpBackupNPCQuoteInfoArray[ ubNPC ] != NULL )
 			{
 				RefreshNPCScriptRecord( ubLoop, ubRecord );
+			}
 			}
 		}
 		return( TRUE );
@@ -663,12 +674,12 @@ BOOLEAN ReloadAllQuoteFiles( void )
 {
 	UINT8		ubProfile, ubLoop;
 
-#ifdef JA2UB
-	for ( ubProfile = FIRST_RPC; ubProfile < NUM_PROFILES; /*GASTON;*/ ubProfile++ )
-#else
-	for ( ubProfile = FIRST_RPC; ubProfile < GASTON; ubProfile++ )
-#endif
+	//for ( ubProfile = FIRST_RPC; ubProfile < GASTON; ubProfile++ )
+	//new profiles by Jazz	
+	for ( ubProfile = 0; ubProfile < NUM_PROFILES; ubProfile++ )
 	{
+		if ( gProfilesRPC[ubProfile].ProfilId == ubProfile || gProfilesNPC[ubProfile].ProfilId == ubProfile )	
+		{
 		// zap backup if any
 		if ( gpBackupNPCQuoteInfoArray[ ubProfile ] != NULL )
 		{
@@ -676,6 +687,7 @@ BOOLEAN ReloadAllQuoteFiles( void )
 			gpBackupNPCQuoteInfoArray[ ubProfile ] = NULL;
 		}
 		ReloadQuoteFileIfLoaded( ubProfile );
+		}
 	}
 	// reload all civ quote files
 	for ( ubLoop = 0; ubLoop < NUM_CIVQUOTE_SECTORS; ubLoop++ )
@@ -1319,7 +1331,9 @@ UINT8 NPCConsiderReceivingItemFromMerc( UINT8 ubNPC, UINT8 ubMerc, OBJECTTYPE * 
 						}
 						break;
 					default:
-						if ( usItemToConsider == MONEY && (ubNPC == SKYRIDER || (ubNPC >= FIRST_RPC && ubNPC < FIRST_NPC) ) )
+						//if ( usItemToConsider == MONEY && (ubNPC == SKYRIDER || (ubNPC >= FIRST_RPC && ubNPC < FIRST_NPC) ) )
+						//new profiles by Jazz
+						if ( usItemToConsider == MONEY && (ubNPC == SKYRIDER || ( gProfilesRPC[ubNPC].ProfilId == ubNPC ) ) )
 						{
 							if ( gMercProfiles[ ubNPC ].iBalance < 0 && pNPCQuoteInfo->sActionData != NPC_ACTION_DONT_ACCEPT_ITEM )
 							{
@@ -1707,17 +1721,23 @@ void ResetOncePerConvoRecordsForNPC( UINT8 ubNPC )
 void ResetOncePerConvoRecordsForAllNPCsInLoadedSector( void )
 {
 	UINT8 ubLoop;
-
+	UINT8 IDnpc;
+	
 	if ( gWorldSectorX == 0 || gWorldSectorY == 0 )
 	{
 		return;
 	}
-#ifdef JA2UB
-	for ( ubLoop = FIRST_RPC; ubLoop < NUM_PROFILES; /*GASTON; */ ubLoop++ )
-#else
-	for ( ubLoop = FIRST_RPC; ubLoop < GASTON; ubLoop++ )
-#endif
+
+	//for ( ubLoop = FIRST_RPC; ubLoop < GASTON; ubLoop++ )
+	//new profiles by Jazz	
+	for ( IDnpc = 0; IDnpc < NUM_PROFILES; IDnpc++ )
 	{
+	
+	if ( gProfilesRPC[IDnpc].ProfilId == IDnpc || gProfilesNPC[IDnpc].ProfilId == IDnpc)
+	{
+		ubLoop = IDnpc;
+	
+	
 		if ( gMercProfiles[ ubLoop ].sSectorX == gWorldSectorX &&
 				 gMercProfiles[ ubLoop ].sSectorY == gWorldSectorY &&
 				 gMercProfiles[ ubLoop ].bSectorZ == gbWorldSectorZ &&
@@ -1725,6 +1745,9 @@ void ResetOncePerConvoRecordsForAllNPCsInLoadedSector( void )
 		{
 			ResetOncePerConvoRecordsForNPC( ubLoop );
 		}
+
+	}
+	
 	}
 }
 
