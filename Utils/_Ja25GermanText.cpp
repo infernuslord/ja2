@@ -113,6 +113,7 @@ STR16 gzIMPMajorTraitsHelpTextsHeavyWeapons[]=
 };
 STR16 gzIMPMajorTraitsHelpTextsSniper[]=
 {
+	L"+%d%s Trefferchance mit Gewehren\n",
 	L"+%d%s Trefferchance mit Scharfschützengewehren\n",
 	L"-%d%s effektive Reichweite zum Ziel mit allen Waffen\n",
 	L"+%d%s Zielbonus pro Zielerfassungs-Klick (außer für Faustfeuerwaffen)\n",
@@ -407,7 +408,7 @@ STR16 gzIMPDisabilitiesHelpTexts[]=
 	L"Kann Panikattacken erleiden, wenn in gewissen Situationen auf sich gestellt.",
 	L"Zeigt geringere Leistung unter Tage (in Höhlen und Kellern).",
 	L"Kann beim Versuch zu schwimmen leicht ertrinken.",
-	L"Erträgt den Anblick großer Insekten nicht und\zeigt verringerte Leistung in tropischen Sektoren.",
+	L"Erträgt den Anblick großer Insekten nicht und\nzeigt verringerte Leistung in tropischen Sektoren.",
 	L"Vergisst manchmal seine Befehle und verliert dadurch im Kampf einen Teil seiner APs.",
 	L"Dreht im Umgang mit Waffen manchmal durch und gibt Dauerfeuer.\nIst ihm das mit seiner Waffe nicht möglich, kann das zu Moralabzügen führen.",
 

@@ -957,17 +957,10 @@ void CompileTileMovementCosts( INT32 usGridNo )
 					// all other passable structures do not block movement in any way
 				}
 				
+				/*
 				//dddokno{ =============================================================
-				else if ( IsNotRestrictedWindow(pStructure)
-							//почти универсальное условие, но становятся проходными окна, на которых
-							//навешаны деревяшки ;( видимо, придется вручную прописывать исключения
-							//(pStructure->fFlags & STRUCTURE_WALLNWINDOW) && gGameExternalOptions.fCanJumpThroughWindows
-							// && !(pStructure->fFlags & STRUCTURE_SPECIAL)
-							// && (pStructure->fFlags & STRUCTURE_OPEN)
-							//&& (pStructure->pDBStructureRef->pDBStructure->bPartnerDelta == NO_PARTNER_STRUCTURE)
-						)
+				else if ( IsNotRestrictedWindow(pStructure) )
 				{
-	
 					// standard door
 					switch( pStructure->ubWallOrientation )
 					{
@@ -1041,78 +1034,78 @@ void CompileTileMovementCosts( INT32 usGridNo )
 							break;
 
 
-						/*switch( pStructure->ubWallOrientation )
-						{
-							case OUTSIDE_TOP_LEFT: //3 \# - клетка внутри помещения, стена наружу
-							case INSIDE_TOP_LEFT: //1 -клетка снаружи помещения  \№ стена внутрь
-								SET_CURRMOVEMENTCOST( NORTH, TRAVELCOST_JUMPABLEWINDOW );
-								SET_CURRMOVEMENTCOST( NORTHEAST, TRAVELCOST_OBSTACLE);
-								SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( SOUTHEAST, TRAVELCOST_OBSTACLE);
-								SET_CURRMOVEMENTCOST( SOUTH, TRAVELCOST_JUMPABLEWINDOW);
-								SET_CURRMOVEMENTCOST( SOUTHWEST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( WEST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_OBSTACLE );
-								//?
-								FORCE_SET_MOVEMENTCOST( sGridNo - WORLD_COLS, NORTH, 0, TRAVELCOST_NONE );
-								SET_MOVEMENTCOST( sGridNo - WORLD_COLS + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
-								SET_MOVEMENTCOST( sGridNo + 1, EAST, 0, TRAVELCOST_OBSTACLE );
-								SET_MOVEMENTCOST( sGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
-								FORCE_SET_MOVEMENTCOST( sGridNo + WORLD_COLS, SOUTH, 0, TRAVELCOST_NONE );
-								SET_MOVEMENTCOST( sGridNo + WORLD_COLS - 1, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
-								SET_MOVEMENTCOST( sGridNo - 1, WEST, 0, TRAVELCOST_OBSTACLE );
-								SET_MOVEMENTCOST( sGridNo - WORLD_COLS - 1, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
-								
+						//switch( pStructure->ubWallOrientation )
+						//{
+						//	case OUTSIDE_TOP_LEFT: //3 \# - клетка внутри помещения, стена наружу
+						//	case INSIDE_TOP_LEFT: //1 -клетка снаружи помещения  \№ стена внутрь
+						//		SET_CURRMOVEMENTCOST( NORTH, TRAVELCOST_JUMPABLEWINDOW );
+						//		SET_CURRMOVEMENTCOST( NORTHEAST, TRAVELCOST_OBSTACLE);
+						//		SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_OBSTACLE );
+						//		SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_OBSTACLE );
+						//		SET_CURRMOVEMENTCOST( SOUTHEAST, TRAVELCOST_OBSTACLE);
+						//		SET_CURRMOVEMENTCOST( SOUTH, TRAVELCOST_JUMPABLEWINDOW);
+						//		SET_CURRMOVEMENTCOST( SOUTHWEST, TRAVELCOST_OBSTACLE );
+						//		SET_CURRMOVEMENTCOST( WEST, TRAVELCOST_OBSTACLE );
+						//		SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_OBSTACLE );
+						//		//?
+						//		FORCE_SET_MOVEMENTCOST( sGridNo - WORLD_COLS, NORTH, 0, TRAVELCOST_NONE );
+						//		SET_MOVEMENTCOST( sGridNo - WORLD_COLS + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
+						//		SET_MOVEMENTCOST( sGridNo + 1, EAST, 0, TRAVELCOST_OBSTACLE );
+						//		SET_MOVEMENTCOST( sGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
+						//		FORCE_SET_MOVEMENTCOST( sGridNo + WORLD_COLS, SOUTH, 0, TRAVELCOST_NONE );
+						//		SET_MOVEMENTCOST( sGridNo + WORLD_COLS - 1, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
+						//		SET_MOVEMENTCOST( sGridNo - 1, WEST, 0, TRAVELCOST_OBSTACLE );
+						//		SET_MOVEMENTCOST( sGridNo - WORLD_COLS - 1, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
+						//		
 
 
-								break;
+						//		break;
 
-							case OUTSIDE_TOP_RIGHT: //4 #/	//клетка внутри помещения, стена наружу
+						//	case OUTSIDE_TOP_RIGHT: //4 #/	//клетка внутри помещения, стена наружу
 
-							case INSIDE_TOP_RIGHT: 
+						//	case INSIDE_TOP_RIGHT: 
 
-								//2 #/ 
-								//. стена стоит на правом нижн. краю и смотрит на ЮВ
-								// клетка находится снаружи помещения, стена внутри клетки
-
-
-								SET_CURRMOVEMENTCOST( NORTH, TRAVELCOST_OBSTACLE );				
-								SET_CURRMOVEMENTCOST( NORTHEAST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_JUMPABLEWINDOW );
-								SET_CURRMOVEMENTCOST( SOUTHEAST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( SOUTH, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( SOUTHWEST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( WEST, TRAVELCOST_JUMPABLEWINDOW );
-								SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_OBSTACLE );
-								//?
-								// set values for the tiles EXITED from this location
-								SET_MOVEMENTCOST( sGridNo - WORLD_COLS, NORTH, 0, TRAVELCOST_OBSTACLE );
-								SET_MOVEMENTCOST( sGridNo - WORLD_COLS + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
-								// make sure no obstacle costs exists before changing path cost to 0
-								if ( gubWorldMovementCosts[ sGridNo + 1 ][ EAST ][ 0 ] < TRAVELCOST_BLOCKED )
-								{
-									FORCE_SET_MOVEMENTCOST( sGridNo + 1, EAST, 0, TRAVELCOST_NONE );
-								}
-								SET_MOVEMENTCOST( sGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
-								SET_MOVEMENTCOST( sGridNo + WORLD_COLS, SOUTH, 0, TRAVELCOST_OBSTACLE );
-								SET_MOVEMENTCOST( sGridNo + WORLD_COLS - 1, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
-								if ( gubWorldMovementCosts[ sGridNo - 1 ][ WEST ][ 0 ] < TRAVELCOST_BLOCKED )
-								{
-									FORCE_SET_MOVEMENTCOST( sGridNo - 1, WEST, 0, TRAVELCOST_NONE );
-								}
-								SET_MOVEMENTCOST( sGridNo - WORLD_COLS - 1, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
+						//		//2 #/ 
+						//		//. стена стоит на правом нижн. краю и смотрит на ЮВ
+						//		// клетка находится снаружи помещения, стена внутри клетки
 
 
-								break;
-							default:
-								// corners aren't jumpable
-								for (ubDirLoop=0; ubDirLoop < NUM_WORLD_DIRECTIONS; ubDirLoop++)
-								{
-									SET_CURRMOVEMENTCOST( ubDirLoop, TRAVELCOST_OBSTACLE );
-								}
-								break;*/
-						}		
+						//		SET_CURRMOVEMENTCOST( NORTH, TRAVELCOST_OBSTACLE );				
+						//		SET_CURRMOVEMENTCOST( NORTHEAST, TRAVELCOST_OBSTACLE );
+						//		SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_JUMPABLEWINDOW );
+						//		SET_CURRMOVEMENTCOST( SOUTHEAST, TRAVELCOST_OBSTACLE );
+						//		SET_CURRMOVEMENTCOST( SOUTH, TRAVELCOST_OBSTACLE );
+						//		SET_CURRMOVEMENTCOST( SOUTHWEST, TRAVELCOST_OBSTACLE );
+						//		SET_CURRMOVEMENTCOST( WEST, TRAVELCOST_JUMPABLEWINDOW );
+						//		SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_OBSTACLE );
+						//		//?
+						//		// set values for the tiles EXITED from this location
+						//		SET_MOVEMENTCOST( sGridNo - WORLD_COLS, NORTH, 0, TRAVELCOST_OBSTACLE );
+						//		SET_MOVEMENTCOST( sGridNo - WORLD_COLS + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
+						//		// make sure no obstacle costs exists before changing path cost to 0
+						//		if ( gubWorldMovementCosts[ sGridNo + 1 ][ EAST ][ 0 ] < TRAVELCOST_BLOCKED )
+						//		{
+						//			FORCE_SET_MOVEMENTCOST( sGridNo + 1, EAST, 0, TRAVELCOST_NONE );
+						//		}
+						//		SET_MOVEMENTCOST( sGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
+						//		SET_MOVEMENTCOST( sGridNo + WORLD_COLS, SOUTH, 0, TRAVELCOST_OBSTACLE );
+						//		SET_MOVEMENTCOST( sGridNo + WORLD_COLS - 1, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
+						//		if ( gubWorldMovementCosts[ sGridNo - 1 ][ WEST ][ 0 ] < TRAVELCOST_BLOCKED )
+						//		{
+						//			FORCE_SET_MOVEMENTCOST( sGridNo - 1, WEST, 0, TRAVELCOST_NONE );
+						//		}
+						//		SET_MOVEMENTCOST( sGridNo - WORLD_COLS - 1, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
+
+
+						//		break;
+						//	default:
+						//		// corners aren't jumpable
+						//		for (ubDirLoop=0; ubDirLoop < NUM_WORLD_DIRECTIONS; ubDirLoop++)
+						//		{
+						//			SET_CURRMOVEMENTCOST( ubDirLoop, TRAVELCOST_OBSTACLE );
+						//		}
+						//		break;
+						//}		
 
 		
 		
@@ -1121,70 +1114,71 @@ void CompileTileMovementCosts( INT32 usGridNo )
 					//	 && (pStructure->fFlags & STRUCTURE_WALLSTUFF)==0 )
 					//if(pStructure->pDBStructureRef->pDBStructure->bPartnerDelta == NO_PARTNER_STRUCTURE)
 
-			/*									// jumpable!
-						switch( pStructure->ubWallOrientation )
-						{
-							case OUTSIDE_TOP_LEFT:
-							case INSIDE_TOP_LEFT:
-								// can be jumped north and south
-								SET_CURRMOVEMENTCOST( NORTH, TRAVELCOST_FENCE );
-								SET_CURRMOVEMENTCOST( NORTHEAST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( SOUTHEAST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( SOUTH, TRAVELCOST_FENCE );
-								SET_CURRMOVEMENTCOST( SOUTHWEST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( WEST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_OBSTACLE );
-								// set values for the tiles EXITED from this location
-								FORCE_SET_MOVEMENTCOST( sGridNo - WORLD_COLS, NORTH, 0, TRAVELCOST_NONE );
-								SET_MOVEMENTCOST( sGridNo - WORLD_COLS + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
-								SET_MOVEMENTCOST( sGridNo + 1, EAST, 0, TRAVELCOST_OBSTACLE );
-								SET_MOVEMENTCOST( sGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
-								FORCE_SET_MOVEMENTCOST( sGridNo + WORLD_COLS, SOUTH, 0, TRAVELCOST_NONE );
-								SET_MOVEMENTCOST( sGridNo + WORLD_COLS - 1, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
-								SET_MOVEMENTCOST( sGridNo - 1, WEST, 0, TRAVELCOST_OBSTACLE );
-								SET_MOVEMENTCOST( sGridNo - WORLD_COLS - 1, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
-								break;
+											// jumpable!
+				//		switch( pStructure->ubWallOrientation )
+				//		{
+				//			case OUTSIDE_TOP_LEFT:
+				//			case INSIDE_TOP_LEFT:
+				//				// can be jumped north and south
+				//				SET_CURRMOVEMENTCOST( NORTH, TRAVELCOST_FENCE );
+				//				SET_CURRMOVEMENTCOST( NORTHEAST, TRAVELCOST_OBSTACLE );
+				//				SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_OBSTACLE );
+				//				SET_CURRMOVEMENTCOST( SOUTHEAST, TRAVELCOST_OBSTACLE );
+				//				SET_CURRMOVEMENTCOST( SOUTH, TRAVELCOST_FENCE );
+				//				SET_CURRMOVEMENTCOST( SOUTHWEST, TRAVELCOST_OBSTACLE );
+				//				SET_CURRMOVEMENTCOST( WEST, TRAVELCOST_OBSTACLE );
+				//				SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_OBSTACLE );
+				//				// set values for the tiles EXITED from this location
+				//				FORCE_SET_MOVEMENTCOST( sGridNo - WORLD_COLS, NORTH, 0, TRAVELCOST_NONE );
+				//				SET_MOVEMENTCOST( sGridNo - WORLD_COLS + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
+				//				SET_MOVEMENTCOST( sGridNo + 1, EAST, 0, TRAVELCOST_OBSTACLE );
+				//				SET_MOVEMENTCOST( sGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
+				//				FORCE_SET_MOVEMENTCOST( sGridNo + WORLD_COLS, SOUTH, 0, TRAVELCOST_NONE );
+				//				SET_MOVEMENTCOST( sGridNo + WORLD_COLS - 1, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
+				//				SET_MOVEMENTCOST( sGridNo - 1, WEST, 0, TRAVELCOST_OBSTACLE );
+				//				SET_MOVEMENTCOST( sGridNo - WORLD_COLS - 1, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
+				//				break;
 
-							case OUTSIDE_TOP_RIGHT:
-							case INSIDE_TOP_RIGHT:
-								// can be jumped east and west
-								SET_CURRMOVEMENTCOST( NORTH, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( NORTHEAST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_FENCE );
-								SET_CURRMOVEMENTCOST( SOUTHEAST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( SOUTH, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( SOUTHWEST, TRAVELCOST_OBSTACLE );
-								SET_CURRMOVEMENTCOST( WEST, TRAVELCOST_FENCE );
-								SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_OBSTACLE );
-								// set values for the tiles EXITED from this location
-								SET_MOVEMENTCOST( sGridNo - WORLD_COLS, NORTH, 0, TRAVELCOST_OBSTACLE );
-								SET_MOVEMENTCOST( sGridNo - WORLD_COLS + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
-								// make sure no obstacle costs exists before changing path cost to 0
-								if ( gubWorldMovementCosts[ sGridNo + 1 ][ EAST ][ 0 ] < TRAVELCOST_BLOCKED )
-								{
-									FORCE_SET_MOVEMENTCOST( sGridNo + 1, EAST, 0, TRAVELCOST_NONE );
-								}
-								SET_MOVEMENTCOST( sGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
-								SET_MOVEMENTCOST( sGridNo + WORLD_COLS, SOUTH, 0, TRAVELCOST_OBSTACLE );
-								SET_MOVEMENTCOST( sGridNo + WORLD_COLS - 1, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
-								if ( gubWorldMovementCosts[ sGridNo - 1 ][ WEST ][ 0 ] < TRAVELCOST_BLOCKED )
-								{
-									FORCE_SET_MOVEMENTCOST( sGridNo - 1, WEST, 0, TRAVELCOST_NONE );
-								}
-								SET_MOVEMENTCOST( sGridNo - WORLD_COLS - 1, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
-								break;
+				//			case OUTSIDE_TOP_RIGHT:
+				//			case INSIDE_TOP_RIGHT:
+				//				// can be jumped east and west
+				//				SET_CURRMOVEMENTCOST( NORTH, TRAVELCOST_OBSTACLE );
+				//				SET_CURRMOVEMENTCOST( NORTHEAST, TRAVELCOST_OBSTACLE );
+				//				SET_CURRMOVEMENTCOST( EAST, TRAVELCOST_FENCE );
+				//				SET_CURRMOVEMENTCOST( SOUTHEAST, TRAVELCOST_OBSTACLE );
+				//				SET_CURRMOVEMENTCOST( SOUTH, TRAVELCOST_OBSTACLE );
+				//				SET_CURRMOVEMENTCOST( SOUTHWEST, TRAVELCOST_OBSTACLE );
+				//				SET_CURRMOVEMENTCOST( WEST, TRAVELCOST_FENCE );
+				//				SET_CURRMOVEMENTCOST( NORTHWEST, TRAVELCOST_OBSTACLE );
+				//				// set values for the tiles EXITED from this location
+				//				SET_MOVEMENTCOST( sGridNo - WORLD_COLS, NORTH, 0, TRAVELCOST_OBSTACLE );
+				//				SET_MOVEMENTCOST( sGridNo - WORLD_COLS + 1, NORTHEAST, 0, TRAVELCOST_OBSTACLE );
+				//				// make sure no obstacle costs exists before changing path cost to 0
+				//				if ( gubWorldMovementCosts[ sGridNo + 1 ][ EAST ][ 0 ] < TRAVELCOST_BLOCKED )
+				//				{
+				//					FORCE_SET_MOVEMENTCOST( sGridNo + 1, EAST, 0, TRAVELCOST_NONE );
+				//				}
+				//				SET_MOVEMENTCOST( sGridNo + WORLD_COLS + 1, SOUTHEAST, 0, TRAVELCOST_OBSTACLE );
+				//				SET_MOVEMENTCOST( sGridNo + WORLD_COLS, SOUTH, 0, TRAVELCOST_OBSTACLE );
+				//				SET_MOVEMENTCOST( sGridNo + WORLD_COLS - 1, SOUTHWEST, 0, TRAVELCOST_OBSTACLE );
+				//				if ( gubWorldMovementCosts[ sGridNo - 1 ][ WEST ][ 0 ] < TRAVELCOST_BLOCKED )
+				//				{
+				//					FORCE_SET_MOVEMENTCOST( sGridNo - 1, WEST, 0, TRAVELCOST_NONE );
+				//				}
+				//				SET_MOVEMENTCOST( sGridNo - WORLD_COLS - 1, NORTHWEST, 0, TRAVELCOST_OBSTACLE );
+				//				break;
 
-							//default:
-								// corners aren't jumpable
-								for (ubDirLoop=0; ubDirLoop < NUM_WORLD_DIRECTIONS; ubDirLoop++)
-								{
-									SET_CURRMOVEMENTCOST( ubDirLoop, TRAVELCOST_OBSTACLE );
-								}
-								break;
-						}//switch*/
-				}//}if dddokno==============================================================================
-				
+				//			//default:
+				//				// corners aren't jumpable
+				//				for (ubDirLoop=0; ubDirLoop < NUM_WORLD_DIRECTIONS; ubDirLoop++)
+				//				{
+				//					SET_CURRMOVEMENTCOST( ubDirLoop, TRAVELCOST_OBSTACLE );
+				//				}
+				//				break;
+				//		}//switch
+				//}//}if dddokno==============================================================================
+				*/
+
 				else if (pStructure->fFlags & STRUCTURE_BLOCKSMOVES)
 				{
 					if ( (pStructure->fFlags & STRUCTURE_FENCE) && !(pStructure->fFlags & STRUCTURE_SPECIAL) )
@@ -4557,3 +4551,4 @@ BOOLEAN MAPTRANSLATION::SetTrnPar(INT32 iFromRows, INT32 iFromCols, INT32 iToRow
 		fTrn = FALSE;
 	return(fTrn);
 }
+

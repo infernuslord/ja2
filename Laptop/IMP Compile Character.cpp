@@ -468,30 +468,18 @@ void ValidateSkillsList( void )
 
 void CreatePlayerSkills( void )
 {
-	// this function will 'roll a die' and decide if any attitude does exists
-	INT32 iDiceValue = 0;
-
 	ValidateSkillsList();
 
-	// DELETED UNUSED PART OF THE CODE - SANDRO
-
 	// Kaiden: This section was added in it's place:
+	// SANDRO - Note: this is actually used only for old trait system
 	if( iLastElementInSkillsList > 0 )
 	{
 		iSkillA = SkillsList[ 0 ];
 	}
-
 	if( iLastElementInSkillsList > 1 )
 	{
 		iSkillB = SkillsList[ 1 ];
 	}
-	
-	if( iLastElementInSkillsList > 2 && gGameOptions.fNewTraitSystem )
-	{
-		iSkillC = SkillsList[ 2 ];
-	}
-
-	// DELETED UNUSED PART OF THE CODE - SANDRO
 }
 
 
@@ -757,13 +745,19 @@ void HandleMercStatsForChangesInFace( )
 		}
 	}
 
-	// skill trait
-	gMercProfiles[ LaptopSaveInfo.iIMPIndex ].bSkillTrait =	( INT8 )iSkillA;
-	gMercProfiles[ LaptopSaveInfo.iIMPIndex ].bSkillTrait2 = ( INT8 )iSkillB;
-	// add third skill trait
 	if (gGameOptions.fNewTraitSystem)
-		gMercProfiles[ LaptopSaveInfo.iIMPIndex ].bSkillTrait3 = ( INT8 )iSkillC;
-
+	{
+		for ( UINT8 ubCnt = 0; ubCnt < gSkillTraitValues.ubMaxNumberOfTraits; ubCnt++ )
+		{
+			gMercProfiles[ LaptopSaveInfo.iIMPIndex ].bSkillTraits[ ubCnt ] = ( INT8 )SkillsList[ ubCnt ];
+		}
+	}
+	else
+	{
+		// skill trait
+		gMercProfiles[ LaptopSaveInfo.iIMPIndex ].bSkillTraits[0] =	( INT8 )iSkillA;
+		gMercProfiles[ LaptopSaveInfo.iIMPIndex ].bSkillTraits[1] = ( INT8 )iSkillB;
+	}
 }
 
 BOOLEAN ShouldThisMercHaveABigBody( void )

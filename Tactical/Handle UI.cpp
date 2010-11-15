@@ -1281,7 +1281,7 @@ UINT32 UIHandleEndTurn( UI_EVENT *pUIEvent )
  	 memset( gubIsCorpseThere, FALSE, sizeof( gubIsCorpseThere ) );
  	 memset( gubMerkCanSeeThisTile, FALSE, sizeof( gubMerkCanSeeThisTile ) );
  	 //развертка цикла. при изменении WORLD_MAX на др.знач. необходимо будет подчищать хвосты! ибо опасный код!!! ;)
-	 for(INT16 i=0; i<WORLD_MAX ;i+=4) 
+	 for(INT32 i=0; i<WORLD_MAX ;i+=4) 
 	 {
 	  gubWorldTileInLight[i] = InLightAtNight(i, gpWorldLevelData[ i ].sHeight);
 	  gubIsCorpseThere[i] = IsCorpseAtGridNo( i, gpWorldLevelData[ i ].sHeight );
@@ -1297,7 +1297,7 @@ UINT32 UIHandleEndTurn( UI_EVENT *pUIEvent )
 	SOLDIERTYPE *tS;
 
 	INT16	sXOffset, sYOffset;
-	INT16	sGridNo;UINT16	usSightLimit=0;
+	INT32	sGridNo;UINT16	usSightLimit=0;
 
 	for ( tS = MercPtrs[ tcnt ]; tcnt <= gTacticalStatus.Team[ gbPlayerNum ].bLastID; tcnt++,tS++ )
 		if ( tS->stats.bLife >= OKLIFE && tS->sGridNo != NOWHERE && tS->bInSector )

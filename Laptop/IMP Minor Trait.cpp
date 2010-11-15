@@ -78,7 +78,7 @@ INT32 giIMPMinorTraitAnswerButtonImage[ IMP_SKILL_TRAITS_NEW_NUMBER_MINOR_SKILLS
 INT32 giIMPMinorlTraitFinsihButton;
 INT32 giIMPMinorlTraitFinsihButtonImage;
 
-INT8	gbLastSelectedMinorTrait[ 3 ];
+INT8	gbLastSelectedMinorTrait[ 10 ];
 
 //image handle
 UINT32	guiIMT_GreyGoldBox;
@@ -99,6 +99,7 @@ void		HandleIMPMinorTraitAnswers( UINT32 uiSkillPressed );
 void		IMPMinorTraitDisplaySkills();
 BOOLEAN CameBackToMinorTraitPageButNotFinished();
 void HandleLastSelectedMinorTrait( INT8 bNewTrait );
+INT8 GetLastSelectedMinorTrait( void );
 INT8		NumAvailableMinorTraits();
 
 void AssignMinorTraitHelpText( UINT8 ubNumber );
@@ -190,7 +191,7 @@ void EnterIMPMinorTrait( void )
 	}
 
 	//reset last selected trait
-	memset( gbLastSelectedMinorTrait, -1, 3 );
+	memset( gbLastSelectedMinorTrait, -1, 10 );
 }
 
 
@@ -327,50 +328,66 @@ void HandleIMPMinorTraitAnswers( UINT32 uiSkillPressed )
 	}
 
 	//if its allready set
-	if( gfMinorTraitQuestions[ uiSkillPressed ] )
+	if( gfMinorTraitQuestions[ uiSkillPressed ] && uiSkillPressed != IMP_SKILL_TRAITS_NEW_MINOR_NONE )
 	{
-		//dont need to do anything
-		return;
-	}
+		gfMinorTraitQuestions[ uiSkillPressed ] = FALSE;
 
-	//if we are to reset all the buttons
-	if( CountNumMinorTraitsSelected( FALSE ) >= NumAvailableMinorTraits() )
-	{
-		// try to remove the last selected minor trait
-		if ( gbLastSelectedMinorTrait[ 0 ] != -1 )
+		BOOLEAN fNoSkillSelected = TRUE;
+		for ( uiCnt=0; uiCnt<(IMP_SKILL_TRAITS_NEW_MINOR_NONE); uiCnt++ )
 		{
-			gfMinorTraitQuestions[ gbLastSelectedMinorTrait[ 0 ] ] = FALSE;
+			if ( gfMinorTraitQuestions[ uiCnt ] == TRUE )
+				fNoSkillSelected = FALSE;
 		}
-		// if there is none, remove all for sure
-		else
+		if ( fNoSkillSelected )
 		{
-			//loop through all the skill and reset them
+			// select NONE button
+			gfMinorTraitQuestions[ IMP_SKILL_TRAITS_NEW_MINOR_NONE ] = TRUE;
+		}
+	}
+	else
+	{
+		//if we are to reset all the buttons
+		if( CountNumMinorTraitsSelected( FALSE ) >= NumAvailableMinorTraits() )
+		{
+			// try to remove the last selected minor trait
+			if ( gfMinorTraitQuestions[ GetLastSelectedMinorTrait() ] > 0 )
+			{
+				gfMinorTraitQuestions[ GetLastSelectedMinorTrait() ] = FALSE;
+
+				// remove this one from list
+				HandleLastSelectedMinorTrait( -1 );
+			}
+			// if there is none, remove all for sure
+			else
+			{
+				//loop through all the skill and reset them
+				for( uiCnt=0; uiCnt<IMP_SKILL_TRAITS_NEW_NUMBER_MINOR_SKILLS; uiCnt++ )
+				{
+					gfMinorTraitQuestions[ uiCnt ] = FALSE;
+				}
+			}
+		}
+		//Set the skill
+		gfMinorTraitQuestions[ uiSkillPressed ] = TRUE;
+
+		HandleLastSelectedMinorTrait( uiSkillPressed );
+
+		//if the NONE trait was selected, clear the rest of the buttons
+		if( uiSkillPressed == IMP_SKILL_TRAITS_NEW_MINOR_NONE )
+		{
+			//reset all the traits
 			for( uiCnt=0; uiCnt<IMP_SKILL_TRAITS_NEW_NUMBER_MINOR_SKILLS; uiCnt++ )
 			{
 				gfMinorTraitQuestions[ uiCnt ] = FALSE;
 			}
+			gfMinorTraitQuestions[ IMP_SKILL_TRAITS_NEW_MINOR_NONE ] = TRUE;
 		}
-	}
-	//Set the skill
-	gfMinorTraitQuestions[ uiSkillPressed ] = TRUE;
 
-	HandleLastSelectedMinorTrait( uiSkillPressed );
-
-	//if the NONE trait was selected, clear the rest of the buttons
-	if( uiSkillPressed == IMP_SKILL_TRAITS_NEW_MINOR_NONE )
-	{
-		//reset all the traits
-		for( uiCnt=0; uiCnt<IMP_SKILL_TRAITS_NEW_NUMBER_MINOR_SKILLS; uiCnt++ )
+		//make sure the none skill is NOT selected if we select anything else
+		if( uiSkillPressed != IMP_SKILL_TRAITS_NEW_MINOR_NONE )
 		{
-			gfMinorTraitQuestions[ uiCnt ] = FALSE;
+			gfMinorTraitQuestions[ IMP_SKILL_TRAITS_NEW_MINOR_NONE ] = FALSE;
 		}
-		gfMinorTraitQuestions[ IMP_SKILL_TRAITS_NEW_MINOR_NONE ] = TRUE;
-	}
-
-	//make sure the none skill is NOT selected if we select anything else
-	if( uiSkillPressed != IMP_SKILL_TRAITS_NEW_MINOR_NONE )
-	{
-		gfMinorTraitQuestions[ IMP_SKILL_TRAITS_NEW_MINOR_NONE ] = FALSE;
 	}
 
 	//Play the button sound
@@ -540,17 +557,21 @@ INT8 NumAvailableMinorTraits()
 	//Count the number of skills selected
 	bNumMajorTraits = CountNumSkillTraitsSelected( FALSE );
 
-	if ( bNumMajorTraits == 0 )
-		bNumMinorTraits = 3;
-	else if ( bNumMajorTraits == 1 )
-		bNumMinorTraits = 2;
-	else if ( bNumMajorTraits == 2 )
-		bNumMinorTraits = 1;
-	else
-	{
-		Assert( 0 );
-		bNumMinorTraits = 0;
-	}
+	bNumMinorTraits = gSkillTraitValues.ubMaxNumberOfTraits - bNumMajorTraits;
+
+	bNumMinorTraits = max( 1, bNumMinorTraits );
+
+	//if ( bNumMajorTraits == 0 )
+	//	bNumMinorTraits = 3;
+	//else if ( bNumMajorTraits == 1 )
+	//	bNumMinorTraits = 2;
+	//else if ( bNumMajorTraits == 2 )
+	//	bNumMinorTraits = 1;
+	//else
+	//{
+	//	Assert( 0 );
+	//	bNumMinorTraits = 0;
+	//}
 
 	return(bNumMinorTraits);
 }
@@ -563,18 +584,8 @@ void AddSelectedMinorTraitsToSkillsList()
 	// if we have somehow reached beyond available traits, try to fix it by removing the last one selected
 	if ( NumAvailableMinorTraits() < CountNumMinorTraitsSelected( FALSE ) )
 	{
-		if (gfMinorTraitQuestions[ gbLastSelectedMinorTrait[ 0 ] ] == TRUE )
-			gfMinorTraitQuestions[ gbLastSelectedMinorTrait[ 0 ] ] = FALSE;
-	}
-	if ( NumAvailableMinorTraits() < CountNumMinorTraitsSelected( FALSE ) )
-	{
-		if (gfMinorTraitQuestions[ gbLastSelectedMinorTrait[ 1 ] ] == TRUE )
-			gfMinorTraitQuestions[ gbLastSelectedMinorTrait[ 1 ] ] = FALSE;
-	}
-	if ( NumAvailableMinorTraits() < CountNumMinorTraitsSelected( FALSE ) )
-	{
-		if (gfMinorTraitQuestions[ gbLastSelectedMinorTrait[ 2 ] ] == TRUE )
-			gfMinorTraitQuestions[ gbLastSelectedMinorTrait[ 2 ] ] = FALSE;
+		if (gfMinorTraitQuestions[ GetLastSelectedMinorTrait() ] == TRUE )
+			gfMinorTraitQuestions[ GetLastSelectedMinorTrait() ] = FALSE;
 	}
 	// if still something is wrong, remove them all
 	if ( NumAvailableMinorTraits() < CountNumMinorTraitsSelected( FALSE ) )
@@ -645,9 +656,33 @@ void AddSelectedMinorTraitsToSkillsList()
 
 void HandleLastSelectedMinorTrait( INT8 bNewTrait )
 {
+	INT16 iCnt;
+
+	if (bNewTrait == -1)
+	{
+		// we only want to delete the last selected trait from list
+		for( iCnt=9; iCnt>=0; iCnt-- )
+		{
+			if ( gbLastSelectedMinorTrait[ iCnt ] > 0 )
+			{
+				gbLastSelectedMinorTrait[ iCnt ] = 0;
+				break;
+			}
+		}
+		
+	}
+	else
+	{
+		for( iCnt=0; iCnt<9; iCnt++ )
+		{
+			gbLastSelectedMinorTrait[ (iCnt + 1) ] = gbLastSelectedMinorTrait[ iCnt ];
+		}
+		gbLastSelectedMinorTrait[ 0 ] = bNewTrait;
+	}
+
 	// here in "gbLastSelectedMinorTrait[ 0 ]" must always be the oldest minor trait selected
 	// this is indeed pretty sh*tty code
-	if( bNewTrait == IMP_SKILL_TRAITS_NEW_MINOR_NONE )
+	/*if( bNewTrait == IMP_SKILL_TRAITS_NEW_MINOR_NONE )
 	{
 		gbLastSelectedMinorTrait[ 0 ] = -1;
 		gbLastSelectedMinorTrait[ 1 ] = -1;
@@ -719,7 +754,22 @@ void HandleLastSelectedMinorTrait( INT8 bNewTrait )
 	{
 		Assert( 0 );
 		gbLastSelectedMinorTrait[ 0 ] = bNewTrait;
+	}*/
+}
+
+INT8 GetLastSelectedMinorTrait( void )
+{
+	INT16 iCnt;
+
+	for( iCnt=9; iCnt>=0; iCnt-- )
+	{
+		if ( gbLastSelectedMinorTrait[ iCnt ] > 0 )
+		{
+			return ( gbLastSelectedMinorTrait[ iCnt ] );
+			break;
+		}
 	}
+	return ( 0 );
 }
 
 UINT8 StrengthRequiredAdjustmentForMinorTraits( INT32 iInitialValue )

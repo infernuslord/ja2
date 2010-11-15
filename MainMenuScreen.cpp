@@ -432,21 +432,7 @@ void InitDependingGameStyleOptions()
 
 	InitSightRange(); //lal
 
-	ReStartingGame();
-
-	if (is_networked)
-	{
-		NUMBER_OF_MERCS = 28;
-		LAST_MERC_ID = 27;
-	}
-	else
-	{
-		// WANNE: I don't think that is needed
-		//InitGameOptions();
-
-		NUMBER_OF_MERCS = 15;
-		LAST_MERC_ID = 14;
-	}
+	ReStartingGame();	
 }
 
 

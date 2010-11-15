@@ -510,7 +510,7 @@ void AStarPathfinder::ResetAStarList()
 
 	//ddd{
 
-	INT16 node;
+	INT32 node;
 	for (node = 0; node < (WORLD_MAX & ~3); node+=4) //ddd разворот цикла
 	{
 		AStarData[node].status = AStarData[node+1].status

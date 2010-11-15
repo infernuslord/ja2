@@ -114,6 +114,7 @@ STR16 gzIMPMajorTraitsHelpTextsHeavyWeapons[]=
 };
 STR16 gzIMPMajorTraitsHelpTextsSniper[]=
 {
+	L"+%d%s к шансу поразить из винтовки\n",
 	L"+%d%s к шансу попасть из снайперской винтовки\n",
 	L"-%d%s эффективной дальности до цели для всего вида оружия\n",	//-%d%s effective range to target with all weapons
 	L"+%d%s к бонусу прицеливания на каджый щелчок мыши (особенно к пистолетам)\n",

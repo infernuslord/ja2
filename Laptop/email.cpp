@@ -3945,25 +3945,25 @@ void HandleIMPCharProfileResultsMessage( void)
 	if ( gGameOptions.fNewTraitSystem )
 		{
 			// Auto Weapons
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == AUTO_WEAPONS_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == AUTO_WEAPONS_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == AUTO_WEAPONS_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, AUTO_WEAPONS_NT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_AUTO ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Heavy Weapons
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == HEAVY_WEAPONS_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == HEAVY_WEAPONS_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == HEAVY_WEAPONS_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, HEAVY_WEAPONS_NT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_HEAVY ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Sniper
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == SNIPER_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == SNIPER_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == SNIPER_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, SNIPER_NT ) > 0 )
 			{
 				wcscpy(pString, MissingIMPSkillsDescriptions[0]);
 				AddEmailRecordToList( pString );
 			}
 			// Ranger
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == RANGER_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == RANGER_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == RANGER_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, RANGER_NT ) > 0 )
 			{
 				if ( gGameExternalOptions.fShowCamouflageFaces == TRUE )
 				{
@@ -3976,91 +3976,91 @@ void HandleIMPCharProfileResultsMessage( void)
 				AddEmailRecordToList( pString );
 			}
 			// Gunslinger
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == GUNSLINGER_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == GUNSLINGER_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == GUNSLINGER_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, GUNSLINGER_NT ) > 0 )
 			{
 				wcscpy(pString, MissingIMPSkillsDescriptions[3]);
 				AddEmailRecordToList( pString );
 			}
 			// Martial Artist
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == MARTIAL_ARTS_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == MARTIAL_ARTS_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == MARTIAL_ARTS_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, MARTIAL_ARTS_NT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_MARTIAL ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Squadleader
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == SQUADLEADER_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == SQUADLEADER_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == SQUADLEADER_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, SQUADLEADER_NT ) > 0 )
 			{
 				wcscpy(pString, MissingIMPSkillsDescriptions[4]);
 				AddEmailRecordToList( pString );
 			}
 			// Technician
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == TECHNICIAN_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == TECHNICIAN_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == TECHNICIAN_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, TECHNICIAN_NT ) > 0 )
 			{
 				wcscpy(pString, MissingIMPSkillsDescriptions[5]);
 				AddEmailRecordToList( pString );
 			}
 			// Doctor
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == DOCTOR_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == DOCTOR_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == DOCTOR_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, DOCTOR_NT ) > 0 )
 			{
 				wcscpy(pString, MissingIMPSkillsDescriptions[6]);
 				AddEmailRecordToList( pString );
 			}
 			// Ambidextrous
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == AMBIDEXTROUS_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == AMBIDEXTROUS_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == AMBIDEXTROUS_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, AMBIDEXTROUS_NT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_AMBI ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Melee
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == MELEE_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == MELEE_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == MELEE_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, MELEE_NT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_KNIFE ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Throwing
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == THROWING_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == THROWING_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == THROWING_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, THROWING_NT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_THROW ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Night Ops
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == NIGHT_OPS_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == NIGHT_OPS_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == NIGHT_OPS_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, NIGHT_OPS_NT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_NIGHT ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Stealthy
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == STEALTHY_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == STEALTHY_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == STEALTHY_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, STEALTHY_NT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_STEALTH ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Athletics
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == ATHLETICS_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == ATHLETICS_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == ATHLETICS_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, ATHLETICS_NT ) > 0 )
 			{
 				wcscpy(pString, MissingIMPSkillsDescriptions[7]);
 				AddEmailRecordToList( pString );
 			}
 			// Bodybuilding
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == BODYBUILDING_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == BODYBUILDING_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == BODYBUILDING_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, BODYBUILDING_NT ) > 0 )
 			{
 				wcscpy(pString, MissingIMPSkillsDescriptions[8]);
 				AddEmailRecordToList( pString );
 			}
 			// Demolitions
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == DEMOLITIONS_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == DEMOLITIONS_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == DEMOLITIONS_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, DEMOLITIONS_NT ) > 0 )
 			{
 				wcscpy(pString, MissingIMPSkillsDescriptions[9]);
 				AddEmailRecordToList( pString );
 			}
 			// Teaching
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == TEACHING_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == TEACHING_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == TEACHING_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, TEACHING_NT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_TEACH ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Scouting
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == SCOUTING_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == SCOUTING_NT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait3 == SCOUTING_NT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, SCOUTING_NT ) > 0 )
 			{
 				wcscpy(pString, MissingIMPSkillsDescriptions[10]);
 				AddEmailRecordToList( pString );
@@ -4069,61 +4069,61 @@ void HandleIMPCharProfileResultsMessage( void)
 	else
 	{
 			// Lockpick
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == LOCKPICKING_OT)||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == LOCKPICKING_OT) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, LOCKPICKING_OT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_LOCK ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Hand to Hand
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == HANDTOHAND_OT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == HANDTOHAND_OT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, HANDTOHAND_OT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_HAND ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Electronics
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == ELECTRONICS_OT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == ELECTRONICS_OT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, ELECTRONICS_OT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_ELEC ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Night Ops
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == NIGHTOPS_OT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == NIGHTOPS_OT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, NIGHTOPS_OT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_NIGHT ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Throwing
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == THROWING_OT)||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == THROWING_OT) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, THROWING_OT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_THROW ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Teaching
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == TEACHING_OT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == TEACHING_OT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, TEACHING_OT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_TEACH ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Heavy Weapons
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == HEAVY_WEAPS_OT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == HEAVY_WEAPS_OT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, HEAVY_WEAPS_OT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_HEAVY ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Auto Weapons
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == AUTO_WEAPS_OT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == AUTO_WEAPS_OT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, AUTO_WEAPS_OT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_AUTO ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Stealthy
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == STEALTHY_OT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == STEALTHY_OT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, STEALTHY_OT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_STEALTH ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Ambidextrous
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == AMBIDEXT_OT)||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == AMBIDEXT_OT) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, AMBIDEXT_OT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_AMBI ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
@@ -4135,26 +4135,26 @@ void HandleIMPCharProfileResultsMessage( void)
 				AddEmailRecordToList( pString );
 			}*/
 			// Martial Arts
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == MARTIALARTS_OT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == MARTIALARTS_OT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, MARTIALARTS_OT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_MARTIAL ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Knifing
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == KNIFING_OT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == KNIFING_OT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, KNIFING_OT ) > 0 )
 			{
 				LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( IMP_SKILLS_SPECIAL_KNIFE ), MAIL_STRING_SIZE );
 				AddEmailRecordToList( pString );
 			}
 			// Sniper
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == PROF_SNIPER_OT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == PROF_SNIPER_OT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, PROF_SNIPER_OT ) > 0 )
 			{
 				wcscpy(pString, MissingIMPSkillsDescriptions[0]);
 				// add to list
 				AddEmailRecordToList( pString );
 			}
 			// Camouflage
-			if( ( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait == CAMOUFLAGED_OT )||( gMercProfiles[ iCurrentIMPSlot ].bSkillTrait2 == CAMOUFLAGED_OT ) )
+			if ( ProfileHasSkillTrait( iCurrentIMPSlot, CAMOUFLAGED_OT ) > 0 )
 			{
 				if ( gGameExternalOptions.fShowCamouflageFaces == TRUE )
 				{
@@ -4983,7 +4983,7 @@ void PreProcessEmail( EmailPtr pMail )
 	// list doesn't exist, reload
 	if( !pTempRecord )
 	{
-	while(pMail->usLength > iCounter)
+		while(pMail->usLength > iCounter)
 		{
 		// read one record from email file
 #ifdef JA2UB
@@ -5028,17 +5028,17 @@ void PreProcessEmail( EmailPtr pMail )
 			// add to list
 			AddEmailRecordToList( pString );
 
-		// increment email record counter
-		iCounter++;
-	}
+			// increment email record counter
+			iCounter++;
+		}
 
-	  // WANNE: Set the value back
-	if (iNew113MERCMerc != 0)
-	{
-		pMail->usLength = iNew113MERCMerc;
-	}
+		// WANNE: Set the value back
+		if (iNew113MERCMerc != 0)
+		{
+			pMail->usLength = iNew113MERCMerc;
+		}
 
-	giPrevMessageId = giMessageId;
+		giPrevMessageId = giMessageId;
 
 	}
 

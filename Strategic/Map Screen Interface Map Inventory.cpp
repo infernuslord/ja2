@@ -849,6 +849,9 @@ void MapInvenPoolSlots(MOUSE_REGION * pRegion, INT32 iReason )
 			//CHRISL: Make it possible to right click and pull up stack popup and/or item description boxes
 			WORLDITEM	* twItem = &(pInventoryPoolList[ ( iCurrentInventoryPoolPage * MAP_INVENTORY_POOL_SLOT_COUNT ) + iCounter ]);
 			bool	fValidPointer = false;
+			//CHRISL: Try to update InSector value so we don't have to "activate" a sector
+			if(MercPtrs[gCharactersList[bSelectedInfoChar].usSolID]->sSectorX == sSelMapX && MercPtrs[gCharactersList[bSelectedInfoChar].usSolID]->sSectorY == sSelMapY && MercPtrs[gCharactersList[bSelectedInfoChar].usSolID]->bSectorZ == iCurrentMapSectorZ && !MercPtrs[gCharactersList[bSelectedInfoChar].usSolID]->flags.fBetweenSectors)
+				MercPtrs[gCharactersList[bSelectedInfoChar].usSolID]->bInSector=TRUE;
 			if ( !InSectorStackPopup( ) && !InItemStackPopup( ) /*&& !InItemDescriptionBox( ) */ && !InKeyRingPopup( ) && twItem->object.exists() == true && (bSelectedInfoChar != -1 && gCharactersList[bSelectedInfoChar].fValid))
 			{
 				if(OK_CONTROL_MERC( MercPtrs[gCharactersList[bSelectedInfoChar].usSolID] ))
@@ -1013,6 +1016,17 @@ void MapInvenPoolSlots(MOUSE_REGION * pRegion, INT32 iReason )
 			usNewItemIndex = gpItemPointer->usItem;
 			iOldNumberOfObjects =  pInventoryPoolList[ ( iCurrentInventoryPoolPage * MAP_INVENTORY_POOL_SLOT_COUNT ) + iCounter ].object.ubNumberOfObjects;
 
+			//CHRISL: Allow CTRL+LMB to clean up stacks just like we do with personal inventory
+			//Curretly, screen isn't automatically refreshing.  You have to move your cursor after CTRL+LMB to see the results.
+			if ( _KeyDown(CTRL) )
+			{
+				CleanUpStack( &( pInventoryPoolList[ ( iCurrentInventoryPoolPage * MAP_INVENTORY_POOL_SLOT_COUNT ) + iCounter ].object ), gpItemPointer );
+				if ( gpItemPointer->exists() == false )
+				{
+					MAPEndItemPointer( );
+				}
+				return;
+			}
 
 			// Else, try to place here
 			if ( PlaceObjectInInventoryStash( &( pInventoryPoolList[ ( iCurrentInventoryPoolPage * MAP_INVENTORY_POOL_SLOT_COUNT ) + iCounter ].object ), gpItemPointer ) )

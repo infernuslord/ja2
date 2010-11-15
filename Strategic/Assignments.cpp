@@ -65,6 +65,7 @@
 	#include "Morale.h"
 #endif
 #include <vector>
+#include <queue>
 
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -547,8 +548,21 @@ BOOLEAN IsSoldierCloseEnoughToADoctor( SOLDIERTYPE *pPatient );
 void VerifyTownTrainingIsPaidFor( void );
 #endif
 
+/// Forward declarations for dynamic repair system.
+/// They are only used in this file.
 
-
+/// Comparator function for priority_queue to determine the repair priority of an item.
+struct RepairPriority; 
+/// Struct to store items to repair in
+struct RepairItem;
+// The data structure used for collecting repairable items
+typedef std::priority_queue<RepairItem, std::vector<RepairItem>, RepairPriority> RepairQueue;
+/// Gets the minimum durability of all items in an object stack
+static INT16 GetMinimumStackDurability(const OBJECTTYPE* pObj);
+/// Check if a gun is jammed
+static BOOLEAN IsGunJammed(const OBJECTTYPE* pObj);
+/// Collect items that need repairing and add them to the repair queue
+static void CollectRepairableItems(const SOLDIERTYPE* pSoldier, RepairQueue& itemsToFix);
 
 void InitSectorsWithSoldiersList( void )
 {
@@ -3293,7 +3307,115 @@ INT8 HandleRepairOfSAMSite( SOLDIERTYPE *pSoldier, INT8 bPointsAvailable, BOOLEA
 }
 */
 
+struct RepairItem {
+	const OBJECTTYPE* item;
+	const SOLDIERTYPE* owner;
+	INVENTORY_SLOT inventorySlot;
 
+	RepairItem (const OBJECTTYPE* object, const SOLDIERTYPE* soldier, INVENTORY_SLOT slot) :
+		item(object), owner(soldier), inventorySlot(slot) {}
+};
+
+struct RepairPriority : std::binary_function<RepairItem, RepairItem, bool> {
+	/// Comperator function
+	bool operator() (const RepairItem& firstItem, const RepairItem& secondItem) const {
+		UINT8 priFirst = CalculateItemPriority(firstItem),
+			  priSecond = CalculateItemPriority(secondItem);
+
+		// Both items have the same priority, prefer the item with less durability
+		if (priFirst == priSecond) {
+			INT16 durabilityFirst = GetMinimumStackDurability(firstItem.item),
+				  durabilitySecond = GetMinimumStackDurability(secondItem.item);
+		
+			// Sort by durability in ascending order
+			return durabilityFirst > durabilitySecond;
+		}
+		else
+			// Sort by priority in descending order
+			return priFirst < priSecond;
+	}
+
+	/// Calculate an item's priority
+	///
+	/// LBE: 0
+	/// Items: 1
+	/// Armor: 2
+	/// Face items: 3
+	/// Weapons: 4
+	/// Equipped armor: 5
+	/// Equipped weapons: 6
+	private: UINT8 CalculateItemPriority(const RepairItem& object) const {
+		
+		UINT32 itemClass = Item[object.item->usItem].usItemClass;
+		// Default priority
+		UINT8 priority = 1;
+
+		// Set base priority
+		if ( itemClass == IC_LBEGEAR )
+			priority = 0;
+		else if ( itemClass == IC_ARMOUR )
+			priority = 2;
+		else if ( itemClass == IC_FACE )
+			priority = 3;
+		else if ( IsWeapon(object.item->usItem) )
+			priority = 4;
+		
+		// Set priority based on equip slot
+		if ((itemClass == IC_ARMOUR) &&  (object.inventorySlot == HELMETPOS || object.inventorySlot == VESTPOS || object.inventorySlot == LEGPOS))
+			priority = 5;
+		if ((IsWeapon(object.item->usItem)) && (object.inventorySlot == HANDPOS || object.inventorySlot == SECONDHANDPOS)) 
+			priority = 6;
+
+		// Set priority for jammed weapons; those weapons should always be highest priority
+		if (IsGunJammed(object.item))
+			priority = 100;
+
+		return priority;
+	}
+};
+
+static INT16 GetMinimumStackDurability(const OBJECTTYPE* pObj) {
+	INT16 minDur = 100;
+	for (UINT8 stackIndex = 0; stackIndex < pObj->ubNumberOfObjects; ++stackIndex) {
+		INT16 durability = (*pObj)[stackIndex]->data.objectStatus;
+
+		if (durability < minDur) 
+			minDur = durability;
+	}
+
+	return minDur;
+}
+
+static void CollectRepairableItems(const SOLDIERTYPE* pSoldier, RepairQueue& itemsToFix) {
+	// Iterate over all pocket slots and add items in need of repair
+	for (UINT8 pocketIndex = HELMETPOS; pocketIndex < NUM_INV_SLOTS; ++pocketIndex) {
+		const OBJECTTYPE* pObj = &(const_cast<SOLDIERTYPE *>(pSoldier)->inv[pocketIndex]);
+
+		// Check if item needs repairing
+		BOOLEAN itemAddedToQueue = FALSE;
+		for (UINT8 stackIndex = 0; stackIndex < pObj->ubNumberOfObjects; ++stackIndex) {
+			// Check the stack item itself
+			if (!itemAddedToQueue && IsItemRepairable(pObj->usItem, (*pObj)[stackIndex]->data.objectStatus)) {
+				itemAddedToQueue = TRUE;
+				RepairItem item(pObj, pSoldier, (INVENTORY_SLOT) pocketIndex);
+				itemsToFix.push(item);
+			}
+
+			// Check for attachments (are there stackable items that can take attachments though?)
+			UINT8 attachmentIndex = 0;
+			for (attachmentList::const_iterator iter = (*pObj)[stackIndex]->attachments.begin(); iter != (*pObj)[stackIndex]->attachments.end(); ++iter, ++attachmentIndex) {
+				if (IsItemRepairable(iter->usItem, (*iter)[attachmentIndex]->data.objectStatus )) {
+					RepairItem item(&(*iter), pSoldier, (INVENTORY_SLOT) pocketIndex);
+					itemsToFix.push(item);
+				}
+			}
+		}
+	}
+}
+
+static BOOLEAN IsGunJammed(const OBJECTTYPE* pObj) {
+	return (Item[pObj->usItem].usItemClass == IC_GUN) && ((*pObj)[0]->data.gun.bGunAmmoStatus < 0);
+}
 
 OBJECTTYPE* FindRepairableItemOnOtherSoldier( SOLDIERTYPE * pSoldier, UINT8 ubPassType )
 {
@@ -3555,14 +3677,8 @@ void HandleRepairBySoldier( SOLDIERTYPE *pSoldier )
 	UINT8 ubRepairPtsLeft =0;
 	UINT8 ubInitialRepairPts = 0;
 	UINT8 ubRepairPtsUsed = 0;
-	INT8 bPocket =0;
 	BOOLEAN fNothingLeftToRepair = FALSE;
-	INT8	bLoop, bLoopStart, bLoopEnd;
-	BOOLEAN fAnyOfSoldiersOwnItemsWereFixed = FALSE;
-	OBJECTTYPE * pObj;
-
 	UINT16 usKitDegrade = 100;
-
 
 	// grab max number of repair pts open to this soldier
 	ubRepairPtsLeft = CalculateRepairPointsForRepairman( pSoldier, &usMax, TRUE );
@@ -3625,83 +3741,151 @@ void HandleRepairBySoldier( SOLDIERTYPE *pSoldier )
 	}
 	else
 	{
-		fAnyOfSoldiersOwnItemsWereFixed = UnjamGunsOnSoldier( pSoldier, pSoldier, &ubRepairPtsLeft );
-
-		// repair items on self
-		// HEADROCK HAM B2.8: Experimental feature: Fixes LBEs last, as they don't actually require repairs.
-		for( bLoop = 0; bLoop < 4; bLoop++ )
+		if (gGameExternalOptions.fAdditionalRepairMode) 
 		{
-			if ( bLoop == 0 )
+			// 2Points: Use new repair algorithm
+			// Collect all items in need of repair and assign them priorities
+			RepairQueue itemsToFix;
+
+			CollectRepairableItems(pSoldier, itemsToFix);
+			for(UINT8 teamIndex = gTacticalStatus.Team[gbPlayerNum].bFirstID; teamIndex < gTacticalStatus.Team[gbPlayerNum].bLastID; ++teamIndex) 
 			{
-				bLoopStart = SECONDHANDPOS;
-				// HEADROCK: New loop stage only checks second hand, to avoid LBEs.
-				bLoopEnd = SECONDHANDPOS;
+				// Ignore self, mercs in other sectors, etc.
+				if (CanCharacterRepairAnotherSoldiersStuff(pSoldier, MercPtrs[teamIndex]))
+					CollectRepairableItems(MercPtrs[teamIndex], itemsToFix);
 			}
-			else if ( bLoop == 1 )
+
+			// Step through items, starting with the highest priority item
+			while (!itemsToFix.empty() && ubRepairPtsLeft > 0) 
 			{
-				// HEADROCK: Second check is for armor and headgear only.
-				bLoopStart = HELMETPOS;
-				bLoopEnd = HEAD2POS;
-			}
-			else if ( bLoop == 2 )
-			{
-				// HEADROCK: Loop stage altered to run through inventory only
-				bLoopStart = UsingNewInventorySystem() == false ? BIGPOCKSTART : GUNSLINGPOCKPOS;
-				// CHRISL: Changed to dynamically determine max inventory locations.
-				bLoopEnd = (NUM_INV_SLOTS - 1);
-			}
-			else if ( bLoop == 3 )
-			{
-				if (UsingNewInventorySystem() == true)
+				const RepairItem object = itemsToFix.top();
+				itemsToFix.pop();
+
+				// Jammed gun; call unjam function first
+				if ( IsGunJammed(object.item) )
+					UnjamGunsOnSoldier(const_cast<SOLDIERTYPE*> (object.owner), pSoldier, &ubRepairPtsLeft);
+
+				// Regular repair function
+				BOOLEAN itemRepaired = RepairObject( pSoldier, const_cast<SOLDIERTYPE*> (object.owner), const_cast<OBJECTTYPE*> (object.item), &ubRepairPtsLeft );
+
+#ifdef _DEBUG
+				if (itemRepaired)
+					ScreenMsg(FONT_ORANGE, MSG_BETAVERSION, L"Repaired: %s's %s in item slot %d [Dur: %d]. %d points left.", 
+						object.owner->name, Item[object.item->usItem].szItemName, object.inventorySlot, GetMinimumStackDurability(object.item), ubRepairPtsLeft);
+#endif
+
+				// The following assumes that weapon/armor has higher priority than regular items! If the priorities are changed, this notification
+				// probably won't work reliably anymore.
+
+				// The item has been repaired completely
+				if (GetMinimumStackDurability(object.item) == 100) 
 				{
-					// HEADROCK: Last loop fixes LBEs
-					bLoopStart = VESTPOCKPOS;
-					bLoopEnd = BPACKPOCKPOS;
+					// No items left in queue: All items have been repaired
+					if (itemsToFix.empty())
+						ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, sRepairsDoneString[ 3 ], pSoldier->name );
+					else {
+						// The current item was a weapon/armor
+						if ( (IsWeapon(object.item->usItem) || Item[object.item->usItem].usItemClass == IC_ARMOUR) &&
+						// ...and the next item isn't:
+							 (!IsWeapon(itemsToFix.top().item->usItem) && Item[itemsToFix.top().item->usItem].usItemClass != IC_ARMOUR) ) 
+						{
+
+							// All weapons & armor have been repaired
+							ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, sRepairsDoneString[ 1 ], pSoldier->name );
+							StopTimeCompression();
+						}
+					}
 				}
-				else
+			}
+		}
+		else 
+		{
+			// Old repair algorithm
+
+			INT8 bPocket =0;
+ 			BOOLEAN fNothingLeftToRepair = FALSE;
+			INT8	bLoop, bLoopStart, bLoopEnd;
+			BOOLEAN fAnyOfSoldiersOwnItemsWereFixed = FALSE;
+			OBJECTTYPE * pObj;
+
+			fAnyOfSoldiersOwnItemsWereFixed = UnjamGunsOnSoldier( pSoldier, pSoldier, &ubRepairPtsLeft );
+
+			// repair items on self
+			// HEADROCK HAM B2.8: Experimental feature: Fixes LBEs last, as they don't actually require repairs.
+			for( bLoop = 0; bLoop < 4; bLoop++ )
+			{
+				if ( bLoop == 0 )
 				{
-					// HEADROCK: In OIV, simply check everything again.
 					bLoopStart = SECONDHANDPOS;
+					// HEADROCK: New loop stage only checks second hand, to avoid LBEs.
+					bLoopEnd = SECONDHANDPOS;
+				}
+				else if ( bLoop == 1 )
+				{
+					// HEADROCK: Second check is for armor and headgear only.
+					bLoopStart = HELMETPOS;
+					bLoopEnd = HEAD2POS;
+				}
+				else if ( bLoop == 2 )
+				{
+					// HEADROCK: Loop stage altered to run through inventory only
+					bLoopStart = UsingNewInventorySystem() == false ? BIGPOCKSTART : GUNSLINGPOCKPOS;
+					// CHRISL: Changed to dynamically determine max inventory locations.
 					bLoopEnd = (NUM_INV_SLOTS - 1);
 				}
-			}
-
-			// now repair objects running from left hand to small pocket
-			for( bPocket = bLoopStart; bPocket <= bLoopEnd; bPocket++ )
-			{
-				//CHRISL: These two conditions allow us to repair LBE pocket items at the same time as worn armor, while
-				//	still letting us repair the item in our offhand first.
-				// HEADROCK HAM B2.8: No longer necessary, as I've artificially added new stages for this. LBE
-				// pockets are now repaired LAST.
-				//if(UsingNewInventorySystem() == true && bLoop == 0 && bPocket>SECONDHANDPOS && bPocket<GUNSLINGPOCKPOS)
-				//	continue;
-				//if(UsingNewInventorySystem() == true && bLoop == 1 && bPocket==SECONDHANDPOS)
-				//	continue;
-				pObj = &(pSoldier->inv[ bPocket ]);
-
-				if ( RepairObject( pSoldier, pSoldier, pObj, &ubRepairPtsLeft ) )
+				else if ( bLoop == 3 )
 				{
-					fAnyOfSoldiersOwnItemsWereFixed = TRUE;
+					if (UsingNewInventorySystem() == true)
+					{
+						// HEADROCK: Last loop fixes LBEs
+						bLoopStart = VESTPOCKPOS;
+						bLoopEnd = BPACKPOCKPOS;
+					}
+					else
+					{
+						// HEADROCK: In OIV, simply check everything again.
+						bLoopStart = SECONDHANDPOS;
+						bLoopEnd = (NUM_INV_SLOTS - 1);
+					}
+				}
 
-					// quit looking if we're already out
-					if ( ubRepairPtsLeft == 0 )
-						break;
+				// now repair objects running from left hand to small pocket
+				for( bPocket = bLoopStart; bPocket <= bLoopEnd; bPocket++ )
+				{
+					//CHRISL: These two conditions allow us to repair LBE pocket items at the same time as worn armor, while
+					//	still letting us repair the item in our offhand first.
+					// HEADROCK HAM B2.8: No longer necessary, as I've artificially added new stages for this. LBE
+					// pockets are now repaired LAST.
+					//if(UsingNewInventorySystem() == true && bLoop == 0 && bPocket>SECONDHANDPOS && bPocket<GUNSLINGPOCKPOS)
+					//	continue;
+					//if(UsingNewInventorySystem() == true && bLoop == 1 && bPocket==SECONDHANDPOS)
+					//	continue;
+					pObj = &(pSoldier->inv[ bPocket ]);
+
+					if ( RepairObject( pSoldier, pSoldier, pObj, &ubRepairPtsLeft ) )
+					{
+						fAnyOfSoldiersOwnItemsWereFixed = TRUE;
+
+						// quit looking if we're already out
+						if ( ubRepairPtsLeft == 0 )
+							break;
+					}
 				}
 			}
+
+			// if he fixed something of his, and now has no more of his own items to fix
+			if ( fAnyOfSoldiersOwnItemsWereFixed && !DoesCharacterHaveAnyItemsToRepair( pSoldier, -1 ) )
+			{
+				ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, sRepairsDoneString[ 0 ], pSoldier->name );
+
+				// let player react
+				StopTimeCompression();
+			}
+
+
+			// repair items on others
+			RepairItemsOnOthers( pSoldier, &ubRepairPtsLeft );
 		}
-
-		// if he fixed something of his, and now has no more of his own items to fix
-		if ( fAnyOfSoldiersOwnItemsWereFixed && !DoesCharacterHaveAnyItemsToRepair( pSoldier, -1 ) )
-		{
-			ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, sRepairsDoneString[ 0 ], pSoldier->name );
-
-			// let player react
-			StopTimeCompression();
-		}
-
-
-		// repair items on others
-		RepairItemsOnOthers( pSoldier, &ubRepairPtsLeft );
 	}
 
 	// what are the total amount of pts used by character?

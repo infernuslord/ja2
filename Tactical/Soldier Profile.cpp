@@ -59,6 +59,7 @@
 
 #include "aim.h"
 #include "AimFacialIndex.h"
+#include "mercs.h"
 
 #ifdef JA2UB
 #include "Ja25_Tactical.h"
@@ -95,6 +96,8 @@ BOOLEAN	gfPotentialTeamChangeDuringDeath = FALSE;
 
 MERCPROFILESTRUCT	gMercProfiles[ NUM_PROFILES ];
 MERCPROFILEGEAR		gMercProfileGear[ NUM_PROFILES ][ NUM_MERCSTARTINGGEAR_KITS ];
+
+extern UINT8 gubItemDroppableFlag[NUM_INV_SLOTS];
 
 #ifdef WFconvertUB
 MERCPROFILESTRUCT_OLD_WF gMercProfilesWF[ NUM_PROFILES ];
@@ -252,6 +255,8 @@ BOOLEAN SaveNewSystemMercsToSaveGameFile( HWFILE hFile );
 BOOLEAN LoadNewSystemMercsToSaveGameFile( HWFILE hFile );
 void InitNewProfiles();
 
+
+// WANNE: This method is not needed anymore. All the stuff is done in the LoadMercProfiles() method.
 void InitNewProfiles()
 {
 	UINT32 uiProfileId = 0;
@@ -289,44 +294,43 @@ void InitNewProfiles()
 	for( uiProfileId = FIRST_NPC; uiProfileId < 160; uiProfileId++ )
 	{	
 		gProfilesNPC[ uiProfileId ].ProfilId = uiProfileId;
-	}	
+	}
 	
-		//IMP
-		gProfilesIMP[ 51 ].ProfilId = 51; //IMP Male
-		gProfilesIMP[ 52 ].ProfilId = 52; //IMP Male
-		gProfilesIMP[ 53 ].ProfilId = 53; //IMP Male
-		gProfilesIMP[ 54 ].ProfilId = 54; //IMP Female
-		gProfilesIMP[ 55 ].ProfilId = 55; //IMP Female
-		gProfilesIMP[ 56 ].ProfilId = 56; //IMP Female
-		
-		//Vehicle
-		gProfilesVehicle[ 160 ].ProfilId = 160; //Hummer
-		gProfilesVehicle[ 161 ].ProfilId = 161; //El Dorado
-		gProfilesVehicle[ 162 ].ProfilId = 162; //Truck
-		gProfilesVehicle[ 163 ].ProfilId = 163; //HELICOPTER
-		gProfilesVehicle[ 164 ].ProfilId = 164; //TANK_CAR
-		
-		//NPC
-		gProfilesNPC[ 169 ].ProfilId = 169; //none
-		
-		//MERC
-		gProfilesMERC[ 165 ].ProfilId = 165; //Gaston
-		gProfilesMERC[ 166 ].ProfilId = 166; //Stogie
-		gProfilesMERC[ 167 ].ProfilId = 167; //Tex
-		gProfilesMERC[ 168 ].ProfilId = 168; //Beggins
-		
-				for(uiLoop=0; uiLoop < 40; uiLoop++)
-				{
-					if ( gProfilesAIM[uiLoop].ProfilId == uiLoop )
-					{
-						AimMercArray[ i ]  = uiLoop;
-					}
-					i++;
-				}	
-				
-		MAX_NUMBER_MERCS = 40;
-		
-		START_MERC = 0;
+	//IMP
+	gProfilesIMP[ 51 ].ProfilId = 51; //IMP Male
+	gProfilesIMP[ 52 ].ProfilId = 52; //IMP Male
+	gProfilesIMP[ 53 ].ProfilId = 53; //IMP Male
+	gProfilesIMP[ 54 ].ProfilId = 54; //IMP Female
+	gProfilesIMP[ 55 ].ProfilId = 55; //IMP Female
+	gProfilesIMP[ 56 ].ProfilId = 56; //IMP Female
+	
+	//Vehicle
+	gProfilesVehicle[ 160 ].ProfilId = 160; //Hummer
+	gProfilesVehicle[ 161 ].ProfilId = 161; //El Dorado
+	gProfilesVehicle[ 162 ].ProfilId = 162; //Truck
+	gProfilesVehicle[ 163 ].ProfilId = 163; //HELICOPTER
+	gProfilesVehicle[ 164 ].ProfilId = 164; //TANK_CAR
+	
+	//NPC
+	gProfilesNPC[ 169 ].ProfilId = 169; //none
+	
+	//MERC
+	gProfilesMERC[ 165 ].ProfilId = 165; //Gaston
+	gProfilesMERC[ 166 ].ProfilId = 166; //Stogie
+	gProfilesMERC[ 167 ].ProfilId = 167; //Tex
+	gProfilesMERC[ 168 ].ProfilId = 168; //Beggins
+	
+	for(uiLoop=0; uiLoop < 40; uiLoop++)
+	{
+		if ( gProfilesAIM[uiLoop].ProfilId == uiLoop )
+		{
+			AimMercArray[ i ]  = uiLoop;
+		}
+		i++;
+	}	
+			
+	MAX_NUMBER_MERCS = 40;	
+	START_MERC = 0;
 	
 	if ( gGameExternalOptions.fReadProfileDataFromXML == TRUE )
 	{		
@@ -342,8 +346,6 @@ void InitNewProfiles()
 	}
 		
 	//------------------------------------------------------------------------
-
-
 }
 
 BOOLEAN SaveNewSystemMercsToSaveGameFile( HWFILE hFile )
@@ -454,7 +456,10 @@ BOOLEAN LoadMercProfiles(void)
 	UINT32 uiLoop, uiLoop2;//, uiLoop3;
 	UINT16 usItem;//, usNewGun, usAmmo, usNewAmmo;
 	
-InitNewProfiles();
+	// ----- WANNE.PROFILE: New Profile Loading - BEGIN
+	//InitNewProfiles();
+	// ----- WANNE.PROFILE: New Profile Loading - END
+
 
 	#ifdef WFconvertUB
 	//WFtoUB ();
@@ -516,13 +521,27 @@ InitNewProfiles();
 		return(FALSE);
 	}
 
+	// Reset
+	for( int uiProfileId = 0; uiProfileId < NUM_PROFILES; uiProfileId++ )
+	{	
+		gProfilesAIM[ uiProfileId ].ProfilId = -1;
+		gProfilesMERC[ uiProfileId ].ProfilId = -1;
+		gProfilesNPC[ uiProfileId ].ProfilId = -1;
+		gProfilesRPC[ uiProfileId ].ProfilId = -1;
+		gProfilesVehicle[ uiProfileId ].ProfilId = -1;
+		gProfilesIMP[ uiProfileId ].ProfilId = -1;
+	}
+
+	int profileIndex = -1;
+
 	for(uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
 	{
+		profileIndex++;
+
 		// Changed by ADB, rev 1513
 		//if( !gMercProfiles[uiLoop].Load(fptr, true))
-		
-		//if( !gMercProfiles[uiLoop].Load(fptr, true, true, true))	
-		if( uiLoop < 170 && !gMercProfiles[uiLoop].Load(fptr, true, true, true))	
+		//if( !gMercProfiles[uiLoop].Load(fptr, true, true, true))
+		if( uiLoop < 170 && !gMercProfiles[uiLoop].Load(fptr, true, true, true))
 		{
 			DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("FAILED to Read Merc Profiles from File %d %s",uiLoop, pFileName) );
 			FileClose( fptr );
@@ -736,9 +755,107 @@ InitNewProfiles();
 		{
 			gMercProfiles[ uiLoop ].usOptionalGearCost = tempGearCost;
 		}
+
+		// ----- WANNE.PROFILE: New Profile Loading - BEGIN
+		if ( gGameExternalOptions.fReadProfileDataFromXML == FALSE )
+		{						
+			// AIM und MERC ( 0 - 51 )
+			if (uiLoop < 51)
+			{
+				// AIM
+				if (uiLoop < 40)
+				{
+					gProfilesAIM[uiLoop].ProfilId = uiLoop;
+				}
+				// MERC
+				else
+				{
+					gProfilesMERC[uiLoop].ProfilId = uiLoop;
+				}			
+			}
+			// IMP (51 - 56)
+			else if (uiLoop >= 51 && uiLoop < FIRST_RPC)
+			{
+				gProfilesIMP[uiLoop].ProfilId = uiLoop;
+			}
+			else
+			{
+				// Vehicle, MERC (default 1.13) or RPC?
+				if (uiLoop >= 165 && uiLoop <= 168)
+				{
+					switch (gMercProfiles[ uiLoop ].ubBodyType)
+					{
+						// MERC
+						case REGMALE:
+						case BIGMALE:
+						case REGFEMALE:
+							gProfilesMERC[uiLoop].ProfilId = uiLoop;
+							break;
+						// Vehicle
+						case HUMVEE:
+						case TANK_NW:
+						case TANK_NE:
+						case ELDORADO:
+						case ICECREAMTRUCK:
+						case JEEP:
+							gProfilesVehicle[uiLoop].ProfilId = uiLoop;
+							break;
+						// Make it an RPC
+						default:
+							gProfilesRPC[uiLoop].ProfilId = uiLoop;
+							break;
+					}
+				}
+				else
+				{
+					// Last Index -> NPC
+					if (uiLoop == 169)
+					{
+						gProfilesNPC[uiLoop].ProfilId = uiLoop;
+					}
+					// NPC, RPC or Vehicle
+					else
+					{
+						switch (gMercProfiles[ uiLoop ].ubBodyType)
+						{
+							// Vehicle
+							case HUMVEE:
+							case TANK_NW:
+							case TANK_NE:
+							case ELDORADO:
+							case ICECREAMTRUCK:
+							case JEEP:
+								gProfilesVehicle[uiLoop].ProfilId = uiLoop;
+								break;
+							// RPC or NPC
+							default:
+								// RPC
+								if (uiLoop >= FIRST_RPC && uiLoop < FIRST_NPC)
+								{
+									gProfilesRPC[uiLoop].ProfilId = uiLoop;
+								}
+								// NPC
+								else
+								{
+									gProfilesNPC[uiLoop].ProfilId = uiLoop;
+								}
+								break;
+						}
+					}
+				}
+			}
+		}
 	}
+	
+	// ----- WANNE.PROFILE: New Profile Loading - END
 
 	// SET SOME DEFAULT LOCATIONS FOR STARTING NPCS
+	
+	// Reset
+	for (int i = 0; i < NUM_PROFILES; i++)
+	{
+		AimMercArray[i] = -1;
+	}
 
 	FileClose( fptr );
 	//WriteMercStartingGearStats();
@@ -763,27 +880,33 @@ for( int i = 0; i < NUM_PROFILES; i++ )
 */
 //--------------
 
-		UINT32 x = 0;
-		UINT32 i = 0;
-	if (gGameExternalOptions.fReadProfileDataFromXML)
+	// ---------------
+
+	UINT16 maxAIMProfiles = 0;
+	if (!gGameExternalOptions.fReadProfileDataFromXML)
+		maxAIMProfiles = 40;
+	else
+		maxAIMProfiles = NUM_PROFILES;
+
+	UINT32 x = 0;
+	UINT32 i = 0;
+	MAX_NUMBER_MERCS = 0;		
+	START_MERC = 0;
+
+	// Find all AIM merc and add them in the AimMercArray which is used for the AIM webpage
+	for (i = 0; i < maxAIMProfiles; i++)
 	{
-		MAX_NUMBER_MERCS = 0;
-		
-		START_MERC = 0;
-		
-		for(i=0; i<NUM_PROFILES; i++)
+		if (gAimAvailability[i].ProfilId != 255)
 		{
-			if ( gProfilesAIM[i].ProfilId == i )
-			{
-				AimMercArray[ x ] = gAimAvailability[i].ProfilId;	
-				x++;	
-				MAX_NUMBER_MERCS++;
-			}
+			AimMercArray[ x ] = gAimAvailability[i].ProfilId;
+			x++;
+			MAX_NUMBER_MERCS++;
 		}
-	
 	}
-	
-		RandomStats (); //random stats by Jazz
+
+	// ---------------
+		
+	RandomStats (); //random stats by Jazz
 
 	// decide which terrorists are active
 	DecideActiveTerrorists();
@@ -1262,11 +1385,12 @@ UINT16 CalcCompetence( MERCPROFILESTRUCT * pProfile )
 
 
 	// count how many he has, don't care what they are
-	// SANDRO - added third skill check
-	if ( gGameOptions.fNewTraitSystem )
-		uiSpecialSkills = max(2, (((pProfile->bSkillTrait != 0) ? 1 : 0) + ((pProfile->bSkillTrait2 != 0) ? 1 : 0) + ((pProfile->bSkillTrait3 != 0) ? 1 : 0)));
-	else
-		uiSpecialSkills = ((pProfile->bSkillTrait != 0) ? 1 : 0) + ((pProfile->bSkillTrait2 != 0) ? 1 : 0);
+	uiSpecialSkills = 0;
+	for ( INT8 bCnt = 0; bCnt < 30; bCnt++ )
+	{
+		if ( pProfile->bSkillTraits[bCnt] != 0 )
+			uiSpecialSkills++;
+	}
 
 	usCompetence = (UINT16) ((pow((double)pProfile->bExpLevel, 0.2) * uiStats * uiSkills * (uiActionPoints - 6) * (1 + (0.05 * (FLOAT)uiSpecialSkills))) / 1000);
 
@@ -2140,8 +2264,6 @@ void OverwriteMercProfileWithXMLData( UINT32 uiLoop )
 		// new data from XML. This allows making PROEDIT obsolete.
 		//
 		//////////////////////////////////////////////////////////////////////////////////
-		// SANDRO - added those
-		INT8 ubSkill1, ubSkill2, ubSkill3;
 
 		wcscpy(gMercProfiles[ uiLoop ].zName, tempProfiles[ uiLoop ].zName) ;
 		wcscpy(gMercProfiles[ uiLoop ].zNickname, tempProfiles[ uiLoop ].zNickname) ;
@@ -2210,65 +2332,66 @@ void OverwriteMercProfileWithXMLData( UINT32 uiLoop )
 		// SANDRO - Check old/new traits and repair possible errors
 		if (gGameOptions.fNewTraitSystem)
 		{
-			ubSkill1 = tempProfiles[ uiLoop ].bNewSkillTrait1;
-			ubSkill2 = tempProfiles[ uiLoop ].bNewSkillTrait2;
-			ubSkill3 = tempProfiles[ uiLoop ].bNewSkillTrait3;
+			gMercProfiles[ uiLoop ].bSkillTraits[0] = tempProfiles[ uiLoop ].bNewSkillTrait1;
+			gMercProfiles[ uiLoop ].bSkillTraits[1] = tempProfiles[ uiLoop ].bNewSkillTrait2;
+			gMercProfiles[ uiLoop ].bSkillTraits[2] = tempProfiles[ uiLoop ].bNewSkillTrait3;
+			gMercProfiles[ uiLoop ].bSkillTraits[3] = tempProfiles[ uiLoop ].bNewSkillTrait4;
+			gMercProfiles[ uiLoop ].bSkillTraits[4] = tempProfiles[ uiLoop ].bNewSkillTrait5;
+			gMercProfiles[ uiLoop ].bSkillTraits[5] = tempProfiles[ uiLoop ].bNewSkillTrait6;
+			gMercProfiles[ uiLoop ].bSkillTraits[6] = tempProfiles[ uiLoop ].bNewSkillTrait7;
+			gMercProfiles[ uiLoop ].bSkillTraits[7] = tempProfiles[ uiLoop ].bNewSkillTrait8;
+			gMercProfiles[ uiLoop ].bSkillTraits[8] = tempProfiles[ uiLoop ].bNewSkillTrait9;
+			gMercProfiles[ uiLoop ].bSkillTraits[9] = tempProfiles[ uiLoop ].bNewSkillTrait10;
+			gMercProfiles[ uiLoop ].bSkillTraits[10] = tempProfiles[ uiLoop ].bNewSkillTrait11;
+			gMercProfiles[ uiLoop ].bSkillTraits[11] = tempProfiles[ uiLoop ].bNewSkillTrait12;
+			gMercProfiles[ uiLoop ].bSkillTraits[12] = tempProfiles[ uiLoop ].bNewSkillTrait13;
+			gMercProfiles[ uiLoop ].bSkillTraits[13] = tempProfiles[ uiLoop ].bNewSkillTrait14;
+			gMercProfiles[ uiLoop ].bSkillTraits[14] = tempProfiles[ uiLoop ].bNewSkillTrait15;
+			gMercProfiles[ uiLoop ].bSkillTraits[15] = tempProfiles[ uiLoop ].bNewSkillTrait16;
+			gMercProfiles[ uiLoop ].bSkillTraits[16] = tempProfiles[ uiLoop ].bNewSkillTrait17;
+			gMercProfiles[ uiLoop ].bSkillTraits[17] = tempProfiles[ uiLoop ].bNewSkillTrait18;
+			gMercProfiles[ uiLoop ].bSkillTraits[18] = tempProfiles[ uiLoop ].bNewSkillTrait19;
+			gMercProfiles[ uiLoop ].bSkillTraits[19] = tempProfiles[ uiLoop ].bNewSkillTrait20;
+			gMercProfiles[ uiLoop ].bSkillTraits[20] = tempProfiles[ uiLoop ].bNewSkillTrait21;
+			gMercProfiles[ uiLoop ].bSkillTraits[21] = tempProfiles[ uiLoop ].bNewSkillTrait22;
+			gMercProfiles[ uiLoop ].bSkillTraits[22] = tempProfiles[ uiLoop ].bNewSkillTrait23;
+			gMercProfiles[ uiLoop ].bSkillTraits[23] = tempProfiles[ uiLoop ].bNewSkillTrait24;
+			gMercProfiles[ uiLoop ].bSkillTraits[24] = tempProfiles[ uiLoop ].bNewSkillTrait25;
+			gMercProfiles[ uiLoop ].bSkillTraits[25] = tempProfiles[ uiLoop ].bNewSkillTrait26;
+			gMercProfiles[ uiLoop ].bSkillTraits[26] = tempProfiles[ uiLoop ].bNewSkillTrait27;
+			gMercProfiles[ uiLoop ].bSkillTraits[27] = tempProfiles[ uiLoop ].bNewSkillTrait28;
+			gMercProfiles[ uiLoop ].bSkillTraits[28] = tempProfiles[ uiLoop ].bNewSkillTrait29;
+			gMercProfiles[ uiLoop ].bSkillTraits[29] = tempProfiles[ uiLoop ].bNewSkillTrait30;
 
-			// Cannot have 3 same traits or 3 major traits
-			if( ( ubSkill1 == ubSkill2 == ubSkill3 ) || 
-			    ( ubSkill1 <= NUM_MAJOR_TRAITS && ubSkill1 != NO_SKILLTRAIT_NT && 
-				  ubSkill2 <= NUM_MAJOR_TRAITS && ubSkill2 != NO_SKILLTRAIT_NT &&
-				  ubSkill3 <= NUM_MAJOR_TRAITS && ubSkill3 != NO_SKILLTRAIT_NT ) )
+			// if we are out of skill number, make it no trait, otherwise set our trait right
+			for ( INT8 bCnt = 0; bCnt < 30; bCnt++ )
 			{
-				// ignore the third one
-				gMercProfiles[ uiLoop ].bSkillTrait = ubSkill1 ;
-				gMercProfiles[ uiLoop ].bSkillTrait2 = ubSkill2 ;
-				gMercProfiles[ uiLoop ].bSkillTrait3 = 0 ;
-			}
-			else
-			{
-				// if we are out of skill number, make it no trait, otherwise set our trait right
-				if( ubSkill1 >= NUM_SKILLTRAITS_NT || ubSkill1 < NO_SKILLTRAIT_NT )
-					gMercProfiles[ uiLoop ].bSkillTrait = 0 ;
-				else
-					gMercProfiles[ uiLoop ].bSkillTrait = ubSkill1 ;
-				
-				if( ubSkill2 >= NUM_SKILLTRAITS_NT || ubSkill2 < NO_SKILLTRAIT_NT )
-					gMercProfiles[ uiLoop ].bSkillTrait2 = 0 ;
-				else
-					gMercProfiles[ uiLoop ].bSkillTrait2 = ubSkill2 ;
-				
-				if( ubSkill3 >= NUM_SKILLTRAITS_NT || ubSkill3 < NO_SKILLTRAIT_NT )
-					gMercProfiles[ uiLoop ].bSkillTrait3 = 0 ;
-				else
-					gMercProfiles[ uiLoop ].bSkillTrait3 = ubSkill3 ;
+				if ( gMercProfiles[ uiLoop ].bSkillTraits[ bCnt ] >= NUM_SKILLTRAITS_NT || gMercProfiles[ uiLoop ].bSkillTraits[ bCnt ] < NO_SKILLTRAIT_NT )
+				{
+					gMercProfiles[ uiLoop ].bSkillTraits[ bCnt ] = 0 ;
+				}
 			}
 		}
 		else
 		{
-			ubSkill1 = tempProfiles[ uiLoop ].bOldSkillTrait;
-			ubSkill2 = tempProfiles[ uiLoop ].bOldSkillTrait2;
+			gMercProfiles[ uiLoop ].bSkillTraits[0] = tempProfiles[ uiLoop ].bOldSkillTrait;
+			gMercProfiles[ uiLoop ].bSkillTraits[1] = tempProfiles[ uiLoop ].bOldSkillTrait2;
 
 			// if we have two same traits and cannot aquire expert level, ignore the second one
-			if( ( ubSkill1 == ELECTRONICS_OT && ubSkill2 == ELECTRONICS_OT ) ||
-				( ubSkill1 == AMBIDEXT_OT && ubSkill2 == AMBIDEXT_OT ) ||
-				( ubSkill1 == CAMOUFLAGED_OT && ubSkill2 == CAMOUFLAGED_OT ) )
+			if( ( gMercProfiles[ uiLoop ].bSkillTraits[0] == ELECTRONICS_OT && gMercProfiles[ uiLoop ].bSkillTraits[1] == ELECTRONICS_OT ) ||
+				( gMercProfiles[ uiLoop ].bSkillTraits[0] == AMBIDEXT_OT && gMercProfiles[ uiLoop ].bSkillTraits[1] == AMBIDEXT_OT ) ||
+				( gMercProfiles[ uiLoop ].bSkillTraits[0] == CAMOUFLAGED_OT && gMercProfiles[ uiLoop ].bSkillTraits[1] == CAMOUFLAGED_OT ) )
 			{
-				gMercProfiles[ uiLoop ].bSkillTrait = ubSkill1 ;
-				gMercProfiles[ uiLoop ].bSkillTrait2 = 0 ;
+				gMercProfiles[ uiLoop ].bSkillTraits[1] = 0 ;
 			}
-			else
+
+			// if we are out of skill number, make it no trait, otherwise set our trait right
+			for ( INT8 bCnt = 0; bCnt < 30; bCnt++ )
 			{
-				// if we are out of skill number, make it no trait, otherwise set our trait right
-				if( ubSkill1 >= NUM_SKILLTRAITS_OT || ubSkill1 < NO_SKILLTRAIT_OT )
-					gMercProfiles[ uiLoop ].bSkillTrait = 0 ;
-				else
-					gMercProfiles[ uiLoop ].bSkillTrait = ubSkill1 ;
-				
-				if( ubSkill2 >= NUM_SKILLTRAITS_OT || ubSkill2 < NO_SKILLTRAIT_OT )
-					gMercProfiles[ uiLoop ].bSkillTrait2 = 0 ;
-				else
-					gMercProfiles[ uiLoop ].bSkillTrait2 = ubSkill2 ;
+				if ( gMercProfiles[ uiLoop ].bSkillTraits[ bCnt ] >= NUM_SKILLTRAITS_OT || gMercProfiles[ uiLoop ].bSkillTraits[ bCnt ] < NO_SKILLTRAIT_OT )
+				{
+					gMercProfiles[ uiLoop ].bSkillTraits[ bCnt ] = 0 ;
+				}
 			}
 		}
 		//////////////////////////////////////////////////////////////////////////////////////
@@ -2448,4 +2571,62 @@ INT8 CheckMercsNearForCharTraits( UINT8 ubProfileID, INT8 bCharTraitID )
 	}
 
 	return( bNumber );
+}
+
+INT8 ProfileHasSkillTrait( INT32 ubProfileID, INT8 bSkillTrait )
+{
+	INT8 bNumTraits = 0;
+	INT8 bNumMajorTraitsCounted = 0;
+
+	// check old/new traits
+	if (gGameOptions.fNewTraitSystem)
+	{
+		for ( INT8 bCnt = 0; bCnt < gSkillTraitValues.ubMaxNumberOfTraits; bCnt++ )
+		{
+			if ( bSkillTrait > 0 && bSkillTrait <= NUM_MAJOR_TRAITS )
+			{
+				if ( gMercProfiles[ubProfileID].bSkillTraits[ bCnt ] == bSkillTrait )
+				{
+					bNumTraits++;
+					bNumMajorTraitsCounted++;
+				}
+				else if ( gMercProfiles[ubProfileID].bSkillTraits[ bCnt ] > 0 && gMercProfiles[ubProfileID].bSkillTraits[ bCnt ] <= NUM_MAJOR_TRAITS )
+				{
+					bNumMajorTraitsCounted++;
+				}
+				// if we exceeded the allowed number of major traits, ignore the rest of them
+				if ( bNumMajorTraitsCounted >= gSkillTraitValues.ubNumberOfMajorTraitsAllowed )
+				{
+					break;
+				}
+			}
+			else
+			{
+				if ( gMercProfiles[ubProfileID].bSkillTraits[ bCnt ] == bSkillTrait )
+				{
+					bNumTraits++;
+				}
+			}
+		}
+		// cannot have more than 1 rade of minor traits or 2 grades of a major traits
+		if( bSkillTrait > NUM_MAJOR_TRAITS )
+			return ( min(1, bNumTraits) );
+		else
+			return ( min(2, bNumTraits) );
+	}
+	else
+	{
+		if (gMercProfiles[ubProfileID].bSkillTraits[ 0 ] == bSkillTrait)
+			bNumTraits++;
+		if (gMercProfiles[ubProfileID].bSkillTraits[ 1 ] == bSkillTrait)
+			bNumTraits++;	
+
+		// Electronics, Ambidextrous and Camouflaged can only be of one grade
+		if( bSkillTrait == ELECTRONICS_OT || 
+			 bSkillTrait == AMBIDEXT_OT ||
+			  bSkillTrait == CAMOUFLAGED_OT )
+			return ( min(1, bNumTraits) );
+		else
+			return ( bNumTraits );
+	}
 }

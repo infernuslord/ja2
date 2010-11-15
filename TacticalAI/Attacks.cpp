@@ -285,10 +285,6 @@ void CalcBestShot(SOLDIERTYPE *pSoldier, ATTACKTYPE *pBestShot, BOOLEAN shootUns
 
 		if ( TANK( pSoldier ) )
 		{
-			// WANNE: Removed theCalcAimingLevelsAvailableWithAP() left for tanks, because otherwise they do not shoot anymore!
-			// HEADROCK HAM 3.6: Calculation must take into account APBP constants and other aiming modifications!
-			//INT8 bAPsLeft = pSoldier->bActionPoints - ubMinAPcost;
-			//ubMaxPossibleAimTime = CalcAimingLevelsAvailableWithAP( pSoldier, pOpponent->sGridNo, bAPsLeft );
 			ubMaxPossibleAimTime = pSoldier->bActionPoints - ubMinAPcost;
 
 			// always burst
@@ -303,9 +299,7 @@ void CalcBestShot(SOLDIERTYPE *pSoldier, ATTACKTYPE *pBestShot, BOOLEAN shootUns
 		}
 		else
 		{
-			// HEADROCK HAM 3.6: Calculation must take into account APBP constants and other aiming modifications!
-			INT8 bAPsLeft = pSoldier->bActionPoints - ubMinAPcost;
-			ubMaxPossibleAimTime = CalcAimingLevelsAvailableWithAP( pSoldier, pOpponent->sGridNo, bAPsLeft );
+			ubMaxPossibleAimTime = min(AllowedAimingLevels(pSoldier),pSoldier->bActionPoints - ubMinAPcost);
 		}
 
 		// consider the various aiming times
@@ -324,11 +318,7 @@ void CalcBestShot(SOLDIERTYPE *pSoldier, ATTACKTYPE *pBestShot, BOOLEAN shootUns
 				//sprintf(tempstr,"Vs. %s, at AimTime %d, ubChanceToHit = %d",ExtMen[pOpponent->ubID].name,ubAimTime,ubChanceToHit);
 				//PopMessage(tempstr);
 
-				// HEADROCK HAM 3.6: Actual aiming time is no longer 1AP per level... Failure to take this into account
-				// may yield skewed results in favour of high-aim targets.
-				INT16 sActualAimTime = CalcAPCostForAiming( pSoldier, pOpponent->sGridNo, (INT8)ubAimTime );
-
-				iHitRate = (pSoldier->bActionPoints * ubChanceToHit) / (ubRawAPCost + sActualAimTime);
+				iHitRate = (pSoldier->bActionPoints * ubChanceToHit) / (ubRawAPCost + ubAimTime);
 				//NumMessage("hitRate = ",iHitRate);
 
 				// if aiming for this amount of time produces a better hit rate

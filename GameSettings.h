@@ -621,6 +621,9 @@ typedef struct
 	// WANNE: Always use "prof.dat".
 	BOOLEAN fUseDifficultyBasedProfDat;
 
+	// 2Points: Use new repair algorithm
+	BOOLEAN fAdditionalRepairMode;
+
 	// CPT: Cover System Settings
 	UINT8 ubStealthTraitCoverValue;
 	UINT8 ubStealthEffectiveness;
@@ -964,6 +967,9 @@ typedef struct
 
 typedef struct
 {
+	UINT8 ubMaxNumberOfTraits;
+	UINT8 ubNumberOfMajorTraitsAllowed;
+
 	// GENERIC SETTINGS
 	INT8 bCtHModifierAssaultRifles;
 	INT8 bCtHModifierSniperRifles;
@@ -1023,6 +1029,7 @@ typedef struct
 	UINT8 ubHWDamageBonusPercentForHW;
 
 	// SNIPER
+	UINT8 ubSNBonusCtHRifles;
 	UINT8 ubSNBonusCtHSniperRifles;
 	UINT8 ubSNEffRangeToTargetReduction;
 	UINT8 ubSNAimingBonusPerClick;

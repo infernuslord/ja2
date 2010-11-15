@@ -649,9 +649,9 @@ public:
 	INT8												bExplosive;
 	INT8												bMedical;
 	INT8												bScientific;	
-	UINT8												ubSkillTrait1;
-	UINT8												ubSkillTrait2;
-	UINT8												ubSkillTrait3; // added by SANDRO
+	UINT8												ubSkillTraits[30];
+	//UINT8												ubSkillTrait2;
+	//UINT8												ubSkillTrait3; // added by SANDRO
 };
 
 class STRUCT_Pathing//last edited at version 102

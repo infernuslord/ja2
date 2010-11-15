@@ -4929,7 +4929,7 @@ BOOLEAN InitializeTEAMPanelCoords( )
 */
 	// CHRISL: New definitions for the team panel clock and location coordinates
 	INTERFACE_CLOCK_TM_X	= ( SCREEN_WIDTH - 86 );
-	INTERFACE_CLOCK_TM_Y	= ( 98	+ INTERFACE_START_Y );
+	INTERFACE_CLOCK_TM_Y	= ( 99	+ INTERFACE_START_Y );
 	LOCATION_NAME_TM_X		= ( SCREEN_WIDTH - 92 );
 	LOCATION_NAME_TM_Y		= ( 65	+ INTERFACE_START_Y	);
 

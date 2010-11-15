@@ -458,7 +458,8 @@ void BtnIMPConfirmNo( GUI_BUTTON *btn,INT32 reason )
 */
 
 // SANDRO - improved this function
-#define PROFILE_HAS_SKILL_TRAIT( p, t ) ( gGameOptions.fNewTraitSystem ? ((p->bSkillTrait == t) || (p->bSkillTrait2 == t) || (p->bSkillTrait3 == t)) : ((p->bSkillTrait == t) || (p->bSkillTrait2 == t)))
+//#define PROFILE_HAS_SKILL_TRAIT( p, t ) ( gGameOptions.fNewTraitSystem ? ((p->bSkillTrait == t) || (p->bSkillTrait2 == t) || (p->bSkillTrait3 == t)) : ((p->bSkillTrait == t) || (p->bSkillTrait2 == t)))
+#define PROFILE_HAS_SKILL_TRAIT( p, t ) ( ProfileHasSkillTrait( p, t ) > 0 )
 
 //CHRISL: New function to handle proper distribution of starting gear
 void DistributeInitialGear(MERCPROFILESTRUCT *pProfile)
@@ -624,80 +625,80 @@ void GiveItemsToPC( UINT8 ubProfileId )
 	if ( gGameOptions.fNewTraitSystem )
 	{
 		// MAJOR TRAITS
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, AUTO_WEAPONS_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, AUTO_WEAPONS_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_AUTO_WEAPONS);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, HEAVY_WEAPONS_NT ))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, HEAVY_WEAPONS_NT ))
 		{
 			GiveIMPRandomItems(pProfile,IMP_HEAVY_WEAPONS);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, SNIPER_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, SNIPER_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_SNIPER);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, RANGER_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, RANGER_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_RANGER);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, GUNSLINGER_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, GUNSLINGER_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_GUNSLINGER);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, MARTIAL_ARTS_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, MARTIAL_ARTS_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_MARTIAL_ARTS);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, SQUADLEADER_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, SQUADLEADER_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_SQUADLEADER);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, TECHNICIAN_NT) && ( iMechanical ) )
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, TECHNICIAN_NT) && ( iMechanical ) )
 		{
 			GiveIMPRandomItems(pProfile,IMP_TECHNICIAN);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, DOCTOR_NT ))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, DOCTOR_NT ))
 		{
 			GiveIMPRandomItems(pProfile,IMP_DOCTOR);
 		}
 		// MINOR TRAITS
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, AMBIDEXTROUS_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, AMBIDEXTROUS_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_AMBIDEXTROUS);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, MELEE_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, MELEE_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_MELEE);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, THROWING_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, THROWING_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_THROWING);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, NIGHT_OPS_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, NIGHT_OPS_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_NIGHT_OPS);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, STEALTHY_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, STEALTHY_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_STEALTHY);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, ATHLETICS_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, ATHLETICS_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_ATHLETICS);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, BODYBUILDING_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, BODYBUILDING_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_BODYBUILDING);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, DEMOLITIONS_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, DEMOLITIONS_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_DEMOLITIONS);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, TEACHING_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, TEACHING_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_TEACHING);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, SCOUTING_NT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, SCOUTING_NT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_SCOUTING);
 		}
@@ -705,77 +706,77 @@ void GiveItemsToPC( UINT8 ubProfileId )
 	}
 	else
 	{
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, LOCKPICKING_OT) && ( iMechanical ) )
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, LOCKPICKING_OT) && ( iMechanical ) )
 		{
 			//MakeProfileInvItemAnySlot(pProfile, LOCKSMITHKIT, 100, 1);
 			GiveIMPRandomItems(pProfile,IMP_LOCKPICKING);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, ELECTRONICS_OT) && ( iMechanical ) )
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, ELECTRONICS_OT) && ( iMechanical ) )
 		{
 			//MakeProfileInvItemAnySlot(pProfile, METALDETECTOR, 100, 1);
 			GiveIMPRandomItems(pProfile,IMP_ELECTRONICS);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, CAMOUFLAGED_OT)) // TODO: Madd - other camouflage types, once we figure out a way to enable more traits
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, CAMOUFLAGED_OT)) // TODO: Madd - other camouflage types, once we figure out a way to enable more traits
 		{
 			//MakeProfileInvItemAnySlot(pProfile, CAMOUFLAGEKIT, 100, 1);
 			GiveIMPRandomItems(pProfile,IMP_CAMOUFLAGED);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, AMBIDEXT_OT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, AMBIDEXT_OT))
 		{
 			//MakeProfileInvItemAnySlot(pProfile, M950, 100, 1);
 			GiveIMPRandomItems(pProfile,IMP_AMBIDEXTROUS);
 		}
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, NIGHTOPS_OT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, NIGHTOPS_OT))
 		{
 //			MakeProfileInvItemAnySlot(pProfile, SILENCER, 100, 2);
 			GiveIMPRandomItems(pProfile,IMP_NIGHT_OPS);
 		}
 		
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, HANDTOHAND_OT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, HANDTOHAND_OT))
 		{
 			//MakeProfileInvItemAnySlot(pProfile, BRASS_KNUCKLES, 100, 1);
 			GiveIMPRandomItems(pProfile,IMP_MARTIAL_ARTS);
 		}
 
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, THROWING_OT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, THROWING_OT))
 		{
 //			MakeProfileInvItemAnySlot(pProfile, THROWING_KNIFE, 100, 1);
 			GiveIMPRandomItems(pProfile,IMP_THROWING);
 		}
 
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, STEALTHY_OT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, STEALTHY_OT))
 		{
 //			MakeProfileInvItemAnySlot(pProfile, SILENCER, 100, 1);
 			GiveIMPRandomItems(pProfile,IMP_STEALTHY);
 		}
 
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, KNIFING_OT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, KNIFING_OT))
 		{
 //			MakeProfileInvItemAnySlot(pProfile, COMBAT_KNIFE, 100, 1);
 			GiveIMPRandomItems(pProfile,IMP_MELEE);
 		}
 
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, MARTIALARTS_OT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, MARTIALARTS_OT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_MARTIAL_ARTS);
 		}
 
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, PROF_SNIPER_OT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, PROF_SNIPER_OT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_SNIPER);
 		}
 
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, TEACHING_OT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, TEACHING_OT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_TEACHING);
 		}
 
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, AUTO_WEAPS_OT))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, AUTO_WEAPS_OT))
 		{
 			GiveIMPRandomItems(pProfile,IMP_AUTO_WEAPONS);
 		}
 
-		if (PROFILE_HAS_SKILL_TRAIT(pProfile, HEAVY_WEAPS_OT ))
+		if (PROFILE_HAS_SKILL_TRAIT(ubProfileId, HEAVY_WEAPS_OT ))
 		{
 			GiveIMPRandomItems(pProfile,IMP_HEAVY_WEAPONS);
 		}

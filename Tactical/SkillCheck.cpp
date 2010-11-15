@@ -650,7 +650,10 @@ INT32 SkillCheck( SOLDIERTYPE * pSoldier, INT8 bReason, INT8 bChanceMod )
 			// for lockpicking and smashing locks, if the chance isn't reasonable
 			// we set it to 0 so they can never get through the door if they aren't
 			// good enough
-			if (iChance < 30)
+			//CHRISL: with this set to 30, some "hard" to open doors become basically impossible.  Case in point, Drassen "dentist office" which imposes a
+			//	-75 penalty on lockpicking/forcing chances.  You find this near the start of the game but would need an 80 STR + Crowbar to open.  It's
+			//	impossible to force with just strength or lockpicking skills, regardless of how skilled you are.
+			if (iChance < 15)
 			{
 				iChance = 0;
 				break;

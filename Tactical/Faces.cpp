@@ -61,9 +61,9 @@ void HandleRenderFaceAdjustments( FACETYPE *pFace, BOOLEAN fDisplayBuffer, BOOLE
 
 extern BOOLEAN	gfInItemPickupMenu;
 
- RPC_SMALL_FACE_VALUES gRPCSmallFaceValues[200];
+ RPC_SMALL_FACE_VALUES gRPCSmallFaceValues[254];
 
-UINT8	gubRPCSmallFaceProfileNum[200];
+UINT8	gubRPCSmallFaceProfileNum[254];
 /*
 RPC_SMALL_FACE_VALUES gRPCSmallFaceValues[ ] =
 {
@@ -134,7 +134,7 @@ UINT8	gubRPCSmallFaceProfileNum[] ={
 
 };
 */
-UINT8	ubRPCNumSmallFaceValues = 201;
+UINT8	ubRPCNumSmallFaceValues = 255;
 
 CAMO_FACE gCamoFace[255];
 
@@ -290,38 +290,38 @@ INT32	InternalInitFace( UINT8 usMercProfileID, UINT8 ubSoldierID, UINT32 uiInitF
 		// SANDRO - old/new traits check (I am not sure if this is used at all)
 		if ( gGameOptions.fNewTraitSystem )
 		{
-			if( gMercProfiles[ 64 ].bSkillTrait2 == RANGER_NT )
+			if ( gMercProfiles[ 64 ].bSkillTraits[0] == RANGER_NT || gMercProfiles[ 64 ].bSkillTraits[1] == RANGER_NT )
 			{
 				sprintf( VObjectDesc.ImageFile, "FACES\\B64c.sti" );
 			}
 		}
 		else
 		{
-			if( gMercProfiles[ 64 ].bSkillTrait2 == CAMOUFLAGED_OT )
+			if ( gMercProfiles[ 64 ].bSkillTraits[0] == CAMOUFLAGED_OT || gMercProfiles[ 64 ].bSkillTraits[1] == CAMOUFLAGED_OT)
 			{
 				sprintf( VObjectDesc.ImageFile, "FACES\\B64c.sti" );
 			}
 		}
-		}
+	}
 #else
 	else if ( usMercProfileID == TEX )
 	{
 		// SANDRO - old/new traits check (I am not sure if this is used at all)
 		if ( gGameOptions.fNewTraitSystem )
 		{
-			if( gMercProfiles[ TEX ].bSkillTrait2 == RANGER_NT )
+			if ( gMercProfiles[ TEX ].bSkillTraits[0] == RANGER_NT || gMercProfiles[ TEX ].bSkillTraits[1] == RANGER_NT )
 			{
-				sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
+				sprintf( VObjectDesc.ImageFile, "FACES\\B64c.sti" );
 			}
 		}
 		else
 		{
-			if( gMercProfiles[ TEX ].bSkillTrait2 == CAMOUFLAGED_OT )
+			if ( gMercProfiles[ TEX ].bSkillTraits[0] == CAMOUFLAGED_OT || gMercProfiles[ TEX ].bSkillTraits[1] == CAMOUFLAGED_OT )
 			{
-				sprintf( VObjectDesc.ImageFile, "FACES\\B167c.sti" );
+				sprintf( VObjectDesc.ImageFile, "FACES\\B64c.sti" );
 			}
 		}
-		}
+	}
 #endif
 
 	}
@@ -590,13 +590,28 @@ void GetFaceRelativeCoordinates( FACETYPE *pFace, UINT16 *pusEyesX, UINT16 *pusE
 	usMouthX			= gMercProfiles[ usMercProfileID ].usMouthX;
 	
 #ifdef JA2UB	
-  if( usMercProfileID == 64 && ( gMercProfiles[ 64 ].bSkillTrait2 == CAMOUFLAGED_OT || gMercProfiles[ 64 ].bSkillTrait2 == RANGER_NT ) )
-  {
-		usEyesX				= 13;
-		usEyesY				= 34;
-		usMouthX			= 13;
-		usMouthY			=	55;
-  }
+
+  		if ( gGameOptions.fNewTraitSystem )
+		{
+			if( usMercProfileID == 64 && ( gMercProfiles[ 64 ].bSkillTraits[0] == RANGER_NT || gMercProfiles[ 64 ].bSkillTraits[1] == RANGER_NT ) )
+			{
+			usEyesX				= 13;
+			usEyesY				= 34;
+			usMouthX			= 13;
+			usMouthY			= 55;
+			}
+		}
+		else
+		{
+			if( usMercProfileID == 64 && ( gMercProfiles[ 64 ].bSkillTraits[0] == CAMOUFLAGED_OT || gMercProfiles[ 64 ].bSkillTraits[1] == CAMOUFLAGED_OT ) )
+			{
+			usEyesX				= 13;
+			usEyesY				= 34;
+			usMouthX			= 13;
+			usMouthY			= 55;
+			}
+		}
+	
 #endif
 
 	// Use some other values for x,y, base on if we are a RPC!
@@ -605,14 +620,25 @@ void GetFaceRelativeCoordinates( FACETYPE *pFace, UINT16 *pusEyesX, UINT16 *pusE
 		// Loop through all values of availible merc IDs to find ours!
 		for ( cnt = 0; cnt < ubRPCNumSmallFaceValues; cnt++ )
 		{
-			// We've found one!
-			if (  gRPCSmallFaceValues[ cnt ].FaceIndex == usMercProfileID  )
-			{
-				usEyesX				= gRPCSmallFaceValues[ cnt ].bEyesX;
-				usEyesY				= gRPCSmallFaceValues[ cnt ].bEyesY;
-				usMouthY			= gRPCSmallFaceValues[ cnt ].bMouthY;
-				usMouthX			= gRPCSmallFaceValues[ cnt ].bMouthX;
-			}
+			// WANNE: This fixes the static faces of Barry Unger (Index = 0)
+			// Problem was, that gRPCSmallFaceValues initialized additional entries with 0 (-> FaceIndex = 0 -> Barry Unger)!!
+			//if ( gRPCSmallFaceValues[ cnt ].bEyesX > 0 && gRPCSmallFaceValues[ cnt ].bEyesY > 0 &&
+			//	gRPCSmallFaceValues[ cnt ].bMouthX > 0 && gRPCSmallFaceValues[ cnt ].bMouthY > 0)
+			//{
+				// We've found one!
+				if ( gRPCSmallFaceValues[ cnt ].FaceIndex == usMercProfileID && ( gProfilesRPC[gRPCSmallFaceValues[ cnt ].FaceIndex].ProfilId == usMercProfileID || gProfilesNPC[gRPCSmallFaceValues[ cnt ].FaceIndex].ProfilId == usMercProfileID ) )
+				{				
+					usEyesX				= gRPCSmallFaceValues[ cnt ].bEyesX;
+					usEyesY				= gRPCSmallFaceValues[ cnt ].bEyesY;
+					usMouthY			= gRPCSmallFaceValues[ cnt ].bMouthY;
+					usMouthX			= gRPCSmallFaceValues[ cnt ].bMouthX;
+				}
+			//}
+			// No more faces in RPC Array -> Cancel loop!
+			//else
+			//{
+			//	break;
+			//}
 		}
 	}
 

@@ -859,7 +859,7 @@ int i;
 	for (i= 1; i<=n; i++ )
 	{
 		if (i == 1 ) ID = lua_tointeger(L,i);
-		if (i == 3 ) inv = lua_tointeger(L,i);
+		if (i == 3 ) i1 = lua_tointeger(L,i);
 		if (i == 4 ) inv = lua_tointeger(L,i);
 		if (i == 5 ) number = lua_tointeger(L,i);
 		if (i == 6 ) status = lua_tointeger(L,i);

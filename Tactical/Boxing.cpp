@@ -391,20 +391,20 @@ BOOLEAN PickABoxer( void )
 					if ( (uiLoop == NUM_BOXERS - 2) )
 					{
 						if (gGameOptions.fNewTraitSystem) // SANDRO - traits
-							pBoxer->stats.ubSkillTrait1 = MARTIAL_ARTS_NT;
+							pBoxer->stats.ubSkillTraits[0] = MARTIAL_ARTS_NT;
 						else
-							pBoxer->stats.ubSkillTrait1 = HANDTOHAND_OT;
+							pBoxer->stats.ubSkillTraits[0] = HANDTOHAND_OT;
 					}
 					// give the 3rd boxer martial arts
 					if ( (uiLoop == NUM_BOXERS - 1) && pBoxer->ubBodyType == REGMALE )
 					{
 						if (gGameOptions.fNewTraitSystem) // SANDRO - traits
 						{
-							pBoxer->stats.ubSkillTrait1 = MARTIAL_ARTS_NT;
-							pBoxer->stats.ubSkillTrait2 = MARTIAL_ARTS_NT;
+							pBoxer->stats.ubSkillTraits[0] = MARTIAL_ARTS_NT;
+							pBoxer->stats.ubSkillTraits[1] = MARTIAL_ARTS_NT;
 						}
 						else
-							pBoxer->stats.ubSkillTrait1 = MARTIALARTS_OT;
+							pBoxer->stats.ubSkillTraits[0] = MARTIALARTS_OT;
 					}
 					return( TRUE );
 				}

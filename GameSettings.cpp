@@ -1330,6 +1330,8 @@ void LoadGameExternalOptions()
 	// HEADROCK HAM 3.6: Controls how important the character's stats are, in insuring he/she gets better results (or smaller damage) from using facilities. The higher this is, the more dangerous all facilities are.
 	gGameExternalOptions.ubFacilityDangerRate				= iniReader.ReadInteger("Strategic Gameplay Settings","FACILITY_DANGER_RATE", 50, 0, 100);
 
+	// 2Points: Use new repair algorithm (Items are priorized based on type and damage to item, starting from equipped weapons, going to armor, then inventory)
+	gGameExternalOptions.fAdditionalRepairMode				= iniReader.ReadBoolean("Strategic Gameplay Settings", "ADDITIONAL_REPAIR_MODE", FALSE);	
 
 	//################# Bobby Ray Settings ##################
 
@@ -1626,9 +1628,12 @@ void LoadSkillTraitsExternalSettings()
 {
 	CIniReader iniReader(STOMP_SETTINGS_FILE);
 
+	gSkillTraitValues.ubMaxNumberOfTraits = iniReader.ReadInteger("Generic Traits Settings","MAX_NUMBER_OF_TRAITS", 3, 2, 30);
+	gSkillTraitValues.ubNumberOfMajorTraitsAllowed = iniReader.ReadInteger("Generic Traits Settings","NUMBER_OF_MAJOR_TRAITS_ALLOWED", 2, 2, 20);
+
 	// GENERIC SETTINGS
 	gSkillTraitValues.bCtHModifierAssaultRifles = iniReader.ReadInteger("Generic Traits Settings","ASSAULT_RIFLES_CTH_MODIFIER", -5, -100, 100);
-	gSkillTraitValues.bCtHModifierSniperRifles = iniReader.ReadInteger("Generic Traits Settings","SNIPER_RIFLES_CTH_MODIFIER", -5, -100, 100);
+	gSkillTraitValues.bCtHModifierSniperRifles = iniReader.ReadInteger("Generic Traits Settings","SNIPER_RIFLES_CTH_MODIFIER", -10, -100, 100);
 	gSkillTraitValues.bCtHModifierRifles = iniReader.ReadInteger("Generic Traits Settings","RIFLES_CTH_MODIFIER", -5, -100, 100);
 	gSkillTraitValues.bCtHModifierSMGs = iniReader.ReadInteger("Generic Traits Settings","SMGS_CTH_MODIFIER", -5, -100, 100);
 	gSkillTraitValues.bCtHModifierLMGs = iniReader.ReadInteger("Generic Traits Settings","LMGS_CTH_MODIFIER", -10, -100, 100);
@@ -1685,7 +1690,8 @@ void LoadSkillTraitsExternalSettings()
 	gSkillTraitValues.ubHWDamageBonusPercentForHW = iniReader.ReadInteger("Heavy Weapons","HW_DAMAGE_PERCENT_BONUS", 15, 0, 100);
 
 	// SNIPER
-	gSkillTraitValues.ubSNBonusCtHSniperRifles = iniReader.ReadInteger("Sniper","BONUS_CTH_SNIPER_RIFLES", 5, 0, 100);
+	gSkillTraitValues.ubSNBonusCtHRifles = iniReader.ReadInteger("Sniper","BONUS_CTH_RIFLES", 5, 0, 100);
+	gSkillTraitValues.ubSNBonusCtHSniperRifles = iniReader.ReadInteger("Sniper","BONUS_CTH_SNIPER_RIFLES", 10, 0, 100);
 	gSkillTraitValues.ubSNEffRangeToTargetReduction = iniReader.ReadInteger("Sniper","EFFECTIVE_RANGE_TO_TARGET_REDUCTION", 5, 0, 45);
 	gSkillTraitValues.ubSNAimingBonusPerClick = iniReader.ReadInteger("Sniper","AIMING_BONUS_PER_CLICK_RIFLES", 10, 0, 50);
 	gSkillTraitValues.ubSNDamageBonusPerClick = iniReader.ReadInteger("Sniper","GUN_DAMAGE_BONUS_PER_CLICK", 5, 0, 50);

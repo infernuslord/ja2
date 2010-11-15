@@ -2,7 +2,7 @@
 #define __IMP_COMPILE_H
 
 #define PLAYER_GENERATED_CHARACTER_ID 51
-#define ATTITUDE_LIST_SIZE 20
+#define ATTITUDE_LIST_SIZE 30
 #define NUMBER_OF_PLAYER_PORTRAITS 50 //16
 
 void AddAnAttitudeToAttitudeList( INT8 bAttitude );

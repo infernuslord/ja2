@@ -690,12 +690,12 @@ public:
 	INT8	bLife;
 	INT8		bDexterity;		// dexterity (hand coord) value
 	INT8	bDisability;
-	INT8	bSkillTrait;
+	INT8	bSkillTraits[30];
 
 	INT8	bReputationTolerance;
 	INT8	bExplosive;
-	INT8	bSkillTrait2;
-	INT8	bSkillTrait3; // added by SANDRO
+	//INT8	bSkillTrait2;
+	//INT8	bSkillTrait3; // added by SANDRO
 	INT8	bLeadership;
 
 	INT8	bBuddy[5];

@@ -25,7 +25,8 @@ extern UINT8 NUMBER_OF_BAD_MERCS;
 #define		MERC_NUM_DAYS_TILL_ACCOUNT_INVALID						12
 
 
-#define		MERC_LARRY_ROACHBURN													7
+// WANNE.LARRY
+//#define		MERC_LARRY_ROACHBURN													7
 
 
 #define		DAYS_TIL_M_E_R_C_AVAIL												3
@@ -56,7 +57,7 @@ typedef struct
 	BOOLEAN StartMercsAvailable;
 	UINT8   MercBio;
 	BOOLEAN Drunk;
-	UINT8   DrunkID;
+	UINT8   uiAlternateIndex;
 
 }	CONTITION_FOR_MERC_AVAILABLE;
 
@@ -71,7 +72,7 @@ typedef struct
 	BOOLEAN StartMercsAvailable;
 	UINT8   MercBio;
 	BOOLEAN	Drunk;
-	UINT8   DrunkID;
+	UINT8   uiAlternateIndex;
 	
 }	CONTITION_FOR_MERC_AVAILABLE_TEMP;
 
@@ -164,4 +165,5 @@ extern INT8			IsSpeckQuoteImportantQuote( UINT32 uiQuoteNum );
 
 
  
+
 

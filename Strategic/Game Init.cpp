@@ -770,7 +770,7 @@ BOOLEAN InitNewGame( BOOLEAN fReset )
 		{
 			for(int uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
 			{
-				if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_OT || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_OT )
+				if ( ProfileHasSkillTrait( uiLoop, CAMOUFLAGED_OT ) > 0 )
 					{
 						gCamoFace[uiLoop].gCamoface = TRUE;
 					}
@@ -798,6 +798,7 @@ BOOLEAN InitNewGame( BOOLEAN fReset )
 	//reset mercs profiles
 	for(i=0; i<NUM_PROFILES; i++)
 	{
+		gConditionsForMercAvailability[i].uiIndex = gConditionsForMercAvailabilityTemp[i].uiIndex;
 		gConditionsForMercAvailability[i].ProfilId = gConditionsForMercAvailabilityTemp[i].ProfilId;
 		gConditionsForMercAvailability[i].usMoneyPaid = gConditionsForMercAvailabilityTemp[i].usMoneyPaid;
 		gConditionsForMercAvailability[i].usDay = gConditionsForMercAvailabilityTemp[i].usDay;
@@ -805,12 +806,14 @@ BOOLEAN InitNewGame( BOOLEAN fReset )
 		gConditionsForMercAvailability[i].NewMercsAvailable = gConditionsForMercAvailabilityTemp[i].NewMercsAvailable;
 		gConditionsForMercAvailability[i].StartMercsAvailable = gConditionsForMercAvailabilityTemp[i].StartMercsAvailable;
 		gConditionsForMercAvailability[i].Drunk = gConditionsForMercAvailabilityTemp[i].Drunk;
-		gConditionsForMercAvailability[i].DrunkID = gConditionsForMercAvailabilityTemp[i].DrunkID;
-		gConditionsForMercAvailability[i].MercBio = gConditionsForMercAvailabilityTemp[i].MercBio;
-	}
+		gConditionsForMercAvailability[i].uiAlternateIndex = gConditionsForMercAvailabilityTemp[i].uiAlternateIndex;
+		gConditionsForMercAvailability[i].MercBio = gConditionsForMercAvailabilityTemp[i].MercBio;		
+	}	
+
 	
 	for(i=0; i<NUM_PROFILES; i++)
 	{
+		gAimAvailability[i].uiIndex = gAimAvailabilityTemp[i].uiIndex;
 		gAimAvailability[i].ProfilId = gAimAvailabilityTemp[i].ProfilId;
 		gAimAvailability[i].ubAimArrayID = gAimAvailabilityTemp[i].ubAimArrayID;
 		gAimAvailability[i].AimBio = gAimAvailabilityTemp[i].AimBio;
@@ -936,9 +939,9 @@ void QuickSetupOfMercProfileItems( UINT32 uiCount, UINT8 ubProfileIndex )
 		gMercProfiles[ ubProfileIndex ].bInvNumber[ BIGPOCK1POS ] = 1;
 
 		if (gGameOptions.fNewTraitSystem) // SANDRO - traits
-			gMercProfiles[ ubProfileIndex ].bSkillTrait = MARTIAL_ARTS_NT;
+			gMercProfiles[ ubProfileIndex ].bSkillTraits[0] = MARTIAL_ARTS_NT;
 		else
-			gMercProfiles[ ubProfileIndex ].bSkillTrait = MARTIALARTS_OT;
+			gMercProfiles[ ubProfileIndex ].bSkillTraits[0] = MARTIALARTS_OT;
 
 		gMercProfiles[ ubProfileIndex ].inv[ SMALLPOCK3POS ] = KEY_2;
 		gMercProfiles[ ubProfileIndex ].bInvStatus[ SMALLPOCK3POS ] = 100;
@@ -1111,7 +1114,7 @@ void ReStartingGame()
 		{
 			for(int uiLoop=0; uiLoop< NUM_PROFILES; uiLoop++)
 			{
-				if ( gMercProfiles[uiLoop].bSkillTrait == CAMOUFLAGED_OT || gMercProfiles[uiLoop].bSkillTrait2 == CAMOUFLAGED_OT )
+				if ( ProfileHasSkillTrait( uiLoop, CAMOUFLAGED_OT ) > 0 )
 					{
 						gCamoFace[uiLoop].gCamoface = TRUE;
 					}

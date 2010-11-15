@@ -917,6 +917,7 @@ STR16 gzMercSkillTextNew[] =
 	L"Squadleader",
 	L"Engineer",
 	L"Doctor",
+	L"More...",
 };
 //////////////////////////////////////////////////////////
 

@@ -1299,39 +1299,18 @@ void HandleUnhiredMercDeaths( INT32 iProfileID )
 		{
 			sChance += 1;
 		}
-		switch (pProfile->bSkillTrait)
-		{
-			case SQUADLEADER_NT:
-			case TECHNICIAN_NT:
-			case DOCTOR_NT:
-			case STEALTHY_NT:
-			case BODYBUILDING_NT:
-			case SCOUTING_NT:
-				sChance -= 1;
-				break;
-		}
-		switch (pProfile->bSkillTrait2)
-		{
-			case SQUADLEADER_NT:
-			case TECHNICIAN_NT:
-			case DOCTOR_NT:
-			case STEALTHY_NT:
-			case BODYBUILDING_NT:
-			case SCOUTING_NT:
-				sChance -= 1;
-				break;
-		}
-		switch (pProfile->bSkillTrait3)
-		{
-			case SQUADLEADER_NT:
-			case TECHNICIAN_NT:
-			case DOCTOR_NT:
-			case STEALTHY_NT:
-			case BODYBUILDING_NT:
-			case SCOUTING_NT:
-				sChance -= 1;
-				break;
-		}
+		if ( ProfileHasSkillTrait( iProfileID, SQUADLEADER_NT ) > 0 )
+			sChance -= ProfileHasSkillTrait( iProfileID, SQUADLEADER_NT );
+		if ( ProfileHasSkillTrait( iProfileID, TECHNICIAN_NT ) > 0 )
+			sChance -= ProfileHasSkillTrait( iProfileID, TECHNICIAN_NT );
+		if ( ProfileHasSkillTrait( iProfileID, DOCTOR_NT ) > 0 )
+			sChance -= ProfileHasSkillTrait( iProfileID, DOCTOR_NT );
+		if ( ProfileHasSkillTrait( iProfileID, STEALTHY_NT ) > 0 )
+			sChance -= ProfileHasSkillTrait( iProfileID, STEALTHY_NT );
+		if ( ProfileHasSkillTrait( iProfileID, BODYBUILDING_NT ) > 0 )
+			sChance -= ProfileHasSkillTrait( iProfileID, BODYBUILDING_NT );
+		if ( ProfileHasSkillTrait( iProfileID, SCOUTING_NT ) > 0 )
+			sChance -= ProfileHasSkillTrait( iProfileID, SCOUTING_NT );
 	}
 	else
 	{		
@@ -1345,10 +1324,8 @@ void HandleUnhiredMercDeaths( INT32 iProfileID )
 				break;
 		}
 		// stealthy guys are slightly less likely to get killed (they're careful)
-		if (pProfile->bSkillTrait == STEALTHY_OT)
-			sChance -= 1;
-		if (pProfile->bSkillTrait2 == STEALTHY_OT)
-			sChance -= 1;
+		if ( ProfileHasSkillTrait( iProfileID, STEALTHY_OT ) > 0 )
+			sChance -= ProfileHasSkillTrait( iProfileID, STEALTHY_OT );
 	}
 
 	if ((INT16) PreRandom(1000) < sChance)

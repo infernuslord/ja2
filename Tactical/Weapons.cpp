@@ -4121,6 +4121,10 @@ UINT32 CalcChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTime,
 			// this bonus is applied only on single shots!
 			if ( HAS_SKILL_TRAIT( pSoldier, RANGER_NT ) && pSoldier->bDoBurst == 0 && pSoldier->bDoAutofire == 0 )
 				iChance += gSkillTraitValues.ubRABonusCtHRifles * NUM_SKILL_TRAITS( pSoldier, RANGER_NT ); // +5% per trait
+			//CHRISL: Why wouldn't sniper training include standard rifles which are often used as "poor-man sniper rifles"
+			// this bonus is applied only on single shots!
+			if ( HAS_SKILL_TRAIT( pSoldier, SNIPER_NT ) && pSoldier->bDoBurst == 0 && pSoldier->bDoAutofire == 0 )
+				iChance += gSkillTraitValues.ubSNBonusCtHRifles * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT ); // +5% per trait
 		}
 		else if ( Weapon[usInHand].ubWeaponType == GUN_SHOTGUN )
 		{
@@ -4723,7 +4727,9 @@ UINT32 CalcChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTime,
 	iPenalty = ((iMaxRange - iRange * 3) * 10) / (17 * CELL_X_SIZE);
 	if ( iPenalty < 0 )
 	{
-		iChance += iPenalty;
+		// No penalty on tanks
+		//if (!TANK(pSoldier))
+			iChance += iPenalty;
 	}
 	//iChance -= 20 * iRange / iMaxRange;
 
@@ -4745,7 +4751,10 @@ UINT32 CalcChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTime,
 		// From for JA2.5:  3% bonus/penalty for each tile different from range NORMAL_RANGE.
 		// This doesn't provide a bigger bonus at close range, but stretches it out, making medium
 		// range less penalized, and longer range more penalized
-		iChance += 3 * ( NORMAL_RANGE - iSightRange ) / CELL_X_SIZE;
+
+		// WANNE: No penalty on the tank
+		if (!TANK(pSoldier))
+			iChance += 3 * ( NORMAL_RANGE - iSightRange ) / CELL_X_SIZE;
 		/*
 		if (iSightRange < NORMAL_RANGE)
 		{

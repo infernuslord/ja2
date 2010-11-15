@@ -111,6 +111,7 @@ STR16 gzIMPMajorTraitsHelpTextsHeavyWeapons[]=
 };
 STR16 gzIMPMajorTraitsHelpTextsSniper[]=
 {
+	L"+%d%s Chance to Hit with Rifles\n",
 	L"+%d%s Chance to Hit with Sniper Rifles\n",
 	L"-%d%s effective range to target with all weapons\n",
 	L"+%d%s aiming bonus per aim click (except for handguns)\n",

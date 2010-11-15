@@ -922,6 +922,7 @@ STR16 gzMercSkillTextNew[] =
 	L"Squadleader",
 	L"Engineer",
 	L"Doctor",
+	L"More...",
 };
 //////////////////////////////////////////////////////////
 
@@ -5286,93 +5287,91 @@ STR16 Additional113Text[]=
 // SANDRO - Taunts (here for now, xml for future, I hope)
 STR16 sEnemyTauntsFireGun[]=
 {
-	L"Suck this!",
-	L"Touch this!",
-	L"Come get some!",
-	L"You're mine!",
-	L"Die!",
-	L"You scared, motherfucker?",
-	L"This will hurt!",
-	L"Come on you bastard!",
-	L"Come on! I don't got all day!",
-	L"Come to daddy!",
-	L"You'll be six feet under in no time!",
-	L"Will send ya home in a pinebox, loser!",
-	L"Hey, wanna play?",
-	L"You should have stayed home, bitch.",
-	L"Sucker!",
+	L"Masz cwelu!",
+	L"A masz!",
+	L"Na¿ryj siê!",
+	L"Jesteœcie moi!",
+	L"Zdychaj!",
+	L"Boisz siê kurwo?",
+	L"To dopiero zaboli!",
+	L"Dawaj skurwielu!",
+	L"Dawaj! Nie mam ca³ego dnia!",
+	L"ChodŸ do tatusia!",
+	L"Zaraz pójdziesz do piachu!",
+	L"Wracasz do domu w dêbowej jesionce frajerze!",
+	L"Chcesz siê zabawiæ?"
+	L"Trzeba by³o zostaæ w domu kurwo."
+	L"Ciota!",
 };
 
 STR16 sEnemyTauntsFireLauncher[]=
 {
 
-	L"We have a barbecue here.",
-	L"I got a present for ya.",
-	L"Bam!",
-	L"Smile!",
+	L"Urz¹dzamy grilla.",
+	L"Mam dla ciebie prezent.",
+	L"Bum!",
+	L"Uœmiech!",
 };
 
 STR16 sEnemyTauntsThrow[]=
 {
-	L"Catch!",
-	L"Here ya go!",
-	L"Pop goes the weasel.",
-	L"This one's for you.",
-	L"Muhehe.",
-	L"Catch this, swine!",
-	L"I like this.",
+	L"£ap!",
+	L"A masz!",
+	L"Przysz³a kryska na Matyska!",
+	L"To dla ciebie!",
+	L"Hahahaha!",
+	L"£ap œwinio!",
+	L"Uwielbiam to.",
 };
 
 STR16 sEnemyTauntsChargeKnife[]=
 {
-	L"I'll get your scalp.",
-	L"Come to papa.",
-	L"Show me your guts!",
-	L"I'll rip you to pieces!",
-	L"Motherfucker!",
+	L"Zedrê ci skalp!",
+	L"ChodŸ do tatusia.",
+	L"Pochwal siê flakami!",
+	L"Por¿nê ciê na kawa³ki!",
+	L"Skurwysyny!",
 };
 
 STR16 sEnemyTauntsRunAway[]=
 {
-	L"We're in some real shit...",
-	L"They said join the army. Not for this shit!",
-	L"I have enough.",
-	L"Oh my God.",
-	L"They ain't paying us enough for this.",
-	L"It's just too much for me.",
-	L"I'll bring some friends.",
+	L"Jesteœmy po uszy w gównie...",
+	L"IdŸ do wojska -mówili. Nie ma chuja, nie po to!",
+	L"Mam ju¿ doœæ.",
+	L"O mój Bo¿e.",
+	L"Za to mi nie p³ac¹.",
+	L"Nie wytrzymam tego!",
+	L"Wrócê z kumplami.",
 
 };
 
 STR16 sEnemyTauntsSeekNoise[]=
 {
-	L"I heard that!",
-	L"Who's there?",
-	L"What was that?",
-	L"Hey! What the...",
+	L"S³ysza³em to!",
+	L"Kto tam?",
+	L"Co to by³o?",
+	L"Hej! Co do...",
 
 };
 
 STR16 sEnemyTauntsAlert[]=
 {
-	L"They are here!",
-	L"Now the fun can start.",
-	L"I hoped this will never happen.",
+	L"S¹ tutaj!",
+	L"Czas zacz¹æ zabawê."
+	L"Liczy³em na to, ¿e to siê nie stanie.",
 
 };
 
 STR16 sEnemyTauntsGotHit[]=
 {
-	L"Ouch!",
-	L"Ugh!",
-	L"This.. hurts!",
-	L"You fuck!",
-	L"You will regret.. uhh.. this.",
-	L"What the..!",
-	L"Now you have.. pissed me off.",
-
+	L"Au!",
+	L"U³...",
+	L"To... boli!",
+	L"Skurwysyny!",
+	L"Po¿a³ujecie... tego.",
+	L"Co do..!",
+	L"Teraz siê... wkurwi³em.",
 };
-
 //Ja25 UB
 
 STR16	gzNewLaptopMessages[]=

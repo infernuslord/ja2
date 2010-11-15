@@ -1199,7 +1199,7 @@ BOOLEAN AdjustToNextAnimationFrame( SOLDIERTYPE *pSoldier )
 							}
 							else
 							{
-								if ( gMercProfiles[ pSoldier->ubProfile ].bSkillTrait == MARTIALARTS_OT || gMercProfiles[ pSoldier->ubProfile ].bSkillTrait2 == MARTIALARTS_OT )
+								if ( ProfileHasSkillTrait( pSoldier->ubProfile, MARTIALARTS_OT ) > 0 )
 								{
 									fMartialArtist = TRUE;
 								}

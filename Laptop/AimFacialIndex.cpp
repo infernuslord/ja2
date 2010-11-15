@@ -83,6 +83,34 @@ void GameInitAimFacialIndex()
 
 }
 
+/// Calculates the needed string for the page button based on number of mercs
+/// and currently displayed page.
+static STR16 GetPageButtonText() 
+{
+	const int MERCS_PER_PAGE = AIM_FI_NUM_MUGSHOTS_X * AIM_FI_NUM_MUGSHOTS_Y;
+
+	int baseTextIndex;
+	// Display three pages of mercs (strings from gszAimPages[2] to gszAimPages[4])
+	if (MAX_NUMBER_MERCS > MERCS_PER_PAGE * 2)
+		baseTextIndex = 2;
+	// Display two pages of mercs (strings from gszAimPages[0] to gszAimPages[1])
+	else if (MAX_NUMBER_MERCS > MERCS_PER_PAGE)
+	{
+		Assert(START_MERC < MERCS_PER_PAGE * 2);
+		baseTextIndex = 0;
+	}
+	// Display one page of mercs (string gszAimPages[5])
+	else
+	{
+		Assert(START_MERC < MERCS_PER_PAGE);
+		baseTextIndex = 5;
+	}
+
+	int currentPage = START_MERC / MERCS_PER_PAGE;
+	int stringIndex = baseTextIndex + currentPage;
+	return gszAimPages[ stringIndex ];
+}
+
 void BtnNewProfilesButtonCallback(GUI_BUTTON *btn,INT32 reason)
 {
 UINT32 i;
@@ -95,55 +123,21 @@ UINT32 i;
 	if ( START_MERC == 0 )
 	{
 		START_MERC = 40;
-		ExitAimFacialIndex();
-		EnterAimFacialIndex();		
-		
-		if ( MAX_NUMBER_MERCS > 80 )
-			SpecifyButtonText( PAGE_BUTTON, gszAimPages[ 3 ] );
-		else
-			SpecifyButtonText( PAGE_BUTTON, gszAimPages[ 1 ] );	
-		
 	}	
 	else if ( START_MERC == 40 )
 	{
-	
 		if ( MAX_NUMBER_MERCS > 80 )
 			START_MERC = 80;
 		else
 			START_MERC = 0;
-			
-		ExitAimFacialIndex();
-		EnterAimFacialIndex();
-		
-		if ( MAX_NUMBER_MERCS > 80 )
-			SpecifyButtonText( PAGE_BUTTON, gszAimPages[ 4 ] );
-		else
-			SpecifyButtonText( PAGE_BUTTON, gszAimPages[ 0 ] );			
-		
 	}
-	else if ( START_MERC == 80 && MAX_NUMBER_MERCS > 80 )
-	{
-		START_MERC = 0;	
-			
-		ExitAimFacialIndex();
-		EnterAimFacialIndex();
-		
-		SpecifyButtonText( PAGE_BUTTON, gszAimPages[ 2 ] );	
-
-	}	
 	else
 	{
 		START_MERC = 0;
-			
-		ExitAimFacialIndex();
-		EnterAimFacialIndex();
-		
-		if ( MAX_NUMBER_MERCS >80 )
-			SpecifyButtonText( PAGE_BUTTON, gszAimPages[ 2 ] );
-		else
-			SpecifyButtonText( PAGE_BUTTON, gszAimPages[ 0 ] );			
-		
 	}
+
+	ExitAimFacialIndex();
+	EnterAimFacialIndex();
 }
 
 BOOLEAN EnterAimFacialIndex()
@@ -169,30 +163,14 @@ BOOLEAN EnterAimFacialIndex()
 	//Page button
 	guiPreviousNewProfilesNextButtonImage =	LoadButtonImage("LAPTOP\\BottomButtons2.sti", -1,0,-1,1,-1 ); //New profiles
 	
-	PAGE_BUTTON = CreateIconAndTextButton( guiPreviousNewProfilesNextButtonImage, gszAimPages[0], FONT14ARIAL,
+	STR16 buttonText = GetPageButtonText();
+	PAGE_BUTTON = CreateIconAndTextButton( guiPreviousNewProfilesNextButtonImage, buttonText, FONT14ARIAL,
 														FONT_MCOLOR_DKWHITE, DEFAULT_SHADOW,
 														138, DEFAULT_SHADOW,
 														TEXT_CJUSTIFIED,
 														IMAGE_OFFSET_X + 6, IMAGE_OFFSET_Y + 35, BUTTON_TOGGLE, MSYS_PRIORITY_HIGH,
 														DEFAULT_MOVE_CALLBACK, BtnNewProfilesButtonCallback);
 	SetButtonCursor(PAGE_BUTTON, CURSOR_WWW );
-	
-	if ( MAX_NUMBER_MERCS > 40 )
-	{
-		//EnableButton( PAGE_BUTTON );
-		ShowButton( PAGE_BUTTON );
-		
-		if ( MAX_NUMBER_MERCS > 80 )
-			SpecifyButtonText( PAGE_BUTTON, gszAimPages[2] );
-		else
-			SpecifyButtonText( PAGE_BUTTON, gszAimPages[0] );
-	}
-	else
-	{
-		HideButton( PAGE_BUTTON );
-		//DisableButton( PAGE_BUTTON );
-		SpecifyButtonText( PAGE_BUTTON, gszAimPages[5] );
-	}
 	
 	usPosX = AIM_FI_FIRST_MUGSHOT_X;
 	usPosY = AIM_FI_FIRST_MUGSHOT_Y;
@@ -205,23 +183,23 @@ BOOLEAN EnterAimFacialIndex()
 			if ( gAimProfiles[i+START_MERC] == TRUE ) //new profiles
 			{
 			
-			MSYS_DefineRegion( &gMercFaceMouseRegions[ i ], usPosX, usPosY, (INT16)(usPosX + AIM_FI_PORTRAIT_WIDTH), (INT16)(usPosY + AIM_FI_PORTRAIT_HEIGHT), MSYS_PRIORITY_HIGH,
-								CURSOR_WWW, SelectMercFaceMoveRegionCallBack, SelectMercFaceRegionCallBack);
-			// Add region
-			MSYS_AddRegion( &gMercFaceMouseRegions[ i ] );
-			MSYS_SetRegionUserData( &gMercFaceMouseRegions[ i ], 0, i);
+				MSYS_DefineRegion( &gMercFaceMouseRegions[ i ], usPosX, usPosY, (INT16)(usPosX + AIM_FI_PORTRAIT_WIDTH), (INT16)(usPosY + AIM_FI_PORTRAIT_HEIGHT), MSYS_PRIORITY_HIGH,
+									CURSOR_WWW, SelectMercFaceMoveRegionCallBack, SelectMercFaceRegionCallBack);
+				// Add region
+				MSYS_AddRegion( &gMercFaceMouseRegions[ i ] );
+				MSYS_SetRegionUserData( &gMercFaceMouseRegions[ i ], 0, i);
 
 			if (gGameExternalOptions.fReadProfileDataFromXML)
 			{
 				// HEADROCK PROFEX: Do not read direct profile number, instead, look inside the profile for a ubFaceIndex value.
 				//sprintf(sTemp, "%s%02d.sti", sFaceLoc, gMercProfiles[AimMercArray[i]].ubFaceIndex);
-				sprintf(sTemp, "%s%02d.sti", sFaceLoc, gMercProfiles[gAimAvailability[AimMercArray[i+START_MERC]].ProfilId].ubFaceIndex);
+				sprintf(sTemp, "%s%02d.sti", sFaceLoc, gMercProfiles[gAimAvailability[AimMercArray[i + START_MERC]].ProfilId].ubFaceIndex);
 				//sprintf(sTemp, "%s%02d.sti", sFaceLoc, gAimAvailability[AimMercArray[i]].ProfilId);
 			}
 			else
 			{
 				//sprintf(sTemp, "%s%02d.sti", sFaceLoc, AimMercArray[i]);
-				sprintf(sTemp, "%s%02d.sti", sFaceLoc, gAimAvailability[AimMercArray[i+START_MERC]].ProfilId );
+				sprintf(sTemp, "%s%02d.sti", sFaceLoc, gAimAvailability[AimMercArray[i + START_MERC]].ProfilId );
 			}
 			VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
 			FilenameForBPP(sTemp, VObjectDesc.ImageFile);
@@ -289,20 +267,15 @@ BOOLEAN RenderAimFacialIndex()
 	CHAR16		sString[150];
 	UINT8			i;
 	
+	SpecifyButtonText( PAGE_BUTTON, GetPageButtonText() );
+
 	if ( MAX_NUMBER_MERCS > 40 )
 	{
-		//EnableButton( PAGE_BUTTON );
 		ShowButton( PAGE_BUTTON );
-		if ( MAX_NUMBER_MERCS > 80 )
-			SpecifyButtonText( PAGE_BUTTON, gszAimPages[2] );
-		else
-			SpecifyButtonText( PAGE_BUTTON, gszAimPages[0] );
 	}
 	else
 	{
 		HideButton( PAGE_BUTTON );
-		//DisableButton( PAGE_BUTTON );
-		SpecifyButtonText( PAGE_BUTTON, gszAimPages[5] );
 	}
 
 	DrawAimDefaults();

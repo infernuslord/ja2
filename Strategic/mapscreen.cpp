@@ -7450,7 +7450,10 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 					if(bSelectedInfoChar != -1)
 					{
 						SOLDIERTYPE *pSoldier = MercPtrs[ gCharactersList[ bSelectedInfoChar ].usSolID ];
-						if(OK_CONTROLLABLE_MERC( pSoldier ))
+						//CHRISL: Try to update InSector value so we don't have to "activate" a sector
+						if(pSoldier->sSectorX == sSelMapX && pSoldier->sSectorY == sSelMapY && pSoldier->bSectorZ == iCurrentMapSectorZ && !pSoldier->flags.fBetweenSectors)
+							pSoldier->bInSector=TRUE;
+						if(OK_CONTROL_MERC( pSoldier ))
 						{
 						if(!fShowMapInventoryPool)
 						{
@@ -7542,7 +7545,7 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 						//Toggle Frame Rate Display
 						gbFPSDisplay = !gbFPSDisplay;
 						DisableFPSOverlay( (BOOLEAN)!gbFPSDisplay );
-			}
+						}
 					}
 					break;
 				case 'h':
@@ -7965,8 +7968,11 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 					if(bSelectedInfoChar != -1)
 					{
 						SOLDIERTYPE *pSoldier = MercPtrs[ gCharactersList[ bSelectedInfoChar ].usSolID ];
-						if(OK_CONTROLLABLE_MERC( pSoldier ))
-						{
+						//CHRISL: Try to update InSector value so we don't have to "activate" a sector
+						if(pSoldier->sSectorX == sSelMapX && pSoldier->sSectorY == sSelMapY && pSoldier->bSectorZ == iCurrentMapSectorZ && !pSoldier->flags.fBetweenSectors)
+							pSoldier->bInSector=TRUE;
+						if(OK_CONTROL_MERC( pSoldier ))
+							{
 						if(!fShowMapInventoryPool)
 						{
 							fShowMapInventoryPool = TRUE;

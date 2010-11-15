@@ -46,7 +46,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				RuntimeTypeInfo="false"
+				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -108,7 +108,7 @@
 				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;"
 				RuntimeLibrary="0"
-				RuntimeTypeInfo="false"
+				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -169,7 +169,7 @@
 				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;"
 				RuntimeLibrary="0"
-				RuntimeTypeInfo="false"
+				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -233,7 +233,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				RuntimeTypeInfo="false"
+				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -296,7 +296,7 @@
 				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;"
 				RuntimeLibrary="0"
-				RuntimeTypeInfo="false"
+				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -504,9 +504,9 @@
 			</File>
 			<File
 				RelativePath=".\IMP MainPage.h"
-				>   
+				>
 			</File>
-			<File         
+			<File
 				RelativePath=".\IMP Minor Trait.h"
 				>
 			</File>
@@ -779,7 +779,7 @@
 			<File
 				RelativePath=".\IMP MainPage.cpp"
 				>
-			</File> 
+			</File>
 			<File
 				RelativePath=".\IMP Minor Trait.cpp"
 				>
@@ -866,6 +866,14 @@
 			</File>
 			<File
 				RelativePath=".\Store Inventory.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\XML_AIMAvailability.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\XML_ConditionsForMercAvailability.cpp"
 				>
 			</File>
 			<File

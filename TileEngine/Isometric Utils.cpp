@@ -206,23 +206,39 @@ BOOLEAN FindWindowJumpDirection( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bSta
     else if ( pSoldier->ubDirection == WEST )
         direction2 = WEST;
 
-	// IF there is a fence in this gridno, return false!
-	if ( IsJumpableWindowPresentAtGridNo( sGridNo, direction2 ) )
+	// WANNE: No need to check on SOUTH and EAST tile, because it is the tile that has the fence we are standing on!
+	if (direction2 == NORTH || direction2 == WEST)
 	{
-		return( FALSE );
+		// IF there is a fence in this gridno, return false!
+		if ( IsJumpableWindowPresentAtGridNo( sGridNo, direction2 ) )
+		{
+			return( FALSE );
+		}
 	}
 
 	// LOOP THROUGH ALL 8 DIRECTIONS
 	for ( cnt = 0; cnt < 8; cnt+= 2 )
 	{
-		// go out *2* tiles
-		sNewGridNo = NewGridNo( sGridNo, (UINT16)DirectionInc( (UINT8)cnt ) );
-		sOtherSideOfFence = NewGridNo( sNewGridNo, (UINT16)DirectionInc( (UINT8)cnt ) );
+		if (cnt != direction2)
+			continue;
 
-		if ( NewOKDestination( pSoldier, sOtherSideOfFence, TRUE, 0 ) )
+		// get the fence tile		
+		if (cnt == NORTH || cnt == WEST)
+		{
+			sNewGridNo = NewGridNo( sGridNo, (UINT16)DirectionInc( (UINT8)cnt ) );
+			sOtherSideOfFence = sNewGridNo;
+		}
+		// current tile we are standing is the fence tile
+		else
+		{
+			sNewGridNo = sGridNo;
+			sOtherSideOfFence = NewGridNo( sNewGridNo, (UINT16)DirectionInc( (UINT8)cnt ) );
+		}
+
+		//if ( NewOKDestination( pSoldier, sOtherSideOfFence, TRUE, 0 ) && validDestTile)
+		if ( NewOKDestination( pSoldier, sOtherSideOfFence, TRUE, 0 ) /*&& validDestTile*/)
 		{
 			// ATE: Check if there is somebody waiting here.....
-
 
 			// Check if we have a fence here
 			if ( IsJumpableWindowPresentAtGridNo( sNewGridNo , direction2) )
@@ -237,6 +253,8 @@ BOOLEAN FindWindowJumpDirection( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bSta
 					bMinNumTurns = bNumTurns;
 					bMinDirection = (INT8)cnt;
 				}
+
+				break;
 			}
 		}
 	}

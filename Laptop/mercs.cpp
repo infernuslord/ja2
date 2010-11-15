@@ -361,13 +361,12 @@ BOOLEAN LoadNewMercsFromLoadGameFile( HWFILE hFile )
 
 void GameInitMercs()
 {
+	UINT8 i;
 
-UINT8 i;
-
-NUMBER_OF_MERCS = 0;
-LAST_MERC_ID = -1;
-NUMBER_OF_BAD_MERCS = -1;
-
+	NUMBER_OF_MERCS = 0;
+	LAST_MERC_ID = -1;
+	NUMBER_OF_BAD_MERCS = -1;
+	
 	for(i=0; i<NUM_PROFILES; i++)
 	{
 		if ( gConditionsForMercAvailability[i].ProfilId != 0 )
@@ -869,9 +868,14 @@ void DailyUpdateOfMercSite( UINT16 usDate)
 		ubMercID = GetMercIDFromMERCArray( (UINT8) i );
 		if( IsMercOnTeam( ubMercID ) )
 		{
-			//if it larry Roach burn advance.	( cause larry is in twice, a sober larry and a stoned larry )
-			if( i == MERC_LARRY_ROACHBURN )
+			// WANNE: If we have drunken merc, then skip otherwise is will exist 2 times!
+			if (gConditionsForMercAvailability[ i ].Drunk)
 				continue;
+
+			//// WANNE.LARRY
+			////if it larry Roach burn advance.	( cause larry is in twice, a sober larry and a stoned larry )
+			//if( i == MERC_LARRY_ROACHBURN )
+			//	continue;
 
 			sSoldierID = GetSoldierIDFromMercID( ubMercID );
 			pSoldier = MercPtrs[ sSoldierID ];
@@ -1087,51 +1091,33 @@ void DailyUpdateOfMercSite( UINT16 usDate)
 //Gets the actual merc id from the array
 UINT8 GetMercIDFromMERCArray(UINT8 ubMercID)
 {
-	//if it is one of the regular MERCS
-	
-	if ( gConditionsForMercAvailability[ ubMercID ].uiIndex == ubMercID && gConditionsForMercAvailability[ ubMercID ].Drunk == FALSE && gConditionsForMercAvailability[ ubMercID ].DrunkID == 0 ) 
-	{
-		return( gubMercArray[ ubMercID ] );
-	}	
-	
-	/*
-	if( ubMercID <= 6 )
-	{
-		return( gubMercArray[ ubMercID ] );
-	}
-	*/
-	
-	//if it is Larry, determine if it Stoned larry or straight larry
-	else if( gConditionsForMercAvailability[ ubMercID ].uiIndex == ubMercID && gConditionsForMercAvailability[ ubMercID ].Drunk == TRUE && gConditionsForMercAvailability[ ubMercID ].DrunkID > 0 )
+	// Is this a drunken merc (e.g Larry) and has an additional drunken profile
+	if( gConditionsForMercAvailability[ ubMercID ].Drunk == TRUE && gConditionsForMercAvailability[ ubMercID ].uiAlternateIndex != 255)
 	{
 		if ( HasLarryRelapsed() )
 		{
-			return( gubMercArray[ gConditionsForMercAvailability[ ubMercID ].DrunkID ] );
+			// Drunken Larry
+			if (gConditionsForMercAvailability[ ubMercID ].uiIndex <= NUM_PROFILES)
+			{
+				return( gubMercArray[ gConditionsForMercAvailability[ ubMercID ].uiIndex ] );
+			}
+			else
+			{
+				Assert(0);
+				return( TRUE );
+			}
 		}
 		else
 		{
-			return( gubMercArray[ gConditionsForMercAvailability[ ubMercID ].uiIndex ] );
+			// Normal Larry (Normal Profile is one 
+			return( gubMercArray[ gConditionsForMercAvailability[ ubMercID ].uiAlternateIndex ] );
 		}
 	}
-	
-	/*else if( ( ubMercID == 7 ) || ( ubMercID == 8 ) )
-	{
-		if ( HasLarryRelapsed() )
-		{
-			return( gubMercArray[ 8 ] );
-		}
-		else
-		{
-			return( gubMercArray[ 7 ] );
-		}
-	}
-	*/
-	//if it is one of the newer mercs
-	else if( ubMercID <= NUM_PROFILES ) //LAST_MERC_ID )
+	// Merc is not drunken
+	else if( ubMercID <= NUM_PROFILES )
 	{
 		return( gubMercArray[ ubMercID ] );
 	}
-
 	//else its an error
 	else
 	{
@@ -2743,7 +2729,7 @@ BOOLEAN AreAnyOfTheNewMercsAvailable()
 	//for(i=(LARRY_NORMAL-BIFF); i<=LaptopSaveInfo.gubLastMercIndex; i++)
 	for(i=0; i<=NUM_PROFILES; i++)
 	{
-		if ( gConditionsForMercAvailability[i].NewMercsAvailable == FALSE ) // off && gProfilesMERC[i].ProfilId != 0 )
+		if ( gConditionsForMercAvailability[i].NewMercsAvailable == FALSE && gProfilesMERC[i].ProfilId != 0 )
 		{
 			ubMercID = GetMercIDFromMERCArray( i );
 			if( IsMercMercAvailable( ubMercID ) ) 
@@ -2764,7 +2750,6 @@ void ShouldAnyNewMercMercBecomeAvailable()
 	//Kaiden: Added this if test to make sure that the "New Mercs Available"
 	// e-mail doesn't show up and no unneccessary checks are made when you
 	// have the ALL_MERCS_AT_MERC set to TRUE in the INI file.
-	
 	if(!gGameExternalOptions.fAllMercsAvailable)
 	{
 		for(i=0; i<NUM_PROFILES; i++)
@@ -2896,7 +2881,7 @@ void NewMercsAvailableAtMercSiteCallBack( )
 					
 					if ( gConditionsForMercAvailability[ gConditionsForMercAvailability[i].uiIndex ].Drunk == TRUE )
 					{
-						LaptopSaveInfo.gubLastMercIndex = gConditionsForMercAvailability[gConditionsForMercAvailability[i].DrunkID].uiIndex;
+						LaptopSaveInfo.gubLastMercIndex = gConditionsForMercAvailability[gConditionsForMercAvailability[i].uiAlternateIndex].uiIndex;
 					}
 					else
 					{

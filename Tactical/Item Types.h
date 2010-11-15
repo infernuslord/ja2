@@ -452,6 +452,7 @@ public:
 	// Destructor
 	~OBJECTTYPE();
 
+	const StackedObjectData* operator[](const unsigned int index) const;
 	StackedObjectData* operator[](const unsigned int index);
 
 	// Initialize the soldier.  

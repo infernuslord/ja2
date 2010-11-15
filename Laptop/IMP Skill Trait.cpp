@@ -86,8 +86,7 @@ INT32 giIMPSkillTraitFinsihButtonImage;
 
 //BOOLEAN	gfSkillTraitButtonChanged=FALSE;
 
-#define	IST__NUM_SELECTABLE_TRAITS				2
-INT8	gbLastSelectedTraits[ IST__NUM_SELECTABLE_TRAITS ];
+INT8	gbLastSelectedTraits[ 10 ];
 
 //image handle
 UINT32	guiIST_GreyGoldBox;
@@ -108,6 +107,7 @@ void		IMPSkillTraitDisplaySkills();
 BOOLEAN ShouldTraitBeSkipped( UINT32 uiTrait );
 //void		AddSelectedSkillsToSkillsList(); // SANDRO - second declaration not needed
 void		HandleLastSelectedTraits( INT8 bNewTrait );
+INT8 GetLastSelectedSkill( void );
 BOOLEAN CameBackToSpecialtiesPageButNotFinished();
 
 BOOLEAN DoesSkillHaveExpertLevel( UINT32 uiSkillTrait );
@@ -220,7 +220,7 @@ void EnterIMPSkillTrait( void )
 	}
 
 	//reset last selecterd trait
-	memset( gbLastSelectedTraits, -1, IST__NUM_SELECTABLE_TRAITS );
+	memset( gbLastSelectedTraits, -1, 10 );
 }
 
 
@@ -497,38 +497,104 @@ void HandleIMPSkillTraitAnswers( UINT32 uiSkillPressed, BOOLEAN fSecondTrait )
 		//if its allready set
 		if( gfSkillTraitQuestions[ uiSkillPressed ] )
 		{
-			//dont need to do anything
-			return;
-		}
+			gfSkillTraitQuestions[ uiSkillPressed ] = FALSE;
 
+			BOOLEAN fNoSkillSelected = TRUE;
+			for ( uiCnt=0; uiCnt<(uiCntMax-1); uiCnt++ )
+			{
+				if ( gfSkillTraitQuestions[ uiCnt ] == TRUE )
+					fNoSkillSelected = FALSE;
+			}
+			if ( fNoSkillSelected )
+			{
+				// select NONE button
+				gfSkillTraitQuestions[ uiCntMax-1 ] = TRUE;
+			}
+		}
 		// if cannot have expert level of skill, don't continue
-		if ( gfSkillTraitQuestions2[ uiSkillPressed ] && !DoesSkillHaveExpertLevel( uiSkillPressed ) )
+		else if ( gfSkillTraitQuestions2[ uiSkillPressed ] && !DoesSkillHaveExpertLevel( uiSkillPressed ) )
 		{
 			//dont need to do anything
 			return;
-		}
-
-		// if the other trait has not been set yet, we rather set it now, 
-		// instead of deselecting the already set one
-		if( gfSkillTraitQuestions2[ uiCntMax-1 ] == TRUE && gfSkillTraitQuestions[ uiCntMax-1 ] == FALSE && (uiSkillPressed != (uiCntMax-1)) )
-		{
-			// Unselect NONE button
-			gfSkillTraitQuestions2[ uiCntMax-1 ] = FALSE;
-			//Set the skill
-			gfSkillTraitQuestions2[ uiSkillPressed ] = TRUE;
 		}
 		else
 		{
-			//loop through all the skill and reset them
-			for( uiCnt=0; uiCnt<uiCntMax; uiCnt++ )
+			// if the other trait has not been set yet, we rather set it now, 
+			// instead of deselecting the already set one
+			if( gfSkillTraitQuestions2[ uiCntMax-1 ] == TRUE && gfSkillTraitQuestions[ uiCntMax-1 ] == FALSE && (uiSkillPressed != (uiCntMax-1)) )
 			{
-				gfSkillTraitQuestions[ uiCnt ] = FALSE;
+				// Unselect NONE button
+				gfSkillTraitQuestions2[ uiCntMax-1 ] = FALSE;
+				//Set the skill
+				gfSkillTraitQuestions2[ uiSkillPressed ] = TRUE;
 			}
-			//Set the skill
-			gfSkillTraitQuestions[ uiSkillPressed ] = TRUE;
+			else
+			{
+				if ( CountNumSkillTraitsSelected( FALSE ) < gSkillTraitValues.ubNumberOfMajorTraitsAllowed && CountNumSkillTraitsSelected( FALSE ) < gSkillTraitValues.ubMaxNumberOfTraits )
+				{
+					// we can select next one, simply do so
+					gfSkillTraitQuestions[ uiSkillPressed ] = TRUE;
+					// Unselect NONE button if necessary
+					gfSkillTraitQuestions[ uiCntMax-1 ] = FALSE;
+
+					HandleLastSelectedTraits( (INT8)uiSkillPressed );
+				}
+				else
+				{
+					if ( gSkillTraitValues.ubNumberOfMajorTraitsAllowed == 2 )
+					{
+						//loop through all the skill and reset them
+						for( uiCnt=0; uiCnt<uiCntMax; uiCnt++ )
+						{
+							gfSkillTraitQuestions[ uiCnt ] = FALSE;
+						}
+					}
+					else
+					{
+						// we have to deselect last selected skill
+						if ( gfSkillTraitQuestions[ GetLastSelectedSkill() ] || gfSkillTraitQuestions2[ GetLastSelectedSkill() ] )
+						{
+							if ( gfSkillTraitQuestions[ GetLastSelectedSkill() ] )
+							{
+								gfSkillTraitQuestions[ GetLastSelectedSkill() ] = FALSE;
+							}
+							else 
+							{
+								gfSkillTraitQuestions2[ GetLastSelectedSkill() ] = FALSE;
+							}
+							HandleLastSelectedTraits( -1 );
+						}
+						else
+						{
+							// something gone wrong, deselect the first one we can find
+							for( uiCnt=0; uiCnt<(uiCntMax-1); uiCnt++ )
+							{
+								if ( gfSkillTraitQuestions[ uiCnt ] == TRUE )
+								{
+									gfSkillTraitQuestions[ uiCnt ] = FALSE;
+									break;
+								}
+								if ( uiCnt >= (uiCntMax-2) )
+								{
+									for( uiCnt=0; uiCnt<(uiCntMax-1); uiCnt++ )
+									{
+										if ( gfSkillTraitQuestions2[ uiCnt ] == TRUE )
+										{
+											gfSkillTraitQuestions2[ uiCnt ] = FALSE;
+											break;
+										}
+									}
+								}
+							}
+						}
+					}
+					//Set the skill
+					gfSkillTraitQuestions[ uiSkillPressed ] = TRUE;
+
+					HandleLastSelectedTraits( (INT8)uiSkillPressed );
+				}
+			}
 		}
-		
-		HandleLastSelectedTraits( (INT8)uiSkillPressed );
 		
 		//Play the button sound
 		if( gfSkillTraitQuestions[ uiSkillPressed ] )
@@ -545,39 +611,105 @@ void HandleIMPSkillTraitAnswers( UINT32 uiSkillPressed, BOOLEAN fSecondTrait )
 		//if its allready set
 		if( gfSkillTraitQuestions2[ uiSkillPressed ] )
 		{
-			//dont need to do anything
-			return;
-		}
+			gfSkillTraitQuestions2[ uiSkillPressed ] = FALSE;
 
+			BOOLEAN fNoSkillSelected = TRUE;
+			for ( uiCnt=0; uiCnt<(uiCntMax-1); uiCnt++ )
+			{
+				if ( gfSkillTraitQuestions2[ uiCnt ] == TRUE )
+					fNoSkillSelected = FALSE;
+			}
+			if ( fNoSkillSelected )
+			{
+				// select NONE button
+				gfSkillTraitQuestions2[ uiCntMax-1 ] = TRUE;
+			}
+		}
 		// if cannot have expert level of skill, don't continue
-		if ( gfSkillTraitQuestions[ uiSkillPressed ] && !DoesSkillHaveExpertLevel( uiSkillPressed ) )
+		else if ( gfSkillTraitQuestions[ uiSkillPressed ] && !DoesSkillHaveExpertLevel( uiSkillPressed ) )
 		{
 			//dont need to do anything
 			return;
-		}
-
-		// if the other trait has not been set yet, we rather set it now, 
-		// instead of deselecting the already set one
-		if( gfSkillTraitQuestions[ uiCntMax-1 ] == TRUE && gfSkillTraitQuestions2[ uiCntMax-1 ] == FALSE && (uiSkillPressed != (uiCntMax-1)) )
-		{
-			// Unselect NONE button
-			gfSkillTraitQuestions[ uiCntMax-1 ] = FALSE;
-			//Set the skill
-			gfSkillTraitQuestions[ uiSkillPressed ] = TRUE;
 		}
 		else
 		{
-			//loop through all the skill and reset them
-			for( uiCnt=0; uiCnt<uiCntMax; uiCnt++ )
+			// if the other trait has not been set yet, we rather set it now, 
+			// instead of deselecting the already set one
+			if( gfSkillTraitQuestions[ uiCntMax-1 ] == TRUE && gfSkillTraitQuestions2[ uiCntMax-1 ] == FALSE && (uiSkillPressed != (uiCntMax-1)) )
 			{
-				gfSkillTraitQuestions2[ uiCnt ] = FALSE;
+				// Unselect NONE button
+				gfSkillTraitQuestions[ uiCntMax-1 ] = FALSE;
+				//Set the skill
+				gfSkillTraitQuestions[ uiSkillPressed ] = TRUE;
 			}
-			//Set the skill
-			gfSkillTraitQuestions2[ uiSkillPressed ] = TRUE;
+			else
+			{
+				if ( CountNumSkillTraitsSelected( FALSE ) < gSkillTraitValues.ubNumberOfMajorTraitsAllowed && CountNumSkillTraitsSelected( FALSE ) < gSkillTraitValues.ubMaxNumberOfTraits )
+				{
+					// we can select next one, simply do so
+					gfSkillTraitQuestions2[ uiSkillPressed ] = TRUE;
+					// Unselect NONE button if necessary
+					gfSkillTraitQuestions2[ uiCntMax-1 ] = FALSE;
+
+					HandleLastSelectedTraits( (INT8)uiSkillPressed );
+				}
+				else
+				{
+					if ( gSkillTraitValues.ubNumberOfMajorTraitsAllowed == 2 )
+					{
+						//loop through all the skill and reset them
+						for( uiCnt=0; uiCnt<uiCntMax; uiCnt++ )
+						{
+							gfSkillTraitQuestions2[ uiCnt ] = FALSE;
+						}
+					}
+					else
+					{
+						// we have to deselect last selected skill
+						if ( gfSkillTraitQuestions[ GetLastSelectedSkill() ] || gfSkillTraitQuestions2[ GetLastSelectedSkill() ] )
+						{
+							if ( gfSkillTraitQuestions2[ GetLastSelectedSkill() ] )
+							{
+								gfSkillTraitQuestions2[ GetLastSelectedSkill() ] = FALSE;
+							}
+							else 
+							{
+								gfSkillTraitQuestions[ GetLastSelectedSkill() ] = FALSE;
+							}
+							HandleLastSelectedTraits( -1 );
+						}
+						else
+						{
+							// something gone wrong, deselect the first one we can find
+							for( uiCnt=0; uiCnt<(uiCntMax-1); uiCnt++ )
+							{
+								if ( gfSkillTraitQuestions2[ uiCnt ] == TRUE )
+								{
+									gfSkillTraitQuestions2[ uiCnt ] = FALSE;
+									break;
+								}
+								if ( uiCnt >= (uiCntMax-2) )
+								{
+									for( uiCnt=0; uiCnt<(uiCntMax-1); uiCnt++ )
+									{
+										if ( gfSkillTraitQuestions[ uiCnt ] == TRUE )
+										{
+											gfSkillTraitQuestions[ uiCnt ] = FALSE;
+											break;
+										}
+									}
+								}
+							}
+						}
+					}
+					//Set the skill
+					gfSkillTraitQuestions2[ uiSkillPressed ] = TRUE;
+
+					HandleLastSelectedTraits( (INT8)uiSkillPressed );
+				}
+			}
 		}
-
-		HandleLastSelectedTraits( (INT8)uiSkillPressed );
-
+		
 		//Play the button sound
 		if( gfSkillTraitQuestions2[ uiSkillPressed ] )
 		{
@@ -586,7 +718,7 @@ void HandleIMPSkillTraitAnswers( UINT32 uiSkillPressed, BOOLEAN fSecondTrait )
 		else
 		{
 			PlayButtonSound( giIMPSkillTraitAnswerButton2[ uiSkillPressed ], BUTTON_SOUND_CLICKED_OFF );
-		}	
+		}
 	}
 
 	//update buttons
@@ -1130,27 +1262,44 @@ void AddSelectedSkillsToSkillsList()
 
 void HandleLastSelectedTraits( INT8 bNewTrait )
 {
-	//if there are none selected
-	if( gbLastSelectedTraits[ 0 ] == -1 )
-	{
-		gbLastSelectedTraits[ 0 ] = bNewTrait;
-	}
+	INT16 iCnt;
 
-	//if the second one is not selected
-	else if( gbLastSelectedTraits[ 1 ] == -1 )
+	if (bNewTrait == -1)
 	{
-		gbLastSelectedTraits[ 1 ] = gbLastSelectedTraits[ 0 ];
-		gbLastSelectedTraits[ 0 ] = bNewTrait;
+		// we only want to delete the last selected trait from list
+		for( iCnt=9; iCnt>=0; iCnt-- )
+		{
+			if ( gbLastSelectedTraits[ iCnt ] > 0 )
+			{
+				gbLastSelectedTraits[ iCnt ] = 0;
+				break;
+			}
+		}
+		
 	}
-
 	else
 	{
-		//unselect old trait
-		//gfSkillTraitQuestions[ gbLastSelectedTraits[ 1 ] ] = FALSE;
-
-		gbLastSelectedTraits[ 1 ] = gbLastSelectedTraits[ 0 ];
+		for( iCnt=0; iCnt<9; iCnt++ )
+		{
+			gbLastSelectedTraits[ (iCnt + 1) ] = gbLastSelectedTraits[ iCnt ];
+		}
 		gbLastSelectedTraits[ 0 ] = bNewTrait;
 	}
+}
+
+INT8 GetLastSelectedSkill( void )
+{
+	INT16 iCnt;
+
+	for( iCnt=9; iCnt>=0; iCnt-- )
+	{
+		if ( gbLastSelectedTraits[ iCnt ] > 0 )
+		{
+			return ( gbLastSelectedTraits[ iCnt ] );
+			break;
+		}
+	}
+	return ( 0 );
 }
 
 INT32 StrengthRequiredDueToMajorSkills( void )
@@ -1722,36 +1871,41 @@ void AssignSkillTraitHelpText( UINT8 ubTraitNumber, BOOLEAN fExpertLevel )
 			case IMP_SKILL_TRAITS_NEW_PROF_SNIPER:
 			{
 				swprintf( apStr, L"" );
+				if( gSkillTraitValues.ubSNBonusCtHRifles != 0 )
+				{
+					swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[0], ( gSkillTraitValues.ubSNBonusCtHRifles * (fExpertLevel ? 2 : 1)), L"%");
+					wcscat( apStr, atStr );
+				}
 				if( gSkillTraitValues.ubSNBonusCtHSniperRifles != 0 )
 				{
-					swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[0], ( gSkillTraitValues.ubSNBonusCtHSniperRifles * (fExpertLevel ? 2 : 1)), L"%");
+					swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[1], ( gSkillTraitValues.ubSNBonusCtHSniperRifles * (fExpertLevel ? 2 : 1)), L"%");
 					wcscat( apStr, atStr );
 				}
 				if( gSkillTraitValues.ubSNEffRangeToTargetReduction != 0 )
 				{
-					swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[1], ( gSkillTraitValues.ubSNEffRangeToTargetReduction * (fExpertLevel ? 2 : 1)), L"%");
+					swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[2], ( gSkillTraitValues.ubSNEffRangeToTargetReduction * (fExpertLevel ? 2 : 1)), L"%");
 					wcscat( apStr, atStr );
 				}
 				if( gSkillTraitValues.ubSNAimingBonusPerClick != 0 )
 				{
-					swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[2], ( gSkillTraitValues.ubSNAimingBonusPerClick * (fExpertLevel ? 2 : 1)), L"%");
+					swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[3], ( gSkillTraitValues.ubSNAimingBonusPerClick * (fExpertLevel ? 2 : 1)), L"%");
 					wcscat( apStr, atStr );
 				}
 				if( gSkillTraitValues.ubSNDamageBonusPerClick != 0 )
 				{
-					swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[3], ( gSkillTraitValues.ubSNDamageBonusPerClick * (fExpertLevel ? 2 : 1)), L"%");
+					swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[4], ( gSkillTraitValues.ubSNDamageBonusPerClick * (fExpertLevel ? 2 : 1)), L"%");
 					if( gSkillTraitValues.ubSNDamageBonusFromNumClicks == 0)
 					{
-						wcscat( apStr, gzIMPMajorTraitsHelpTextsSniper[4] );
 						wcscat( apStr, gzIMPMajorTraitsHelpTextsSniper[5] );
+						wcscat( apStr, gzIMPMajorTraitsHelpTextsSniper[6] );
 					}
 					else if( gSkillTraitValues.ubSNDamageBonusFromNumClicks == 1 )
 					{
-						wcscat( atStr, gzIMPMajorTraitsHelpTextsSniper[5] );
+						wcscat( atStr, gzIMPMajorTraitsHelpTextsSniper[6] );
 					}
 					else
 					{
-						wcscat( atStr, gzIMPMajorTraitsHelpTextsSniper[5] );
+						wcscat( atStr, gzIMPMajorTraitsHelpTextsSniper[6] );
 						wcscat( atStr, gzIMPMajorTraitsHelpTextsSniper[gSkillTraitValues.ubSNDamageBonusFromNumClicks + 4] );
 					}
 					wcscat( atStr, L"\n" );
@@ -1759,15 +1913,15 @@ void AssignSkillTraitHelpText( UINT8 ubTraitNumber, BOOLEAN fExpertLevel )
 				}
 				if( gSkillTraitValues.ubSNChamberRoundAPsReduction != 0 )
 				{
-					swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[13], ( gSkillTraitValues.ubSNChamberRoundAPsReduction * (fExpertLevel ? 2 : 1)), L"%");
+					swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[14], ( gSkillTraitValues.ubSNChamberRoundAPsReduction * (fExpertLevel ? 2 : 1)), L"%");
 					wcscat( apStr, atStr );
 				}
 				if( gSkillTraitValues.ubSNAimClicksAdded != 0 )
 				{
 					if( gSkillTraitValues.ubSNAimClicksAdded == 1 && !fExpertLevel)
-						swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[14]);
+						swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[15]);
 					else
-						swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[15], ( gSkillTraitValues.ubSNAimClicksAdded * (fExpertLevel ? 2 : 1)));
+						swprintf( atStr, gzIMPMajorTraitsHelpTextsSniper[16], ( gSkillTraitValues.ubSNAimClicksAdded * (fExpertLevel ? 2 : 1)));
 
 					wcscat( apStr, atStr );
 				}

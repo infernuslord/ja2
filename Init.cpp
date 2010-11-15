@@ -690,9 +690,10 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	}
 #endif
 
+	// WANNE: Why do we need it. It should also run without that file!!
 	// SANDRO - always initialize those files, we need it on game start
-	//if (gGameExternalOptions.fReadProfileDataFromXML)
-	//{
+	if (gGameExternalOptions.fReadProfileDataFromXML)
+	{
 		// HEADROCK PROFEX: Read in Merc Profile data to replace PROF.DAT data
 		strcpy(fileName, directoryName);
 		strcat(fileName, MERCPROFILESFILENAME);
@@ -712,9 +713,9 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		// HEADROCK PROFEX: Read in Merc Opinion data to replace PROF.DAT data
 		strcpy(fileName, directoryName);
 		strcat(fileName, MERCOPINIONSFILENAME);
-		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));	
+		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
 		SGP_THROW_IFFALSE(ReadInMercOpinions(fileName), MERCOPINIONSFILENAME);
-		
+	}	
 		
 #ifdef JA2UB		
 		// UB25
@@ -869,7 +870,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		}
 #endif
 
-
+	LoadIMPPortraitsTEMP();
 /*
 	strcpy(fileName, directoryName);
 	strcat(fileName, SOUNDPROFILE);
@@ -919,24 +920,6 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 #endif
 
 	//new profiles by Jazz	
-	strcpy(fileName, directoryName);
-	strcat(fileName, MERCAVAILABILITY);
-	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	SGP_THROW_IFFALSE(ReadInMercAvailability(fileName,FALSE), MERCAVAILABILITY);
-	
-#ifndef ENGLISH
-		AddLanguagePrefix(fileName);
-		if ( FileExists(fileName) )
-		{
-			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-			if(!ReadInMercAvailability(fileName,TRUE))
-				return FALSE;
-		}
-#endif
-
-	
-	LoadIMPPortraitsTEMP();
-
 	strcpy(fileName, directoryName);
 	strcat(fileName, MERCAVAILABILITY);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));

@@ -496,8 +496,8 @@ void STRUCT_Flags::ConvertFrom_101_To_102(const OLDSOLDIERTYPE_101& src)
 
 void STRUCT_Statistics::ConvertFrom_101_To_102(const OLDSOLDIERTYPE_101& src)
 {
-	this->ubSkillTrait1 = src.ubSkillTrait1;
-	this->ubSkillTrait2 = src.ubSkillTrait2;
+	this->ubSkillTraits[0] = src.ubSkillTrait1;
+	this->ubSkillTraits[1] = src.ubSkillTrait2;
 	this->bDexterity = src.bDexterity;		// dexterity (hand coord) value
 	this->bWisdom = src.bWisdom;
 	this->bExpLevel = src.bExpLevel;		// general experience level
@@ -1364,11 +1364,12 @@ MERCPROFILESTRUCT& MERCPROFILESTRUCT::operator=(const OLD_MERCPROFILESTRUCT_101&
 		this->bLife = src.bLife;
 		this->bDexterity = src.bDexterity;// dexterity (hand coord) value
 		this->bDisability = src.bDisability;
-		this->bSkillTrait = src.bSkillTrait;
+	
+		this->bSkillTraits[0] = src.bSkillTrait;
+		this->bSkillTraits[1] = src.bSkillTrait2;
 
 		this->bReputationTolerance = src.bReputationTolerance;
 		this->bExplosive = src.bExplosive;
-		this->bSkillTrait2 = src.bSkillTrait2;
 		this->bLeadership = src.bLeadership;
 
 		this->bExpLevel = src.bExpLevel;// general experience level
@@ -14399,23 +14400,44 @@ BOOLEAN HAS_SKILL_TRAIT( SOLDIERTYPE * pSoldier, UINT8 uiSkillTraitNumber )
 	if ( pSoldier == NULL )
 		return( FALSE );
 
+	INT8 bNumMajorTraitsCounted = 0;
+
 	// check old/new traits
 	if (gGameOptions.fNewTraitSystem)
 	{
-		if (pSoldier->stats.ubSkillTrait1 == uiSkillTraitNumber)
-			return( TRUE );
-		if (pSoldier->stats.ubSkillTrait2 == uiSkillTraitNumber)
-			return( TRUE );
-		if (pSoldier->stats.ubSkillTrait3 == uiSkillTraitNumber)
-			return( TRUE );
+		for ( INT8 bCnt = 0; bCnt < gSkillTraitValues.ubMaxNumberOfTraits; bCnt++ )
+		{
+			if ( uiSkillTraitNumber > 0 && uiSkillTraitNumber <= NUM_MAJOR_TRAITS )
+			{
+				if (pSoldier->stats.ubSkillTraits[ bCnt ] == uiSkillTraitNumber)
+				{
+					return( TRUE );
+				}
+				else if ( pSoldier->stats.ubSkillTraits[ bCnt ] > 0 && pSoldier->stats.ubSkillTraits[ bCnt ] <= NUM_MAJOR_TRAITS )
+				{
+					bNumMajorTraitsCounted++;
+				}
+				// if we exceeded the allowed number of major traits, ignore the rest of them
+				if ( bNumMajorTraitsCounted >= gSkillTraitValues.ubNumberOfMajorTraitsAllowed )
+				{
+					break;
+				}
+			}
+			else
+			{
+				if (pSoldier->stats.ubSkillTraits[ bCnt ] == uiSkillTraitNumber)
+				{
+					return( TRUE );
+				}
+			}
+		}
 	}
 	else
 	{
-		if (pSoldier->stats.ubSkillTrait1 == uiSkillTraitNumber)
+		if (pSoldier->stats.ubSkillTraits[ 0 ] == uiSkillTraitNumber)
 			return( TRUE );
-		if (pSoldier->stats.ubSkillTrait2 == uiSkillTraitNumber)
+		if (pSoldier->stats.ubSkillTraits[ 1 ] == uiSkillTraitNumber)
 			return( TRUE );
-		// ignore third trait if playing old traits
 	}
 	return( FALSE );
 }
@@ -14425,27 +14447,60 @@ INT8 NUM_SKILL_TRAITS( SOLDIERTYPE * pSoldier, UINT8 uiSkillTraitNumber )
 	if ( pSoldier == NULL )
 		return( 0 );
 
-	INT8 iNumberOfTraits = 0;
+	INT8 bNumberOfTraits = 0;
+	INT8 bNumMajorTraitsCounted = 0;
 
 	// check old/new traits
 	if (gGameOptions.fNewTraitSystem)
 	{
-		if (pSoldier->stats.ubSkillTrait1 == uiSkillTraitNumber)
-			iNumberOfTraits++;
-		if (pSoldier->stats.ubSkillTrait2 == uiSkillTraitNumber)
-			iNumberOfTraits++;
-		if (pSoldier->stats.ubSkillTrait3 == uiSkillTraitNumber)
-			iNumberOfTraits++;
+		for ( INT8 bCnt = 0; bCnt < gSkillTraitValues.ubMaxNumberOfTraits; bCnt++ )
+		{
+			if ( uiSkillTraitNumber > 0 && uiSkillTraitNumber <= NUM_MAJOR_TRAITS )
+			{
+				if ( pSoldier->stats.ubSkillTraits[ bCnt ] == uiSkillTraitNumber )
+				{
+					bNumberOfTraits++;
+					bNumMajorTraitsCounted++;
+				}
+				else if ( pSoldier->stats.ubSkillTraits[ bCnt ] > 0 && pSoldier->stats.ubSkillTraits[ bCnt ] <= NUM_MAJOR_TRAITS )
+				{
+					bNumMajorTraitsCounted++;
+				}
+				// if we exceeded the allowed number of major traits, ignore the rest of them
+				if ( bNumMajorTraitsCounted >= gSkillTraitValues.ubNumberOfMajorTraitsAllowed )
+				{
+					break;
+				}
+			}
+			else
+			{
+				if ( pSoldier->stats.ubSkillTraits[ bCnt ] == uiSkillTraitNumber )
+				{
+					bNumberOfTraits++;
+				}
+			}
+		}
+		// cannot have more than one same minor trait
+		if( uiSkillTraitNumber > NUM_MAJOR_TRAITS )
+			return ( min(1, bNumberOfTraits) );
+		else
+			return ( min(2, bNumberOfTraits) );
 	}
 	else
 	{
-		if (pSoldier->stats.ubSkillTrait1 == uiSkillTraitNumber)
-			iNumberOfTraits++;
-		if (pSoldier->stats.ubSkillTrait2 == uiSkillTraitNumber)
-			iNumberOfTraits++;	
-		// ignore third trait if playing old traits
+		if (pSoldier->stats.ubSkillTraits[ 0 ] == uiSkillTraitNumber)
+			bNumberOfTraits++;
+		if (pSoldier->stats.ubSkillTraits[ 1 ] == uiSkillTraitNumber)
+			bNumberOfTraits++;	
+
+		// Electronics, Ambidextrous and Camouflaged can only be of one grade
+		if( uiSkillTraitNumber == ELECTRONICS_OT || 
+			 uiSkillTraitNumber == AMBIDEXT_OT ||
+			  uiSkillTraitNumber == CAMOUFLAGED_OT )
+			return ( min(1, bNumberOfTraits) );
+		else
+			return ( bNumberOfTraits );
 	}
-	return (iNumberOfTraits);
 }
 
 UINT8 GetSquadleadersCountInVicinity( SOLDIERTYPE * pSoldier, BOOLEAN fWithHigherLevel, BOOLEAN fDontCheckDistance )

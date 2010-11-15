@@ -92,20 +92,24 @@ aimAvailabilityEndElementHandle(void *userData, const XML_Char *name)
 			
 			if (!AimAvailability_TextOnly)
 				{		
+					gAimAvailability[pData->curAimAvailability.uiIndex].uiIndex = pData->curAimAvailability.uiIndex;
 					gAimAvailability[pData->curAimAvailability.uiIndex].ProfilId = pData->curAimAvailability.ProfilId;
 					gAimAvailability[pData->curAimAvailability.uiIndex].ubAimArrayID = pData->curAimAvailability.uiIndex;
 					gAimAvailability[pData->curAimAvailability.uiIndex].AimBio = pData->curAimAvailability.AimBio;
 					
+					gAimAvailabilityTemp[pData->curAimAvailability.uiIndex].uiIndex = pData->curAimAvailability.uiIndex;
 					gAimAvailabilityTemp[pData->curAimAvailability.uiIndex].ProfilId = pData->curAimAvailability.ProfilId;
 					gAimAvailabilityTemp[pData->curAimAvailability.uiIndex].ubAimArrayID = pData->curAimAvailability.uiIndex;
 					gAimAvailabilityTemp[pData->curAimAvailability.uiIndex].AimBio = pData->curAimAvailability.AimBio;
 				}
 				else
 				{
+					gAimAvailability[pData->curAimAvailability.uiIndex].uiIndex = pData->curAimAvailability.uiIndex;
 					gAimAvailability[pData->curAimAvailability.uiIndex].ProfilId = pData->curAimAvailability.ProfilId;
 					gAimAvailability[pData->curAimAvailability.uiIndex].ubAimArrayID = pData->curAimAvailability.uiIndex;
 					gAimAvailability[pData->curAimAvailability.uiIndex].AimBio = pData->curAimAvailability.AimBio;
 					
+					gAimAvailabilityTemp[pData->curAimAvailability.uiIndex].uiIndex = pData->curAimAvailability.uiIndex;
 					gAimAvailabilityTemp[pData->curAimAvailability.uiIndex].ProfilId = pData->curAimAvailability.ProfilId;
 					gAimAvailabilityTemp[pData->curAimAvailability.uiIndex].ubAimArrayID = pData->curAimAvailability.uiIndex;
 					gAimAvailabilityTemp[pData->curAimAvailability.uiIndex].AimBio = pData->curAimAvailability.AimBio;

@@ -54,7 +54,7 @@ mercAvailabilityStartElementHandle(void *userData, const XML_Char *name, const X
 				strcmp(name, "StartMercsAvailable") == 0 ||
 				strcmp(name, "MercBioID") == 0 ||
 				strcmp(name, "Drunk") == 0 ||
-				strcmp(name, "DrunkID") == 0 ||
+				strcmp(name, "uiAlternateIndex") == 0 ||
 				strcmp(name, "usDay") == 0 ))
 		{
 			pData->curElement = ELEMENT_PROPERTY;
@@ -99,6 +99,7 @@ mercAvailabilityEndElementHandle(void *userData, const XML_Char *name)
 			
 			if (!MercAvailability_TextOnly)
 				{		
+					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].uiIndex = pData->curMercAvailability.uiIndex;
 					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].ProfilId = pData->curMercAvailability.ProfilId;
 					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].usMoneyPaid = pData->curMercAvailability.usMoneyPaid;
 					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].usDay = pData->curMercAvailability.usDay;
@@ -107,8 +108,9 @@ mercAvailabilityEndElementHandle(void *userData, const XML_Char *name)
 					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].StartMercsAvailable = pData->curMercAvailability.StartMercsAvailable;
 					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].MercBio = pData->curMercAvailability.MercBio;
 					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].Drunk = pData->curMercAvailability.Drunk;
-					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].DrunkID = pData->curMercAvailability.DrunkID;
+					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].uiAlternateIndex = pData->curMercAvailability.uiAlternateIndex;
 					
+					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].uiIndex = pData->curMercAvailability.uiIndex;
 					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].ProfilId = pData->curMercAvailability.ProfilId;
 					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].usMoneyPaid = pData->curMercAvailability.usMoneyPaid;
 					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].usDay = pData->curMercAvailability.usDay;
@@ -117,10 +119,11 @@ mercAvailabilityEndElementHandle(void *userData, const XML_Char *name)
 					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].StartMercsAvailable = pData->curMercAvailability.StartMercsAvailable;
 					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].MercBio = pData->curMercAvailability.MercBio;
 					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].Drunk = pData->curMercAvailability.Drunk;
-					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].DrunkID = pData->curMercAvailability.DrunkID;
+					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].uiAlternateIndex = pData->curMercAvailability.uiAlternateIndex;
 				}
 				else
 				{
+					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].uiIndex = pData->curMercAvailability.uiIndex;
 					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].ProfilId = pData->curMercAvailability.ProfilId;
 					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].usMoneyPaid = pData->curMercAvailability.usMoneyPaid;
 					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].usDay = pData->curMercAvailability.usDay;
@@ -129,8 +132,9 @@ mercAvailabilityEndElementHandle(void *userData, const XML_Char *name)
 					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].StartMercsAvailable = pData->curMercAvailability.StartMercsAvailable;
 					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].MercBio = pData->curMercAvailability.MercBio;
 					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].Drunk = pData->curMercAvailability.Drunk;
-					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].DrunkID = pData->curMercAvailability.DrunkID;
+					gConditionsForMercAvailability[pData->curMercAvailability.uiIndex].uiAlternateIndex = pData->curMercAvailability.uiAlternateIndex;
 					
+					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].uiIndex = pData->curMercAvailability.uiIndex;
 					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].ProfilId = pData->curMercAvailability.ProfilId;
 					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].usMoneyPaid = pData->curMercAvailability.usMoneyPaid;
 					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].usDay = pData->curMercAvailability.usDay;
@@ -139,7 +143,7 @@ mercAvailabilityEndElementHandle(void *userData, const XML_Char *name)
 					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].StartMercsAvailable = pData->curMercAvailability.StartMercsAvailable;
 					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].MercBio = pData->curMercAvailability.MercBio;
 					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].Drunk = pData->curMercAvailability.Drunk;
-					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].DrunkID = pData->curMercAvailability.DrunkID;
+					gConditionsForMercAvailabilityTemp[pData->curMercAvailability.uiIndex].uiAlternateIndex = pData->curMercAvailability.uiAlternateIndex;
 
 				}		
 		}
@@ -183,10 +187,10 @@ mercAvailabilityEndElementHandle(void *userData, const XML_Char *name)
 			pData->curElement = ELEMENT;
 			pData->curMercAvailability.Drunk	= (BOOLEAN) atol(pData->szCharData);
 		}
-		else if(strcmp(name, "DrunkID") == 0)
+		else if(strcmp(name, "uiAlternateIndex") == 0)
 		{
 			pData->curElement = ELEMENT;
-			pData->curMercAvailability.DrunkID	= (UINT8) atol(pData->szCharData);
+			pData->curMercAvailability.uiAlternateIndex	= (UINT8) atol(pData->szCharData);
 		}
 		
 		pData->maxReadDepth--;
@@ -204,7 +208,7 @@ BOOLEAN ReadInMercAvailability(STR fileName, BOOLEAN localizedVersion)
 
 	mercAvailabilityParseData pData;
 
-	DebugMsg(TOPIC_JA2, DBG_LEVEL_3, "Loading ConditionsForMercAvailability.xml" );
+	DebugMsg(TOPIC_JA2, DBG_LEVEL_3, "Loading MercAvailability.xml" );
 
 	MercAvailability_TextOnly = localizedVersion;
 	
@@ -240,7 +244,7 @@ BOOLEAN ReadInMercAvailability(STR fileName, BOOLEAN localizedVersion)
 	{
 		CHAR8 errorBuf[511];
 
-		sprintf(errorBuf, "XML Parser Error in ConditionsForMercAvailability.xml: %s at line %d", XML_ErrorString(XML_GetErrorCode(parser)), XML_GetCurrentLineNumber(parser));
+		sprintf(errorBuf, "XML Parser Error in MercAvailability.xml: %s at line %d", XML_ErrorString(XML_GetErrorCode(parser)), XML_GetCurrentLineNumber(parser));
 		LiveMessage(errorBuf);
 
 		MemFree(lpcBuffer);

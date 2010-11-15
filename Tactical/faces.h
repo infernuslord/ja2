@@ -39,8 +39,8 @@ typedef struct
 
 } RPC_SMALL_FACE_VALUES;
 
-extern RPC_SMALL_FACE_VALUES gRPCSmallFaceValues[200];
-extern UINT8	gubRPCSmallFaceProfileNum[200];
+extern RPC_SMALL_FACE_VALUES gRPCSmallFaceValues[254];
+extern UINT8	gubRPCSmallFaceProfileNum[254];
 
 #define	FACE_AUTO_DISPLAY_BUFFER		0xFFFFF000
 #define	FACE_AUTO_RESTORE_BUFFER		0xFFFFFF00

@@ -544,8 +544,8 @@ sgp::Exception::Exception(sgp::WString const& msg SGP_CALLER_LOCATION_IMPL)
 {
 	Excp excp;
 	excp.line		= line;
-	excp.file		= file;
-	excp.function	= function;
+	excp.file		= file ? file : "";
+	excp.function	= function ? function : "";
 	excp.msg		= msg.str;
 
 	_msg.push_back(excp);
@@ -557,8 +557,8 @@ sgp::Exception::Exception(sgp::WString const& msg, Exception& ex SGP_CALLER_LOCA
 
 	Excp excp;
 	excp.line		= line;
-	excp.file		= file;
-	excp.function	= function;
+	excp.file		= file ? file : "";
+	excp.function	= function ? function : "";
 	excp.msg		= msg.str;
 
 	_msg.push_back(excp);
@@ -580,8 +580,8 @@ sgp::Exception::Exception(sgp::WString const& msg, vfs::Exception& ex SGP_CALLER
 
 	Excp excp;
 	excp.line		= line;
-	excp.file		= file;
-	excp.function	= function;
+	excp.file		= file ? file : "";
+	excp.function	= function ? function : "";
 	excp.msg		= msg.str;
 
 	_msg.push_back(excp);
@@ -621,8 +621,8 @@ sgp::Exception::Exception(WString const& msg, std::exception& ex SGP_CALLER_LOCA
 
 	Excp excp;
 	excp.line = line;
-	excp.file = file;
-	excp.function = function;
+	excp.file = file ? file : "";
+	excp.function = function ? function : "";
 	excp.msg = msg.str;
 
 	_msg.push_back(excp);

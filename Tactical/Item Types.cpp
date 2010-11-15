@@ -817,6 +817,18 @@ StackedObjectData* OBJECTTYPE::operator [](const unsigned int index)
 	return &(*iter);
 }
 
+const StackedObjectData* OBJECTTYPE::operator [](const unsigned int index) const {
+	StackedObjects::const_iterator iter = objectStack.begin();
+	if(index >= objectStack.size()){
+		return &(*iter);
+	}
+	Assert(index < objectStack.size());
+	for (unsigned int x = 0; x < index; ++x) {
+		++iter;
+	}
+	return &(*iter);
+}
+
 
 //you may have noticed code like this:
 //pSoldier->pTempObject	= (OBJECTTYPE *)MemAlloc( sizeof( OBJECTTYPE ) );

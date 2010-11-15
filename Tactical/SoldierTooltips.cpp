@@ -225,42 +225,42 @@ void SoldierTooltip( SOLDIERTYPE* pSoldier )
 			{				
 				if ( gGameOptions.fNewTraitSystem )
 				{
-					if (( pSoldier->stats.ubSkillTrait1 == pSoldier->stats.ubSkillTrait2 ) && pSoldier->stats.ubSkillTrait1 != 0 )
+					if (( pSoldier->stats.ubSkillTraits[0] == pSoldier->stats.ubSkillTraits[1] ) && pSoldier->stats.ubSkillTraits[0] != 0 )
 					{
 						CHAR16 pStrAux[50]; 
-						swprintf( pStrAux, L"(%s)", gzMercSkillTextNew[pSoldier->stats.ubSkillTrait1]);
+						swprintf( pStrAux, L"(%s)", gzMercSkillTextNew[pSoldier->stats.ubSkillTraits[0]]);
 						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_1], pStrInfo, pStrAux );
-						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_2], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTrait2 + 19] );
-						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_3], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTrait3] );
+						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_2], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTraits[1] + 19] );
+						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_3], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTraits[2]] );
 						//swprintf( pStrInfo, L"%s\n", pStrInfo );
 					}
-					else if (( pSoldier->stats.ubSkillTrait2 == pSoldier->stats.ubSkillTrait3 ) && pSoldier->stats.ubSkillTrait2 != 0 )
+					else if (( pSoldier->stats.ubSkillTraits[1] == pSoldier->stats.ubSkillTraits[2] ) && pSoldier->stats.ubSkillTraits[1] != 0 )
 					{
 						CHAR16 pStrAux[50]; 
-						swprintf( pStrAux, L"(%s)", gzMercSkillTextNew[pSoldier->stats.ubSkillTrait2]);
+						swprintf( pStrAux, L"(%s)", gzMercSkillTextNew[pSoldier->stats.ubSkillTraits[1]]);
 						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_1], pStrInfo, pStrAux );
-						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_2], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTrait3 + 19] );
-						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_3], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTrait1] );
+						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_2], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTraits[2] + 19] );
+						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_3], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTraits[0]] );
 					}
-					else if (( pSoldier->stats.ubSkillTrait1 == pSoldier->stats.ubSkillTrait3 ) && pSoldier->stats.ubSkillTrait1 != 0 )
+					else if (( pSoldier->stats.ubSkillTraits[0] == pSoldier->stats.ubSkillTraits[2] ) && pSoldier->stats.ubSkillTraits[0] != 0 )
 					{
 						CHAR16 pStrAux[50]; 
-						swprintf( pStrAux, L"(%s)", gzMercSkillTextNew[pSoldier->stats.ubSkillTrait1]);
+						swprintf( pStrAux, L"(%s)", gzMercSkillTextNew[pSoldier->stats.ubSkillTraits[0]]);
 						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_1], pStrInfo, pStrAux );
-						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_2], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTrait3 + 19] );
-						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_3], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTrait2] );
+						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_2], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTraits[2] + 19] );
+						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_3], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTraits[1]] );
 					}
 					else
 					{
-						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_1], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTrait1] );
-						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_2], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTrait2] );
-						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_3], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTrait3] );
+						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_1], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTraits[0]] );
+						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_2], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTraits[1]] );
+						swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_3], pStrInfo, gzMercSkillTextNew[pSoldier->stats.ubSkillTraits[2]] );
 					}
 				}
 				else
 				{
-					swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_1], pStrInfo, gzMercSkillText[pSoldier->stats.ubSkillTrait1] );
-					swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_2], pStrInfo, gzMercSkillText[pSoldier->stats.ubSkillTrait2] );
+					swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_1], pStrInfo, gzMercSkillText[pSoldier->stats.ubSkillTraits[0]] );
+					swprintf( pStrInfo, gzTooltipStrings[STR_TT_SKILL_TRAIT_2], pStrInfo, gzMercSkillText[pSoldier->stats.ubSkillTraits[1]] );
 				}
 			}
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////

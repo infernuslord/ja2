@@ -17,6 +17,8 @@ void this_is_the_Ja25PolishText_public_symbol(void){;}
 
 // VERY TRUNCATED FILE COPIED FROM JA2.5 FOR ITS FEATURES FOR JA2 GOLD
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SANDRO - New STOMP laptop strings
 //these strings match up with the defines in IMP Skill trait.cpp
 STR16 gzIMPSkillTraitsText[]=
 {
@@ -37,74 +39,74 @@ STR16 gzIMPSkillTraitsText[]=
 
 	L"Brak",
 	L"Umiejêtnoœci",
-	L"(Expert)",
+	L"(Ekspert)",
 
 };
 
 //added another set of skill texts for new major traits
 STR16 gzIMPSkillTraitsTextNewMajor[]=
 {
-	L"Auto Weapons",
-	L"Heavy Weapons",
-	L"Marksman",
-	L"Hunter",
-	L"Gunslinger",
-	L"Hand to Hand",
-	L"Deputy",
-	L"Technician",
-	L"Paramedic",
+	L"Broñ automatyczna",
+	L"Broñ ciê¿ka",
+	L"Strzelec wyborowy",
+	L"£owca",
+	L"Rewolwerowiec",
+	L"Walka wrêcz",
+	L"Zastêpca szeryfa",
+	L"Technik",
+	L"Paramedyk",
 
 	L"None",
-	L"I.M.P. Major Traits",
+	L"G³ówne cechy I.M.P",
 	// second names
-	L"Machinegunner",
+	L"Strzelec CKM",
 	L"Bombardier",
-	L"Sniper",
-	L"Ranger",
-	L"Gunfighter",
-	L"Martial Arts",
-	L"Squadleader",
-	L"Engineer",
-	L"Doctor",
+	L"Snajper",
+	L"Leœniczy",
+	L"Rewolwerowiec",
+	L"Walka wrêcz",
+	L"Dowódca dru¿yny",
+	L"In¿ynier",
+	L"Doktor",
 };
 
 //added another set of skill texts for new minor traits
 STR16 gzIMPSkillTraitsTextNewMinor[]=
 {
-	L"Ambidextrous",
-	L"Melee",
-	L"Throwing",
-	L"Night Ops",
-	L"Stealthy",
-	L"Athletics",
+	L"Oburêcznoœæ",
+	L"Walka wrêcz",
+	L"Rzucanie",
+	L"Operacje nocne",
+	L"Cichy",
+	L"Atletyka",
 	L"Bodybuilding",
-	L"Demolitions",
-	L"Teaching",
-	L"Scouting",
+	L"£adunki wybuchowe",
+	L"Nauczanie",
+	L"Zwiad",
 
-	L"None",
-	L"I.M.P. Minor Traits",
+	L"Brak",
+	L"Pomniejsze cechy I.M.P",
 };
 
 //these texts are for help popup windows, describing trait properties
 STR16 gzIMPMajorTraitsHelpTextsAutoWeapons[]=
 {
-	L"+%d%s Chance to Hit with Assault Rifles\n",
-	L"+%d%s Chance to Hit with SMGs\n",
-	L"+%d%s Chance to Hit with LMGs\n",
-	L"-%d%s APs needed to fire with LMGs\n",
-	L"-%d%s APs needed to ready light machine guns\n",
-	L"Auto fire/burst chance to hit penalty is reduced by %d%s\n",
-	L"Reduced chance for shooting unwanted bullets on autofire\n",
+	L"+%d%s do szansy trafienia karabinem szturmowym\n",
+	L"+%d%s do szansy trafienia pistoletem maszynowym\n",
+	L"+%d%s do szansy trafienia erkaemem\n",
+	L"-%d%s do liczby PA potrzebnych do strza³u erkaemem w trybie automatycznym lub seri¹\n",
+	L"-%d%s do liczby PA potrzebnych do przygotowania erkaemu\n",
+	L"Kara do szansy trafienia ogniem automatycznym/seri¹ jest zmniejszona o %d%s\n",
+	L"Zmniejszona szansa na wystrzelenie przez przypadek wiêkszej liczby pocisków w ogniu automatycznym o -%d%s\n",
 
 };
 STR16 gzIMPMajorTraitsHelpTextsHeavyWeapons[]=
 {
-	L"-%d%s APs needed to fire grenade launchers\n",
-	L"-%d%s APs needed to fire rocket launchers\n",
-	L"+%d%s chance to hit with grenade launchers\n",
-	L"+%d%s chance to hit with rocket launchers\n",
-	L"-%d%s APs needed to fire mortar\n",
+	L"-%d%s do liczby PA potrzebnych do strza³u z granatnika\n",
+	L"-%d%s do liczby PA potrzebnych do strza³u z wyrzutni rakiet\n",
+	L"+%d%s do szansy trafienia grantnikiem\n",
+	L"+%d%s do szansy trafienia wyrzutni¹ rakiet\n",
+	L"-%d%s do liczby PA potrzebnych do strza³u z moŸdzierza\n",
 	L"Reduce penalty for mortar CtH by %d%s\n",
 	L"+%d%s damage to tanks with heavy weapons, grenades and explosives\n",
 	L"+%d%s damage to other targets with heavy weapons\n",
@@ -112,6 +114,7 @@ STR16 gzIMPMajorTraitsHelpTextsHeavyWeapons[]=
 };
 STR16 gzIMPMajorTraitsHelpTextsSniper[]=
 {
+	L"+%d%s Chance to Hit with Rifles\n",
 	L"+%d%s Chance to Hit with Sniper Rifles\n",
 	L"-%d%s effective range to target with all weapons\n",
 	L"+%d%s aiming bonus per aim click (except for handguns)\n",
@@ -151,7 +154,7 @@ STR16 gzIMPMajorTraitsHelpTextsGunslinger[]=
 	L"+%d%s chance to hit with machine pistols",
 	L" (on single shots only)",
 	L"+%d%s aiming bonus per click with pistols, machine pistols and revolvers\n",
-	L"-%d%s APs needed to raise pistols and revolvers\n",
+	L"-%d%s APs needed to ready pistols and revolvers\n", // MINTY - "raise" changed to "ready"
 	L"-%d%s APs needed to reload pistols, machine pistols and revolvers\n",
 	L"Adds %d more aim click for pistols, machine pistols and revolvers\n",
 	L"Adds %d more aim clicks for pistols, machine pistols and revolvers\n",
@@ -180,11 +183,11 @@ STR16 gzIMPMajorTraitsHelpTextsMartialArts[]=
 	L"+%d%s on top chance to dodge HtH attacks with brass knuckles\n",
 	L"+%d%s chance to dodge attacks by any melee weapon\n",
 	L"-%d%s APs needed to steal weapon from enemy hands\n",
-	L"-%d%s APs needed to change state (stand, crouch, lie down), turn around, climb on/off roof and jump obstacles\n",
-	L"-%d%s APs needed to change state (stand, crouch, lie down)\n",
+	L"-%d%s APs needed to change stance (stand, crouch, lie down), turn around, climb on/off roof and jump obstacles\n", // MINTY - "state" changed to "stance"
+	L"-%d%s APs needed to change stance (stand, crouch, lie down)\n", // MINTY - "state" changed to "stance"
 	L"-%d%s APs needed to turn around\n",
 	L"-%d%s APs needed to climb on/off roof and jump obstacles\n",
-	L"+%d%s chance to kick doors\n",
+	L"+%d%s chance to kick doors in\n", // MINTY - Changed to "kick doors in"
 	L"You gain special animations for hand to hand combat\n",
 
 };
@@ -193,9 +196,9 @@ STR16 gzIMPMajorTraitsHelpTextsSquadleader[]=
 	L"+%d%s APs per round of other mercs in vicinity\n",
 	L"+%d effective exp level of other mercs in vicinity, which have lesser level than the %s\n",
 	L"+%d effective exp level to count as a standby when counting friends' bonus for suppression\n",
-	L"+%d%s total suppression tolerance of other mercs in vicinity and %s himself\n",
-	L"+%d morale gain of other mercs in vicinity\n",
-	L"-%d morale loss of other mercs in vicinity\n",
+	L"+%d%s total suppression tolerance for other mercs in the vicinity and %s himself\n", // MINTY - Changed "of" to "for"
+	L"+%d morale gain for other mercs in the vicinity\n", // MINTY - Changed "of" to "for"
+	L"-%d morale loss for other mercs in the vicinity\n", // MINTY - Changed "of" to "for"
 	L"The vicinity for bonuses is %d tiles",
 	L" (%d tiles with extended ears)",
 	L"(Max simultaneous bonuses for one soldier is %d)\n",
@@ -218,7 +221,7 @@ STR16 gzIMPMajorTraitsHelpTextsTechnician[]=
 };
 STR16 gzIMPMajorTraitsHelpTextsDoctor[]=
 {
-	L"Has ability to make surgical intervention by using medical bag on wounded soldier\n",
+	L"Has ability to perform surgical intervention by using medical bag on wounded soldier\n", // MINTY - "make" changed to "perform"
 	L"Surgery instantly returns %d%s of lost health back.",
 	L" (This drains the medical bag a lot.)",
 	L"Can heal lost stats (from critical hits) by the",
@@ -226,8 +229,8 @@ STR16 gzIMPMajorTraitsHelpTextsDoctor[]=
 	L" doctor assignment.\n",
 	L"+%d%s effectiveness on doctor-patient assignment\n",
 	L"+%d%s bandaging speed\n",
-	L"+%d%s natural regeneration speed of all soldiers in the same sector",
-	L" (max %d these bonuses per sector)",
+	L"+%d%s natural regeneration speed for all soldiers in the same sector", // MINTY - Changed "of" to "for"
+	L" (max %d of these bonuses per sector stack)",
 
 };
 STR16 gzIMPMajorTraitsHelpTextsNone[]=
@@ -251,13 +254,13 @@ STR16 gzIMPMinorTraitsHelpTextsMelee[]=
 	L"-%d%s APs needed to attack by blades\n",
 	L"+%d%s chance to hit with blades\n",
 	L"+%d%s chance to hit with blunt melee weapons\n",
-	L"+%d%s damage of blades\n",
-	L"+%d%s damage of blunt melee weapons\n",
-	L"Aimed attack by any melee weapon deals +%d%s damage\n",
+	L"+%d%s damage with blades\n", // MINTY - Changed "of" to "with"
+	L"+%d%s damage with blunt melee weapons\n",  // MINTY - Changed "of" to "with"
+	L"Aimed attack with any melee weapon deals +%d%s damage\n", // MINTY - Changed "by" to "with"
 	L"+%d%s chance to dodge attack by melee blades\n",
-	L"+%d%s on top chance to dodge melee blades if having a blade in hands\n",
+	L"+%d%s on top chance to dodge melee blades if holding a blade\n", // MINTY - "having a blade in hands" changed to "holding a blade"
 	L"+%d%s chance to dodge attack by blunt melee weapons\n",
-	L"+%d%s on top chance to dodge blunt melee weapons if having a blade in hands\n",
+	L"+%d%s on top chance to dodge blunt melee weapons if holding a blade\n", // MINTY - "having a blade in hands" changed to "holding a blade"
 
 };
 STR16 gzIMPMinorTraitsHelpTextsThrowing[]=
@@ -266,20 +269,20 @@ STR16 gzIMPMinorTraitsHelpTextsThrowing[]=
 	L"+%d%s max range when throwing blades\n",
 	L"+%d%s chance to hit when throwing blades\n",
 	L"+%d%s chance to hit when throwing blades per aim click\n",
-	L"+%d%s damage of throwing blades\n",
-	L"+%d%s damage of throwing blades per aim click\n",
-	L"+%d%s chance to inflict critical hit by throwing blade if not seen or heard\n",
-	L"+%d critical hit by throwing blade multiplier\n",
+	L"+%d%s damage with throwing blades\n", // MINTY - Changed "of" to "with"
+	L"+%d%s damage with throwing blades per aim click\n", // MINTY - Changed "of" to "with"
+	L"+%d%s chance to inflict critical hit with throwing blade if not seen or heard\n", // MINTY - Changed "by" to "with"
+	L"+%d critical hit with throwing blade multiplier\n", // MINTY - Changed "by" to "with"
 	L"Adds %d more aim click for throwing blades\n",
 	L"Adds %d more aim clicks for throwing blades\n",
 
 };
 STR16 gzIMPMinorTraitsHelpTextsNightOps[]=
 {
-	L"+%d to effective sight range in dark\n",
+	L"+%d to effective sight range in the dark\n",
 	L"+%d to general effective hearing range\n",
-	L"+%d to effective hearing range in dark on top\n",
-	L"+%d to interrupts modifier in dark\n",
+	L"+%d additional hearing range in the dark\n", // MINTY - Changed "effective hearing range in dark on top" to "additional hearing range in the dark"
+	L"+%d to interrupts modifier in the dark\n",
 	L"-%d need to sleep\n",
 
 };
@@ -293,7 +296,7 @@ STR16 gzIMPMinorTraitsHelpTextsStealthy[]=
 };
 STR16 gzIMPMinorTraitsHelpTextsAthletics[]=
 {
-	L"-%d%s APs needed for moving (running, walking, swatting, crawling, swimming, etc.)\n",
+	L"-%d%s APs needed for moving (running, walking, squatting, crawling, swimming, etc.)\n",
 	L"-%d%s energy spent for movement, roof-climbing, obstacle-jumping, swimming, etc.\n",
 };
 STR16 gzIMPMinorTraitsHelpTextsBodybuilding[]=
@@ -318,7 +321,7 @@ STR16 gzIMPMinorTraitsHelpTextsDemolitions[]=
 };
 STR16 gzIMPMinorTraitsHelpTextsTeaching[]=
 {
-	L"+%d%s bonus to train militia\n",
+	L"+%d%s bonus to militia training speed\n",
 	L"+%d%s bonus to effective leadership for determining militia training\n",
 	L"+%d%s bonus to teaching other mercs\n",
 	L"Skill value counts to be +%d higher for being able to teach this skill to other mercs\n",
@@ -331,9 +334,9 @@ STR16 gzIMPMinorTraitsHelpTextsScouting[]=
 	L"+%d to effective sight range with binoculars (and scopes separated from weapons)\n",
 	L"-%d tunnel vision with binoculars (and scopes separated from weapons)\n",
 	L"If in sector, adjacent sectors will show exact number of enemies\n",
-	L"If in sector, adjacent sectors will show presence of enemies if any\n",
-	L"Prevents the enemy to ambush your squad\n",
-	L"Prevents the bloodcats to ambush your squad\n",
+	L"If in sector, adjacent sectors will show presence of enemies, if any\n",
+	L"Prevents enemy ambushes on your squad\n",
+	L"Prevents bloodcat ambushes on your squad\n",
 
 };
 STR16 gzIMPMinorTraitsHelpTextsNone[]=
@@ -348,22 +351,22 @@ STR16 gzIMPOldSkillTraitsHelpTexts[]=
 	L"+%d%s hand to hand damage\n",
 	L"+%d%s chance to dodge hand to hand attacks\n",
 	L"Eliminates the penalty to repair and handle\nelectronic things (locks, traps, rem. detonators, robot, etc.)\n",
-	L"+%d to effective sight range in dark\n",
+	L"+%d to effective sight range in the dark\n",
 	L"+%d to general effective hearing range\n",
-	L"+%d to effective hearing range in dark on top\n",
-	L"+%d to interrupts modifier in dark\n",
+	L"+%d extra hearing range in the dark\n",
+	L"+%d to interrupts modifier in the dark\n",
 	L"-%d need to sleep\n",
 	L"+%d%s max range when throwing anything\n",	// 10
 	L"+%d%s chance to hit when throwing anything\n",
 	L"+%d%s chance to instantly kill by throwing knife if not seen or heard\n",
-	L"+%d%s bonus to train militia and instruct other mercs\n",
+	L"+%d%s bonus to militia training and other mercs instructing speed\n",
 	L"+%d%s effective leadership for militia training calculations\n",
 	L"+%d%s chance to hit with rocket/greande launchers and mortar\n",
 	L"Auto fire/burst chance to hit penalty is divided by %d\n",
 	L"Reduced chance for shooting unwanted bullets on autofire\n",
 	L"+%d%s chance to move quietly\n",
 	L"+%d%s stealth (being 'invisible' if unnoticed)\n",
-	L"Eliminates the CtH penalty for second hand when firing two weapons at once\n",	// 20
+	L"Eliminates the CtH penalty when firing two weapons at once\n",	// 20
 	L"+%d%s chance to hit with melee blades\n",
 	L"+%d%s chance to dodge attacks by melee blades if having blade in hands\n",
 	L"+%d%s chance to dodge attacks by melee blades if having anything else in hands\n",

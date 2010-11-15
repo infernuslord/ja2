@@ -923,7 +923,8 @@ BOOLEAN EnterAIMMembers()
 	}
 
 	//tais: nsgi create kit selection buttons
-	if(gGameExternalOptions.gfUseNewStartingGearInterface) CreateKitSelectionButtons();
+	if(gGameExternalOptions.gfUseNewStartingGearInterface) 
+		CreateKitSelectionButtons();
 
 	gbCurrentSoldier = AimMercArray[gbCurrentIndex];
 	gbCurrentSoldier = gAimAvailability[AimMercArray[gbCurrentIndex]].ProfilId;
@@ -1358,7 +1359,13 @@ BOOLEAN	UpdateMercInfo(void)
 		if(!g_bUseXML_Strings)
 		{
 		//	LoadMercBioInfo( gbCurrentSoldier, MercInfoString, AdditionalInfoString);
-			LoadMercBioInfo( gbCurrentSoldierBio, MercInfoString, AdditionalInfoString);
+			if (gbCurrentSoldierBio != 255)
+				LoadMercBioInfo( gbCurrentSoldierBio, MercInfoString, AdditionalInfoString);
+			else
+			{
+				MercInfoString[0] = 0;
+				AdditionalInfoString[0] = 0;
+			}
 		}
 		else
 		{
@@ -1406,7 +1413,15 @@ BOOLEAN	UpdateMercInfo(void)
 		if(!g_bUseXML_Strings)
 		{
 //			LoadMercBioInfo( gbCurrentSoldier, MercInfoString, AdditionalInfoString);
-			LoadMercBioInfo( gbCurrentSoldierBio, MercInfoString, AdditionalInfoString);
+
+			if (gbCurrentSoldierBio != 255)
+				LoadMercBioInfo( gbCurrentSoldierBio, MercInfoString, AdditionalInfoString);
+			else
+			{
+				MercInfoString[0] = 0;
+				AdditionalInfoString[0] = 0;
+			}
+
 		}
 		else
 		{

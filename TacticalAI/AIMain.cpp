@@ -2061,6 +2061,23 @@ void AIDecideRadioAnimation( SOLDIERTYPE *pSoldier )
 	}
 }
 
+UINT32 GetTankCannonIndex()
+{
+	UINT32 tankCannonIndex = 0;
+
+	for (UINT32 i = 0; i < MAXITEMS; i++)
+	{
+		if (Item[i].cannon)
+		{
+			tankCannonIndex = Item[i].uiIndex;
+			break;
+		}
+	}
+
+	return tankCannonIndex;
+}
+
+
 
 INT8 ExecuteAction(SOLDIERTYPE *pSoldier)
 {
@@ -2074,7 +2091,26 @@ INT8 ExecuteAction(SOLDIERTYPE *pSoldier)
 	// reset this field, too
 	pSoldier->aiData.bLastAttackHit = FALSE;
 
+	// WANNE.TANK: Choose cannon or rocket
 	UINT16 usHandItem = pSoldier->inv[HANDPOS].usItem;
+
+	if (TANK(pSoldier))
+	{
+		// No cannon selected to fire
+		if (!Item[pSoldier->inv[HANDPOS].usItem].cannon)
+		{
+			// 50 % chance, that the tank fires with the explosive cannon
+			UINT32 fireWithCannon = GetRndNum(2);
+			if (fireWithCannon)
+			{
+				UINT32 tankCannonIndex = GetTankCannonIndex();
+				if (tankCannonIndex > 0)
+				{
+					usHandItem = tankCannonIndex;
+				}
+			}
+		}
+	}
 
 	UINT16 usSoldierIndex; // added by SANDRO
 

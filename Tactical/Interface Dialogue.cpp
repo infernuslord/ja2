@@ -5581,11 +5581,11 @@ void HandleTexBecomingCamoed()
 			// SANDRO - old/new traits check (I am not sure if this is used at all)
 		if ( gGameOptions.fNewTraitSystem )
 		{
-			gMercProfiles[ 64 ].bSkillTrait2 = RANGER_NT;
+			gMercProfiles[ 64 ].bSkillTraits[0] = RANGER_NT;
 		}
 		else
 		{
-			gMercProfiles[ 64 ].bSkillTrait2 = CAMOUFLAGED_OT;
+			gMercProfiles[ 64 ].bSkillTraits[0] = CAMOUFLAGED_OT;
 		}
 
 	//Close down the talking menu...

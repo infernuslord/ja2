@@ -319,6 +319,33 @@ typedef struct
 	INT8		bNewSkillTrait1;
 	INT8		bNewSkillTrait2;
 	INT8		bNewSkillTrait3;
+	INT8		bNewSkillTrait4;
+	INT8		bNewSkillTrait5;
+	INT8		bNewSkillTrait6;
+	INT8		bNewSkillTrait7;
+	INT8		bNewSkillTrait8;
+	INT8		bNewSkillTrait9;
+	INT8		bNewSkillTrait10;
+	INT8		bNewSkillTrait11;
+	INT8		bNewSkillTrait12;
+	INT8		bNewSkillTrait13;
+	INT8		bNewSkillTrait14;
+	INT8		bNewSkillTrait15;
+	INT8		bNewSkillTrait16;
+	INT8		bNewSkillTrait17;
+	INT8		bNewSkillTrait18;
+	INT8		bNewSkillTrait19;
+	INT8		bNewSkillTrait20;
+	INT8		bNewSkillTrait21;
+	INT8		bNewSkillTrait22;
+	INT8		bNewSkillTrait23;
+	INT8		bNewSkillTrait24;
+	INT8		bNewSkillTrait25;
+	INT8		bNewSkillTrait26;
+	INT8		bNewSkillTrait27;
+	INT8		bNewSkillTrait28;
+	INT8		bNewSkillTrait29;
+	INT8		bNewSkillTrait30;
 
 	INT8		bBuddy[5];
 	INT8		bLearnToLike;
@@ -366,7 +393,8 @@ extern BOOLEAN WriteMercOpinions();
 void OverwriteMercProfileWithXMLData( UINT32 uiLoop );
 void OverwriteMercOpinionsWithXMLData( UINT32 uiLoop );
 
-// SANDRO - added function
+// SANDRO - added functions
 INT8 CheckMercsNearForCharTraits( UINT8 ubProfileID, INT8 bCharTraitID );
+INT8 ProfileHasSkillTrait( INT32 ubProfileID, INT8 bSkillTrait );
 
 #endif

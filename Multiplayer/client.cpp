@@ -5205,17 +5205,7 @@ void connect_client ( void )
 				
 				// Set fast loading of WWW sites
 				gfTemporaryDisablingOfLoadPendingFlag = TRUE;
-
-				gMercProfiles[ 57 ].sSalary = 2000;
-				gMercProfiles[ 58 ].sSalary = 1500;
-				gMercProfiles[ 59 ].sSalary = 600;
-				gMercProfiles[ 60 ].sSalary = 500;
-				gMercProfiles[ 64 ].sSalary = 1500;
-				gMercProfiles[ 72 ].sSalary = 1000;
-				gMercProfiles[ 148 ].sSalary = 100;
-				gMercProfiles[ 68 ].sSalary = 2200; //iggy;
-
-							
+											
 			//**********************
 
 			// WANNE: FILE TRANSFER: Build the absolut file transfer directory path for the client

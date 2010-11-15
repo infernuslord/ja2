@@ -3690,6 +3690,11 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 											}
 										}
 									}
+									//CHRISL: if not enough ammo in sector, reload using ammo carried in inventory
+									if ( (*pGun)[0]->data.gun.ubGunShotsLeft < GetMagSize( pGun )	)
+									{
+										AutoReload( pTeamSoldier );
+									}
 								}
 							}
 						}
@@ -6511,7 +6516,7 @@ void	QueryTBMButton( UINT32 *puiNewEvent )
 void	QueryTBWheel( UINT32 *puiNewEvent )
 {
 	SOLDIERTYPE	*pSoldier;
-	UINT16		usMapPos=0;
+	INT32		usMapPos=0;
 	UINT8		bID;
 
 	// stub

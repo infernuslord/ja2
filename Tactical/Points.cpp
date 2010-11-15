@@ -2108,10 +2108,22 @@ BOOLEAN EnoughAmmo( SOLDIERTYPE *pSoldier, BOOLEAN fDisplay, INT8 bInvPos )
 					return( TRUE );
 				}
 
+				
+				if (Item[pSoldier->inv[bInvPos].usItem].usItemClass == IC_BOMB)
+				{
+					return (TRUE);
+				}
+
 				// ATE: Did an else if here...
 				if ( FindAttachmentByClass( &(pSoldier->inv[ bInvPos ]), IC_BOMB ) != 0 )
 				{
 					return( TRUE );
+				}
+
+				// WANNE: If there is a tank, it always have ammo to shoot, no check!
+				if (Item[pSoldier->inv[bInvPos].usItem].cannon)
+				{
+					return ( TRUE );
 				}
 
 				if ( fDisplay )

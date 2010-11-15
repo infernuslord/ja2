@@ -919,6 +919,7 @@ STR16 gzMercSkillTextNew[] =
 	L"Squadleader",
 	L"Engineer",
 	L"Doctor",
+	L"Mehr...",
 };
 
 // This is pop up help text for the options that are available to the merc
@@ -3654,7 +3655,7 @@ STR16 gzCopyrightText[] =
 {
 	L"Copyright (C) 1999 Sir-tech Canada Ltd. Alle Rechte vorbehalten.", //
 };
-
+/*
 //option Text
 STR16 zOptionsToggleText[] = 
 {
@@ -3703,6 +3704,64 @@ STR16 zOptionsToggleText[] =
 	L"--DEBUG OPTIONEN--",					// an example options screen options header (pure text)
 	L"ALLE Einstellungen zurücksetzen",		// failsafe show/hide option to reset all options
 	L"Wollen Sie wirklich zurücksetzen?", 		// a do once and reset self option (button like effect)
+	L"DEBUG Options in other builds",		// allow debugging in release or mapeditor
+	L"DEBUG Render Option group",			// an example option that will show/hide other options
+	L"Render Mouse Regions",				// an example of a DEBUG build option
+	L"-----------------",					// an example options screen options divider (pure text)
+
+	// this is THE LAST option that exists (debug the options screen, doesnt do anything, except exist)
+	L"THE_LAST_OPTION",
+};
+*/
+
+//option Text
+STR16 zOptionsToggleText[] = 
+{
+	L"Sprache",
+	L"Stumme Bestätigungen",
+	L"Untertitel",
+	L"Dialoge Pause",
+	L"Rauch animieren", 
+	L"Blut zeigen",
+	L"Meinen Cursor nicht bewegen!",
+	L"Alte Auswahlmethode",
+	L"Weg vorzeichnen",
+	L"Fehlschüsse anzeigen",
+	L"Bestätigung bei Echtzeit",
+	L"Schlaf-/Wachmeldung anzeigen", 
+	L"Metrisches System benutzen",
+	L"Boden beleuchten",
+	L"Cursor autom. auf Söldner",
+	L"Cursor autom. auf Türen",
+	L"Gegenstände leuchten",
+	L"Baumkronen zeigen",
+	L"Drahtgitter zeigen",
+	L"3D Cursor zeigen",
+	L"Trefferchance anzeigen",
+	L"GL Burst mit Burst Cursor",
+	L"Gegner-Spott aktiveren",		// Changed from "Enemies Drop all Items" - SANDRO
+	L"Hohe Granatwerferflugbahn",
+	L"Echtzeit-Schleichen aktivieren",	// Changed from "Restrict extra Aim Levels" - SANDRO
+	L"Nächste Gruppe selektieren",
+	L"Gegenstände mit Schatten",
+	L"Waffenreichweite in Felder",
+	L"Leuchtspur für Einzelschüsse",
+	L"Regengeräusche",
+	L"Krähen erlauben",
+	L"Tooltips über Gegner",
+	L"Automatisch speichern",
+	L"Stummer Skyrider",
+	L"Niedrige CPU Belastung",
+	L"Erw. Gegenstandsinfo (EDB)",
+	L"Erzwungener Runden-Modus",			// add forced turn mode
+	L"Status Trainingsfortschritt",					// Show progress towards stat increase
+	L"Alternative Projektilgrafik",			// Show alternate bullet graphics (tracers)
+	L"--Cheat Mode Optionen--",				// TOPTION_CHEAT_MODE_OPTIONS_HEADER,
+	L"Erzwinge BR Lieferungen",			// force all pending Bobby Ray shipments
+	L"-----------------",					// TOPTION_CHEAT_MODE_OPTIONS_END
+	L"--DEBUG OPTIONEN--",					// an example options screen options header (pure text)
+	L"ALLE Einstellungen rücksetzen",		// failsafe show/hide option to reset all options
+	L"Wollen Sie wirklich rücksetzen?", 		// a do once and reset self option (button like effect)
 	L"DEBUG Options in other builds",		// allow debugging in release or mapeditor
 	L"DEBUG Render Option group",			// an example option that will show/hide other options
 	L"Render Mouse Regions",				// an example of a DEBUG build option
