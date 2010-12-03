@@ -44,6 +44,8 @@
 #include "legion cfg.h"
 #endif
 
+#include "LuaInitNPCs.h"
+
 #define TESTQUESTS
 
 extern SOLDIERTYPE * gpSrcSoldier;
@@ -336,6 +338,23 @@ BOOLEAN CheckNPCIsEPC( UINT8 ubProfileID )
 		return( FALSE );
 	}
 	return( (pNPC->ubWhatKindOfMercAmI == MERC_TYPE__EPC ) );
+}
+
+BOOLEAN CheckNPCIsRPC( UINT8 ubProfileID )
+{
+	SOLDIERTYPE *		pNPC;
+
+	if ( gMercProfiles[ ubProfileID ].bMercStatus == MERC_IS_DEAD )
+	{
+		return( FALSE );
+	}
+
+	pNPC = FindSoldierByProfileID( ubProfileID, TRUE );
+	if (!pNPC)
+	{
+		return( FALSE );
+	}
+	return( (pNPC->ubWhatKindOfMercAmI == MERC_TYPE__NPC ) );
 }
 
 BOOLEAN NPCInRoom( UINT8 ubProfileID, UINT8 ubRoomID )
@@ -645,6 +664,11 @@ DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"Quests");
 
 BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 {
+
+
+//	LuaCheckFact ( usFact, ubProfileID, 0 );
+
+//#if 0
 	INT8 bTown = -1;
 
 
@@ -1276,6 +1300,8 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 		default:
 			break;
 	}
+	
+//#endif
 	return( gubFact[usFact] );
 }
 

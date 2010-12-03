@@ -443,7 +443,7 @@ void InitStrategicLayer( void )
 	
 #ifdef JA2UB
 	////if ( gGameLegionOptions.InitTownLoyalty_UB == TRUE )
-	//	InitTownLoyalty(); //Ja25 no loyalty
+		InitTownLoyalty(); //Ja25 no loyalty
 #else
 		// init town loyalty
 		InitTownLoyalty(); //Ja25 no loyalty
@@ -848,6 +848,10 @@ BOOLEAN InitNewGame( BOOLEAN fReset )
 
 	*/
 
+	//Lua
+	IniLuaGlobal();
+
+
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"InitNewGame done");
 	return( TRUE );
 }
@@ -1227,4 +1231,8 @@ void ReStartingGame()
 		gubCheatLevel = STARTING_CHEAT_LEVEL;
 	else
 		gubCheatLevel = 0;
+		
+	//Lua
+	IniLuaGlobal();
+
 }

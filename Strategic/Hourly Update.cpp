@@ -21,6 +21,7 @@
 	#include "Strategic AI.h"
 #endif
 
+#include "LuaInitNPCs.h"
 #include "SaveLoadGame.h"
 #include "GameSettings.h"
 #include "connect.h"
@@ -136,7 +137,10 @@ void HandleQuarterHourUpdate()
 void HourlyQuestUpdate( void )
 {
 	UINT32 uiHour = GetWorldHour();
+	
+	LetLuaHourlyQuestUpdate(0);
 
+	#if 0 
 	// brothel
 	if ( uiHour == 4 )
 	{
@@ -188,8 +192,8 @@ void HourlyQuestUpdate( void )
 	else if ( uiHour == 18 )
 	{
 		SetFactFalse( FACT_MUSEUM_OPEN );
-	}
-
+	}	
+	#endif
 }
 
 #define BAR_TEMPTATION 4

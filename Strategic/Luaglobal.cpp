@@ -24,6 +24,11 @@
 #include "Map Screen Interface Map.h"
 #include "Legion cfg.h"
 
+#include "Creature Spreading.h"
+#include "World Items.h"
+#include "Map Screen Helicopter.h"
+#include "Campaign Types.h"
+
 extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
@@ -37,6 +42,33 @@ extern	BOOLEAN	gfDoneWithSplashScreen;
 
 void IniGlobalGameSetting(lua_State *L)
 {
+
+	lua_pushinteger(L, gGameExternalOptions.ubDefaultArrivalSectorY);
+	lua_setglobal(L, "ubDefaultArrivalSectorY");
+	
+	lua_pushinteger(L, gGameExternalOptions.ubDefaultArrivalSectorX);
+	lua_setglobal(L, "ubDefaultArrivalSectorX");
+	
+	lua_pushinteger(L, gGameExternalOptions.iFirstArrivalDelay);
+	lua_setglobal(L, "iFirstArrivalDelay");
+	
+	lua_pushinteger(L, guiHelicopterSkyriderTalkState);
+	lua_setglobal(L, "guiHelicopterSkyriderTalkState");
+	
+	lua_pushinteger(L, guiTimeOfLastSkyriderMonologue);
+	lua_setglobal(L, "guiTimeOfLastSkyriderMonologue");
+	
+	
+	lua_pushinteger(L, gubBloodcatLairSectorId);
+	lua_setglobal(L, "gubBloodcatLairSectorId");
+	
+	
+
+	lua_pushinteger(L, gubSrcSoldierProfile);
+	lua_setglobal(L, "gubSrcSoldierProfile");
+
+	lua_pushinteger(L, giLairID);
+	lua_setglobal(L, "giLairID");
 	
 	lua_pushinteger(L, is_networked);
 	lua_setglobal(L, "is_networked");
@@ -74,6 +106,15 @@ void IniGlobalGameSetting(lua_State *L)
 	
 	lua_pushinteger(L, gubBoxingMatchesWon);
 	lua_setglobal(L, "gubBoxingMatchesWon");
+	
+	lua_pushinteger(L, uiHourLua);
+	lua_setglobal(L, "cHour");
+	
+	lua_pushinteger(L, uiDayLua);
+	lua_setglobal(L, "cDay");
+	
+	lua_pushinteger(L, uiMinLua);
+	lua_setglobal(L, "cMin");
 	
 	lua_pushinteger(L, gbPlayerNum);
 	lua_setglobal(L, "gbPlayerNum");
@@ -120,6 +161,9 @@ void IniGlobalGameSetting(lua_State *L)
 	
 	lua_pushinteger(L, gGameExternalOptions.fCanTrueCiviliansBecomeHostile);
 	lua_setglobal(L, "fCanTrueCiviliansBecomeHostile");
+
+	lua_pushinteger(L, guiNumWorldItems);
+	lua_setglobal(L, "guiNumWorldItems");
 	
 	//intro
 	lua_pushboolean(L, gfEnteringMapScreen);

@@ -173,15 +173,14 @@ profileStartElementHandle(void *userData, const XML_Char *name, const XML_Char *
 				strcmp(name, "usApproachFactorRecruit") == 0 ||
 				
 				//new tag
-				strcmp(name, "Type")  == 0 ||
-				
+				strcmp(name, "Type")  == 0 ||				
 				strcmp(name, "sSectorX")  == 0 ||
 				strcmp(name, "sSectorY")  == 0 ||
-				strcmp(name, "bSectorZ")  == 0 ||
+				strcmp(name, "sSectorZ")  == 0 ||
 				strcmp(name, "ubCivilianGroup")  == 0 ||
-				strcmp(name, "bTownAttachment")  == 0 ||
-				strcmp(name, "Type")  == 0 ||
-				strcmp(name, "Type")  == 0 
+				strcmp(name, "bTown")  == 0 ||
+				strcmp(name, "bTownAttachment")  == 0
+				
 				))
 		{
 			pData->curElement = ELEMENT_PROPERTY;
@@ -975,7 +974,7 @@ profileEndElementHandle(void *userData, const XML_Char *name)
 		else if(strcmp(name, "bTownAttachment") == 0)
 		{
 			pData->curElement = ELEMENT;
-			pData->curProfile.bTown = (INT8) atol(pData->szCharData);
+			pData->curProfile.bTownAttachment = (INT8) atol(pData->szCharData);
 		}	
 		
 

@@ -15235,7 +15235,8 @@ void HandleNewDestConfirmation( INT16 sMapX, INT16 sMapY )
 				if(gGameSettings.fOptions[ TOPTION_SILENT_SKYRIDER ] == FALSE) SkyRiderTalk( CONFIRM_DESTINATION );
 			}
 		}
-		else
+		//CHRISL: If we're allowing Skyrider to drop mercs into a hot LZ, we don't need Skyrider telling us he isn't going to drop the mercs off.
+		else if(gGameExternalOptions.ubSkyriderHotLZ == 0)
 		{
 			// ok, but... you know there are enemies there...
 			SkyRiderTalk( BELIEVED_ENEMY_SECTOR );

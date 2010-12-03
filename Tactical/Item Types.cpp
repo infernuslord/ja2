@@ -201,10 +201,11 @@ BOOLEAN MoveItemsToActivePockets( SOLDIERTYPE *pSoldier, std::vector<INT8>& LBES
 			if(pSoldier->inv[i].exists() == false)	// No item in this pocket.  Place the item.
 			{
 				if((i == CPACKPOCKPOS && uiHandPos == BPACKPOCKPOS) || (i == BPACKPOCKPOS && uiHandPos == CPACKPOCKPOS))
-				{
-					UINT8 newPack = LoadBearingEquipment[Item[pObj->usItem].ubClassIndex].lbeCombo;
-					UINT8 chkPack = LoadBearingEquipment[Item[pSoldier->inv[i].usItem].ubClassIndex].lbeCombo;
-					if(newPack == 0 || newPack != chkPack)
+				{	
+					//DBrot: changed to bitwise comparison
+					UINT32 newPack = LoadBearingEquipment[Item[pObj->usItem].ubClassIndex].lbeCombo;
+					UINT32 chkPack = LoadBearingEquipment[Item[pSoldier->inv[i].usItem].ubClassIndex].lbeCombo;
+					if(newPack == 0 || (newPack & chkPack == 0))
 						continue;
 				}
 				if(CanItemFitInPosition(pSoldier, &(pSoldier->inv[LBESlots[x]]), i, FALSE))

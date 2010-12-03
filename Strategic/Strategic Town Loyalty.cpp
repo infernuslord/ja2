@@ -39,6 +39,8 @@
 	#include "Facilities.h"
 #endif
 
+#include "LuaInitNPCs.h"
+
 // the max loyalty rating for any given town
 #define MAX_LOYALTY_VALUE 100
 
@@ -1617,7 +1619,7 @@ void DecrementTownLoyaltyEverywhere( UINT32 uiLoyaltyDecrease )
 // this applies the change to every town differently, depending on the distance from the event
 void HandleGlobalLoyaltyEvent( UINT8 ubEventType, INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ)
 {
-	INT32 iLoyaltyChange;
+//	INT32 iLoyaltyChange;
 	INT8 bTownId = 0;
 
 	if( bSectorZ == 0 )
@@ -1631,6 +1633,11 @@ void HandleGlobalLoyaltyEvent( UINT8 ubEventType, INT16 sSectorX, INT16 sSectorY
 	{
 		return;
 	}
+	
+	LuaHandleGlobalLoyaltyEvent( ubEventType, sSectorX, sSectorY, bSectorZ, 0 );
+	
+	//move to lua scripts StrategicTownLoyalty.lua
+	#if 0
 
 	// determine what the base loyalty change of this event type is worth
 	// these are->hundredths<- of loyalty points, so choose appropriate values accordingly!
@@ -1688,6 +1695,8 @@ void HandleGlobalLoyaltyEvent( UINT8 ubEventType, INT16 sSectorX, INT16 sSectorY
 	}
 
 	AffectAllTownsLoyaltyByDistanceFrom( iLoyaltyChange, sSectorX, sSectorY, bSectorZ);
+	
+	#endif
 }
 
 
@@ -1868,6 +1877,11 @@ void CheckIfEntireTownHasBeenLost( INT8 bTownId, INT16 sSectorX, INT16 sSectorY 
 
 void HandleLoyaltyChangeForNPCAction( UINT8 ubNPCProfileId )
 {
+
+	LetHandleLoyaltyChangeForNPCAction( ubNPCProfileId, 0 );
+
+	//move to lua scripts StrategicTownLoyalty.lua
+	#if 0
 	switch ( ubNPCProfileId )
 	{
 		case MIGUEL:
@@ -1913,6 +1927,7 @@ void HandleLoyaltyChangeForNPCAction( UINT8 ubNPCProfileId )
 			break;
 
 	}
+#endif
 }
 
 

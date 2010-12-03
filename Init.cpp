@@ -69,6 +69,7 @@
 #include "Strategic Town Loyalty.h"
 #include "Soldier Profile.h"
 #include "aim.h"
+#include "mainmenuscreen.h"
 
 #ifdef JA2UB
 #include "Ja25_Tactical.h"
@@ -79,6 +80,8 @@
 
 #include "Civ Quotes.h"
 #include "Sector Summary.h"
+#include "LuaInitNPCs.h"
+
 extern INT16 APBPConstants[TOTAL_APBP_VALUES] = {0};
 extern INT16 gubMaxActionPoints[28];//MAXBODYTYPES = 28... JUST GETTING IT TO WORK NOW.  GOTTHARD 7/2/08
 extern BOOLEAN GetCDromDriveLetter( STR8	pString );
@@ -957,6 +960,29 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		}
 #endif
 
+
+	//Main Menu by Jazz	
+	strcpy(fileName, directoryName);
+	strcat(fileName, LAYOUTMAINMENU);
+	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+	SGP_THROW_IFFALSE(ReadInMainMenu(gMainMenulayout,fileName), LAYOUTMAINMENU);
+
+	strcpy(fileName, directoryName);
+	strcat(fileName, ACTIONITEMSFILENAME);
+	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+	SGP_THROW_IFFALSE(ReadInActionItems(fileName,FALSE), ACTIONITEMSFILENAME);	
+
+#ifndef ENGLISH
+		AddLanguagePrefix(fileName);
+		if ( FileExists(fileName) )
+		{
+			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+			if(!ReadInActionItems(fileName,TRUE))
+				return FALSE;
+		}
+#endif
+
+
 #ifdef JA2UB	
 	//if ( OldNew == TRUE )
 	//	Old_UB_Inventory ();
@@ -1188,6 +1214,11 @@ UINT32 InitializeJA2(void)
 		#endif
 	#endif
 #endif
+
+
+
+//Lua
+IniLuaGlobal();
 
 	return( INIT_SCREEN );
 }

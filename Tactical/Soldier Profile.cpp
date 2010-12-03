@@ -556,8 +556,10 @@ BOOLEAN LoadMercProfiles(void)
 		//</SB>
 
 		/* CHRISL: For now, we should only overwrite prof.dat in the new inventory system.  Old system should still use
-		prof.dat until we're sure we want to replace it with the xml file.*/
-		if(UsingNewInventorySystem() == true){
+		prof.dat until we're sure we want to replace it with the xml file.
+			Because the new WF mercs don't have entries in the prof*.dat files, we need to always load their equipment from
+			MercStaringGear.xml, regardless of the inventory system we're going to use.*/
+		if(UsingNewInventorySystem() == true || uiLoop >= 170){
 			// Start by resetting all profile inventory values to 0
 			gMercProfiles[uiLoop].clearInventory();
 			gMercProfiles[uiLoop].ubInvUndroppable = 0;
@@ -749,7 +751,7 @@ BOOLEAN LoadMercProfiles(void)
 		{
 			FLOAT mod;
 			mod = (FLOAT) (gMercProfileGear[uiLoop][0].PriceModifier + 100) / 100;
-			gMercProfiles[ uiLoop ].usOptionalGearCost = tempGearCost * mod;
+			gMercProfiles[ uiLoop ].usOptionalGearCost = (UINT16)(tempGearCost * mod);
 		}
 		else
 		{
@@ -2421,40 +2423,79 @@ void OverwriteMercProfileWithXMLData( UINT32 uiLoop )
 			gMercProfiles[ uiLoop ].ubMiscFlags3 |= PROFILE_MISC_FLAG3_GOODGUY;
 		}
 		
+		gMercProfiles[ uiLoop ].sSectorX = tempProfiles[uiLoop].sSectorX;
+		gMercProfiles[ uiLoop ].sSectorY = tempProfiles[uiLoop].sSectorY;
+		gMercProfiles[ uiLoop ].bSectorZ = tempProfiles[uiLoop].bSectorZ;
+		gMercProfiles[ uiLoop ].ubCivilianGroup = tempProfiles[uiLoop].ubCivilianGroup;
+		gMercProfiles[ uiLoop ].bTown = tempProfiles[uiLoop].bTown;
+		gMercProfiles[ uiLoop ].bTownAttachment = tempProfiles[uiLoop].bTownAttachment;
 		
+					//None
 					if ( tempProfiles[uiLoop].Type == 0 )
 					{
-					
+						//Reset
+						gMercProfiles[ uiLoop ].sSectorX = 0;
+						gMercProfiles[ uiLoop ].sSectorY = 0;
+						gMercProfiles[ uiLoop ].bSectorZ = 0;
+						gMercProfiles[ uiLoop ].bTown = 0;
+						gMercProfiles[ uiLoop ].bTownAttachment = 0;
 					}
 					
+					//AIM
 					if ( tempProfiles[uiLoop].Type == 1 )
 					{
 						gProfilesAIM[ uiLoop ].ProfilId = uiLoop;
+						
+						//Reset
+						gMercProfiles[ uiLoop ].sSectorX = 0;
+						gMercProfiles[ uiLoop ].sSectorY = 0;
+						gMercProfiles[ uiLoop ].bSectorZ = 0;
+						gMercProfiles[ uiLoop ].bTown = 0;
+						gMercProfiles[ uiLoop ].bTownAttachment = 0;
 					}
-
+					
+					//MERC
 					if ( tempProfiles[uiLoop].Type == 2 )
 					{
 						gProfilesMERC[ uiLoop ].ProfilId = uiLoop;
+						
+						//Reset
+						gMercProfiles[ uiLoop ].sSectorX = 0;
+						gMercProfiles[ uiLoop ].sSectorY = 0;
+						gMercProfiles[ uiLoop ].bSectorZ = 0;
+						gMercProfiles[ uiLoop ].bTown = 0;
+						gMercProfiles[ uiLoop ].bTownAttachment = 0;
 					}
 					
+					//RPC
 					if ( tempProfiles[uiLoop].Type == 3 )
 					{
 						gProfilesRPC[ uiLoop ].ProfilId = uiLoop;
 					}
 					
+					//NPC
 					if ( tempProfiles[uiLoop].Type == 4 )
 					{
 						gProfilesNPC[ uiLoop ].ProfilId = uiLoop;
 					}
 					
+					//Vehicle
 					if ( tempProfiles[uiLoop].Type == 5 )
 					{
 						gProfilesVehicle[ uiLoop ].ProfilId = uiLoop;
 					}
 					
+					//IMP
 					if ( tempProfiles[uiLoop].Type == 6 )
 					{
 						gProfilesIMP[ uiLoop ].ProfilId = uiLoop;
+						
+						//Reset
+						gMercProfiles[ uiLoop ].sSectorX = 0;
+						gMercProfiles[ uiLoop ].sSectorY = 0;
+						gMercProfiles[ uiLoop ].bSectorZ = 0;
+						gMercProfiles[ uiLoop ].bTown = 0;
+						gMercProfiles[ uiLoop ].bTownAttachment = 0;
 					}
 		
 }

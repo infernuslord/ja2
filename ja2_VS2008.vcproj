@@ -782,6 +782,10 @@
 				RelativePath=".\XML_IntroFiles.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\XML_Layout_MainMenu.cpp"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

@@ -157,9 +157,9 @@ int CIniReader::ReadInteger(const STR8	szSection, const STR8	szKey, int iDefault
 int CIniReader::ReadInteger(const STR8 szSection, const STR8 szKey, int defaultValue, int minValue, int maxValue)
 {
 #ifndef USE_VFS
-	int iniValueReadFromFile = GetPrivateProfileInt(szSection,	szKey, defaultValue, m_szFileName);
+	int iniValueReadFromFile = (int)(GetPrivateProfileInt(szSection,	szKey, defaultValue, m_szFileName));
 #else
-	int iniValueReadFromFile = m_oProps.getIntProperty(szSection, szKey, defaultValue);
+	int iniValueReadFromFile = (int)(m_oProps.getIntProperty(szSection, szKey, defaultValue));
 #endif
 	//AssertGE(iniValueReadFromFile, minValue);
 	//AssertLE(iniValueReadFromFile, maxValue);

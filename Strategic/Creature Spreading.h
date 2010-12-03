@@ -55,4 +55,6 @@ void DetermineCreatureTownCompositionBasedOnTacticalInformation( UINT8 *pubNumCr
 
 BOOLEAN PlayerGroupIsInACreatureInfestedMine();
 
+extern INT32 giLairID;
+
 #endif

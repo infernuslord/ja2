@@ -5435,7 +5435,8 @@ BOOLEAN CanItemFitInPosition( SOLDIERTYPE *pSoldier, OBJECTTYPE *pObj, INT8 bPos
 			}
 			if(pSoldier->inv[BPACKPOCKPOS].exists() == true)
 			{
-				if(LoadBearingEquipment[Item[pSoldier->inv[BPACKPOCKPOS].usItem].ubClassIndex].lbeCombo != LoadBearingEquipment[Item[pObj->usItem].ubClassIndex].lbeCombo ||
+				//DBrot: changed to bitwise comparison
+				if(((LoadBearingEquipment[Item[pSoldier->inv[BPACKPOCKPOS].usItem].ubClassIndex].lbeCombo & LoadBearingEquipment[Item[pObj->usItem].ubClassIndex].lbeCombo) == 0) ||
 				LoadBearingEquipment[Item[pSoldier->inv[BPACKPOCKPOS].usItem].ubClassIndex].lbeCombo == 0)
 				{
 					return( FALSE );
@@ -5452,7 +5453,8 @@ BOOLEAN CanItemFitInPosition( SOLDIERTYPE *pSoldier, OBJECTTYPE *pObj, INT8 bPos
 			//	return( FALSE );
 			if(pSoldier->inv[CPACKPOCKPOS].exists() == true)
 			{
-				if(LoadBearingEquipment[Item[pSoldier->inv[CPACKPOCKPOS].usItem].ubClassIndex].lbeCombo != LoadBearingEquipment[Item[pObj->usItem].ubClassIndex].lbeCombo ||
+				//DBrot: changed to bitwise comparison
+				if(((LoadBearingEquipment[Item[pSoldier->inv[CPACKPOCKPOS].usItem].ubClassIndex].lbeCombo & LoadBearingEquipment[Item[pObj->usItem].ubClassIndex].lbeCombo) ==0)||
 				LoadBearingEquipment[Item[pSoldier->inv[CPACKPOCKPOS].usItem].ubClassIndex].lbeCombo == 0)
 				{
 					return( FALSE );
@@ -6183,7 +6185,7 @@ bool PlaceInAnySmallPocket(SOLDIERTYPE* pSoldier, OBJECTTYPE* pObj, bool fNewIte
 BOOLEAN AutoPlaceObject( SOLDIERTYPE * pSoldier, OBJECTTYPE * pObj, BOOLEAN fNewItem, INT8 bExcludeSlot )
 {
 	INVTYPE	* pItem;
-	UINT8			packCombo, backCombo;
+	UINT32			packCombo, backCombo;
 
 	// statuses of extra objects would be 0 if the # exceeds the maximum
 	//Assert( pObj->ubNumberOfObjects <= MAX_OBJECTS_PER_SLOT);
@@ -6346,7 +6348,8 @@ BOOLEAN AutoPlaceObject( SOLDIERTYPE * pSoldier, OBJECTTYPE * pObj, BOOLEAN fNew
 			{
 				packCombo = LoadBearingEquipment[pItem->ubClassIndex].lbeCombo;
 				backCombo = LoadBearingEquipment[Item[pSoldier->inv[BPACKPOCKPOS].usItem].ubClassIndex].lbeCombo;
-				if((pSoldier->inv[BPACKPOCKPOS].exists() == true && packCombo != 0 && backCombo == packCombo) || pSoldier->inv[BPACKPOCKPOS].exists() == false)
+				//DBrot: changed to bitwise comparison
+				if((pSoldier->inv[BPACKPOCKPOS].exists() == true && packCombo != 0 && (backCombo & packCombo)) || pSoldier->inv[BPACKPOCKPOS].exists() == false)
 				{
 					PlaceObject( pSoldier, CPACKPOCKPOS, pObj, fNewItem );
 					if(pObj->exists() == false)
@@ -6360,7 +6363,8 @@ BOOLEAN AutoPlaceObject( SOLDIERTYPE * pSoldier, OBJECTTYPE * pObj, BOOLEAN fNew
 				//{
 					packCombo = LoadBearingEquipment[Item[pSoldier->inv[CPACKPOCKPOS].usItem].ubClassIndex].lbeCombo;
 					backCombo = LoadBearingEquipment[pItem->ubClassIndex].lbeCombo;
-					if((pSoldier->inv[CPACKPOCKPOS].exists() == true && backCombo != 0 && backCombo == packCombo) || pSoldier->inv[CPACKPOCKPOS].exists() == false)
+					//DBrot: changed to bitwise comparison
+					if((pSoldier->inv[CPACKPOCKPOS].exists() == true && backCombo != 0 && (backCombo & packCombo)) || pSoldier->inv[CPACKPOCKPOS].exists() == false)
 					{
 						PlaceObject( pSoldier, BPACKPOCKPOS, pObj, fNewItem );
 						pSoldier->flags.DropPackFlag = FALSE;

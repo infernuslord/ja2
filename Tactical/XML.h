@@ -8,9 +8,10 @@
 #include "Interface.h"
 #include "XML_SenderNameList.h"
 #include "XML_FilesSenderList.h"
+#include "mainmenuscreen.h"
 
 #include "legion cfg.h"
-
+#include "Strategic Town Loyalty.h"
 
 #include "qarray.h"
 
@@ -191,6 +192,7 @@ typedef PARSE_STAGE;
 #define SENDERNAMELISTFILENAME					"SenderNameList.xml"
 
 #define QUOTEARRAYFILENAME					"MercQuote.xml"
+#define ACTIONITEMSFILENAME					"MapAction\\Actionitems.xml"
 
 #define IMPPORTRAITS					"IMPPortraits.xml"
 
@@ -216,6 +218,8 @@ typedef PARSE_STAGE;
 #define MERCAVAILABILITY	"MercAvailability.xml"
 
 #define AIMAVAILABILITY	"AimAvailability.xml"
+
+#define LAYOUTMAINMENU	"Layout\\LayoutMainMenu.xml"
 
 
 extern BOOLEAN ReadInItemStats(STR fileName, BOOLEAN localizedVersion);
@@ -429,5 +433,11 @@ extern BOOLEAN ReadInQarray(QARRAY_VALUES *pQarray, STR fileName);
 extern BOOLEAN ReadInFilesSenderList(STR fileName, BOOLEAN localizedVersion);
 
 extern BOOLEAN ReadInIntroNames(STR fileName, BOOLEAN localizedVersion);
+
+extern BOOLEAN ReadInMainMenu(MAIN_MENU_VALUES *pMainMenu, STR fileName);
+
+extern BOOLEAN ReadInActionItems(STR fileName, BOOLEAN localizedVersion);
+extern BOOLEAN WriteInActionItems( STR fileName);
+
 
 #endif

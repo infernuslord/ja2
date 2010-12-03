@@ -867,7 +867,9 @@ INT8 DecideActionGreen(SOLDIERTYPE *pSoldier)
 				if ( PythSpacesAway( pSoldier->sGridNo, pCorpse->def.sGridNo ) <= 5 )//приделать сравнение переменно дальности видения (smaxvid ?)
 				{
 					//проверить, находится ли труп в поле зрения драника.мента?
-					if ( SoldierTo3DLocationLineOfSightTest( pSoldier, pCorpse->def.sGridNo, pSoldier->pathing.bLevel, 3, TRUE, CALC_FROM_WANTED_DIR ) )
+					//CHRISL: Shouldn't we be using the corpse's bLevel?  Otherwise a soldier inside a building can see a corpse on the roof of that building
+					//if ( SoldierTo3DLocationLineOfSightTest( pSoldier, pCorpse->def.sGridNo, pSoldier->pathing.bLevel, 3, TRUE, CALC_FROM_WANTED_DIR ) )
+					if ( SoldierTo3DLocationLineOfSightTest( pSoldier, pCorpse->def.sGridNo, pCorpse->def.bLevel, 3, TRUE, CALC_FROM_WANTED_DIR ) )
 					{
 						ScreenMsg( MSG_FONT_YELLOW, MSG_INTERFACE, L"Warning: enemy corpse found!!!" );
 						//pCorpse->def.ubAIWarningValue=0;

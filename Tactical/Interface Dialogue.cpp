@@ -81,6 +81,8 @@
 	#include "Overhead.h"
 #endif
 
+#include "LuaInitNPCs.h"
+
 #ifdef JA2UB
 #include "Explosion Control.h"
 #include "Ja25_Tactical.h"
@@ -1717,6 +1719,10 @@ void HandleNPCClosePanel(	)
 
 void HandleStuffForNPCEscorted( UINT8 ubNPC )
 {
+
+LetLuaInterfaceDialogue(ubNPC,0);
+
+#if 0
 	SOLDIERTYPE * pSoldier;
 
 	switch( ubNPC )
@@ -1763,6 +1769,8 @@ void HandleStuffForNPCEscorted( UINT8 ubNPC )
 			}
 			break;
 	}
+	
+#endif
 }
 
 void HandleFactForNPCUnescorted( UINT8 ubNPC )
@@ -4376,6 +4384,9 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 				ScreenMsg( FONT_MCOLOR_RED, MSG_TESTVERSION, L"No code support for NPC action %d", usActionCode );
 				break;
 		}
+		
+				//Lua
+	//	LuaHandleNPCDoAction( ubTargetNPC, usActionCode, ubQuoteNum , 0);
 	}
 }
 
@@ -5066,6 +5077,10 @@ void TextRegionClickCallback( MOUSE_REGION * pRegion, INT32 iReason )
 
 void CarmenLeavesSectorCallback( void )
 {
+
+	LetLuaInterfaceDialogue(0,0);
+
+	#if 0
 	if (gWorldSectorX == 13 && gWorldSectorY == MAP_ROW_C && gbWorldSectorZ == 0)
 	{
 		TriggerNPCRecord( 78, 34 );
@@ -5078,7 +5093,7 @@ void CarmenLeavesSectorCallback( void )
 	{
 		TriggerNPCRecord( 78, 36 );
 	}
-
+	#endif
 }
 
 #ifdef JA2UB

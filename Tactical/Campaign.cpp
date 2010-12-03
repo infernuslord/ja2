@@ -1365,7 +1365,7 @@ UINT8 CurrentPlayerProgressPercentage(void)
 #ifdef JA2UB
 	INT8	bFurthestSectorPlayerOwns=-1; //JA25 UB
 	UINT8 ubCurrentProgress;
-#endif
+#else
 	
 	UINT32 uiCurrentIncome;
 	UINT32 uiPossibleIncome;
@@ -1384,7 +1384,8 @@ UINT8 CurrentPlayerProgressPercentage(void)
 	UINT16 usMaxIncomeProgress;
 	UINT16 usMaxControlProgress;
 	UINT16 usMaxVisitProgress;
-	
+#endif
+
 #ifdef JA2UB	
 	//Get the furthest sector the player owns
 	bFurthestSectorPlayerOwns = GetTheFurthestSectorPlayerOwns();

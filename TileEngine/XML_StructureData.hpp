@@ -143,7 +143,7 @@ public:
 		if(num > 0)
 		{
 			SGP_THROW_IFFALSE(num == P_DATA->oHeader.usNumberOfImages , L"inconsistent data");
-			P_DATA->pStructureFileRef->usNumberOfStructures = num;
+			P_DATA->pStructureFileRef->usNumberOfStructures = (UINT16)num;
 			int size = sizeof(AuxObjectData) * num;
 			P_DATA->pStructureFileRef->pAuxData = (AuxObjectData*)MemAlloc(size);
 			memset(P_DATA->pStructureFileRef->pAuxData, 0, size);
@@ -276,8 +276,8 @@ public:
 				memset(&P_DATA->_structures[i].structure, 0, sizeof(DB_STRUCTURE));
 			}
 			// save data
-			P_DATA->pStructureFileRef->usNumberOfStructures = num;
-			P_DATA->pStructureFileRef->usNumberOfStructuresStored = stored;
+			P_DATA->pStructureFileRef->usNumberOfStructures = (UINT16)num;
+			P_DATA->pStructureFileRef->usNumberOfStructuresStored = (UINT16)stored;
 		}
 		P_DATA->structure_count = 0;
 		P_DATA->structure_index = -1;
@@ -327,7 +327,7 @@ public:
 		SGP_THROW_IFFALSE( (index >= 0) && (index < P_DATA->pStructureFileRef->usNumberOfStructures), L"structure index out of range");
 		SGP_THROW_IFFALSE( (P_DATA->structure_count >= 0) && (P_DATA->structure_count < P_DATA->pStructureFileRef->usNumberOfStructuresStored), L"structure count larger than announced");
 		P_DATA->current_structure = &P_DATA->_structures[P_DATA->structure_count];
-		P_DATA->current_structure->structure.usStructureNumber = index;
+		P_DATA->current_structure->structure.usStructureNumber = (UINT16)index;
 		P_DATA->structure_index = index;
 	}
 	TRANSITION_LEAVE{

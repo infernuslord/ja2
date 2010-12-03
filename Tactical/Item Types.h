@@ -740,6 +740,7 @@ typedef struct
 
 // CHRISL: Added new structures to handle LBE gear and the two new XML files that will be needed to deal
 // with the IC pockets and the new inventory system.
+//DBrot: Increased the LBE combo to 32bit to allow for multiple combos (using a bitwise system)
 class LBETYPE{
 public:
 	LBETYPE();
@@ -748,7 +749,7 @@ public:
 	~LBETYPE();
 	UINT16			lbeIndex;
 	UINT32			lbeClass;
-	UINT8			lbeCombo;
+	UINT32			lbeCombo;
 	UINT8			lbeFilledSize;
 	char			POD;
 	std::vector<UINT8>	lbePocketIndex;
@@ -1406,6 +1407,22 @@ enum
 	IMP_LOCKPICKING,
 	IMP_ELECTRONICS,
 	IMP_CAMOUFLAGED,
+// DBrot: added seperate choices for experts	
+	IMP_AUTO_WEAPONS_EXP,
+	IMP_HEAVY_WEAPONS_EXP,
+	IMP_SNIPER_EXP,
+	IMP_RANGER_EXP,
+	IMP_GUNSLINGER_EXP,
+	IMP_MARTIAL_ARTS_EXP,
+	IMP_SQUADLEADER_EXP,
+	IMP_TECHNICIAN_EXP,
+	IMP_DOCTOR_EXP,
+	IMP_MELEE_EXP,
+	IMP_THROWING_EXP,
+	IMP_NIGHT_OPS_EXP,
+	IMP_STEALTHY_EXP,
+	IMP_TEACHING_EXP,
+	IMP_LOCKPICKING_EXP,
 
 	MAX_IMP_ITEM_TYPES
 };

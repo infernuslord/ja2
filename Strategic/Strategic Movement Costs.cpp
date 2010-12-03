@@ -5652,7 +5652,7 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 	//SUMMARYFILE *pSummary
 	INT8			bLevel;
 	UNDERGROUND_SECTORINFO *pSector;
-	UNDERGROUND_SECTORINFO *curr;
+	//UNDERGROUND_SECTORINFO *curr;
 	//SECTORINFO			   *pSector = NULL;
 
 	// if we are the first secotr, ignore!

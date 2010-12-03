@@ -106,6 +106,8 @@
 	#include "cursors.h"
 #endif
 
+#include "LuaInitNPCs.h"
+
 #ifdef JA2UB
 #include "SaveLoadGame.h"
 #include "email.h"
@@ -2610,6 +2612,10 @@ void HandleQuestCodeOnSectorEntry( INT16 sNewSectorX, INT16 sNewSectorY, INT8 bN
 
 void HandleQuestCodeOnSectorExit( INT16 sOldSectorX, INT16 sOldSectorY, INT8 bOldSectorZ )
 {
+	LuaHandleQuestCodeOnSectorExit( sOldSectorX, sOldSectorY, bOldSectorZ, 0);
+	
+#if 0
+
 #ifdef JA2UB
 SOLDIERTYPE *pSoldier=NULL;
 #endif
@@ -2683,6 +2689,8 @@ SOLDIERTYPE *pSoldier=NULL;
 
 	// reset the state of the museum alarm for Eldin's quotes
 	SetFactFalse( FACT_MUSEUM_ALARM_WENT_OFF );
+	
+#endif
 }
 
 BOOLEAN EnterSector( INT16 sSectorX, INT16 sSectorY , INT8 bSectorZ )

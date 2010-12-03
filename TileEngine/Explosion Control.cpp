@@ -75,6 +75,9 @@
 #include "connect.h"
 #include "debug control.h"
 
+#include "LuaInitNPCs.h"
+
+
 #ifdef JA2UB
 #include "interface Dialogue.h"
 
@@ -89,7 +92,7 @@
 class OBJECTTYPE;
 class SOLDIERTYPE;
 
-
+BOOLEAN HookerInRoom( UINT8 ubRoom );
 
 // MODULE FOR EXPLOSIONS
 
@@ -3081,6 +3084,15 @@ BOOLEAN HookerInRoom( UINT8 ubRoom )
 void PerformItemAction( INT32 sGridNo, OBJECTTYPE * pObj )
 {
 	STRUCTURE * pStructure;
+	UINT32 i;
+		
+		for (i = ACTION_ITEM_OPEN_DOOR; i <= ACTION_ITEM_NEW; i++ )
+		{
+			if ( (*pObj)[0]->data.misc.bActionValue == i ) 
+			LetLuaPerformItemAction( i, sGridNo, 0 );
+		}
+
+	#if 0 
 
 	switch( (*pObj)[0]->data.misc.bActionValue )
 	{
@@ -3518,6 +3530,10 @@ void PerformItemAction( INT32 sGridNo, OBJECTTYPE * pObj )
 #endif
 		break;
 	}
+	
+#endif
+
+
 }
 
 void AddBombToQueue( UINT32 uiWorldBombIndex, UINT32 uiTimeStamp, BOOL fFromRemoteClient )

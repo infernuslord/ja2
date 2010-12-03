@@ -1414,6 +1414,8 @@ void CreatureNightPlanning()
 
 void CheckConditionsForTriggeringCreatureQuest( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ )
 {
+
+// move to Scripts/StrategicTownLoyalty.lua
 	UINT8 ubValidMines = 0;
 	if( !(gGameOptions.ubGameStyle == STYLE_SCIFI) || !gGameExternalOptions.fEnableCrepitus)
 		return; //No scifi, no creatures...

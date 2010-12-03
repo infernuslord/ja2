@@ -117,6 +117,8 @@
 #include "test_space.h"
 #include "connect.h"
 
+#include "LuaInitNPCs.h"
+
 #ifdef JA2UB
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
@@ -2678,7 +2680,16 @@ BOOLEAN HandleAtNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving )
 	INT32								sMineGridNo;
 	UINT8							 ubVolume;
 
-
+		//uses Lua
+		PROFILLUA_sSectorX = pSoldier->sSectorX;
+		PROFILLUA_sSectorY = pSoldier->sSectorY;
+		PROFILLUA_bSectorZ = pSoldier->bSectorZ;
+		PROFILLUA_Level = pSoldier->pathing.bLevel;
+		PROFILLUA_ubID = pSoldier->ubID;
+		PROFILLUA_sGridNo = pSoldier->sGridNo;
+		PROFILLUA_ubDirectiono = pSoldier->ubDirection;
+		PROFILLUA_bTeam = pSoldier->bTeam;
+	
 	// ATE; Handle bad guys, as they fade, to cancel it if
 	// too long...
 	// ONLY if fading IN!
@@ -2901,6 +2912,10 @@ BOOLEAN HandleAtNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving )
 
 	HandleSystemNewAISituation( pSoldier, FALSE );
 
+	
+	//----------------Lua------------------------
+	#if 0
+	
 	if ( pSoldier->bTeam == gbPlayerNum )
 	{
 		if ( pSoldier->ubWhatKindOfMercAmI == MERC_TYPE__EPC)
@@ -2995,6 +3010,11 @@ BOOLEAN HandleAtNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving )
 			break;
 		}
 	}
+	
+	#endif
+	
+	LetLuaMyCustomHandleAtNewGridNo(NULL,pSoldier->ubProfile, 0);	
+
 	return( TRUE );
 }
 
@@ -3419,6 +3439,9 @@ void HandlePlayerTeamMemberDeath( SOLDIERTYPE *pSoldier )
 			}
 		}
 
+		LuaHandlePlayerTeamMemberDeath( pSoldier->ubProfile, 0 );
+		
+		#if 0
 		// handle stuff for Carmen if Slay is killed
 		switch( pSoldier->ubProfile )
 		{
@@ -3446,7 +3469,7 @@ void HandlePlayerTeamMemberDeath( SOLDIERTYPE *pSoldier )
 			}
 			break;
 		}
-
+		#endif
 	}
 
 	//Make a call to handle the strategic things, such as Life Insurance, record it in history file etc.
@@ -4008,7 +4031,7 @@ void MakeCivHostile( SOLDIERTYPE *pSoldier, INT8 bNewSide )
 	{
 		return;
 	}
-
+//#if 0
 	// override passed-in value; default is hostile to player, allied to army
 	bNewSide = 1;
 
@@ -4102,6 +4125,17 @@ void MakeCivHostile( SOLDIERTYPE *pSoldier, INT8 bNewSide )
 	{
 		CheckForPotentialAddToBattleIncrement( pSoldier );
 	}
+	
+//#endif
+
+		//uses Lua
+		PROFILLUA2_ubProfile = pSoldier->ubProfile;
+		PROFILLUA2_sSectorX = pSoldier->sSectorX;
+		PROFILLUA2_sSectorY = pSoldier->sSectorY;
+		PROFILLUA2_bSectorZ = pSoldier->bSectorZ;
+		PROFILLUA2_sGridNo = pSoldier->sGridNo;
+	
+	//LetLuaMyCustomHandleAtNewGridNo(bNewSide,NULL, 1);	
 }
 
 UINT8 CivilianGroupMembersChangeSidesWithinProximity( SOLDIERTYPE * pAttacked )
@@ -6744,19 +6778,21 @@ BOOLEAN CheckForEndOfBattle( BOOLEAN fAnEnemyRetreated )
 										gfUIStanceDifferent = TRUE;
 										pTeamSoldier->bStealthMode = FALSE;
 										fInterfacePanelDirty = DIRTYLEVEL2;
-
-										if ( gAnimControl[ pTeamSoldier->usAnimState ].ubHeight != ANIM_STAND )
-										{
-											pTeamSoldier->ChangeSoldierStance( ANIM_STAND );
-										}
-										else
-										{
-											// If they are aiming, end aim!
-											usAnimState = PickSoldierReadyAnimation( pTeamSoldier, TRUE );
-
-											if ( usAnimState != INVALID_ANIMATION )
+										//DBrot: Stance change
+										if (gGameExternalOptions.fStandUpAfterBattle){
+											if ( gAnimControl[ pTeamSoldier->usAnimState ].ubHeight != ANIM_STAND )
 											{
-												pTeamSoldier->EVENT_InitNewSoldierAnim( usAnimState, 0, FALSE );
+												pTeamSoldier->ChangeSoldierStance( ANIM_STAND );
+											}
+											else
+											{
+												// If they are aiming, end aim!
+												usAnimState = PickSoldierReadyAnimation( pTeamSoldier, TRUE );
+
+												if ( usAnimState != INVALID_ANIMATION )
+												{
+													pTeamSoldier->EVENT_InitNewSoldierAnim( usAnimState, 0, FALSE );
+												}
 											}
 										}
 									}

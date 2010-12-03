@@ -33,7 +33,11 @@ BOOLEAN LetLuaBuildUndergroundSectorInfoList()
 	HWFILE file = FileOpen(filename, FILE_ACCESS_READ, FALSE);
 
 	if (!file)
-		return false;
+	{
+		string msg("Cannot open file: ");
+		msg.append(filename);
+		SGP_THROW(msg);
+	}
 
 	size = FileSize(filename);
 	buffer = new char[size+1];

@@ -63,6 +63,7 @@
 	#include "Timer Control.h"
 	#include "message.h"
 	#include "InterfaceItemImages.h"
+	#include "GameSettings.h"
 #endif
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -333,6 +334,51 @@ wchar_t *GetGrupaString( SOLDIERTYPE *pSoldier ) //Legion 2
 			
 	}
 	return gszCivGroupNames[ par ];
+}
+
+
+STR16 GetSoldierExpLevelString( SOLDIERTYPE *pSoldier )
+{
+	INT32 cnt, cntStart,par;
+//	if( pSoldier->stats.bExpLevel == pSoldier->stats.bExpLevel )
+//	{
+//		cntStart = 4;
+//	}
+//	else
+//	{
+		cntStart = 1;
+//	}
+	//Show health on others.........
+	for ( cnt = cntStart; cnt < 10; cnt ++ )
+	{
+		if ( pSoldier->stats.bExpLevel == zEnemyRank[ cnt ].ExpLevel )
+		{
+			par = cnt;
+		}
+	}
+	
+	
+	return zEnemyRank[ par ].szCurRank;
+}
+
+STR16 GetSoldierEnemyString( SOLDIERTYPE *pSoldier )
+{
+	INT32 cnt, cntStart,par;
+	
+	
+		cntStart = 0;
+
+	//Show health on others.........
+	for ( cnt = cntStart; cnt < 256; cnt ++ )
+	{
+		if (gWorldSectorX == zEnemyName[cnt].SectorX && gWorldSectorY == zEnemyName[cnt].SectorY && zEnemyName[cnt].Enabled == 1)
+		{
+			par = cnt;
+		}
+	}
+	
+	
+	return zEnemyName[ par ].szCurGroup;
 }
 //------------
 
@@ -3132,10 +3178,10 @@ void RenderMercStrings()
 	SOLDIERTYPE								*pSoldier;
 	INT16 sXPos, sYPos;
 	INT16 sX, sY;
-	STR16 pStr, pStr2;
+	STR16 pStr, pStr2, pStr3;
 	SOLDIERINITNODE *curr;
 	CHAR16 str[50];
-
+	
 	curr = gSoldierInitHead;
 	while( curr )
 	{
@@ -3198,6 +3244,49 @@ void RenderMercStrings()
 				sYPos += 10;
 				}
 				
+				
+				
+				if (pSoldier->bTeam == ENEMY_TEAM && gGameExternalOptions.fEnemyNames == FALSE && gGameExternalOptions.fEnemyRank == TRUE )
+				{
+		
+				if ( pSoldier->ubProfile == NO_PROFILE )  
+				{	
+
+				pStr3 = GetSoldierExpLevelString (pSoldier);
+				
+				SetFontBackground( FONT_MCOLOR_BLACK );
+				SetFontForeground( FONT_YELLOW ); //FONT_MCOLOR_WHITE
+				FindFontCenterCoordinates( sXPos, sYPos, 80, 1, pStr3, TINYFONT1, &sX, &sY );
+				if( sY < (2 * iScreenHeightOffset + 352 ))
+				{
+					gprintfdirty( sX, sY, pStr3 );
+					mprintf( sX, sY, pStr3 );
+				}
+				sYPos += 10;
+				}
+				}
+				
+				
+				if (gGameExternalOptions.fEnemyNames == TRUE && gGameExternalOptions.fEnemyRank == FALSE)
+				{
+				
+				if (pSoldier->ubProfile == NO_PROFILE && pSoldier->bTeam == 1 ) 
+				{	
+					
+				pStr3 = GetSoldierEnemyString (pSoldier);
+				
+				SetFontBackground( FONT_MCOLOR_BLACK );
+				SetFontForeground( FONT_YELLOW ); //FONT_MCOLOR_WHITE
+				FindFontCenterCoordinates( sXPos, sYPos, 80, 1, pStr3, TINYFONT1, &sX, &sY );
+				if( sY < (2 * iScreenHeightOffset + 352 ))
+				{
+					gprintfdirty( sX, sY, pStr3 );
+					mprintf( sX, sY, pStr3 );
+				}
+				sYPos += 10;
+				}
+				} 
+
 			}
 			else
 			{
@@ -3242,6 +3331,45 @@ void RenderMercStrings()
 				}
 				sYPos += 10;
 				}
+				
+				if (pSoldier->bTeam == ENEMY_TEAM && gGameExternalOptions.fEnemyNames == FALSE && gGameExternalOptions.fEnemyRank == TRUE )
+				{
+				if ( pSoldier->ubProfile == NO_PROFILE )  
+				{	
+							
+				pStr3 = GetSoldierExpLevelString (pSoldier);
+				
+				SetFontBackground( FONT_MCOLOR_BLACK );
+				SetFontForeground( FONT_YELLOW ); //FONT_MCOLOR_WHITE
+				FindFontCenterCoordinates( sXPos, sYPos, 80, 1, pStr3, TINYFONT1, &sX, &sY );
+				if( sY < (2 * iScreenHeightOffset + 352 ))
+				{
+					gprintfdirty( sX, sY, pStr3 );
+					mprintf( sX, sY, pStr3 );
+				}
+				sYPos += 10;
+				}
+				}
+				
+				if (gGameExternalOptions.fEnemyNames == TRUE && gGameExternalOptions.fEnemyRank == FALSE)
+				{
+				
+				if (pSoldier->ubProfile == NO_PROFILE && pSoldier->bTeam == 1 ) 
+				{	
+					
+				pStr3 = GetSoldierEnemyString (pSoldier);
+				
+				SetFontBackground( FONT_MCOLOR_BLACK );
+				SetFontForeground( FONT_YELLOW ); //FONT_MCOLOR_WHITE
+				FindFontCenterCoordinates( sXPos, sYPos, 80, 1, pStr3, TINYFONT1, &sX, &sY );
+				if( sY < (2 * iScreenHeightOffset + 352 ))
+				{
+					gprintfdirty( sX, sY, pStr3 );
+					mprintf( sX, sY, pStr3 );
+				}
+				sYPos += 10;
+				}
+				} 
 				
 			}
 			if( curr->pBasicPlacement->bOrders == RNDPTPATROL || curr->pBasicPlacement->bOrders == POINTPATROL )
@@ -3365,7 +3493,7 @@ void CancelCurrentScheduleAction()
 
 void RegisterCurrentScheduleAction( INT32 iMapIndex )
 {
-	CHAR16 str[6];
+	CHAR16 str[10];
 	MarkWorldDirty();
 	swprintf( str, L"%d", iMapIndex );
 	if( gfUseScheduleData2 )

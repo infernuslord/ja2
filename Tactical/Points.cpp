@@ -3231,9 +3231,9 @@ INT8 CalcAimingLevelsAvailableWithAP( SOLDIERTYPE *pSoldier, INT32 sTargetGridNo
 
 	for (INT16 x = APBPConstants[AP_MIN_AIM_ATTACK]; x <= AllowedAimingLevels(pSoldier, GetRangeInCellCoordsFromGridNoDiff( pSoldier->sGridNo, sTargetGridNo ) ); x++)
 	{
-		if (CalcAPCostForAiming( pSoldier, sTargetGridNo, x ) <= (INT16)bAPsLeft)
+		if (CalcAPCostForAiming( pSoldier, sTargetGridNo, (INT8)x ) <= (INT16)bAPsLeft)
 		{
-			bAllowedLevels = x;
+			bAllowedLevels = (INT8)x;
 		}
 		else
 		{

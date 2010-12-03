@@ -2044,9 +2044,12 @@ void DisplayHelicopterTempPath( void )
 	return;
 }
 
+extern BOOLEAN HeliCharacterDialogue( SOLDIERTYPE *pSoldier, UINT16 usQuoteNum );
 
 void PlotPathForHelicopter( INT16 sX, INT16 sY )
 {
+	SOLDIERTYPE *pSkyRider = NULL;
+
 	// will plot the path for the helicopter
 
 	// no heli...go back
@@ -2063,6 +2066,12 @@ void PlotPathForHelicopter( INT16 sX, INT16 sY )
 
 	// set up mvt group for helicopter
 	SetUpHelicopterForMovement( );
+
+	//CHRISL: If we've plotted a path through enemy controlled airspace, we have a new Skyrider speech we want to hear.
+	if( GetNumUnSafeSectorsInPath( ) > 0 && !gGameSettings.fOptions[TOPTION_SILENT_SKYRIDER] )
+	{
+		HeliCharacterDialogue( pSkyRider, HELI_PATH_THROUGH_ENEMEY_AIRSPACE );
+	}
 
 	// move to beginning of list
 	//pHelicopterPath = MoveToBeginningOfPathList( pVehicleList[ iHelicopterVehicleId ].pMercPath );

@@ -1550,7 +1550,9 @@ BOOLEAN AdjustToNextAnimationFrame( SOLDIERTYPE *pSoldier )
 				SoldierGiveItemFromAnimation( pSoldier );
 			//	if (pSoldier->ubProfile != NO_PROFILE && pSoldier->ubProfile >= FIRST_NPC )
 				//new profiles by Jazz	
-				if (pSoldier->ubProfile != NO_PROFILE && gProfilesNPC[pSoldier->ubProfile].ProfilId == pSoldier->ubProfile && gProfilesVehicle[pSoldier->ubProfile].ProfilId == pSoldier->ubProfile )
+				if (pSoldier->ubProfile != NO_PROFILE && (gProfilesNPC[pSoldier->ubProfile].ProfilId == pSoldier->ubProfile ||
+					gProfilesRPC[pSoldier->ubProfile].ProfilId == pSoldier->ubProfile ||
+					gProfilesVehicle[pSoldier->ubProfile].ProfilId == pSoldier->ubProfile))
 				{
 					TriggerNPCWithGivenApproach( pSoldier->ubProfile, APPROACH_DONE_GIVING_ITEM, FALSE );
 				}

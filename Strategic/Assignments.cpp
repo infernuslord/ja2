@@ -75,6 +75,8 @@ class SOLDIERTYPE;
 // HEADROCK HAM 3.5: Include Facility data
 #include "Facilities.h"
 
+#include "Vehicles.h"
+
 #ifdef JA2UB
 #include "Explosion Control.h"
 #include "Ja25_Tactical.h"
@@ -1687,7 +1689,10 @@ BOOLEAN CanCharacterOnDuty( SOLDIERTYPE *pSoldier )
 			// enemies in sector
 			if( NumEnemiesInSector( pSoldier->sSectorX, pSoldier->sSectorY ) > 0 )
 			{
-				return( TRUE );
+				if( gGameExternalOptions.ubSkyriderHotLZ == 0 )
+					return( FALSE );
+				else
+					return( TRUE );
 			}
 		}
 	}
@@ -8416,7 +8421,7 @@ void SquadMenuBtnCallback( MOUSE_REGION * pRegion, INT32 iReason )
 
 		if( pSoldier->bOldAssignment == VEHICLE )
 				{
-			SetSoldierExitVehicleInsertionData( pSoldier, pSoldier->iVehicleId );
+					SetSoldierExitVehicleInsertionData( pSoldier, pSoldier->iVehicleId, pSoldier->ubGroupID );
 				}
 
 				//Clear any desired squad assignments -- seeing the player has physically changed it!

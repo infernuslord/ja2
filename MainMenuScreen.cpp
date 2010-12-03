@@ -65,8 +65,12 @@ enum
 };
 
 //#define		MAINMENU_Y				iScreenHeightOffset + 277
-#define		MAINMENU_Y				iScreenHeightOffset + 210
-#define		MAINMENU_Y_SPACE		37
+//#define		MAINMENU_Y  			iScreenHeightOffset + 210
+//#define		MAINMENU_Y_SPACE 37
+
+UINT32 MAINMENU_Y;
+UINT32 MAINMENU_X;
+UINT32 MAINMENU_Y_SPACE;
 
 
 INT32							iMenuImages[ NUM_MENU_ITEMS ];
@@ -74,8 +78,8 @@ INT32							iMenuButtons[ NUM_MENU_ITEMS ];
 
 UINT16						gusMainMenuButtonWidths[ NUM_MENU_ITEMS ];
 
-UINT32						guiMainMenuBackGroundImage;
-UINT32						guiJa2LogoImage;
+//UINT32						guiMainMenuBackGroundImage;
+//UINT32						guiJa2LogoImage;
 
 MOUSE_REGION			gBackRegion;
 INT8							gbHandledMainMenu = 0;
@@ -104,6 +108,10 @@ void CreateDestroyBackGroundMouseMask( BOOLEAN fCreate );
 BOOLEAN CreateDestroyMainMenuButtons( BOOLEAN fCreate );
 void RenderMainMenu();
 void RestoreButtonBackGrounds();
+
+//Main Menu layout by Jazz
+MAIN_MENU_VALUES gMainMenulayout[MAX_MAIN_MENU_IMAGE];
+VSURFACE_DESC		vs_desc;
 
 extern void InitSightRange(); //lal
 
@@ -287,6 +295,10 @@ BOOLEAN InitMainMenu( )
 {
 	VOBJECT_DESC	VObjectDesc;
 
+	//main Menu by JAzz
+	UINT16 i,iCounter2; 
+
+
 //	gfDoHelpScreen = 0;
 
 	if(is_networked)
@@ -316,42 +328,37 @@ BOOLEAN InitMainMenu( )
 	CreateDestroyBackGroundMouseMask( TRUE );
 
 	CreateDestroyMainMenuButtons( TRUE );
-
-	// load background graphic and add it
-	VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
-
-	if (iResolution == 0)
+		
+	// load background graphic and add it	
+	//Main Menu by Jazz
+	for( iCounter2 = 1; iCounter2 < MAX_ELEMENT; iCounter2++ )
 	{
-		FilenameForBPP("INTERFACE\\MM24Background.sti", VObjectDesc.ImageFile);
-		if ( !FileExists(VObjectDesc.ImageFile) )
-		{		
-		FilenameForBPP("Loadscreens\\MainMenuBackGround.sti", VObjectDesc.ImageFile);		
-		}	
-	}
-	else if (iResolution == 1)
-	{
-		FilenameForBPP("INTERFACE\\MM24Background_800x600.sti", VObjectDesc.ImageFile);
-		if ( !FileExists(VObjectDesc.ImageFile) )
+		VObjectDesc.fCreateFlags = VSURFACE_CREATE_FROMFILE;		
+
+		if (gMainMenulayout[iCounter2].Visible == 1)
 		{
-		FilenameForBPP("Loadscreens\\MainMenuBackGround_800x600.sti", VObjectDesc.ImageFile);		
+			if (iResolution == 0)
+			{
+				strcpy(VObjectDesc.ImageFile, gMainMenulayout[iCounter2].FileName); //"LOADSCREENS\\MainMenuBackGround.sti");
+			}
+			else if (iResolution == 1)
+			{
+				strcpy(VObjectDesc.ImageFile, gMainMenulayout[iCounter2].FileName800x600);//"LOADSCREENS\\MainMenuBackGround_800x600.sti");
+			}
+			else if (iResolution == 2)
+			{
+				strcpy(VObjectDesc.ImageFile, gMainMenulayout[iCounter2].FileName1024x768);//""LOADSCREENS\\MainMenuBackGround_1024x768.sti");
+			}
+
+		CHECKF(AddVideoObject(&VObjectDesc,&gMainMenulayout[iCounter2].uiIndex));
 		}
 	}
-	else if (iResolution == 2)
-	{
-		FilenameForBPP("INTERFACE\\MM24Background_1024x768.sti", VObjectDesc.ImageFile);	
-		if ( !FileExists(VObjectDesc.ImageFile) )
-		{
-		FilenameForBPP("Loadscreens\\MainMenuBackGround_1024x768.sti", VObjectDesc.ImageFile);		
-		}
-	}
-
-	CHECKF(AddVideoObject(&VObjectDesc, &guiMainMenuBackGroundImage ));
-
+	
 	// load ja2 logo graphic and add it
-	VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
+	//VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
 //	FilenameForBPP("INTERFACE\\Ja2_2.sti", VObjectDesc.ImageFile);
-	FilenameForBPP("LOADSCREENS\\Ja2Logo.sti", VObjectDesc.ImageFile);
-	CHECKF(AddVideoObject(&VObjectDesc, &guiJa2LogoImage ));
+	//FilenameForBPP("LOADSCREENS\\Ja2Logo.sti", VObjectDesc.ImageFile);
+	//CHECKF(AddVideoObject(&VObjectDesc, &guiJa2LogoImage ));
 
 /*
 	// Gray out some buttons based on status of game!
@@ -391,7 +398,7 @@ void ExitMainMenu( )
 {
 //	UINT32										uiDestPitchBYTES;
 //	UINT8											*pDestBuf;
-
+UINT32 iCounter2 ;
 //	if( !gfDoHelpScreen )
 	{
 		CreateDestroyBackGroundMouseMask( FALSE );
@@ -400,8 +407,16 @@ void ExitMainMenu( )
 
 	CreateDestroyMainMenuButtons( FALSE );
 
-	DeleteVideoObjectFromIndex( guiMainMenuBackGroundImage );
-	DeleteVideoObjectFromIndex( guiJa2LogoImage );
+	for( iCounter2 = 1; iCounter2 < MAX_ELEMENT; iCounter2++ )
+	{	
+		if (gMainMenulayout[iCounter2].Visible == 1)
+		{
+		DeleteVideoObjectFromIndex( gMainMenulayout[iCounter2].uiIndex );
+		}
+	}
+	
+	
+	//DeleteVideoObjectFromIndex( guiJa2LogoImage );
 
 	gMsgBox.uiExitScreen = MAINMENU_SCREEN;
 /*
@@ -687,7 +702,27 @@ BOOLEAN CreateDestroyMainMenuButtons( BOOLEAN fCreate )
 	SGPFILENAME filename;
 	SGPFILENAME filenameMP;
 	INT16 sSlot;
-
+	
+			if (iResolution == 0)
+			{
+			 MAINMENU_Y =  gMainMenulayout[0].MAINMENU_Y;
+			 MAINMENU_X =  gMainMenulayout[0].MAINMENU_X;
+			 MAINMENU_Y_SPACE = gMainMenulayout[0].MAINMENU_Y_SPACE;
+			}
+			
+			if (iResolution == 1)
+			{
+			 MAINMENU_Y =  gMainMenulayout[0].MAINMENU_800x600Y;
+			 MAINMENU_X =  gMainMenulayout[0].MAINMENU_800x600X;
+			 MAINMENU_Y_SPACE = gMainMenulayout[0].MAINMENU_Y_SPACE;
+			}
+			
+			if (iResolution == 2)
+			{
+			 MAINMENU_Y =  gMainMenulayout[0].MAINMENU_1024x768Y;
+			 MAINMENU_X =  gMainMenulayout[0].MAINMENU_1024x768X;
+			 MAINMENU_Y_SPACE = gMainMenulayout[0].MAINMENU_Y_SPACE;
+			}
 	if( fCreate )
 	{
 		if( fButtonsCreated )
@@ -726,15 +761,17 @@ BOOLEAN CreateDestroyMainMenuButtons( BOOLEAN fCreate )
 				case QUIT:				gusMainMenuButtonWidths[cnt] = GetWidthOfButtonPic( (UINT16)iMenuImages[cnt], 15 );			break;
 			}
 #ifdef TESTFOREIGNFONTS
-			iMenuButtons[ cnt ] = QuickCreateButton( iMenuImages[ cnt ], (INT16)((SCREEN_WIDTH / 2) - gusMainMenuButtonWidths[cnt]/2), (INT16)( 0 + ( cnt * 18 ) ),
+//			iMenuButtons[ cnt ] = QuickCreateButton( iMenuImages[ cnt ], (INT16)((SCREEN_WIDTH / 2) - gusMainMenuButtonWidths[cnt]/2), (INT16)( 0 + ( cnt * 18 ) ),
+			iMenuButtons[ cnt ] = QuickCreateButton( iMenuImages[ cnt ], (INT16)(MAINMENU_X - gusMainMenuButtonWidths[cnt]/2), (INT16)( 0 + ( cnt * 18 ) ), //(INT16)((SCREEN_WIDTH / 2) - gusMainMenuButtonWidths[cnt]/2)
 												BUTTON_TOGGLE, MSYS_PRIORITY_HIGHEST,
 												DEFAULT_MOVE_CALLBACK, MenuButtonCallback );
 #else
-			/*iMenuButtons[ cnt ] = QuickCreateButton( iMenuImages[ cnt ], (INT16)(420 - gusMainMenuButtonWidths[cnt]/2), (INT16)( MAINMENU_Y + ( cnt * MAINMENU_Y_SPACE ) ),
+			/*iMenuButtons[ cnt ] = QuickCreateButton( iMenuImages[ cnt ], (INT16)MAINMENU_X, (INT16)( MAINMENU_Y + ( cnt * MAINMENU_Y_SPACE ) ),
 												BUTTON_TOGGLE, MSYS_PRIORITY_HIGHEST,
 												DEFAULT_MOVE_CALLBACK, MenuButtonCallback );*/
 
-			iMenuButtons[ cnt ] = QuickCreateButton( iMenuImages[ cnt ], (INT16)((SCREEN_WIDTH / 2) - gusMainMenuButtonWidths[cnt]/2), (INT16)( MAINMENU_Y + ( cnt * MAINMENU_Y_SPACE ) ),
+//			iMenuButtons[ cnt ] = QuickCreateButton( iMenuImages[ cnt ], (INT16)((SCREEN_WIDTH / 2) - gusMainMenuButtonWidths[cnt]/2), (INT16)( MAINMENU_Y + ( cnt * MAINMENU_Y_SPACE ) ),
+			iMenuButtons[ cnt ] = QuickCreateButton( iMenuImages[ cnt ], (INT16)(MAINMENU_X - gusMainMenuButtonWidths[cnt]/2), (INT16)( MAINMENU_Y + ( cnt * MAINMENU_Y_SPACE ) ),
 												BUTTON_TOGGLE, MSYS_PRIORITY_HIGHEST,
 												DEFAULT_MOVE_CALLBACK, MenuButtonCallback );
 #endif
@@ -789,15 +826,44 @@ BOOLEAN CreateDestroyMainMenuButtons( BOOLEAN fCreate )
 void RenderMainMenu()
 {
 	HVOBJECT hPixHandle;
-
+	UINT32 iCounter2;
+	
 	//Get and display the background image
-	GetVideoObject(&hPixHandle, guiMainMenuBackGroundImage );
-	BltVideoObject( guiSAVEBUFFER, hPixHandle, 0, 0, 0, VO_BLT_SRCTRANSPARENCY,NULL);
-	BltVideoObject( FRAME_BUFFER, hPixHandle, 0, 0, 0, VO_BLT_SRCTRANSPARENCY,NULL);
+	for( iCounter2 = 1; iCounter2 < MAX_ELEMENT; iCounter2++ )
+	{	
+		if (gMainMenulayout[iCounter2].Visible == 1)
+		{
+		
+			if (iResolution == 0)
+			{	
+			GetVideoObject(&hPixHandle, gMainMenulayout[iCounter2].uiIndex);
+			BltVideoObject( guiSAVEBUFFER, hPixHandle, 0, gMainMenulayout[iCounter2].ImagePositionX, gMainMenulayout[iCounter2].ImagePositionY, VO_BLT_SRCTRANSPARENCY,NULL);
+			BltVideoObject( FRAME_BUFFER, hPixHandle, 0, gMainMenulayout[iCounter2].ImagePositionX, gMainMenulayout[iCounter2].ImagePositionY, VO_BLT_SRCTRANSPARENCY,NULL);
+			}
+			
+			if (iResolution == 1)
+			{	
+			GetVideoObject(&hPixHandle, gMainMenulayout[iCounter2].uiIndex);
+			BltVideoObject( guiSAVEBUFFER, hPixHandle, 0, gMainMenulayout[iCounter2].ImagePosition800x600X, gMainMenulayout[iCounter2].ImagePosition800x600Y, VO_BLT_SRCTRANSPARENCY,NULL);
+			BltVideoObject( FRAME_BUFFER, hPixHandle, 0, gMainMenulayout[iCounter2].ImagePosition800x600X, gMainMenulayout[iCounter2].ImagePosition800x600Y, VO_BLT_SRCTRANSPARENCY,NULL);
+			}
+			
+			if (iResolution == 2)
+			{	
+			GetVideoObject(&hPixHandle, gMainMenulayout[iCounter2].uiIndex);
+			BltVideoObject( guiSAVEBUFFER, hPixHandle, 0, gMainMenulayout[iCounter2].ImagePosition1024x768X, gMainMenulayout[iCounter2].ImagePosition1024x768Y, VO_BLT_SRCTRANSPARENCY,NULL);
+			BltVideoObject( FRAME_BUFFER, hPixHandle, 0, gMainMenulayout[iCounter2].ImagePosition1024x768X, gMainMenulayout[iCounter2].ImagePosition1024x768Y, VO_BLT_SRCTRANSPARENCY,NULL);
+			}
+		}
+	}
+	
+//	GetVideoObject(&hPixHandle, guiMainMenuBackGroundImage );
+//	BltVideoObject( guiSAVEBUFFER, hPixHandle, 0, 0, 0, VO_BLT_SRCTRANSPARENCY,NULL);
+//	BltVideoObject( FRAME_BUFFER, hPixHandle, 0, 0, 0, VO_BLT_SRCTRANSPARENCY,NULL);
 
-	GetVideoObject(&hPixHandle, guiJa2LogoImage );
-	BltVideoObject( FRAME_BUFFER, hPixHandle, 0, iScreenWidthOffset + 188, iScreenHeightOffset + 10, VO_BLT_SRCTRANSPARENCY,NULL);
-	BltVideoObject( guiSAVEBUFFER, hPixHandle, 0, iScreenWidthOffset + 188, iScreenHeightOffset + 10, VO_BLT_SRCTRANSPARENCY,NULL);
+//	GetVideoObject(&hPixHandle, guiJa2LogoImage );
+//	BltVideoObject( FRAME_BUFFER, hPixHandle, 0, iScreenWidthOffset + 188, iScreenHeightOffset + 10, VO_BLT_SRCTRANSPARENCY,NULL);
+//	BltVideoObject( guiSAVEBUFFER, hPixHandle, 0, iScreenWidthOffset + 188, iScreenHeightOffset + 10, VO_BLT_SRCTRANSPARENCY,NULL);
 
 
 #ifdef TESTFOREIGNFONTS
@@ -835,9 +901,32 @@ void RestoreButtonBackGrounds()
 //	RestoreExternBackgroundRect( (UINT16)(320 - gusMainMenuButtonWidths[TITLE]/2), MAINMENU_TITLE_Y, gusMainMenuButtonWidths[TITLE], 23 );
 
 #ifndef TESTFOREIGNFONTS
+
+			if (iResolution == 0)
+			{
+			 MAINMENU_Y =  gMainMenulayout[0].MAINMENU_Y;
+			 MAINMENU_X =  gMainMenulayout[0].MAINMENU_X;
+			 MAINMENU_Y_SPACE = gMainMenulayout[0].MAINMENU_Y_SPACE;
+			}
+			
+			if (iResolution == 1)
+			{
+			 MAINMENU_Y =  gMainMenulayout[0].MAINMENU_800x600Y;
+			 MAINMENU_X =  gMainMenulayout[0].MAINMENU_800x600X;
+			 MAINMENU_Y_SPACE = gMainMenulayout[0].MAINMENU_Y_SPACE;
+			}
+			
+			if (iResolution == 2)
+			{
+			 MAINMENU_Y =  gMainMenulayout[0].MAINMENU_1024x768Y;
+			 MAINMENU_X =  gMainMenulayout[0].MAINMENU_1024x768X;
+			 MAINMENU_Y_SPACE = gMainMenulayout[0].MAINMENU_Y_SPACE;
+			}
+			
 	for ( cnt = 0; cnt < NUM_MENU_ITEMS; cnt++ )
 	{
-		RestoreExternBackgroundRect( (UINT16)((SCREEN_WIDTH / 2) - gusMainMenuButtonWidths[cnt]/2), (INT16)( MAINMENU_Y + ( cnt * MAINMENU_Y_SPACE )-1), (UINT16)(gusMainMenuButtonWidths[cnt]+1), 23 );
+//		RestoreExternBackgroundRect( (UINT16)((SCREEN_WIDTH / 2) - gusMainMenuButtonWidths[cnt]/2), (INT16)( MAINMENU_Y + ( cnt * MAINMENU_Y_SPACE )-1), (UINT16)(gusMainMenuButtonWidths[cnt]+1), 23 );
+		RestoreExternBackgroundRect( (UINT16)(MAINMENU_X - gusMainMenuButtonWidths[cnt]/2), (INT16)( MAINMENU_Y + ( cnt * MAINMENU_Y_SPACE )-1), (UINT16)(gusMainMenuButtonWidths[cnt]+1), 23 );
 	}
 #endif
 }

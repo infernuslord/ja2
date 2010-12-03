@@ -763,6 +763,7 @@ void RenderItemDetails()
 						pItem = &gpWorldItemsSummaryArray[ i ].object;
 						uiExistChance += (100 - gpWorldItemsSummaryArray[ i ].ubNonExistChance) * pItem->ubNumberOfObjects;
 						uiStatus += (*pItem)[0]->data.objectStatus;
+						uiQuantity += pItem->ubNumberOfObjects;
 					}
 				}
 			}
@@ -3224,6 +3225,9 @@ void SetupItemDetailsMode( BOOLEAN fAllowRecursion )
 	OBJECTTYPE *pItem;
 	UINT16 usPEnemyIndex, usNEnemyIndex;
 
+	SUMMARYFILE *s = gpCurrentSectorSummary;
+	MAPCREATE_STRUCT *m = &gpCurrentSectorSummary->MapInfo;
+
 	//Clear memory for all the item summaries loaded
 	if( gpWorldItemsSummaryArray )
 	{
@@ -3295,7 +3299,7 @@ void SetupItemDetailsMode( BOOLEAN fAllowRecursion )
 	gusWorldItemsSummaryArraySize = gpCurrentSectorSummary->usNumItems;
 	for (unsigned int x = 0; x < uiNumItems; ++x)
 	{
-		gpWorldItemsSummaryArray[x].Load(hfile);
+		gpWorldItemsSummaryArray[x].Load(hfile, s->dMajorMapVersion, m->ubMapVersion);
 	}
 
 	//NOW, do the enemy's items!

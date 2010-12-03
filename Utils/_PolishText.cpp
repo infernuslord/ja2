@@ -352,8 +352,7 @@ CHAR16 Message[][STRING_LENGTH] =
 	L"%s: kamufla¿ zimowy siê star³.",
 	L"%s: kamufla¿ zimowy siê zmy³.",
 
-	// TODO.Translate
-	L"You cannot attach %s to this slot.",
+	L"Niemo¿esz przydzieliæ %s do tego slotu.",
 };
 
 
@@ -423,7 +422,7 @@ STR16 pAssignmentStrings[] =
 	L"Naprawa", // repairing
 	L"Praktyka", // training themselves  
 	L"Samoobr.", // training a town to revolt 
-	L"M.Militia", //training moving militia units		// TODO.Translate
+	L"R.Samoobr.", //training moving militia units
 	L"Instruk.", // training a teammate
 	L"Uczeñ", // being trained by someone else 
 	L"Staff", // operating a strategic facility			// TODO.Translate
@@ -441,15 +440,15 @@ STR16 pMilitiaString[] =
 	L"Samoobrona", // the title of the militia box
 	L"Bez przydzia³u", //the number of unassigned militia troops
 	L"Nie mo¿esz przemieszczaæ oddzia³ów samoobrony gdy nieprzyjaciel jest w sektorze!",
-	L"Some militia were not assigned to a sector. Would you like to disband them?", // TODO.Translate
+	L"Czêœæ samoobrony nie zosta³a przydzielona do sektoru. Czy chcesz ich rozwi¹zaæ?",
 };
 
 
 STR16 pMilitiaButtonString[] =
 {
-	L"Auto", // auto place the militia troops for the player
+	L"Automatyczne", // auto place the militia troops for the player
 	L"OK", // done placing militia troops
-	L"Disband", // HEADROCK HAM 3.6: Disband militia	// TODO.Translate
+	L"Rozwi¹¿", // HEADROCK HAM 3.6: Disband militia
 };
 
 STR16 pConditionStrings[] = 
@@ -800,63 +799,63 @@ STR16 pPersonnelScreenStrings[] =
  	L"Ranny(a):", // number of times merc has been wounded
  	L"Umiejêtnoœci:",
  	L"Brak umiêjêtnoœci",
-	L"Achievements", // added by SANDRO
+	L"Osi¹gniêcia", // added by SANDRO
 };
 
 // SANDRO - helptexts for merc records
 STR16 pPersonnelRecordsHelpTexts[] =
 {
-	L"Elites:      %d\n",
-	L"Regulars:   %d\n",
-	L"Admins:    %d\n",
-	L"Hostile Civs: %d\n",
-	L"Creatures:  %d\n",
-	L"Tanks:      %d\n", 
-	L"Others:     %d\n",
+L"Elitarni:   %d\n",
+L"Regularni:  %d\n",
+L"Administratorzy:  %d\n",
+L"Wrodzy Cywile: %d\n",
+L"Stworzenia: %d\n",
+L"Czo³gi:   %d\n", 
+L"Inne:   %d\n",
 
-	L"To Mercs: %d\n",
-	L"Militia:   %d\n",
-	L"Others:     %d\n",
+L"Do najemników: %d\n",
+L"Milicja:  %d\n",
+L"Inni:   %d\n",
 
-	L"Shots Fired:         %d\n",
-	L"Missiles Launched:   %d\n",
-	L"Grenades Thrown:     %d\n",
-	L"Knives Thrown:       %d\n",
-	L"Blade Attacks:       %d\n",
-	L"HtH Attacks:         %d\n",
-	L"Successful Hits:     %d\n",
+L"Strza³ów:     %d\n",
+L"Wystrzelonych Pocisków:  %d\n",
+L"Rzuconych Granatów:   %d\n",
+L"Rzuconych No¿y:    %d\n",
+L"Ataków No¿em:    %d\n",
+L"Ataków Wrêcz:     %d\n",
+L"Udanych Trafieñ:   %d\n",
 
-	L"Locks Picked:     %d\n",
-	L"Locks Breached:   %d\n",
-	L"Traps Removed:     %d\n",
-	L"Explosives Detonated: %d\n",
-	L"Items Repaired:      %d\n",
-	L"Items Combined:    %d\n",
-	L"Items Stolen:    %d\n",
-	L"Militia Trained:    %d\n",
-	L"Mercs Bandaged:    %d\n",
-	L"Surgeries Made:    %d\n",
-	L"NPCs Met:      %d\n",
-	L"Sectors Discovered:  %d\n",
-	L"Ambushes Prevented:  %d\n",
-	L"Quests Handled:    %d\n",
+L"Zamki Otwarte Wytrychem:   %d\n",
+L"Zamki Wy³amane:  %d\n",
+L"Usuniête Pu³apka:   %d\n",
+L"Zdetonowane £adunki: %d\n",
+L"Naprawione Przedmioty:   %d\n",
+L"Po³¹czone Przedmioty:  %d\n",
+L"Ukradzione Przedmioty:  %d\n",
+L"Wytrenowana Milicja:  %d\n",
+L"Zabanda¿owani Najemnicy:  %d\n",
+L"Wykonane Operacje Chirurgiczne:  %d\n",
+L"Spotkani NPC:   %d\n",
+L"Odkryte Sektory: %d\n",
+L"Unikniête Zasadzki: %d\n",
+L"Wykonane Zadania:  %d\n",
 
-	L"Tactical Battles:    %d\n",
-	L"Autoresolve Battles:  %d\n",
-	L"Times Retreated:    %d\n",
-	L"Ambushes Experienced:  %d\n",
-	L"Largest Battle:   %d Enemies\n",
+L"Bitwy Taktyczne:  %d\n",
+L"Bitwy Autorozstrzygniête: %d\n",
+L"Wykonane Odwroty:  %d\n",
+L"Napotkanych Zasadzek: %d\n",
+L"Najwiêksza Walka:  %d Wrogów\n",
 
-	L"Shot:        %d\n",
-	L"Stabbed:     %d\n",
-	L"Punched:     %d\n",
-	L"Blasted:     %d\n",
-	L"Stat Damaged:   %d\n",
-	L"Surgeries Undergoed:  %d\n",
-	L"Facility Accidents:   %d\n",
+L"Postrzelony:    %d\n",
+L"Ugodzony No¿em:   %d\n",
+L"Uderzony:   %d\n",
+L"Wysadzony W Powietrze:   %d\n",
+L"Uszkodzonych Atrybutów:  %d\n",
+L"Poddany Zabiegom Chirurgicznym: %d\n",
+L"Wypadków Przy Pracy:  %d\n",
 
-	L"Character:",
-	L"Disability:",
+L"Charakter:",
+L"Niepe³nosprawnoœæ:",
 };
 
 
@@ -890,39 +889,39 @@ STR16 gzMercSkillText[] =
 // SANDRO - added this
 STR16 gzMercSkillTextNew[] = 
 {
-	// Major traits
-	L"No Skill",
-	L"Auto Weapons",
-	L"Heavy Weapons",
-	L"Marksman",
-	L"Hunter",
-	L"Gunslinger",
-	L"Hand to Hand",
-	L"Deputy",
-	L"Technician",
-	L"Paramedic",
-	// Minor traits
-	L"Ambidextrous",
-	L"Melee",
-	L"Throwing",
-	L"Night Ops",
-	L"Stealthy",
-	L"Athletics",
-	L"Bodybuilding",
-	L"Demolitions",
-	L"Teaching",
-	L"Scouting",
-	// second names for major skills
-	L"Machinegunner",
-	L"Bombardier",
-	L"Sniper",
-	L"Ranger",
-	L"Gunfighter",
-	L"Martial Arts",
-	L"Squadleader",
-	L"Engineer",
-	L"Doctor",
-	L"More...",
+// Major traits
+L"Brak Umiejêtnoœci",
+L"Broñ Automatyczna",
+L"Broñ Ciê¿ka",
+L"Strzelec Wyborowy",
+L"Myœliwy",
+L"Pistolero",
+L"Walka Wrêcz",
+L"Zastêpca Szeryfa",
+L"Technik",
+L"Paramedyk",
+// Minor traits
+L"Oburêcznoœæ",
+L"Walka Wrêcz",
+L"Rzucanie",
+L"Operacje Nocne",
+L"Ukradkowoœæ",
+L"Atletyka",
+L"Bodybuilding",
+L"£adunki Wybuchowe",
+L"Uczenie",
+L"Zwiad",
+// second names for major skills
+L"Strzelec RKMu",
+L"Bombardier",
+L"Snajper",
+L"Myœliwy",
+L"Pistolero",
+L"Sztuki Walki",
+L"Dowódca Dru¿yny",
+L"In¿ynier",
+L"Doktor",
+L"Wiêcej...",
 };
 //////////////////////////////////////////////////////////
 
@@ -1255,8 +1254,7 @@ CHAR16		gWeaponStatsDesc[][ 17 ] =
 	L"AUTO/5:",		//15
 	L"Liczba:",		//16
 
-	// TODO.Translate
-	L"Default:",	//17 //WarmSteel - So we can also display default attachments
+	L"Domyœlne:",	//17 //WarmSteel - So we can also display default attachments
 
 };
 
@@ -1984,7 +1982,7 @@ STR16 pMapScreenFastHelpTextList[] =
 	L"Próbny tekst",
 	L"Próbny tekst",
 	L"Próbny tekst",
-	L"Niewiele mo¿esz tu zrobiæ, dopóki najemnicy nie przylec¹ do Tracona. Gdy ju¿ zbierzesz swój oddzia³, kliknij przycisk Kompresji Czasu, w prawym dolnym rogu. W ten sposób twoi najemnicy szybciej dotr¹ na miejsce.",
+	L"Niewiele mo¿esz tu zrobiæ, dopóki najemnicy nie przylec¹ do Arulco. Gdy ju¿ zbierzesz swój oddzia³, kliknij przycisk Kompresji Czasu, w prawym dolnym rogu. W ten sposób twoi najemnicy szybciej dotr¹ na miejsce.",
 };
 
 // movement menu text
@@ -2222,8 +2220,8 @@ STR16 pTransactionText[] =
 	L"Zakupy u - %s.",	//is used for the Shop keeper interface.  The dealers name will be appended to the end of the string.
 	L"%s wp³aci³(a) pieni¹dze.",
 	L"Sprzedano rzecz(y) miejscowym",
-	L"Facility Use", // HEADROCK HAM 3.6		// TODO.Translate
-	L"Militia upkeep", // HEADROCK HAM 3.6		// TODO.Translate
+	L"Wykorzystanie Placówki", // HEADROCK HAM 3.6	
+	L"Utrzymanie Samoobr.", // HEADROCK HAM 3.6
 };
 
 STR16 pTransactionAlternateText[] =
@@ -2479,16 +2477,16 @@ STR16 pImpButtonText[] =
 	L"Rejestr", 			// the IMP site registry..when name and gender is selected
 	L"Analizujê...", 			// analyzing your profile results
 	L"OK",
-	L"Character", // Change from "Voice"
+	L"Postaæ", // Change from "Voice"
 };
 
 STR16 pExtraIMPStrings[] =
 {
 	// These texts have been also slightly changed 
-	L"With your character traits chosen, it is time to select your skills.",
-	L"To complete the process, select your attributes.",
-	L"To commence actual profiling, select portrait, voice and colors.",
-	L"Now that you have completed your appearence choice, procced to character analysis.",
+	L"Po wybraniu twoich cech pora wybraæ twoje umiejêtnoœci.",
+	L"Wybierz twoje atrybuty.",
+	L"Aby dokonaæ prawdziwego profilowania wybie¿ portret, g³os i kolory.",
+	L"Teraz, po wybraniu wygl¹du, przejdŸ do analizy postaci.",
 };
 
 STR16 pFilesTitle[] =
@@ -3375,9 +3373,9 @@ STR16			CharacterInfo[] =
 {
 	// The various attributes of the merc
 
-	L"Zdrowie",										
-	L"Zwinnoœæ",										
-	L"Sprawnoœæ",									
+	L"Zdrowie",
+	L"Zwinnoœæ",
+	L"Sprawnoœæ",
 	L"Si³a",
 	L"Um. dowodzenia",
 	L"Inteligencja",
@@ -3390,8 +3388,8 @@ STR16			CharacterInfo[] =
 	// the contract expenses' area
 
 	L"Zap³ata",
-	L"Czas",				
-	L"1 dzieñ",					
+	L"Czas",
+	L"1 dzieñ",
 	L"1 tydzieñ",
 	L"2 tygodnie",
 
@@ -3407,11 +3405,11 @@ STR16			CharacterInfo[] =
 	L"Opcjonalne wyposa¿enie:",				// Displays the optional gear cost
 	L"gear",			//"gear",	//tais: Displays the optional gear cost in nsgi, this moved and can have only a small room, so just make it "gear" without extra's
 	L"Wymagany jest zastaw na ¿ycie",			// If the merc required a medical deposit, this is displayed
-	L"Kit 1",				// Text on Starting Gear Selection Button 1  // TODO.Translate
-	L"Kit 2",				// Text on Starting Gear Selection Button 2
-	L"Kit 3",				// Text on Starting Gear Selection Button 3
-	L"Kit 4",				// Text on Starting Gear Selection Button 4
-	L"Kit 5",				// Text on Starting Gear Selection Button 5
+	L"Zestaw nr 1",				// Text on Starting Gear Selection Button 1
+	L"Zestaw nr 2",				// Text on Starting Gear Selection Button 2
+	L"Zestaw nr 3",				// Text on Starting Gear Selection Button 3
+	L"Zestaw nr 4",				// Text on Starting Gear Selection Button 4
+	L"Zestaw nr 5",				// Text on Starting Gear Selection Button 5
 };
 
 
@@ -3814,10 +3812,10 @@ STR16 pMilitiaConfirmStrings[] =
 	L"Nie masz %d$, aby wyszkoliæ samoobronê w tym mieœcie.",
 	L"%s musi mieæ %d% lojalnoœci, aby mo¿na by³o kontynuowaæ szkolenie samoobrony.",
 	L"Nie mo¿esz ju¿ d³u¿ej szkoliæ samoobrony w mieœcie %s.",
-	L"You cannot afford the $%d to train mobile militia here.", // HEADROCK HAM 3.6: Mobile Militia		// TODO.Translate
-	L"Continue training mobile militia in %s (%s %d)?", // HEADROCK HAM 3.6: Mobile Militia				// TODO.Translate
-	L"Training mobile militia in %d sectors will cost $ %d. %s", // HEADROCK HAM 3.6: Mobile Militia	// TODO.Translate
-	L"Training a squad of mobile militia will cost $", // HEADROCK HAM 3.6: Mobile Militia				// TODO.Translate
+	L"Nie masz %d$ i nie mo¿esz trenowaæ tutaj ruchomej samoobrony.", // HEADROCK HAM 3.6: Mobile Militia
+	L"Kontynuuj trening ruchomej samoobrony w %s (%s %d)?", // HEADROCK HAM 3.6: Mobile Militia
+	L"Trenowanie ruchomej samoobrony w %d sektorach bêdzie kosztowaæ %d$. %s", // HEADROCK HAM 3.6: Mobile Militia
+	L"Trenowanie ruchomej samoobrony bêdzie kosztowaæ $", // HEADROCK HAM 3.6: Mobile Militia
 };
 
 //Strings used in the popup box when withdrawing, or depositing money from the $ sign at the bottom of the single merc panel
@@ -3857,9 +3855,9 @@ STR16		zOptionsToggleText[] =
 	L"Pokazuj kursor 3D",
 	L"Pokazuj szansê na trafienie",
 	L"Zamiana kursora granatnika",
-	L"Allow Enemy Taunts", // Changed from "Enemies Drop all Items" - SANDRO
+	L"Pozwól na przechwa³ki wrogów", // Changed from "Enemies Drop all Items" - SANDRO
 	L"Wysoki k¹t strza³ów z granatnika",
-	L"Allow Real Time Sneaking", // Changed from "Restrict extra Aim Levels" - SANDRO
+	L"Pozwól na skradanie siê w czasie rzeczywistym", // Changed from "Restrict extra Aim Levels" - SANDRO
 	L"Spacja = nastêpny oddzia³",
 	L"Pokazuj cienie przedmiotów",
 	L"Pokazuj zasiêg broni w polach",
@@ -3954,32 +3952,32 @@ STR16	zOptionsScreenHelpText[] =
 	// Options for 1.13
 	L"Jeœli W£¥CZONE, kursor bêdzie pokazywa³ szansê na trafienie.",
 	L"Jeœli W£¥CZONE, seria z granatnika bêdzie u¿ywa³a kursora serii z broni palnej.",
-	L"When ON, enemies will occasionally comment certain actions.", // Changed from Enemies Drop All Items - SANDRO
+	L"Je¿eli w³¹czone, to wrogowie bêd¹ czasami komentowaæ pewne akcje.", // Changed from Enemies Drop All Items - SANDRO
 	L"Jeœli W£¥CZONE, granatniki bêd¹ strzela³y pod wysokim k¹tem. ( |Q )",
-	L"When ON, the turn based mode will not be entered when sneaking unnoticed and seeing an enemy unless pressing |C|t|r+|X.", // Changed from Restrict Extra Aim Levels - SANDRO
+	L"Jeœli W£¥CZONE, zapobiega przejœciu do trybu turowego po zauwa¿eniu wroga podczas skradania. Aby wymusiæ tryb turowy z t¹ opcj¹ aktywn¹ naciœnij |C|t|r+|X.", // Changed from Restrict Extra Aim Levels - SANDRO
 	L"Jeœli W£¥CZONE, |S|p|a|c|j|a wybiera kolejny oddzia³.",
 	L"Jeœli W£¥CZONE, pokazywane bêd¹ cienie przedmiotów.",
 	L"Jeœli W£¥CZONE, zasiêg broni bêdzie wyœwietlany w polach.",
 	L"Jeœli W£¥CZONE, pojedynczy strza³ bêdzie z efektem pocisku smugowego",
 	L"Jeœli W£¥CZONE, bêdziesz s³ysza³ padaj¹cy deszcz.",
 	L"Jeœli W£¥CZONE, w grze pojawiaæ siê bêd¹ wrony.",
-	L"When ON, a tooltip window is shown when pressing |A|l|t and hovering cursor over an enemy.",
+	L"Gdy ta opcja jest AKTYWNA, wskazanie postaci wroga kursorem i naciœniêcie A|l|t uka¿e okienko informacji dodatkowych.",
 	L"Jeœli W£¥CZONE, gra bêdzie zapisywana ka¿dorazowo po zakoñczeniu tury gracza.",
 	L"Jeœli W£¥CZONE, Skyrider nie bêdzie nic mówi³.",
 	L"Jeœli W£¥CZONE, gra bêdzie obci¹¿a³a procesor w mniejszym stopniu.",
 	L"Jeœli W£¥CZONE, rozszerzone opisy bêd¹ pokazane dla przedmiotów i broni.",
 	L"Jeœli W£¥CZONE i wróg jest obecny, \ntryb turowy jest w³¹czony, \ndopóki sektor nie zostanie oczyszczony (|C|T|R|L+|S|H|I|F|T+|A|L|T+|T).",	// add forced turn mode
-	L"When ON, shows character progress towards gaining levels.",	// TODO.Translate
-	L"When ON, alternate bullet graphics will be shown when you shoot.", // TODO.Translate
+	L"Gdy W£¥CZONE, pokazuje postêp w doœwiadczeniu postaci.",
+	L"Gdy W£¥CZONE, zastêpuje star¹ animacjê pocisku now¹.",
 	L"(text not rendered)TOPTION_CHEAT_MODE_OPTIONS_HEADER",
-	L"Force all pending Bobby Ray shipments",
+	L"Wymuœ wszystkie oczekiwane dostawy od Bobby Ray's.",
 	L"(text not rendered)TOPTION_CHEAT_MODE_OPTIONS_END",
 	L"(text not rendered)TOPTION_DEBUG_MODE_OPTIONS_HEADER",			// an example options screen options header (pure text)
-	L"Click me to fix corrupt game settings",							// failsafe show/hide option to reset all options
-	L"Click me to fix corrupt game settings",							// a do once and reset self option (button like effect)
-	L"Allows debug options in release or mapeditor builds",				// allow debugging in release or mapeditor
-	L"Toggle to display debugging render options",						// an example option that will show/hide other options
-	L"Attempts to display slash-rects around mouse regions",			// an example of a DEBUG build option
+	L"Kliknij by naprawiæ b³êdy w ustawieniach gry.",							// failsafe show/hide option to reset all options
+	L"Kliknij by naprawiæ b³êdy w ustawieniach gry.",							// a do once and reset self option (button like effect)
+	L"Udostêpnia tryb debugowania w edytorze map oraz wersji koñcowej.",				// allow debugging in release or mapeditor
+	L"Prze³¹cz na tryb wyœwietlania/ukrycia opcji renderowania debugowego.",						// an example option that will show/hide other options
+	L"Wyœwietl wymiary wokó³ kursora myszy.",			// an example of a DEBUG build option
 	L"(text not rendered)TOPTION_DEBUG_MODE_OPTIONS_END",				// an example options screen options divider (pure text)
 
 
@@ -4019,107 +4017,100 @@ STR16	gzGIOScreenText[] =
 	L"Œwietne",
 	L"Wyœmienite",
 	L"Niewiarygodne",
-	L"Inventory / Attachments",	// TODO.Translate
-	L"NOT USED",
-	L"NOT USED",
-	L"Load MP Game",
+	L"Ekwipunek / Dodatki",
+	L"Nie u¿ywany",
+	L"Nie u¿ywany",
+	L"Wczytaj grê MP",
 	L"POCZ¥TKOWE USTAWIENIA GRY (Only the server settings take effect)",
 	// Added by SANDRO
-	L"Skill Traits",
-	L"Old",
-	L"New",
-	L"Max IMP Characters",
-	L"1",
-	L"2",
-	L"3",
-	L"4",
-	L"5",
-	L"6",
-	L"Enemies Drop All Items",
-	L"Off",
-	L"On",
-#ifdef JA2UB
-	L"Tex and John",
-	L"Random",
-	L"All",
-#else
-	L"Number of Terrorists",
-	L"Random",
-	L"All",
-#endif	
-	L"Secret Weapon Caches",
-	L"Random",
-	L"All",
-	L"Progress Speed of Item Choices",
-	L"Very Slow",
-	L"Slow",
-	L"Normal",
-	L"Fast",
-	L"Very Fast",
+	L"Cechy umiejêtnoœci",
+	L"Stare",
+	L"Nowe",
+	L"Maks. liczba IMP",
+	L"Jeden",
+	L"Dwa",
+	L"Trzy",
+	L"Cztery",
+	L"Piêæ",
+	L"Szeœæ",
+	L"Wrogowie upuszczaj¹ ca³oœæ ekwipunku",
+	L"Wy³¹czone",
+	L"W³¹czone",
+	L"Liczba terrorystów",
+	L"Losowe",
+	L"Wszystkie",
+	L"Tajne sk³ady proni",
+	L"Losowe",
+	L"Wszystkie",
+	L"Szybkoœæ zwiêkszania dostêpnoœci przedmiotów",
+	L"Bardzo wolna",
+	L"Wolna",
+	L"Normala",
+	L"Szybka",
+	L"Bardzo szybkia",
 
-	// TODO.Translate
-	L"Stary / Stary",
-	L"Nowy / Stary",
-	L"Nowy / Nowy",
+	L"Stare / Stare",
+	L"Nowe / Stare",
+	L"Nowe / Nowe",
 };
 
 STR16	gzMPJScreenText[] =
 {
 	L"MULTIPLAYER",
-	L"Join",
-	L"Host",
-	L"Cancel",
-	L"Refresh",
-	L"Player Name",
-	L"Server IP",
+	L"Do³¹cz",
+	L"Uruchom serwer",
+	L"Anuluj",
+	L"Odœwie¿",
+	L"Nazwa gracza",
+	L"IP Serwera",
 	L"Port",
-	L"Server Name",
-	L"# Plrs",
-	L"Version",
-	L"Game Type",
+	L"Nazwa serwera",
+	L"# Plrs",			// ?? if plrs=players then "# graczy"
+	L"Wersja",
+	L"Typ rozgrywki",
 	L"Ping",
-	L"You must enter a player name",
-	L"You must enter a valid server IP address.\n (eg 84.114.195.239).",
-	L"You must enter a valid Server Port between 1 and 65535.",
+	L"Musisz podaæ nazwê gracza",
+	L"Musisz podaæ odpowiedni numer IP serwera.\n (np. 84.114.195.239).",
+	L"Musisz podaæ odpowiedni port serwera pomiêdzy 1 i 65535.",
 };
 
 STR16	gzMPHScreenText[] =
 {
-	L"HOST GAME",
+	L"UTWÓRZ SERWER",
 	L"Start",
-	L"Cancel",
-	L"Server Name",
-	L"Game Type",
+	L"Anuluj",
+	L"Nazwa serwera",
+	L"Typ rozgrywki",
 	L"Deathmatch",
 	L"Team Deathmatch",
 	L"Co-operative",
-	L"Max Players",
-	L"Squad Size",
-	L"Merc Selection",
-	L"Random Mercs",
-	L"Hired by Player",
-	L"Starting Balance",
-	L"Can Hire Same Merc",
+	L"Maksymalna liczba graczy",
+	L"Rozmiar dru¿yny",
+	L"Wybór najemników",
+	L"Losowi najemnicy",
+	L"Wynajêci przez gracza",
+	L"Pocz¹tkowy stan gotówki",
+	L"Mo¿na wynajmowaæ takich samych najemników",
 	L"Report Hired Mercs",
-	L"Allow Bobby Rays",
-	L"Randomise Starting Edge",
-	L"You must enter a server name",
-	L"Max Players must be between 2 and 4",
-	L"Squad size must be between 1 and 6",
-	L"Time of Day",
-	L"Time of Day must be a 24 hour time (HH:MM)",
-	L"Starting Cash must be a valid dollar amount (no cents)" ,
-	L"Damage Multiplier",
-	L"Damage Multiplier must be a number between 0 and 5",
-	L"Turn Timer Multiplier",
-	L"Turn Timer multiplier must be a number between 0 (no timed turns) and 200 (short timed turns)",
-	L"Enable Civilians in CO-OP",
-	L"Use New Inventory (NIV)",
-	L"Sync. MP Clients Directory",
-	L"MP Sync. Directory",
-	L"You must enter a file transfer directory.",
-	L"(Use '/' instead of '\\' for directory delimiters.)",
-	L"The specified synchronisation directory does not exist.",
+	L"Dozwolone korzystanie z Bobby Rays",
+	L"Losowa pozycja startowa",
+	L"Musisz podaæ nazwê serwera",
+	L"Maksymalna liczba graczy musi byæ pomiêdzy 2 i 4",
+	L"Rozmiar dru¿yny musi byæ pomiêdzy 1 i 6",
+	L"Pora dnia",
+	L"Pora dnia musi byæ w formacie 24-godzinnym (GG:MM)",
+	L"Pocz¹tkowy stan gotówki musi byæ podany w dolarach (bez centów)" ,
+	L"Mno¿nik obra¿eñ",
+	L"Mno¿nik obra¿eñ musi byæ liczb¹ pomiêdzy 0 i 5",
+	L"Mno¿nik czasu",
+	L"Mno¿nik czasu musi byæ liczb¹ pomiêdzy 0 (tury nielimitowane czasowo) i 200 (krótki czas na turê)",
+	L"Umo¿liwiæ wystêpowanie cywili w trybie CO-OP",
+	L"U¿ywaj nowego trybu wyposa¿enia (NTW)",
+	L"Katalog synchronizacji klientów rozgrywki wieloosobowej",
+	L"Katalog synchronizacji gry wieloosobowej",
+	L"Musisz wskazaæ katalog wymiany plików.",
+	L"(U¿yj '/' zamiast '\\' jako separatora.)",
+	L"Podany katalog synchronizacji nie istnieje.",
 };
 
 STR16 pDeliveryLocationStrings[] =
@@ -4312,8 +4303,7 @@ STR16 pMessageStrings[] =
 	L"..\\SavedGames\\MP_SavedGames", //The name of the directory where games are saved.
 	L"Client",
 
-	// TODO.Translate
-	L"You cannot use the Old Inventory and the New Attachment System at the same time.",
+	L"Nie mo¿esz u¿ywaæ nowego trybu wyposa¿enia i nowego systemu dodatków jednoczeœnie.",
 };
 
 
@@ -4521,10 +4511,10 @@ STR16 sRepairsDoneString[] =
 	L"%s skoñczy³(a) naprawiaæ w³asne wyposa¿enie",
 	L"%s skoñczy³(a) naprawiaæ broñ i ochraniacze wszystkich cz³onków oddzia³u",
 	L"%s skoñczy³(a) naprawiaæ wyposa¿enie wszystkich cz³onków oddzia³u",
-	L"%s finished repairing everyone's large carried items",
-	L"%s finished repairing everyone's medium carried items",
-	L"%s finished repairing everyone's small carried items",
-	L"%s finished repairing everyone's LBE gear",
+	L"%s skoñczy³(a) naprawiaæ ciê¿kie wyposa¿enie wszystkich cz³onków oddzia³u",
+	L"%s skoñczy³(a) naprawiaæ œrednie wyposa¿enie wszystkich cz³onków oddzia³u",
+	L"%s skoñczy³(a) naprawiaæ lekkie wyposa¿enie wszystkich cz³onków oddzia³u",
+	L"%s skoñczy³(a) naprawiaæ strój LBE wszystkich cz³onków oddzia³u",
 };
 
 STR16 zGioDifConfirmText[]=
@@ -4644,7 +4634,7 @@ STR16 gzLateLocalizedString[] =
 
 	//46-48
 	L"%s - przed³u¿ka lufy jego/jej broni odpada!",
-	L"No more than %d militia trainers are permitted in this sector.",		// TODO.Translate
+	L"W tym sektorze mo¿e byæ maks. %d instruktorów szkol¹cych samoobronê.",
   	L"Na pewno?",
 
 	//49-50
@@ -4682,7 +4672,7 @@ STR16 gzLateLocalizedString[] =
 
 STR16 gzCWStrings[] = 
 {
-	L"Call reinforcements to %s from adjacent sectors?",		// TODO.Translate
+	L"Wezwaæ posi³ki do %s z przyleg³ych sektorów?",
 };
 
 // WANNE: Tooltips
@@ -4729,9 +4719,9 @@ STR16 gzTooltipStrings[] =
 	L"brak getrów ochronnych",
 	L"|Pancerz: %s\n", 
 	 // Added - SANDRO
-	L"%s|Skill 1: %s\n",
-	L"%s|Skill 2: %s\n", 
-	L"%s|Skill 3: %s\n",
+	L"%s|Umiejêtnoœæ 1: %s\n",
+	L"%s|Umiejêtnoœæ 2: %s\n", 
+	L"%s|Umiejêtnoœæ 3: %s\n",
 };
 
 STR16 New113Message[] =
@@ -4756,62 +4746,61 @@ STR16 New113Message[] =
 	L"Wszystkie przedmioty tego typu sprzedane",
 	L"SprawdŸ swoje gogle",
 	// Real Time Mode messages
-	L"In combat already",
-	L"No enemies in sight",
-	L"Real-time sneaking OFF",
-	L"Real-time sneaking ON",
-	//L"Enemy spotted! (Ctrl + x to enter turn based)",
-	L"Enemy spotted!", // this should be enough - SANDRO
+	L"W trakcie walki",
+	L"Brak wrogów w zasiêgu wzroku",
+	L"Wy³¹czone skradanie w czasie rzeczywistym",
+	L"W³¹czone skradanie w czasie rzeczywistym",
+	//L"Spotkano wroga! (Ctrl + x by uruchomiæ tryb turowy)",
+	L"Spotkano wroga!", // this should be enough - SANDRO
 	//////////////////////////////////////////////////////////////////////////////////////
 	// These added by SANDRO
-	L"%s was successful on stealing!",
-	L"%s had not enough action points to steal all selected items.",
-	L"Do you want to make surgery on %s before bandaging? (You can heal about %i Health.)",
-	L"Do you want to make surgery on %s? (You can heal about %i Health.)",
-	L"Do you wish to make necessary surgeries first? (%i patient(s))",
-	L"Do you wish to make the surgery on this patient first?",
-	L"Apply first aid automatically with necessary surgeries or without them?",
-	L"Surgery on %s finished.",
-	L"%s is hit in the chest and loses a point of maximum health!",
-	L"%s is hit in the chest and loses %d points of maximum health!",
-	L"%s has regained one point of lost %s",
-	L"%s has regained %d points of lost %s",
-	L"Your scouting skills prevented you to be ambushed by the enemy!",
-	L"Thanks to your scouting skills you have successfuly avoided a pack of bloodcats!",
-	L"%s is hit to groin and falls down in pain!",
-	//////////////////////////////////////////////////////////////////////////////////////
+	L"%s dokona³(a) udanej kradzie¿y!",
+	L"%s nie posiada wystarczaj¹cej liczby PA by ukraœæ wszystkie zaznaczone przedmioty.",
+	L"Chcesz operowaæ %s zanim u¿yjesz banda¿y? (mo¿esz przywróciæ oko³o %i punktów zdrowia.)",
+	L"Chcesz operowaæ %s zanim u¿yjesz banda¿y? (mo¿esz przywróciæ oko³o %i punktów zdrowia.)",
+	L"Czy chcesz najpierw operowaæ przed u¿yciem banda¿y? (%i pacjent(ów))",
+	L"Czy chcesz najpierw operowaæ pacjenta?",
+	L"Czy podczas udzielania pierwszej pomocy wykonywaæ niezbêdne operacje?",
+	L"operacja na %s zakoñczona.",
+	L"%s otrzymuje trafienie w korpus i traci punkt maksymalnego zdrowia!",
+	L"%s otrzymuje trafienie w korpus i traci %d punktów maksymalnego zdrowia!",
+	L"%s odzyska³(a) utracony punkt %s",
+	L"%s odzyska³(a) %d utraconych punktów %s",
+	L"Twoja umiejêtnoœæ zwiadowcy uchroni³a ciê przed zasadzk¹!",
+	L"Twoja umiejêtnoœæ zwiadowcy pozwoli³a ci omin¹æ stado krwawych kotów!",
+	L"%s zosta³ trafiony w pachwinê i pada na ziemiê!",
+	//////////////////////////////////////////////////////////////////////////////
 };
 
-// TODO.Translate
 STR16 New113HAMMessage[] = 
 {
 	// 0 - 5
-	L"%s cowers in fear!",
-	L"%s is pinned down!",
-	L"%s fires more rounds than intended!",
-	L"You cannot train militia in this sector.",
-	L"Militia picks up %s.",
-	L"Cannot train militia with enemies present!", 
+	L"%s kuli siê ze strachu!",
+	L"%s zosta³ przyparty do muru!",
+	L"%s odda³(a) wiêcej strza³ów ni¿ zamierza³(a)!",
+	L"Nie mo¿esz szkoliæ samoobrony w tym sektorze.",
+	L"Samoobrona znajduje %s.",
+	L"Nie mo¿na szkoliæ samoobrony, gdy wróg jest w sektorze!", 
 	// 6 - 10
-	L"%s lacks sufficient Leadership score to train militia.",
-	L"No more than %d Mobile Militia trainers are permitted in this sector.",
-	L"No room in %s or around it for new Mobile Militia!",
-	L"You need to have %d Town Militia in each of %s's liberated sectors before you can train Mobile Militia here.",
-	L"Can't staff a facility while enemies are present!",
+	L"%s Brak odpowiednich umiejêtnoœci dowodzenia do szkolenia samoobrony.",
+	L"W tym sektorze jest dozwolonych nie wiêcej ni¿ %d instruktorów samoobrony.",
+	L"W %s oraz okolicy nie ma miejsca dla nowych oddzia³ów samoobrony!",
+	L"Musisz mieæ conajmniej %d jednostek samoobrony w ka¿dym z %s wyzwolonych sektorów zanim bêdziesz móg³ szkoliæ tu nowe oddzia³y.",
+	L"Nie mo¿esz obsadziæ fabryki dopóki w okolicy s¹ wrogie jednostki!",  // not sure
 	// 11 - 15
-	L"%s lacks sufficient Wisdom to staff this facility.",
-	L"The %s is already fully-staffed.",
-	L"It will cost $%d per hour to staff this facility. Do you wish to continue?",
-	L"You have insufficient funds to pay for all Facility work today. $%d have been paid, but you still owe $%d. The locals are not pleased.",
-	L"You have insufficient funds to pay for all Facility work today. You owe $%d. The locals are not pleased.",
+	L"%s zbyt niska inteligencja do obsadzenia tej fabryki.",
+	L"%s posiada ju¿ maksymaln¹ liczbê personelu.",
+	L"Obsadzenie tej fabryki bêdzie kosztowaæ $%d za godzinê. Chcesz kontynuowaæ?",
+	L"Nie posiadasz funduszy potrzebnych na op³acenie wszystkich fabryk. Zap³acono $%d, ale wci¹¿ pozosta³o $%d do zap³aty. Tubylcy s¹ zaniepokojeni.",
+	L"Nie posiadasz funduszy potrzebnych na op³acenie wszystkich fabryk. Pozosta³o $%d do zap³aty. Tubylcy s¹ zaniepokojeni.",
 	// 16 - 20
-	L"You have an outstanding debt of $%d for Facility Operation, and no money to pay it off!",
-	L"You have an outstanding debt of $%d for Facility Operation. You can't assign this merc to facility duty until you have enough money to pay off the entire debt.",
-	L"You have an outstanding debt of $%d for Facility Operation. Would you like to pay it all back?",
-	L"N/A in this sector",
-	L"Daily Expenses",
+	L"Zalegasz $%d dla Fabryki i nie posiadasz funduszy umo¿liwiaj¹cych sp³atê d³ugu!",
+	L"Zalegasz $%d dla Fabryki!. Nie mo¿esz przydzieliæ tego najemnika do fabryki do momentu sp³aty d³ugu.",
+	L"Zalegasz $%d dla Fabryki!. Czy chcesz sp³aciæ ten d³ug?",
+	L"Niedostêpny w tym sektorze",
+	L"Dzienne wydatki",
 	// 21 - 25
-	L"Insufficient funds to pay all enlisted militia! %d militia have disbanded and returned home.",
+	L"Brak funduszy do op³acenia wykazanych jednostek samoobrony! %d jednostek opuszcza oddzia³y i wraca do domu.",
 };
 
 // WANNE: This are the email texts, when one of the 4 new 1.13 MERC mercs have levelled up, that Speck sends
@@ -4838,23 +4827,23 @@ STR16 MissingIMPSkillsDescriptions[] =
 	L"Kamufla¿: Przy tobie nawet krzaki wygl¹daj¹ na sztuczne! ± ",	
 	// SANDRO - new strings for new traits added
 	// Ranger
-	L"Ranger: You are the one from Texas deserts, aren't you! ± ",	
+	L"Stra¿nik: To ty jesteœ tym z pustyni Teksasu! ± ",	
 	// Gunslinger
-	L"Gunslinger: With a handgun or two, you can be as lethal as the Billy Kid! ± ",
+	L"Rewolwerowiec: Z pistoletem lub dwoma, mo¿esz byæ tak œmiercionoœny jak Billy Kid! ± ",
 	// Squadleader
-	L"Squadleader: Natural leader and boss, you are the big shot no kidding! ± ",
+	L"Przywódca: Urodzony dowódca i szef, jesteœ naprawdê grub¹ ryb¹ bez kitu! ± ",
 	// Technician
-	L"Technician: Fixing stuff, removing traps, planting bombs, that's your bussiness! ± ",
+	L"Mechanik: Naprawa sprzêtu, rozbrajanie pu³apek, podk³adanie bomb, to twoja dzia³ka! ± ",
 	// Doctor
-	L"Doctor: You can make a quick surgery with pocket-knife and chewing gum anywhere! ± ",
+	L"Chirurg: Mo¿esz przeprowadziæ skomplikowan¹ operacjê przy u¿yciu scyzoryka i gumy do ¿ucia! ± ",
 	// Athletics
-	L"Athletics: Your speed and vitality is on top of possibilities! ± ",
+	L"Atleta: Kondycji móg³by ci pozazdroœciæ niejeden maratoñczyk! ± ",
 	// Bodybuilding
-	L"Bodybuilding: That big muscular figure which cannot be overlooked is you actually! ± ",
+	L"Budowa cia³a: Ta ogromna muskularna postaæ, której nie sposób przeoczyæ, to w rzeczy samej ty! ± ",
 	// Demolitions
-	L"Demolitions: You can blow up a whole city just by common home stuff! ± ",
+	L"Materia³y wybuchowe: Potrafisz wysadziæ miasto przy u¿yciu standardowego wyposa¿enia kuchni! ± ",
 	// Scouting
-	L"Scouting: Nothing can escape your notice! ± ",
+	L"Zwiadowca: Nic nie umknie twej uwadze! ± ",
 };
 
 STR16 NewInvMessage[] = 
@@ -4885,15 +4874,15 @@ STR16 MPServerMessage[] =
 	L"£adowanie klientów, czekaj.",
 	L"Nie mo¿na zmieniaæ miejsc zrzutu po starcie serwera.",
 	// 10
-	L"Sent file '%S' - 100/100",
-	L"Finished sending files to '%S'.",
-	L"Started sending files to '%S'.",
+	L"Wys³ano '%S' pliku - 100/100",
+	L"Zakoñczono wysy³anie plików do '%S'.",
+	L"Rozpoczêto wysy³anie plików do '%S'.",
 };
 
 STR16 MPClientMessage[] =
 {
 	// 0
-	L"Inicjacja klienta RakNet…",		
+	L"Inicjacja klienta RakNet…",
 	L"£¹czenie z IP: %S ...",
 	L"Otrzymano ustawienia:",
 	L"Jesteœ ju¿ po³¹czony.",
@@ -4926,7 +4915,7 @@ STR16 MPClientMessage[] =
 	// 25
 	L"Test, funkcja cheat’ów '9' jest w³¹czona.",
 	L"Nowe po³¹czenie Client #%d - '%S'.",
-	L"Team: %d.",//not used any more
+	L"Dru¿yna: %d.",//not used any more
 	L"'%s' (klient %d - '%S') zabity przez '%s' (client %d - '%S')",
 	L"Wyrzucono #%d - '%S'",
 	// 30
@@ -4948,34 +4937,34 @@ STR16 MPClientMessage[] =
 	L"Wspinanie wy³¹czone w MP",
 	L"Wynajêto '%s'",
 	// 45
-	L"You cant change the map once purchasing has commenced",
-	L"Map changed to '%s'",
-	L"Client '%s' disconnected, removing from game",
-	L"You were disconnected from the game, returning to the Main Menu",
-	L"Connection failed, Retrying in 5 seconds, %i retries left...",
+	L"Nie mo¿esz zmieniæ mapy w trakcie dokonywania zakupu",
+	L"Mapa zmieniona na '%s'",
+	L"Klient '%s' roz³¹czony, usuwanie z gry",
+	L"Zosta³eœ roz³¹czony, powrót do g³ównego menu",
+	L"Próba po³¹czenia zakoñczona niepowodzeniem, kolejna poróba za 5 sekund, %i prób pozosta³o...",
 	//50
-	L"Connection failed, giving up...",
-	L"You cannot start the game until another player has connected",
+	L"Próba po³¹czenia zakoñczona niepowodzeniem, rezygnacja z kolejnych prób...",
+	L"Nie mo¿esz rozpocz¹æ gry dopóki nie s¹ pod³¹czeni inni gracze",
 	L"%s : %s",
-	L"Send to All",
-	L"Allies only",
+	L"Wyœlij do wszystkich",
+	L"Wyœlij do sprzymierzeñców",
 	// 55
-	L"Cannot join game. This game has already started.",
-	L"%s (team): %s",
+	L"Nie mo¿na do³¹czyæ do gry. Ta gra ju¿ siê rozpoczê³a",
+	L"%s (dru¿yna): %s",
 	L"#%i - '%s'",
 	L"%S - 100/100",
 	L"%S - %i/100",
 	// 60
-	L"Received all files from server.",
-	L"'%S' finished downloading from server.",
-	L"'%S' started downloading from server.",
-	L"Cannot start the game until all clients have finished receiving files",
-	L"This server requires that you download modified files to play, do you wish to continue?",
+	L"Pobrano wszystkie pliki z serwera.",
+	L"Pobrano '%S' z serwera",
+	L"Rozpoczêto pobieranie '%s' z serwera",
+	L"Nie mo¿na rozpocz¹æ gry dopóki wszyscy nie zakoñcz¹ pobierania plików z serwera",
+	L"Ten serwer przed rozpoczêciem gry wymaga pobrania zmodyfikowanych plików, czy chcesz kontynuowaæ",
 	// 65
-	L"Press 'Ready' to enter tactical screen.",
-	L"Cannot connect because your version %S is different from the server version %S.",
-	L"You killed an enemy soldier.",
-	L"Cannot start the game, because all teams are the same.",
+	L"Naciœnij 'Gotowe' aby przejœæ do ekranu taktycznego",
+	L"Nie mo¿na siê po³¹czyæ poniewa¿ twoja wersja %S ró¿ni siê od wersji %S na serwerze.",
+	L"Zabi³eœ wrog¹ jednostkê",
+	L"Nie mo¿na do³¹czyæ do gry. Ta gra ju¿ siê rozpoczê³a",
 };
 
 STR16 MPHelp[] =
@@ -5005,11 +4994,11 @@ STR16 MPHelp[] =
 
 STR16 gszMPEdgesText[] =
 {
-	L"N",
-	L"S",
-	L"E",
-	L"W",
-	L"C",	// "C"enter
+	L"Pn", //- Pó³noc
+	L"Pd", //- Po³udnie
+	L"W", //- Wschód
+	L"Z", //- Zachód
+	L"C",   // "C" - Centralny
 };
 
 STR16 gszMPTeamNames[] =
@@ -5018,265 +5007,262 @@ STR16 gszMPTeamNames[] =
 	L"Bravo",
 	L"Delta",
 	L"Charlie",
-	L"N/D",		// Acronym of Not Applicable
+	L"N/D",         // Acronym of Not Applicable
 };
 
 STR16 gszMPMapscreenText[] =
 {
-	L"Game Type: ",
-	L"Players: ",
+	L"Tryb gry: ",
+	L"Gracze: ",
 	L"Mercs each: ",
-	L"You cannot change starting edge once Laptop is unlocked.",
-	L"You cannot change teams once the Laptop is unlocked.",
-	L"Random Mercs: ",
-	L"Y",
-	L"Difficulty:",
-	L"Server Version:",
+	L"Nie mo¿esz zmieniæ pocz¹tkowego wierzcho³ka dopóki laptop jest odblokowany.",
+	L"Nie mo¿esz zmieniaæ dru¿yn dopóki laptop jest odblokowany.",
+	L"Losowi najemnicy: ",
+	L"T", //if "Y" means Yes here
+	L"Poziom trudnoœci:",
+	L"Wersja serwera:",
 };
 
 STR16 gzMPSScreenText[] =
 {
-	L"Scoreboard",
-	L"Continue",
-	L"Cancel",
-	L"Player",
-	L"Kills",
-	L"Deaths",
-	L"Queen's Army",
-	L"Hits",
-	L"Misses",
-	L"Accuracy",
-	L"Damage Dealt",
-	L"Damage Taken",
-	L"Please wait for the server to press 'Continue'."
+	L"Tabela punktów",
+	L"Kontynuuj",
+	L"Anuluj",
+	L"Gracz",
+	L"Zabitych",
+	L"Liczba zgonów",
+	L"Armia królowej",
+	L"Trafienia",
+	L"Strza³y chybione",
+	L"Celnoœæ",
+	L"Obra¿enia zadane",
+	L"Obra¿enia otrzymane",
+	L"Czekaj na po³¹czenie z serwerem aby nacisn¹æ 'Kontynuuj'",
 };
 
 STR16 gzMPCScreenText[] =
 {
-	L"Cancel",
-	L"Connecting to Server",
-	L"Getting Server Settings",
-	L"Downloading custom files",
-	L"Press 'ESC' to cancel or 'Y' to chat",
-	L"Press 'ESC' to cancel",
-	L"Ready"
+	L"Anuluj",
+	L"£¹czenie z serwerem",
+	L"Pobieranie ustawieñ serwera",
+	L"Pobieranie plików",
+	L"Naciœnij 'ESC' aby anulowaæ lub 'Y' aby wejœæ na chat",
+	L"Naciœnij 'ESC'aby anuowaæ",
+	L"Gotowe",
 };
 
 STR16 gzMPChatToggleText[] =
 {
-	L"Send to All",
-	L"Send to Allies only",
+	L"Wyœlij do wszystkich",
+	L"Wyœlij do sprzymierzeñców",
 };
 
 STR16 gzMPChatboxText[] =
 {
 	L"Multiplayer Chat",
-	L"Chat: Press 'ENTER' to send of 'ESC' to cancel.",
+	L"Chat: Naciœnij 'ENTER' aby wys³aæ lub 'ESC' by anulowaæ",
 };
 
 // Following strings added - SANDRO
 STR16 pSkillTraitBeginIMPStrings[] =
 {
-	// For old traits
-	L"On the next page, you are going to choose your skill traits according to your proffessional specialization as a mercenary. No more than two different traits or one expert trait can be selected.",
-	L"You can also choose only one or even no traits, which will give you a bonus to your attribute points as a compensation. Note that Electronics and Ambidextrous traits cannot be achieved at expert levels.",
-	// For new major/minor traits
-	L"Next stage is about choosing your skill traits according to your proffessional specialization as a mercenary. On first page you can select up to two potential major traits, which mostly represent your main role in a team. While on second page is list of possible minor traits, which represent personal feats.",
-	L"No more then three choices altogeher are possible. Which means if you choose no major traits, you can then choose three minor traits. If you choose both major traits (or one enhanced), you can then choose only one minor trait...",
+	// Odnoœnie starych umiejêtnoœci
+	L"Na nastêpnej stronie, wybierzesz umiejêtnoœci dotycz¹ce twojej specjalizacji jako najemnika. Nie mo¿na wybraæ wiêcej ni¿ dwóch ró¿nych umiejêtnoœci, albo jednej w stopniu eksperta.",
+	L"Mo¿esz tak¿e wybraæ jedn¹, albo nawet nie wybraæ ¿adnej umiejêtnoœci, co da ci bonus do liczby punktów atrybutów. Zauwa¿, ¿e elektronika i oburêcznoœæ nie mog¹ byæ wybrane w stopniu eksperta.",
+	// Odnoœnie nowych/pomniejszych umiejêtnoœci
+	L"Nastêpny etap dotyczy wybierania umiejêtnoœci dotycz¹cych twojej specjalizacji jako najemnika. Na pierwszej stronie, mo¿esz wybraæ do dwóch g³ównych umiejêtnoœci, które reprezentuj¹ twoj¹ rolê w zespole. Druga strona to lista pomniejszych cech, które reprezentuj¹ twoj¹ osobowoœæ.",
+	L"Wybranie wiêcej ni¿ trzech jednoczeœnie jest niemo¿liwe. Oznacza to, ¿e je¿eli nie wybierzesz ¿adnych g³ównych umiejêtnoœci, mo¿esz wybraæ trzy pomniejsze cechy. Jeœli wybierzesz 2 g³ówne umiejêtnoœci (albo jedn¹ zaawansowan¹), mo¿esz wybraæ tylko jedn¹ cechê dodatkow¹...",
 };
 
 STR16 sgAttributeSelectionText[] = 
 {
-	L"Please adjust your physical attributes according to your true abilities. You cannot raise any score above",
-	L"I.M.P. Attributes and skills review.",
-	L"Bonus Pts.:",
-	L"Starting Level",
+	L"Proszê, wybierz swoje atrybuty fizyczne zgodnie z twoimi prawdziwymi umiejêtnoœciami. Nie mo¿esz podnieœæ ¿adnego z powy¿szych wyników.",
+	L"Przegl¹d atrybutów i umiejêtnoœci I.M.P..",
+	L"Punkty bonusowe.:",
+	L"Poziom startowy",
 	// New strings for new traits
-	L"On the next page you are going to specify your physical attributes and skills. As 'attributes' are called: health, dexterity, agility, strength and wisdom. Attributes cannot go lower than %d.",
-	L"The rest are called 'skills' and unlike attributes skills can be set to zero meaning you have absolutely no proficieny in it.",
-	L"All scores are set to a minimum at the beginning. Note that certain attributes are set to specific values according to skill traits you have selected. You cannot set those attributes lower than that.",
-	//L"Please adjust the scores the way to describe your attributes at best.",
+	L"Na nastêpnej stronie wybierzesz swoje atrybuty fizyczne i umiejêtnoœci. 'Atrybuty' to: zdrowie, zwinnoœæ, zrêcznoœæ, si³a oraz inteligencja. Atrybuty nie mog¹ byæ ni¿sze ni¿ %d.",
+	L"Reszta to 'umiejêtnoœci', w przeciwieñstwie do atrybutów, mog¹ byæ ustawione na zero, co oznacza, ¿e nie masz w nich kompletnie ¿adnej wprawy.",
+	L"Wszystkie punkty s¹ na pocz¹tku ustawione na minimum. Zauwa¿, ¿e niektóre atrybuty s¹ ustawione na wartoœciach, co ma zwi¹zek z wczeœniej wybranymi umiejêtnoœciami. Nie mo¿esz ustawiæ ich ni¿ej.",
+	//L"Proszê, dobierz punkty tak, by najlepiej opisywa³y twoje atrybuty.",
 };
 
 STR16 pCharacterTraitBeginIMPStrings[] =
 {
-	L"I.M.P. Character Analysis",
-	L"The analysis of your character is the next step on your profile creation. On the first page you will be shown a list of character traits to choose. We imagine you could identify yourself with more of them, but here you will be able to pick only one. Choose the one which you feel aligned with mostly. ",
-	L"The second page enlists possible disabilities you might have. If you suffer from any of these disabilities, choose which one (we believe that everyone has only one such disablement). Be honest, as it is important to inform potential employers of your true condition.",
+	L"Analiza charakteru I.M.P.",
+	L"Analiza charakteru to nastêpny krok w tworzeniu twojego profile. Na pierwszej stronie zostanie ci przedstawiona lista cech charakteru do wybrania. Domyœlamy siê, ¿e mo¿esz identyfikowaæ siê z wiêksz¹ ich iloœci¹, jednak bêdziesz móg³ wybraæ tylko jedn¹. Wybierz tak¹, z któr¹ czujesz siê najbardziej zwi¹zany.",
+	L"Druga strona przedstawia listê niepe³nosprawnoœci, na które mo¿esz cierpieæ. Jeœli cierpisz na jedn¹ z nich, wybierz j¹ (wierzymy, ¿e ka¿dy ma tylko jedn¹ tak¹ niepe³nosprawnoœæ). B¹dŸ szczery, poniewa¿ to wa¿ne, by poinformowaæ potencjalnych pracodawców o twoim faktycznym stanie zdrowia.",
 };
 
 STR16 gzIMPAttitudesText[]=
 {
-	L"Normal",
-	L"Friendly",
-	L"Loner",
-	L"Optimist",
-	L"Pessimist",
-	L"Aggressive",
-	L"Arrogant",
-	L"Big Shot",
-	L"Asshole",
-	L"Coward",
-	L"I.M.P. Attitudes",
+	L"Normalny",
+	L"Przyjazny",
+	L"Samotnik",
+	L"Optymista",
+	L"Pesymista",
+	L"Agresywny",
+	L"Arogancki",
+	L"Gruba ryba",
+	L"Dupek",
+	L"Tchórz",
+	L"Nastawienie I.M.P.-a",
 };
 
 STR16 gzIMPCharacterTraitText[]=
 {
-	L"Normal",
-	L"Sociable",
-	L"Loner",
-	L"Optimist",
-	L"Assertive",
-	L"Intellectual",
-	L"Primitive",
-	L"Aggressive",
-	L"Phlegmatic",
-	L"Dauntless",
-	L"Pacifist",
-	L"Malicious",
-	L"Show-off",
-	L"I.M.P. Character Traits",
+	L"Normalny",
+	L"Towarzyski",
+	L"Samotnik",
+	L"Optymista",
+	L"Asertywny",
+	L"Intelektualista",
+	L"Prymityw",
+	L"Agresywny",
+	L"Flegmatyk",
+	L"Nieustraszony",
+	L"Pacyfista",
+	L"Podstêpny",
+	L"Gwiazdor",
+	L"Cechy charakteru I.M.P.-a",
 };
 
 STR16 gzIMPColorChoosingText[] = 
 {
-	L"I.M.P. Colors and Body Type",
-	L"I.M.P. Colors",
-	L"Please select the respective colors of your skin, hair and clothing. And select what body type you have.",
-	L"Please select the respective colors of your skin, hair and clothing.",
-	L"Toggle this to use alternative rifle holding.",
-	L"\n(Caution: you will need a big strength for this.)",
+	L"Kolory i sylwetka cia³a I.M.P.-a",
+	L"Kolory I.M.P.",
+	L"Proszê wybraæ odpowiednie kolory skóry, w³osów i ubrañ oraz swoj¹ sylwetkê cia³a.",
+	L" Proszê wybraæ odpowiednie kolory skóry, w³osów i ubrañ.",
+	L"Zaznacz, by u¿ywaæ alternatywnego sposobu trzymania broni.",
+	L"\n(Uwaga: bêdziesz potrzebowaæ do tego du¿ej si³y.)",
 };
 
 STR16 sColorChoiceExplanationTexts[]=
 {
-	L"Hair Color",
-	L"Skin Color",
-	L"Shirt Color",
-	L"Pants Color",
-	L"Normal Body",
-	L"Big Body",
+	L"Kolor w³osów",
+	L"Kolor skóry",
+	L"Kolor koszulki",
+	L"Kolor spodni",
+	L"Normalne cia³o",
+	L"Du¿e cia³o",
 };
 
 STR16 gzIMPDisabilityTraitText[]=
 {
-	L"No Disability",
-	L"Heat Intolerant",
-	L"Nervous",
-	L"Claustrophobic",
-	L"Nonswimmer",
-	L"Fear of Insects",
-	L"Forgetful",
-	L"Psychotic",
-	L"I.M.P. Disabilities",
+	L"Bez niepe³nosprawnoœci",
+	L"Nie lubi ciep³a",
+	L"Nerwowy",
+	L"Klaustrofobik",
+	L"Nie umie p³ywaæ",
+	L"Boi siê owadów",
+	L"Zapominalski",
+	L"Psychol",
+	L"Niepe³nosprawnoœci I.M.P.-a",
 };
 
-// TODO.Translate
 // HEADROCK HAM 3.6: Error strings for assigning a merc to a facility
 STR16 gzFacilityErrorMessage[]=
 {
-	L"%s lacks sufficient Strength to perform this task.",
-	L"%s lacks sufficient Dexterity to perform this task.",
-	L"%s lacks sufficient Agility to perform this task.",
-	L"%s is not Healthy enough to perform this task.",
-	L"%s lacks sufficient Wisdom to perform this task.",
-	L"%s lacks sufficient Marksmanship to perform this task.",
+	L"%s nie ma wystarczaj¹cej si³y, by tego dokonaæ",
+	L"%s nie ma wystarczaj¹cej zrêcznoœci, by tego dokonaæ",
+	L"%s nie ma wystarczaj¹cej zwinnoœci, by tego dokonaæ",
+	L"%s nie ma doœæ zdrowia, by tego dokonaæ",
+	L"%s nie ma wystarczaj¹cej inteligencji, by tego dokonaæ",
+	L"%s nie ma wystarczaj¹cej celnoœci, by tego dokonaæ",
 	// 6 - 10
-	L"%s lacks sufficient Medical Skill to perform this task.",
-	L"%s lacks sufficient Mechanical Skill to perform this task.",
-	L"%s lacks sufficient Leadership to perform this task.",
-	L"%s lacks sufficient Explosives Skill to perform this task.",
-	L"%s lacks sufficient Experience to perform this task.",
+	L"%s nie ma wystarczaj¹cych um. medycznych, by tego dokonaæ.",
+	L"%s nie ma wystarczaj¹cych um. mechaniki, by tego dokonaæ.",
+	L"%s nie ma wystarczaj¹cych um. dowodzenia, by tego dokonaæ.",
+	L"%s nie ma wystarczaj¹cych um. mat. wyb., by tego dokonaæ.",
+	L"%s nie ma wystarczaj¹cego doœwiadczenia, by tego dokonaæ.",
 	// 11 - 15
-	L"%s lacks sufficient Morale to perform this task.",
-	L"%s is too exhausted to perform this task.",
-	L"Insufficient loyalty in %s. The locals refuse to allow you to perform this task.",
-	L"Too many people are already working at the %s.",
-	L"Too many people are already performing this task at the %s.",
+	L"%s ma za ma³e morale, by tego dokonaæ",
+	L"%s nie ma wystarczaj¹co du¿o energii, by tego dokonaæ",
+	L"W %s jest zbyt ma³a lojalnoœæ. Mieszkañcy nie pozwol¹ ci tego zrobiæ.",
+	L"W %s pracuje ju¿ zbyt wiele osób.",
+	L"W %s zbyt wiele osób wykonuje ju¿ to polecenie.",
 	// 16 - 20
-	L"%s can find no items to repair.",
-	L"%s has lost some %s while working in sector %s!",
-	L"%s has lost some %s while working at the %s in %s!",
-	L"%s was injured while working in sector %s, and requires immediate medical attention!",
-	L"%s was injured while working at the %s in %s, and requires immediate medical attention!",
+	L"%s nie znajduje przedmiotów do naprawy.",
+	L"%s traci nieco %s, pracuj¹c w sektorze %s",
+	L"%s traci nieco %s, pracuj¹c w %s w sektorze %s",
+	L"%s odnosi rany, pracuj¹c w sektorze %s i wymaga natychmiastowej pomocy medycznej!",
+	L"%s odnosi rany, pracuj¹c w %s w sektorze %s i wymaga natychmiastowej pomocy medycznej!",
 	// 21 - 25
-	L"%s was injured while working in sector %s. It doesn't seem too bad though.",
-	L"%s was injured while working at the %s in %s. It doesn't seem too bad though.",
-	L"The residents of %s seem upset about %s's presence.",
-	L"The residents of %s seem upset about %s's work at the %s.",
-	L"%s's actions in sector %s have caused loyalty loss throughout the region!",
+	L"%s odnosi rany, pracuj¹c w sektorze %s. Nie wygl¹da to jednak bardzo powa¿nie.",
+	L"%s odnosi rany, pracuj¹c w %s w sektorze %s. Nie wygl¹da to jednak bardzo powa¿nie.",
+	L"Mieszkañcy miasta %s wydaj¹ siê poirytowani tym, ¿e %s przebywa w ich okolicy.",
+	L"Mieszkañcy miasta %s wydaj¹ siê poirytowani tym, ¿e %s pracuje w %s.",
+	L"%s po swych dzia³aniach w sektorze %s powoduje spadek poparcia w regionie.",
 	// 26 - 30
-	L"%s's actions at the %s in %s have caused loyalty loss throughout the region!",
-	L"%s is drunk.", // <--- This is a log message string.
-	L"%s has become severely ill in sector %s, and has been taken off duty.",
-	L"%s has become severely ill and cannot continue his work at the %s in %s.",
-	L"%s was injured in sector %s.", // <--- This is a log message string.
+	L"%s swymi dzia³aniami w %s w %s powoduje spadek poparcia w regionie.",
+	L"%s jest w stanie upojenia alkoholowego",
+	L"%s ciê¿ko choruje w sektorze %s i przechodzi w stan spoczynku",
+	L"%s ciêzko choruje i nie mo¿e dalej pracowaæ w %s w %s",
+	L"%s doznaje ciê¿kich obra¿eñ w sektorze %s",	//	%s was injured in sector %s. // <--- This is a log message string.
 	// 31 - 35
-	L"%s was severely injured in sector %s.", //<--- This is a log message string.
+	L"%s doznaje ciê¿kich obra¿eñ w sektorze %s", //<--- This is a log message string.
 
 
 };
 
-// TODO.Translate
 STR16 gzFacilityRiskResultStrings[]=
 {
-	L"Strength",
-	L"Agility",
-	L"Dexterity",
-	L"Wisdom",
-	L"Health",
-	L"Marksmanship",
+	L"Si³a",
+	L"Zwinnoœæ",
+	L"Zrêcznoœæ",
+	L"Inteligencja",
+	L"Zdrowie",
+	L"Umiejêtnoœci strzeleckie",   //short: "Um. strzeleckie"
 	// 5-10
-	L"Leadership",
-	L"Mechanical skill",
-	L"Medical skill",
-	L"Explosives skill",
+	L"Umiejêtnoœæ dowodzenia",   //short: "Um. dowodzenia"
+	L"Znajomoœæ mechaniki",   //short: "Zn. mechaniki"
+	L"Wiedza medyczna",
+	L"Znajomoœæ materia³ów wybuchowych",   //short: "Zn. mat. wybuchowych"
 };
 
-// TODO.Translate
 STR16 gzFacilityAssignmentStrings[]=
 {
 	L"AMBIENT",
 	L"Staff",
-	L"Rest",
-	L"Repair Items",
-	L"Repair %s", // Vehicle name inserted here
-	L"Repair Robot",
+	L"Odpoczywa"
+	L"Naprawa ekwipunku",
+	L"Naprawa %s",
+	L"Naprawa Robota",
 	// 6-10
-	L"Doctor",
-	L"Patient",
-	L"Practice Strength",
-	L"Practice Dexterity",
-	L"Practice Agility",
-	L"Practice Health",
+	L"Lekarz",
+	L"Pacjent",
+	L"Trening si³y",
+	L"Trening zrêcznoœci",
+	L"Trening zwinnoœci",
+	L"Trening zdrowia",
 	// 11-15
-	L"Practice Marksmanship",
-	L"Practice Medical",
-	L"Practice Mechanical",
-	L"Practice Leadership",
-	L"Practice Explosives",
+	L"Trening um. strzeleckich",
+	L"Trening wiedzy medycznej",
+	L"Trening zn. mechaniki",
+	L"Trening dowodzenia",
+	L"Trening zn. mat. wybuchowych",
 	// 16-20
-	L"Student Strength",
-	L"Student Dexterity",
-	L"Student Agility",
-	L"Student Health",
-	L"Student Marksmanship",
+	L"Uczeñ si³a",
+	L"Uczeñ zrêcznoœæ",
+	L"Uczeñ zwinnoœæ",
+	L"Uczeñ zdrowie",
+	L"Uczeñ um. strzeleckie",
 	// 21-25
-	L"Student Medical",
-	L"Student Mechanical",
-	L"Student Leadership",
-	L"Student Explosives",
-	L"Trainer Strength",
+	L"Uczeñ wiedza medyczna",
+	L"Uczeñ zn. mechaniki",
+	L"Uczeñ um. dowodzenia",
+	L"Uczeñ zn. mat. wybuchowych",
+	L"Instruktor si³a",
 	// 26-30
-	L"Trainer Dexterity",
-	L"Trainer Agility",
-	L"Trainer Health",
-	L"Trainer Marksmanship",
-	L"Trainer Medical",
+	L"Instruktor zrêcznoœæ",
+	L"Instruktor zwinnoœæ",
+	L"Instruktor zdrowie",
+	L"Instruktor um. strzeleckie",
+	L"Instruktor wiedza medyczna",
 	// 30-35
-	L"Trainer Mechanical",
-	L"Trainer Leadership",
-	L"Trainer Explosives",
+	L"Instruktor zn. mechaniki",
+	L"Instruktor um. dowodzenia",
+	L"Instruktor zn. mat. wybuchowych",
 };
 
 STR16 Additional113Text[]=

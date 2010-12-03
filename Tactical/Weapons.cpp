@@ -4456,9 +4456,7 @@ UINT32 CalcChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTime,
 				maxBonus = 20+((FLOAT)iMarksmanship/20*(EffectiveExpLevel(pSoldier)))+(Weapon[Item[pInHand->usItem].ubClassIndex].bAccuracy*2)+(NUM_SKILL_TRAITS( pSoldier, SNIPER_NT )*gSkillTraitValues.ubSNAimingBonusPerClick);
 		}
 		else
-		{
-			//dddd!!{
-			FLOAT	maxBonus;
+		{			
 			if(gGameExternalOptions.bAltAimEnabled) 
 				maxBonus = (20*(iMarksmanship/100))+((FLOAT)iMarksmanship/20*pSoldier->stats.bExpLevel)+(Weapon[Item[pInHand->usItem].ubClassIndex].bAccuracy*2)+(NUM_SKILL_TRAITS( pSoldier, PROF_SNIPER_OT )*10);
 			else 

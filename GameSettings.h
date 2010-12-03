@@ -492,7 +492,8 @@ typedef struct
 
 	//tais: nsgi
 	BOOLEAN gfUseNewStartingGearInterface;
-
+	// DBrot: Seperate Starting items for Experts
+	BOOLEAN fExpertsGetDifferentChoices;
 	BOOLEAN gfUseAutoSave;
 
 	//Merc Assignment settings
@@ -623,6 +624,9 @@ typedef struct
 
 	// 2Points: Use new repair algorithm
 	BOOLEAN fAdditionalRepairMode;
+
+	// CHRISL: Skyrider and enemy occupied sectors
+	UINT8 ubSkyriderHotLZ;
 
 	// CPT: Cover System Settings
 	UINT8 ubStealthTraitCoverValue;
@@ -963,6 +967,7 @@ typedef struct
 
 	UINT8 ubChanceTonyAvailable; // silversurfer/SANDRO
 	
+	BOOLEAN fStandUpAfterBattle;
 } GAME_EXTERNAL_OPTIONS;
 
 typedef struct

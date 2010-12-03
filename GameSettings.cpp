@@ -721,7 +721,8 @@ void LoadGameExternalOptions()
 	gGameExternalOptions.iIMPStartingLevelCostMultiplier	= iniReader.ReadInteger("Recruitment Settings","IMP_STARTING_LEVEL_COST_MULTIPLIER", 5, 0, 100);
 	gGameExternalOptions.iBonusPointsForDisability			= iniReader.ReadInteger("Recruitment Settings","IMP_BONUS_POINTS_FOR_DISABILITY",20, 0, 500);
 	gGameExternalOptions.iBonusPointsPerSkillNotTaken		= iniReader.ReadInteger("Recruitment Settings","IMP_BONUS_POINTS_PER_SKILL_NOT_TAKEN",25, 0, 500);
-
+	// DBrot: Expert choices
+	gGameExternalOptions.fExpertsGetDifferentChoices			 = iniReader.ReadBoolean("Recruitment Settings","EXPERTS_GET_DIFFERENT_CHOICES",FALSE);
 	//Merc settings
 	gGameExternalOptions.fMercDayOne						= iniReader.ReadBoolean("Recruitment Settings","MERC_WEBSITE_IMMEDIATELY_AVAILABLE",FALSE);
 	gGameExternalOptions.fAllMercsAvailable					= iniReader.ReadBoolean("Recruitment Settings","MERC_WEBSITE_ALL_MERCS_AVAILABLE",FALSE);
@@ -834,7 +835,9 @@ void LoadGameExternalOptions()
 
 	// silversurfer: don't play quote when mine spotted?
 	gGameExternalOptions.fMineSpottedNoTalk					= iniReader.ReadBoolean("Tactical Interface Settings","MINES_SPOTTED_NO_TALK", FALSE);
-
+	
+	//DBrot: Stand up after battle? 
+	gGameExternalOptions.fStandUpAfterBattle				= iniReader.ReadBoolean("Tactical Interface Settings","STAND_UP_AFTER_BATTLE", TRUE);
 	// Tactical militia command	
 	gGameExternalOptions.fAllowTacticalMilitiaCommand		= iniReader.ReadBoolean("Tactical Interface Settings","ALLOW_TACTICAL_MILITIA_COMMAND",0);
 
@@ -1332,6 +1335,9 @@ void LoadGameExternalOptions()
 
 	// 2Points: Use new repair algorithm (Items are priorized based on type and damage to item, starting from equipped weapons, going to armor, then inventory)
 	gGameExternalOptions.fAdditionalRepairMode				= iniReader.ReadBoolean("Strategic Gameplay Settings", "ADDITIONAL_REPAIR_MODE", FALSE);	
+
+	// CHRISL: Determine how Skyrider should handle landing in enemy occupied sectors
+	gGameExternalOptions.ubSkyriderHotLZ					= iniReader.ReadInteger("Strategic Gameplay Settings", "ALLOW_SKYRIDER_HOT_LZ", 0);
 
 	//################# Bobby Ray Settings ##################
 

@@ -5474,7 +5474,7 @@ void WeaponKitSelectionUpdate(UINT8 selectedInventory = 0)
 	{
 		FLOAT mod;
 		mod = (FLOAT) (gMercProfileGear[gbCurrentSoldier][selectedInventory].PriceModifier + 100) / 100;
-		gMercProfiles[ gbCurrentSoldier ].usOptionalGearCost = tempGearCost * mod;
+		gMercProfiles[ gbCurrentSoldier ].usOptionalGearCost = (UINT16)(tempGearCost * mod);
 	}
 	else
 	{
