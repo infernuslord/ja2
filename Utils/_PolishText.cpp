@@ -4036,9 +4036,15 @@ STR16	gzGIOScreenText[] =
 	L"Wrogowie upuszczaj¹ ca³oœæ ekwipunku",
 	L"Wy³¹czone",
 	L"W³¹czone",
+#ifdef JA2UB
+	L"Tex and John",
+	L"Random",
+	L"All",
+#else
 	L"Liczba terrorystów",
 	L"Losowe",
 	L"Wszystkie",
+#endif	
 	L"Tajne sk³ady proni",
 	L"Losowe",
 	L"Wszystkie",
