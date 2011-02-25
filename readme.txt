@@ -1,4 +1,4 @@
-Last 1.13 SVN 3944
+Last 1.13 SVN 3944 Beta
 
 Compilation of UB :
 
