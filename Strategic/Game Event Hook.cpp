@@ -218,17 +218,18 @@ BOOLEAN ExecuteStrategicEvent( STRATEGICEVENT *pEvent )
 			DailyUpdateOfMercSite( (UINT16)GetWorldDay() );
 			break;
 	case EVENT_DAY3_ADD_EMAIL_FROM_SPECK:
-			if ( gGameExternalOptions.fMercDayOne == FALSE && gGameExternalOptions.fAllMercsAvailable == FALSE )
+			// WANNE: This fixes the bug, that Speck did not sent the email on Day 3, when MERC_WEBSITE_ALL_MERCS_AVAILABLE = TRUE!
+			if ( gGameExternalOptions.fMercDayOne == FALSE /* && gGameExternalOptions.fAllMercsAvailable == FALSE */ )
 			{
 			#ifdef JA2UB
 			//No JA25 UB
 			#else
-				AddEmail(MERC_INTRO, MERC_INTRO_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin( ), -1 );
-			#endif		
+				AddEmail(MERC_INTRO, MERC_INTRO_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin( ), -1, -1 ,TYPE_EMAIL_EMAIL_EDT );
+			#endif	
 			}
 			break;
 		case EVENT_DAY2_ADD_EMAIL_FROM_IMP:
-			AddEmail(IMP_EMAIL_PROFILE_RESULTS, IMP_EMAIL_PROFILE_RESULTS_LENGTH, IMP_PROFILE_RESULTS, GetWorldTotalMin( ), -1 );
+			AddEmail(IMP_EMAIL_PROFILE_RESULTS, IMP_EMAIL_PROFILE_RESULTS_LENGTH, IMP_PROFILE_RESULTS, GetWorldTotalMin( ), -1, -1, TYPE_EMAIL_EMAIL_EDT);
 			break;
 		//If a merc gets hired and they dont show up immediately, the merc gets added to the queue and shows up
 		// uiTimeTillMercArrives	minutes later
@@ -547,5 +548,6 @@ void CrippledVersionEndGameCheckCallBack( UINT8 bExitValue )
 }
 
 #endif
+
 
 

@@ -270,12 +270,16 @@
 
 #define DEFAULT_APS 20
 #define DEFAULT_AIMSKILL 80
-*/
+*/						
 
 //Just so the compiler will be able to use it in init.cpp, I'm a careful person.  Gotthard 1/18/07
 extern INT16 APBPConstants[TOTAL_APBP_VALUES];
 
 INT16 BaseAPsToShootOrStab( INT16 bAPs, INT16 bAimSkill, OBJECTTYPE * pObj );
+// HEADROCK HAM 4: Same function as above, except no modifier.
+INT16 BaseAPsToShootOrStabNoModifier( INT16 bAPs, INT16 bAimSkill, OBJECTTYPE * pObj );
+// HEADROCK HAM 4: Same function as above, except no modifier.
+INT16 BaseAPsToShootOrStabNoModifier( INT16 bAPs, INT16 bAimSkill, OBJECTTYPE * pObj );
 
 INT16 TerrainActionPoints( SOLDIERTYPE *pSoldier, INT32 sGridno, INT8 bDir, INT8 bLevel );
 INT16 ActionPointCost( SOLDIERTYPE *pSoldier, INT32 sGridNo, INT8 bDir, UINT16 usMovementMode	);
@@ -303,7 +307,15 @@ INT16 MinAPsToPunch(SOLDIERTYPE *pSoldier, INT32 sGridNo, UINT8 ubAddTurningCost
 INT16 ApsToPunch( SOLDIERTYPE *pSoldier ); // SANDRO added this
 INT16 CalcTotalAPsToAttack( SOLDIERTYPE *pSoldier, INT32 sGridNo, UINT8 ubAddTurningCost, INT16 bAimTime );
 INT16 CalcAPsToBurst( INT16 bBaseActionPoints, OBJECTTYPE * pObj );
+// HEADROCK HAM 4: Same as above, without percent modifiers.
+INT16 CalcAPsToBurstNoModifier( INT16 bBaseActionPoints, OBJECTTYPE * pObj );
+// HEADROCK HAM 4: Same as above, without percent modifiers.
+INT16 CalcAPsToBurstNoModifier( INT16 bBaseActionPoints, OBJECTTYPE * pObj );
 INT16 CalcAPsToAutofire( INT16 bBaseActionPoints, OBJECTTYPE * pObj, UINT8 bDoAutofire );
+// HEADROCK HAM 4: Same as above, without modifiers
+INT16 CalcAPsToAutofireNoModifier( INT16 bBaseActionPoints, OBJECTTYPE * pObj, UINT8 bDoAutofire );
+// HEADROCK HAM 4: Same as above, without modifiers
+INT16 CalcAPsToAutofireNoModifier( INT16 bBaseActionPoints, OBJECTTYPE * pObj, UINT8 bDoAutofire );
 INT16 GetAPsToChangeStance( SOLDIERTYPE *pSoldier, INT8 bDesiredHeight );
 // SANDRO - actually this procedure is  nowhere used in the entire JA2 code - commented out
 //INT16 GetBPsToChangeStance( SOLDIERTYPE *pSoldier, INT8 bDesiredHeight );
@@ -318,7 +330,9 @@ INT16 GetAPsToReadyWeapon( SOLDIERTYPE *pSoldier, UINT16 usAnimState );
 INT16 GetAPsToClimbRoof( SOLDIERTYPE *pSoldier, BOOLEAN fClimbDown );
 INT16 GetBPsToClimbRoof( SOLDIERTYPE *pSoldier, BOOLEAN fClimbDown );
 
-INT16 GetAPsToJumpThroughWindows( SOLDIERTYPE *pSoldier, BOOLEAN fClimbDown ); //Jump
+INT16 GetAPsToJumpThroughWindows( SOLDIERTYPE *pSoldier, BOOLEAN fWithBackpack ); //Jump
+INT16 GetBPsToJumpThroughWindows( SOLDIERTYPE *pSoldier, BOOLEAN fWithBackpack ); //Jump
+
 // SANDRO - changed these 2
 INT16 GetAPsToJumpFence( SOLDIERTYPE *pSoldier, BOOLEAN fWithBackpack );
 INT16 GetBPsToJumpFence( SOLDIERTYPE *pSoldier, BOOLEAN fWithBackpack );
@@ -363,5 +377,8 @@ INT16 GetAPsToBombDoor( SOLDIERTYPE *pSoldier );
 INT16 GetAPsToUntrapDoor( SOLDIERTYPE *pSoldier );
 INT16 GetBasicAPsToPickupItem( SOLDIERTYPE *pSoldier );
 INT16 GetAPsToDisarmMine( SOLDIERTYPE *pSoldier );
+
+INT16 GetAPsToJumpWall( SOLDIERTYPE *pSoldier, BOOLEAN fClimbDown );
+INT16 GetBPsToJumpWall( SOLDIERTYPE *pSoldier, BOOLEAN fClimbDown );
 
 #endif

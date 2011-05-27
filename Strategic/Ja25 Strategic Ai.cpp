@@ -1067,7 +1067,7 @@ BOOLEAN SaveJa25SaveInfoToSaveGame( HWFILE hFile )
 {
 	UINT32 uiNumBytesWritten;
 	UINT32	uiSize = sizeof( JA25_SAVE_INFO );
-	CHAR8		zString[512];
+//	CHAR8		zString[512];
 
 	//Make sure struct is 1000 bytes in size
 //	sprintf( zString, "JA2 SaveInfo Struct != 1000, it is: %d", uiSize );
@@ -1875,7 +1875,7 @@ void ResetJa25SectorProbabilities()
 //returns the element into the array of which sector the enemy will attack
 INT8	GetTheFurthestSectorPlayerOwns()
 {
-	INT8	bCnt;
+	//INT8	bCnt;
 	BOOLEAN	fFoundLatest=FALSE;
 	INT8	bSector=-1;
 /*
@@ -2670,7 +2670,7 @@ void HandleEnricosUnderstandingEmail()
 	//if the player just got the laptop working again, and we are to send an email when entering a new sector
 	if( gJa25SaveStruct.fSendEmail_10_NextSector )
 	{
-		AddEmail( EMAIL_UNDERSTANDING, EMAIL_UNDERSTANDING_LENGTH, MAIL_ENRICO,  GetWorldTotalMin() , -1);
+		AddEmail( EMAIL_UNDERSTANDING, EMAIL_UNDERSTANDING_LENGTH, MAIL_ENRICO,  GetWorldTotalMin() , -1 , -1, TYPE_EMAIL_EMAIL_EDT);
 
 		//Remeber we sent it
 		gJa25SaveStruct.ubEmailFromSectorFlag |= SECTOR_EMAIL__ANOTHER_SECTOR;

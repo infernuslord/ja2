@@ -40,6 +40,7 @@
 #include "InterfaceItemImages.h"
 #include "SaveLoadGame.h"//dnl ch51 081009
 #include "Map Information.h"//dnl ch51 091009
+#include "Interface Items.h"
 
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -1038,6 +1039,10 @@ void MapInvenPoolSlots(MOUSE_REGION * pRegion, INT32 iReason )
 					if(!GridNoOnVisibleWorldTile(sObjectSourceGridNo))
 						sObjectSourceGridNo = gMapInformation.sCenterGridNo;
 				}
+
+				//CHRISL: Make sure we put the item at the same level as the merc
+				if(gpItemPointerSoldier->exists() == true)
+					pInventoryPoolList[(iCurrentInventoryPoolPage*MAP_INVENTORY_POOL_SLOT_COUNT)+iCounter].ubLevel = gpItemPointerSoldier->pathing.bLevel;
 
 				// set as reachable and set gridno
 				pInventoryPoolList[ ( iCurrentInventoryPoolPage * MAP_INVENTORY_POOL_SLOT_COUNT ) + iCounter ].usFlags |= WORLD_ITEM_REACHABLE;

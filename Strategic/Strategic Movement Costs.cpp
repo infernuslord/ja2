@@ -322,9 +322,6 @@ smctableEndElementHandle(void *userData, const XML_Char *name)
 			{
 				trav_type = GROUNDBARRIER;
 			}
-			
-			
-			
 			// Now assign it to the correct directory using the close tag as a guide
 			if(strcmp(name, "North") == 0)
 			{
@@ -5777,7 +5774,7 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 				}
 			}
 		}
-
+		
 		// Is this the current sector?
 		if ( gWorldSectorX == iCol && gWorldSectorY == iRow && gbWorldSectorZ == bLevel )
 		{
@@ -5807,6 +5804,7 @@ void AddCustomMap( INT32 iRow, INT32 iCol, BOOLEAN fDisplayMessages, BOOLEAN fMe
 					continue;
 				}
 			}
+			
 			else
 			{
 				// See if this sector exists, and if so is it a campagin sectior?

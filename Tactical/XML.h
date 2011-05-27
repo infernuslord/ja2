@@ -7,14 +7,11 @@
 #include "faces.h"
 #include "Interface.h"
 #include "XML_SenderNameList.h"
-#include "XML_FilesSenderList.h"
 #include "mainmenuscreen.h"
 
 #include "legion cfg.h"
 #include "Strategic Town Loyalty.h"
-
 #include "qarray.h"
-
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -67,9 +64,6 @@ typedef PARSE_STAGE;
 #define	AMMOTYPESFILENAME						"AmmoTypes.xml"
 #define	INCOMPATIBLEATTACHMENTSFILENAME			"IncompatibleAttachments.xml"
 #define	ATTACHMENTSLOTSFILENAME					"AttachmentSlots.xml"
-#define	ITEMSLOTASSIGNFILENAME					"ItemSlotAssign.xml"
-#define	NASINCOMPATIBLEATTACHMENTS				"NASIncompatibleAttachments.xml"
-#define	ALTERINGATTACHMENTSFILENAME				"AlteringAttachments.xml"
 #define	ENEMYGUNCHOICESFILENAME					"EnemyGunChoices.xml"
 #define	ENEMYITEMCHOICESFILENAME				"EnemyItemChoices.xml"
 #define	IMPITEMCHOICESFILENAME					"IMPItemChoices.xml"
@@ -191,7 +185,6 @@ typedef PARSE_STAGE;
 //Sender Name List
 #define SENDERNAMELISTFILENAME					"SenderNameList.xml"
 
-#define QUOTEARRAYFILENAME					"MercQuote.xml"
 #define ACTIONITEMSFILENAME					"MapAction\\Actionitems.xml"
 
 #define IMPPORTRAITS					"IMPPortraits.xml"
@@ -211,16 +204,19 @@ typedef PARSE_STAGE;
 #define SECTORLEVEL2NAMESFILENAME						"Map\\SectorNamesLevel_2.xml"
 #define SECTORLEVEL3NAMESFILENAME						"Map\\SectorNamesLevel_3.xml"
 
-#define FILESSENDERLISTFILENAME						"FilesSenderList.xml"
-
+#define LAYOUTMAINMENU	"Layout\\LayoutMainMenu.xml"
 #define INTROFILESFILENAME						"IntroFiles.xml"
-
 #define MERCAVAILABILITY	"MercAvailability.xml"
 
 #define AIMAVAILABILITY	"AimAvailability.xml"
 
-#define LAYOUTMAINMENU	"Layout\\LayoutMainMenu.xml"
+#define QUOTEARRAYFILENAME					"MercQuote.xml"
 
+#define FACEGEARFILENAME					"FaceGear.xml"
+
+#define EMAILMERCAVAILABLE					"Email\\EmailMercAvailable.xml"
+#define EMAILMERCLEVELUP					"Email\\EmailMercLevelUp.xml"
+#define EMAILOTHER							"Email\\EmailOther.xml"
 
 extern BOOLEAN ReadInItemStats(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteItemStats();
@@ -273,15 +269,6 @@ extern BOOLEAN ReadInIncompatibleAttachmentStats(STR fileName);
 //WarmSteel - for New Attachment System
 extern BOOLEAN WriteAttachmentSlotsStats();
 extern BOOLEAN ReadInAttachmentSlotsStats(STR fileName);
-
-extern BOOLEAN WriteItemSlotAssignStats();
-extern BOOLEAN ReadInItemSlotAssignStats(STR fileName);
-
-extern BOOLEAN WriteNASIncompatibleAttachmentsStats();
-extern BOOLEAN ReadInNASIncompatibleAttachmentsStats(STR fileName);
-
-extern BOOLEAN WriteNASAlteringAttachmentsStats();
-extern BOOLEAN ReadInAlteringAttachmentsStats(STR fileName);
 
 extern BOOLEAN WriteExtendedArmyGunChoicesStats();
 extern BOOLEAN ReadInExtendedArmyGunChoicesStats(STR fileName);
@@ -417,6 +404,10 @@ extern void LoadIMPPortraitsTEMP();
 extern BOOLEAN ReadInSoundProfile( STR fileName );
 extern BOOLEAN WriteSoundProfile( STR fileName );
 
+//Random stats by Jazz
+extern BOOLEAN WriteRandomStats( STR fileName );
+extern BOOLEAN ReadInRandomStats( STR fileName );
+
 //new profiles by Jazz	
 extern BOOLEAN ReadInMercAvailability(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteMercAvailability(STR fileName);
@@ -424,20 +415,18 @@ extern BOOLEAN WriteMercAvailability(STR fileName);
 extern BOOLEAN ReadInAimAvailability(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteAimAvailability(STR fileName);
 
-extern BOOLEAN WriteRandomStats( STR fileName);
-extern BOOLEAN ReadInRandomStats(STR fileName);
-
 extern BOOLEAN WriteQarray(QARRAY_VALUES *pQarray, STR fileName);
 extern BOOLEAN ReadInQarray(QARRAY_VALUES *pQarray, STR fileName);
 
-extern BOOLEAN ReadInFilesSenderList(STR fileName, BOOLEAN localizedVersion);
-
+extern BOOLEAN WriteFaceGear();
+extern BOOLEAN ReadInFaceGear( FACE_GEAR_VALUES *pFaceGear, STR fileName );
 extern BOOLEAN ReadInIntroNames(STR fileName, BOOLEAN localizedVersion);
-
 extern BOOLEAN ReadInMainMenu(MAIN_MENU_VALUES *pMainMenu, STR fileName);
 
 extern BOOLEAN ReadInActionItems(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteInActionItems( STR fileName);
 
-
+extern BOOLEAN ReadInEmailMercAvailable(STR fileName, BOOLEAN localizedVersion);
+extern BOOLEAN ReadInEmailMercLevelUp(STR fileName, BOOLEAN localizedVersion);
+extern BOOLEAN ReadInEmailOther(STR fileName, BOOLEAN localizedVersion);
 #endif

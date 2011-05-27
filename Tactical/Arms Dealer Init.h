@@ -122,13 +122,13 @@ enum
 
 #define		ARMS_DEALER_ALL_WEAPONS			ARMS_DEALER_ALL_GUNS | ARMS_DEALER_BLADE | ARMS_DEALER_LAUNCHER | ARMS_DEALER_KNIFECLASS
 
-
+#ifdef JA2UB
 //Raul
 #define	ARMS_DEALER_FLAG__RAUL_HAS_SOLD_BARRETT_TO_PLAYER					0x00000001	// Raul has sold the Barrett to the player
 #define	ARMS_DEALER_FLAG__RAUL_SAID_QUOTE_48											0x00000002	// Raul said the quote for when the player first puts the hand cannon down
 #define	ARMS_DEALER_FLAG__RAUL_SAID_QUOTE_49											0x00000004	// Quote for when player removes hand cannon from players offer area
 #define	ARMS_DEALER_FLAG__RAUL_SAID_QUOTE_50											0x00000008	// Quote for when player adds the hand cannon AGAIN into the players offer area
-
+#endif
 
 
 
@@ -324,9 +324,9 @@ extern const ARMS_DEALER_INFO	DefaultarmsDealerInfo[ NUM_ARMS_DEALERS ];
 extern std::vector<ARMS_DEALER_INFO>	armsDealerInfo;
 extern ARMS_DEALER_STATUS		gArmsDealerStatus[ NUM_ARMS_DEALERS ];
 
-
+#ifdef JA2UB
 void AddTexsVideosToBettysInventory();
-
+#endif
 
 
 void		InitAllArmsDealers();
@@ -383,10 +383,11 @@ UINT16	CalcValueOfItemToDealer( UINT8 ubArmsDealer, UINT16 usItemIndex, BOOLEAN 
 
 UINT32 CalculateOvernightRepairDelay( UINT8 ubArmsDealer, UINT32 uiTimeWhenFreeToStartIt, UINT32 uiMinutesToFix );
 UINT32 CalculateMinutesClosedBetween( UINT8 ubArmsDealer, UINT32 uiStartTime, UINT32 uiEndTime );
-
+#ifdef JA2UB
 extern void DailyCheckOnItemQuantities( BOOLEAN fInstallyHaveItemsAppear ); //Ja25 UB
-
+#endif
 extern void		GuaranteeAtLeastXItemsOfIndex( UINT8 ubArmsDealer, UINT16 usItemIndex, UINT8 ubHowMany );
+
 
 
 #endif

@@ -208,7 +208,7 @@ BOOLEAN		gfLoadedGame = FALSE;	//Used to know when a game has been loaded, the f
 
 BOOLEAN		gfLoadGameUponEntry = FALSE;
 
-BOOLEAN		gfHadToMakeBasementLevels = FALSE;
+//BOOLEAN		gfHadToMakeBasementLevels = FALSE;
 
 BOOLEAN		gfGettingNameFromSaveLoadScreen = FALSE;
 
@@ -515,16 +515,17 @@ BOOLEAN		EnterSaveLoadScreen()
 //	if( guiPreviousOptionScreen != MAINMENU_SCREEN )
 //		gbSetSlotToBeSelected = -1;
 
-	// This is a hack to get sector names , but... if the underground sector is NOT loaded
-	if( !gpUndergroundSectorInfoHead )
-	{
-		BuildUndergroundSectorInfoList();
-		gfHadToMakeBasementLevels = TRUE;
-	}
-	else
-	{
-		gfHadToMakeBasementLevels = FALSE;
-	}
+	// In reality, this is not needed, but even screws things up
+	//// This is a hack to get sector names , but... if the underground sector is NOT loaded
+	//if( !gpUndergroundSectorInfoHead )
+	//{
+	//	BuildUndergroundSectorInfoList();
+	//	gfHadToMakeBasementLevels = TRUE;
+	//}
+	//else
+	//{
+	//	gfHadToMakeBasementLevels = FALSE;
+	//}
 
 	//guiSaveLoadExitScreen = SAVE_LOAD_SCREEN;
 	// this is where we came from; if loading of resources fails, this is also where we go next/back
@@ -856,8 +857,8 @@ void			ExitSaveLoadScreen()
 	gfCameDirectlyFromGame = FALSE;
 
 	//unload the basement sectors
-	if( gfHadToMakeBasementLevels )
-		TrashUndergroundSectorInfo();
+	//if( gfHadToMakeBasementLevels )
+	//	TrashUndergroundSectorInfo();
 
 	gfGettingNameFromSaveLoadScreen = FALSE;
 }
@@ -2217,7 +2218,7 @@ void DisplayOnScreenNumber( BOOLEAN fErase )
 void DoneFadeOutForSaveLoadScreen( void )
 {
 	//Make sure we DONT reset the levels if we are loading a game
-	gfHadToMakeBasementLevels = FALSE;
+	//gfHadToMakeBasementLevels = FALSE;
 
 	if( !LoadSavedGame( gbSelectedSaveLocation ) )
 	{

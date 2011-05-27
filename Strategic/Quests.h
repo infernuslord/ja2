@@ -524,7 +524,8 @@ enum Facts
 
 	FACT_CONRAD_SHOULD_GO =																		367,
 	FACT_PLAYER_KILLED_BOXERS =																368,
-	
+	// HEADROCK HAM 4: Seen Mobile Militia screen after having at least one mobile unit?
+	FACT_MOBILE_RESTRICTIONS_VIEWED =														369,
 #ifdef JA2UB	
 	//Ja25 UB
 	FACT_IMPORTED_SAVE_AND_MARY_WAS_DEAD	=										400,
@@ -602,6 +603,7 @@ BOOLEAN SaveQuestInfoToSavedGameFile( HWFILE hFile );
 
 // added by SANDRO
 void GiveQuestRewardPoint( INT16 sQuestSectorX, INT16 sQuestsSectorY, INT8 bExpReward, UINT8 bException );
+
 extern BOOLEAN CheckNPCWounded( UINT8 ubProfileID, BOOLEAN fByPlayerOnly );
 extern BOOLEAN CheckNPCInOkayHealth( UINT8 ubProfileID );
 extern BOOLEAN CheckNPCBleeding( UINT8 ubProfileID );

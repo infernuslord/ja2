@@ -1210,6 +1210,7 @@ BOOLEAN HandleMissionBriefingFiles( UINT8 ubFormat )
 		// title bar
 		VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
 		//Ja25, new map	
+#ifdef JA2UB
 		if (FileExists(MAP_JA25))
 		{
 		FilenameForBPP("LAPTOP\\TraconaMap.sti", VObjectDesc.ImageFile);
@@ -1218,6 +1219,9 @@ BOOLEAN HandleMissionBriefingFiles( UINT8 ubFormat )
 		{
 		FilenameForBPP("LAPTOP\\ArucoFilesMap.sti", VObjectDesc.ImageFile);
 		}
+#else
+		FilenameForBPP("LAPTOP\\ArucoFilesMap.sti", VObjectDesc.ImageFile);
+#endif
 		CHECKF(AddVideoObject(&VObjectDesc, &uiPicture));
 
 		// get title bar object
@@ -1234,6 +1238,7 @@ BOOLEAN HandleMissionBriefingFiles( UINT8 ubFormat )
 		// title bar
 		VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
 		//Ja25, new map	
+#ifdef JA2UB
 		if (FileExists(MAP_JA25))
 		{
 		FilenameForBPP("LAPTOP\\TraconaMap.sti", VObjectDesc.ImageFile);
@@ -1242,6 +1247,9 @@ BOOLEAN HandleMissionBriefingFiles( UINT8 ubFormat )
 		{
 		FilenameForBPP("LAPTOP\\ArucoFilesMap.sti", VObjectDesc.ImageFile);
 		}
+#else
+		FilenameForBPP("LAPTOP\\ArucoFilesMap.sti", VObjectDesc.ImageFile);
+#endif
 		CHECKF(AddVideoObject(&VObjectDesc, &uiPicture));
 
 		// get title bar object

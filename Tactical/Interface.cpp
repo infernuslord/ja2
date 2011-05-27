@@ -58,6 +58,8 @@
 	#include "message.h"
     #include "strategicmap.h"
 	#include "Queen Command.h"
+	// HEADROCK HAM 4: Included for new CTH indicator
+	#include "weapons.h"
 
 #endif
 
@@ -123,8 +125,12 @@ UINT8		gubProgCurEnemy			= 0;
 
 UINT32		guiPORTRAITICONS;
 
-UINT32		guiPORTRAITICONS_NV; //legion
-UINT32		guiPORTRAITICONS_GAS_MASK; //legion
+//UINT32		guiPORTRAITICONS_NV; //legion
+//UINT32		guiPORTRAITICONS_GAS_MASK; //legion
+
+// WANNE: Additional face gear file for IMPs
+//UINT32		guiPORTRAITICONS_NV_IMP;
+//UINT32		guiPORTRAITICONS_GAS_MASK_IMP;
 
 typedef struct
 {
@@ -249,6 +255,13 @@ UINT16 gsDownArrowY;
 UINT32 giUpArrowRect;
 UINT32 giDownArrowRect;
 
+// HEADROCK HAM 4: Rectangles for the various CTH displays.
+RECT MagRect;
+RECT AimRect;
+RECT ModeRect;
+RECT APRect;
+// HEADROCK HAM 4: Externed this value which tracks whether we've clicked out final aiming click yet.
+extern BOOLEAN gfDisplayFullCountRing;
 
 void DrawBarsInUIBox( SOLDIERTYPE *pSoldier , INT16 sXPos, INT16 sYPos, INT16 sWidth, INT16 sHeight );
 void PopupDoorOpenMenu( BOOLEAN fClosingDoor );
@@ -276,6 +289,10 @@ BOOLEAN InitializeTacticalInterface(	)
 {
 	VSURFACE_DESC		vs_desc;
 	VOBJECT_DESC	VObjectDesc;
+	
+	UINT32 iCounter2;
+	
+	char fileName[500];
 
 	// CHRISL: Setup default interface coords based on inventory system in use
 	if((UsingNewInventorySystem() == true))
@@ -415,56 +432,106 @@ BOOLEAN InitializeTacticalInterface(	)
 	VObjectDesc.fCreateFlags = VOBJECT_CREATE_FROMFILE;
 	
 	//legion 2 jazz
-	if (gGameExternalOptions.fShowTacticalFaceIcons == TRUE || gGameExternalOptions.fShowTacticalFaceGear == TRUE ) 
+	if (gGameSettings.fOptions[ TOPTION_SHOW_TACTICAL_FACE_ICONS ] == TRUE) 
 	{
-		//legion 2 jazz
+		//additional face icons (legion 2)
 		if (gGameExternalOptions.bTacticalFaceIconStyle == 0) 
 		{	
 			FilenameForBPP("INTERFACE\\portraiticons_a.sti", VObjectDesc.ImageFile);
+
+			if( !AddVideoObject( &VObjectDesc, &guiPORTRAITICONS ) )
+				AssertMsg(0, "Missing INTERFACE\\portraiticons_a.sti" );
 		}	
 		else if (gGameExternalOptions.bTacticalFaceIconStyle == 1) 
 		{	
 			FilenameForBPP("INTERFACE\\portraiticons_b.sti", VObjectDesc.ImageFile);
+
+			if( !AddVideoObject( &VObjectDesc, &guiPORTRAITICONS ) )
+				AssertMsg(0, "Missing INTERFACE\\portraiticons_b.sti" );
 		}	
 		else if (gGameExternalOptions.bTacticalFaceIconStyle == 2) 
 		{
 			FilenameForBPP("INTERFACE\\portraiticons_c.sti", VObjectDesc.ImageFile);
+
+			if( !AddVideoObject( &VObjectDesc, &guiPORTRAITICONS ) )
+				AssertMsg(0, "Missing INTERFACE\\portraiticons_c.sti" );
 		}
 		else if (gGameExternalOptions.bTacticalFaceIconStyle == 3) 
 		{
 			FilenameForBPP("INTERFACE\\portraiticons_d.sti", VObjectDesc.ImageFile);
-		}
-		else 
-		{	
-			FilenameForBPP("INTERFACE\\portraiticons_a.sti", VObjectDesc.ImageFile);
-		}
+
+			if( !AddVideoObject( &VObjectDesc, &guiPORTRAITICONS ) )
+				AssertMsg(0, "Missing INTERFACE\\portraiticons_d.sti" );
+		}		
 	}
 	else 
 	{
+		// JA2 classic face icons
 		FilenameForBPP("INTERFACE\\portraiticons.sti", VObjectDesc.ImageFile);
+
+		if( !AddVideoObject( &VObjectDesc, &guiPORTRAITICONS ) )
+			AssertMsg(0, "Missing INTERFACE\\portraiticons.sti" );
 	}
-		
-	if( !AddVideoObject( &VObjectDesc, &guiPORTRAITICONS ) )
-		AssertMsg(0, "Missing INTERFACE\\portraiticons.sti" );
+			
 						
 	//legion
-	if (gGameExternalOptions.fShowTacticalFaceGear == TRUE) 
+	if (gGameSettings.fOptions[ TOPTION_SHOW_TACTICAL_FACE_GEAR ] == TRUE) 
 	{
-	   FilenameForBPP("INTERFACE\\portraiticons_NV.sti", VObjectDesc.ImageFile);
+		/*
+		FilenameForBPP("INTERFACE\\portraiticons_NV.sti", VObjectDesc.ImageFile);
 		if( !AddVideoObject( &VObjectDesc, &guiPORTRAITICONS_NV ) )
 			AssertMsg(0, "Missing INTERFACE\\portraiticons_NV.sti" );
-			
-	   FilenameForBPP("INTERFACE\\portraiticons_GAS_MASK.sti", VObjectDesc.ImageFile);
+		
+		FilenameForBPP("INTERFACE\\portraiticons_NV_IMP.sti", VObjectDesc.ImageFile);
+		if( !AddVideoObject( &VObjectDesc, &guiPORTRAITICONS_NV_IMP ) )
+			AssertMsg(0, "Missing INTERFACE\\portraiticons_NV_IMP.sti" );
+				
+		FilenameForBPP("INTERFACE\\portraiticons_GAS_MASK.sti", VObjectDesc.ImageFile);
 		if( !AddVideoObject( &VObjectDesc, &guiPORTRAITICONS_GAS_MASK ) )
-			AssertMsg(0, "Missing INTERFACE\\portraiticons_GAS_MASK.sti" );		   
+			AssertMsg(0, "Missing INTERFACE\\portraiticons_GAS_MASK.sti" );	
+		
+		FilenameForBPP("INTERFACE\\portraiticons_GAS_MASK_IMP.sti", VObjectDesc.ImageFile);
+		if( !AddVideoObject( &VObjectDesc, &guiPORTRAITICONS_GAS_MASK_IMP ) )
+			AssertMsg(0, "Missing INTERFACE\\portraiticons_GAS_MASK_IMP.sti" );	
+		*/	
+		for( iCounter2 = 1; iCounter2 < MAXITEMS; iCounter2++ )
+		{
+			VObjectDesc.fCreateFlags = VSURFACE_CREATE_FROMFILE;		
+
+			#define SCSTI ".STI"
+			
+			if ( zNewFaceGear[iCounter2].Type > 0 )
+			{
+				strcpy(fileName, zNewFaceGear[iCounter2].szFile);
+				strcat(fileName, SCSTI);
+				strcpy(VObjectDesc.ImageFile, fileName);
+				CHECKF(AddVideoObject(&VObjectDesc,&zNewFaceGear[iCounter2].uiIndex));
+
+			}
+		}
+		
+		for( iCounter2 = 1; iCounter2 < MAXITEMS; iCounter2++ )
+		{
+			VObjectDesc.fCreateFlags = VSURFACE_CREATE_FROMFILE;		
+			
+			#define SCSTI_IMP "_IMP.STI"
+			
+			if ( zNewFaceGear[iCounter2].Type > 0 )
+			{
+				//IMP
+				strcpy(fileName, zNewFaceGear[iCounter2].szFile);
+				strcat(fileName, SCSTI_IMP);
+				strcpy(VObjectDesc.ImageFile, fileName);
+				CHECKF(AddVideoObject(&VObjectDesc,&zNewFaceGearIMP[iCounter2].uiIndex));
+			}
+		}
 	}
 
 	// LOAD RADIO
 	VObjectDesc.fCreateFlags = VOBJECT_CREATE_FROMFILE;
 	FilenameForBPP("INTERFACE\\radio.sti", VObjectDesc.ImageFile);
 
-	if( !AddVideoObject( &VObjectDesc, &guiRADIO ) )
-	//	AssertMsg(0, "Missing INTERFACE\\bracket.sti" );
+	if( !AddVideoObject( &VObjectDesc, &guiRADIO ) )	
 		AssertMsg(0, "Missing INTERFACE\\radio.sti" );
 
 	// LOAD RADIO2
@@ -1515,6 +1582,40 @@ void GetSoldierAboveGuyPositions( SOLDIERTYPE *pSoldier, INT16 *psX, INT16 *psY,
 	}
 }
 
+void DrawCTHPixelToBuffer( UINT16 *pBuffer, UINT32 uiPitch, INT16 sLeft, INT16 sTop, INT16 sRight, INT16 sBottom, INT16 sPixelX, INT16 sPixelY, UINT16 usColor )
+{
+	///////////////////////////////////////////////////////////
+	// HEADROCK HAM 4:
+	//
+	// This is a specialized drawing function that's used for the CTH indicator. It makes sure that the
+	// pixel is drawn only within the allowed region (the Tactical Viewport), and never drawn in regions
+	// reserved for other parts of the CTH indicator.
+ 
+	if (sPixelX < sLeft || sPixelX > sRight || sPixelY < sTop || sPixelY > (sBottom-1))
+	{
+		return;
+	}
+	// Do not draw in other CTH rects!
+	if ((sPixelX >= MagRect.left && sPixelX <= MagRect.right) && (sPixelY >= MagRect.top && sPixelY <= MagRect.bottom))
+	{
+		return;
+	}
+	if ((sPixelX >= AimRect.left && sPixelX <= AimRect.right) && (sPixelY >= AimRect.top && sPixelY <= AimRect.bottom))
+	{
+		return;
+	}
+	if ((sPixelX >= ModeRect.left && sPixelX <= ModeRect.right) && (sPixelY >= ModeRect.top && sPixelY <= ModeRect.bottom))
+	{
+		return;
+	}
+	if ((sPixelX >= APRect.left && sPixelX <= APRect.right) && (sPixelY >= APRect.top && sPixelY <= APRect.bottom))
+	{
+		return;
+	}
+
+	
+	pBuffer[sPixelX + uiPitch*sPixelY] = usColor;
+}
 
 //QUOTE_SYSTEM_STRUCT	soldierTTInfo;
 
@@ -2083,6 +2184,875 @@ void DrawSelectedUIAboveGuy( UINT16 usSoldierID )
 		}
 	//------------
 	}
+}
+
+BOOLEAN DrawCTHIndicator()
+{
+	////////////////////////////////////////////
+	// HEADROCK HAM 4: NCTH Indicator
+	//
+	// The NCTH shooting system is radically different from the old CTH, and as a result it requires a completely
+	// new indicator to show hit-probability. The "Hit Percentage" bar we've all gotten used to in JA2 1.13 is not
+	// doable in NCTH since the hit probability is unknown before the bullet reaches the target distance. Instead,
+	// we use a sort of "reticle" to show the margin of error for our current shot.
+	//
+	// The CTH indicator is made up of several parts:
+	//   1. Outer Circle: This circle shows the margin of error that we would have if Muzzle Accuracy was 0%. In other
+	//      words, it indicates the "worst" possible shot with the gun we're holding, given the target's distance.
+	//      This circle only gets larger or smaller if the shooter moves closer or further from the target (or
+	//      changes weapons...).
+	//   2. Inner Circle+Crosshairs: This indicator shows the margin of error for the shot given all the bonuses from
+	//      Base CTH and extra aiming clicks. It is a visual representation of where our bullet may end up once fired.
+	//      The bullet can end up anywhere within this smaller circle. The circle gets larger or smaller as we change
+	//      the number of applied aiming clicks, add magnification bonuses from a scope, change stance, etcetera.
+	//   3. Additional indicators: These are floating graphical and numerical indicators showing various important
+	//      data, such as how many aiming clicks we've applied (and how many we can apply), how many bullets we're
+	//      going to fire (in burst/auto mode), and how many APs it's going to cost us. These are generally just
+	//      relocation and redesign of existing indicators on the OCTH cursor.
+
+	if (gCTHDisplay.MuzzleSwayPercentage < 0 || gCTHDisplay.MuzzleSwayPercentage > 99 || gCTHDisplay.FinalMagFactor < 1.0)
+	{
+		// Obviously Uninitialized.
+		return 0;
+	}
+
+	INT32			iBack;
+
+	// Find the shooter.
+	SOLDIERTYPE *pSoldier;
+	GetSoldier( &pSoldier, gusSelectedSoldier );
+
+	// Create a Background Rect for us to draw our indicator on. With NCTH, the size and position of this rectangle
+	// is equal exactly to the size of the tactical screen viewport. Unlike the OCTH indicator, the NCTH one can grow
+	// so large as to fill the entire screen.
+	INT16 sLeft = gsVIEWPORT_START_X;
+	INT16 sTop = gsVIEWPORT_WINDOW_START_Y;
+	INT16 sRight = gsVIEWPORT_END_X;
+	INT16 sBottom = gsVIEWPORT_WINDOW_END_Y;
+
+	iBack = RegisterBackgroundRect(BGND_FLAG_SINGLE, NULL, sLeft, sTop, sRight, sBottom);
+
+	if ( iBack != -1 )
+	{
+		SetBackgroundRectFilled( iBack );
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// HEADROCK HAM 4: New CTH, Aperture Size
+	//
+	// As explained above, the most important part of the new indicator is the Aperture circle/crosshairs.
+	// These indicate the size of the "margin of error" for our current shot. The more accurate we are,
+	// the smaller the circle will be.
+	// 
+	// The player uses this to determine whether the shot has a good likelyhood to hit the target.
+	// If the circle is the same size or smaller than the target itself, then hit probability is 100%.
+	// The larger it gets, the less hit probability there will be. When adding extra aiming clicks,
+	// the circle gets proportionally smaller. The idea is to try to make it as small as the target
+	// (if possible) to ensure a hit.
+	//
+	// Shot aperture is calculated using the CTH formula (CalcChanceToHitGun). Scopes and lasers
+	// can help decrease the size of the aperture further.
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/////////////////////////////////
+	// Define colors
+	UINT8 ColorsRed[10] = { 255, 255, 255, 255, 255, 255, 255, 255, 173, 0 };
+	UINT8 ColorsGreen[10] = { 0, 50, 81, 101, 133, 174, 211, 243, 255, 255 };
+
+	// Select the color of the indicator circles
+	UINT16 usCApertureBar;
+
+	// CHRISL: Instead of shigting the color based on MuzzleSwayPercent, let's move this line and base it on the final iAperture value
+	// Indicator changes color from red to yellow to green, based on how well the gun is aimed.
+	//usCApertureBar		= Get16BPPColor( FROMRGB( ColorsRed[gCTHDisplay.MuzzleSwayPercentage/10], ColorsGreen[gCTHDisplay.MuzzleSwayPercentage/10], 0 ) ); // Crosshair color shifts from red (longshot) to green (Accurate shot)
+
+	UINT16 usCApertureBorder	= Get16BPPColor( FROMRGB( 10, 10, 10 ) ); // Boundaries in dark color.
+
+	//////////////////////////////////
+	// Calculate Aperture
+
+	// Calculate the center point of the shooter, in world coordinates.
+	FLOAT dStartX = (FLOAT) CenterX( gCTHDisplay.iShooterGridNo );
+	FLOAT dStartY = (FLOAT) CenterY( gCTHDisplay.iShooterGridNo );
+
+	// Calculate the center point of the target, in world coordinates.
+	FLOAT dEndX = (FLOAT) CenterX( gCTHDisplay.iTargetGridNo );
+	FLOAT dEndY = (FLOAT) CenterY( gCTHDisplay.iTargetGridNo );
+
+	// Calculate a delta: the difference between the shooter and target.
+	FLOAT dDeltaX = dEndX - dStartX;
+	FLOAT dDeltaY = dEndY - dStartY;
+
+	// Calculate the distance of the shot, using Pythagorean Theorem
+	DOUBLE d2DDistance = sqrt( (DOUBLE) (dDeltaX * dDeltaX + dDeltaY * dDeltaY ));
+	// Round it upwards.
+	INT32 iDistance = (INT32) d2DDistance;
+	if ( d2DDistance != iDistance )
+	{
+		iDistance += 1;
+		d2DDistance = (FLOAT) ( iDistance);
+	}
+
+	// Calculate the Distance Ratio. This will increase or decrease the size of the Shooting Aperture based
+	// on both distance and Magnification Factor.
+	FLOAT iDistanceRatio = (FLOAT)(d2DDistance / gGameCTHConstants.NORMAL_SHOOTING_DISTANCE);
+	FLOAT iFinalRatio = iDistanceRatio / gCTHDisplay.FinalMagFactor;
+
+	///////////////////////////////////////////////////////////
+	// Now we calculate the Aperture size. This is done using the same method as the shooting formula uses.
+
+	// Calculate the maximum angle of any shot.
+	DOUBLE ddMaxAngleRadians = (gGameCTHConstants.DEGREES_MAXIMUM_APERTURE * 6.283) / 360;
+
+	// Calculate the size of a "normal" aperture. This is how wide a shot can go at 1x Normal Distance.
+	FLOAT iBasicAperture = (FLOAT)((sin(ddMaxAngleRadians) * gGameCTHConstants.NORMAL_SHOOTING_DISTANCE) * 2); // The *2 compensates for the difference between CellXY and ScreenXY 
+
+	// Calculate the Maximum Aperture. This is the margin of error for the "worst" shot we can have given the
+	// target's actual distance. This will later be used to draw the Outer Circle around the target.
+	FLOAT iMaxAperture = iBasicAperture * iDistanceRatio;
+
+	// Calculate the aperture for our shot by applying both distance and scope magnification (which work against each
+	// other) to the size of a normal aperture.
+	FLOAT iAperture = iBasicAperture * iFinalRatio;
+
+	// Apply CTH to the aperture to find out how much smaller it's become thanks to skills and extra aiming.
+	UINT8 actualPct		= __min(gCTHDisplay.MuzzleSwayPercentage,99);
+	iAperture = ((100 - actualPct) * iAperture) / 100;
+
+	/////////////////////////////////////////////
+	// Factor in Weapon "Effective Range".
+	UINT16 sEffRange = Weapon[Item[pSoldier->inv[pSoldier->ubAttackingHand].usItem].ubClassIndex].usRange + GetRangeBonus(&(pSoldier->inv[ pSoldier->ubAttackingHand ]));
+	FLOAT iRangeRatio = __max(1.0f, (FLOAT)(d2DDistance / sEffRange));
+	
+	/////////////////////////////////////////////
+	// Factor in Gun Accuracy.
+	
+	INT16 sAccuracy = GetGunAccuracy( &(pSoldier->inv[ pSoldier->ubAttackingHand ]) );
+
+	sAccuracy = __max(0, sAccuracy);
+	sAccuracy = __min(100, sAccuracy);
+
+	FLOAT iBulletDev = (gGameCTHConstants.MAX_BULLET_DEV * (100-sAccuracy)) / 100;
+	if( gGameCTHConstants.RANGE_EFFECTS_DEV == TRUE )
+		iBulletDev *= iRangeRatio;
+	iBulletDev *= iDistanceRatio;
+
+	// Since bullet dev is only affected by distance, we add it last as a flat modifier.
+	iBasicAperture += iBulletDev;
+	iMaxAperture += iBulletDev;
+	iAperture += iBulletDev;
+
+	// CHRISL: Moved here so we can base the cursor color on the iAperture value
+	UINT8 iColorCode = 0;
+	if(iAperture < 3.0)
+		iColorCode = 9;
+	else if(iAperture < 6.0)
+		iColorCode = 8;
+	else if(iAperture < 9.0)
+		iColorCode = 7;
+	else if(iAperture < 12.0)
+		iColorCode = 6;
+	else if(iAperture < 16.0)
+		iColorCode = 5;
+	else if(iAperture < 20.0)
+		iColorCode = 4;
+	else if(iAperture < 25.0)
+		iColorCode = 3;
+	else if(iAperture < 30.0)
+		iColorCode = 2;
+	else if(iAperture < 40.0)
+		iColorCode = 1;
+	usCApertureBar		= Get16BPPColor( FROMRGB( ColorsRed[iColorCode], ColorsGreen[iColorCode], 0 ) ); // Crosshair color shifts from red (longshot) to green (Accurate shot)
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	// HEADROCK HAM 4: Calculate Screen Positions
+	//
+	// Aperture Size has to be translated into on-screen size. We also want to track the position of the
+	// mouse so that our indicator moves with it like a cursor.
+
+	// Z Offset is used to move the indicator up or down. It's currently set to 0 since it's not required ATM.
+	FLOAT zOffset = 0;
+
+	// Calculate the position of the mouse cursor and store it.
+	INT16 sStartScreenX;
+	INT16 sStartScreenY;
+
+	POINT	MousePos;
+	GetCursorPos(&MousePos);
+	ScreenToClient(ghWindow, &MousePos); // In window coords!	
+
+	sStartScreenX = (INT16)MousePos.x;
+	sStartScreenY = (INT16)MousePos.y;
+
+	// Define regions for the various indicators. We need to do this now because the Aperture Circles will want to
+	// avoid being drawn within these regions, otherwise they might make them harder to see.
+
+	MagRect.left = sStartScreenX-50;	MagRect.top = sStartScreenY-15;		MagRect.right = sStartScreenX-20;		MagRect.bottom = sStartScreenY-5;
+	APRect.left = sStartScreenX+22;		APRect.top = sStartScreenY-15;		APRect.right = sStartScreenX+52;		APRect.bottom = sStartScreenY-5;
+	AimRect.left = sStartScreenX-35;	AimRect.top = sStartScreenY+22;		AimRect.right = sStartScreenX+35;		AimRect.bottom = sStartScreenY+30;
+	ModeRect.left = sStartScreenX-28;	ModeRect.top = sStartScreenY+31;	ModeRect.right = sStartScreenX+28;		ModeRect.bottom = sStartScreenY+41;
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// DRAW ADDITIONAL COMPONENTS:
+	//
+	// We now draw additional indicators on top of the circles. There are four indicators:
+	//
+	// 1. AP Cost: The current AP cost for the shot has been moved from the center of the
+	//    targeting cursor to avoid obscuring the meeting point of the aperture crosshairs.
+	//    It is now displayed in the top right, together with the word "AP".
+	// 2. MAG Factor: The current Magnification or Projection factor for the shot is displayed
+	//    in the top-left, followed by an "x". Its color indicates whether we are using the
+	//    full potential of our aiming device.
+	// 3. Aiming Pips: The circles on the old indicator shows how many aiming clicks we've
+	//    placed into the shot. Now that the circles are used to indicate shot probability,
+	//    the aiming clicks are displayed with a series of pips below the targeting cursor
+	//    which fill up as we add levels.
+	// 4. Bullet Count: This indicator, now below the Aiming Pips indicator, shows the number
+	//    of bullets queues up for a Burst/Autofire volley. For autofire, it starts out by
+	//    displaying grey bullets showing how many we CAN add, then fills up with colored
+	//    bullets as we add them to the volley. A "+" sign is added if space for bullets runs out.
+
+	CHAR16 pStr[10];
+
+	INT16 curX = 0;
+	INT16 curY = 0;
+
+	/////////////////////////////////////////
+	// Load image STI
+	UINT32	guiCTHImage;
+	VOBJECT_DESC	VObjectDesc;
+
+	VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
+	if(UsingNewCTHSystem() == true)
+		FilenameForBPP("CURSORS\\CUR_CTH_NCTH.sti", VObjectDesc.ImageFile);
+	else
+		FilenameForBPP("CURSORS\\CUR_CTH.sti", VObjectDesc.ImageFile);
+	CHECKF(AddVideoObject(&VObjectDesc, &guiCTHImage));
+
+	/////////////// AP COST FOR CURRENT SHOT
+	{
+		// Create a pointer to the Frame Buffer which we are going to draw directly into.
+		SetFont( TINYFONT1 );
+		SetFontBackground( FONT_MCOLOR_BLACK );
+		SetFontForeground( FONT_MCOLOR_WHITE );
+
+		// Find coordinates, using the full string ("XX AP")
+		swprintf( pStr, L"%d %s", gsCurrentActionPoints, gzNCTHlabels[ 1 ] );
+		FindFontCenterCoordinates( (INT16)APRect.left, (INT16)APRect.top, (INT16)APRect.right-(INT16)APRect.left, 10, pStr, TINYFONT1, &curX, &curY);
+		// Find width of this string.
+		UINT16 usTotalWidth = StringPixLength ( pStr, TINYFONT1 );
+
+		// Cut string to just the number of APs
+		swprintf( pStr, L"%d", gsCurrentActionPoints );
+		// Find out how wide this string is
+		UINT16 usWidth = StringPixLength( pStr, TINYFONT1 );
+		// Draw to screen
+		gprintfdirty( curX, curY, pStr );
+		mprintf( curX, curY, pStr);
+
+		// Draw the "AP" label 4 pixels forward.
+		SetFontForeground(FONT_MCOLOR_LTYELLOW);
+		swprintf( pStr, L"%s", gzNCTHlabels[ 1 ] );
+		curX += usWidth + 4;
+		gprintfdirty( curX, curY, pStr );
+		mprintf( curX, curY, pStr);
+
+		// Redefine area size based on total width plus a margin of 2 pixels.
+		usTotalWidth = usTotalWidth + 6;
+		INT16 sCenter = (INT16)((APRect.right + APRect.left) / 2);
+		APRect.left = sCenter - (usTotalWidth / 2);
+		APRect.right = sCenter + (usTotalWidth / 2);
+	}
+
+	/////////////// MAG FACTOR
+	{
+		SetFont( TINYFONT1 );
+
+		// Find coordinates, using full string ("X.X x")
+		swprintf( pStr, L"%1.1f x", gCTHDisplay.FinalMagFactor );
+		FindFontCenterCoordinates( (INT16)MagRect.left, (INT16)MagRect.top, (INT16)MagRect.right-(INT16)MagRect.left, 10, pStr, TINYFONT1, &curX, &curY);
+		// Find width of this string.
+		UINT16 usTotalWidth = StringPixLength ( pStr, TINYFONT1 );
+
+		// Cut string to just the float
+		swprintf( pStr, L"%1.1f", gCTHDisplay.FinalMagFactor );
+		// Record the width of the float
+		UINT16 usWidth = StringPixLength( pStr, TINYFONT1 );
+
+		////////////////////////////
+		// We change the color of this indicator based on whether or not our optical devices are working
+		// at full potential. Remember that scopes below their best range give out penalties!
+
+		// If using a scope below its optimal range...
+		if (gCTHDisplay.ScopeMagFactor > 1.0 && gCTHDisplay.ScopeMagFactor > gCTHDisplay.FinalMagFactor)
+		{
+			// If within projection range...
+			if (gCTHDisplay.ProjectionFactor > 1.0 && gCTHDisplay.ProjectionFactor >= iDistanceRatio )
+			{
+				SetFontForeground( FONT_ORANGE );
+			}
+			// If only using a scope...
+			else
+			{
+				SetRGBFontForeground( 255, 150, 150 ); // Bright Pink
+			}
+		}
+		// If using a scope above its range, or a laser below its range
+		else if ((gCTHDisplay.ScopeMagFactor > 1.0 && gCTHDisplay.ScopeMagFactor <= iDistanceRatio) ||
+				(gCTHDisplay.ProjectionFactor > 1.0 && gCTHDisplay.ProjectionFactor >= iDistanceRatio) )
+		{
+			SetRGBFontForeground( 100,255,100 ); // True Light Green
+		}
+		// In all other circumstances...
+		else
+		{
+			SetFontForeground( FONT_MCOLOR_WHITE );
+		}
+
+		// Print the float
+		gprintfdirty( curX, curY, pStr );
+		mprintf( curX, curY, pStr);
+
+		// Add an "x" 4 pixels forward.
+		SetFontForeground( FONT_MCOLOR_LTYELLOW );
+		swprintf( pStr, L"x" );
+		curX += usWidth + 4;
+		gprintfdirty( curX, curY, pStr );
+		mprintf( curX, curY, pStr);
+
+		// Redefine area size based on total width plus a margin of 2 pixels.
+		usTotalWidth = usTotalWidth + 6;
+		INT16 sCenter = (INT16)((MagRect.right + MagRect.left) / 2);
+		MagRect.left = sCenter - (usTotalWidth / 2);
+		MagRect.right = sCenter + (usTotalWidth / 2);
+	}
+	
+#ifdef JA2BETAVERSION
+	/////////////// SHOT APERTURE SIZE
+	{
+		// Create a pointer to the Frame Buffer which we are going to draw directly into.
+		SetFont( TINYFONT1 );
+		SetFontBackground( FONT_MCOLOR_BLACK );
+		SetFontForeground( FONT_MCOLOR_WHITE );
+
+		// Find coordinates, using the full string ("XX AP")
+		swprintf( pStr, L"%3.2f", iAperture );
+		FindFontCenterCoordinates( (INT16)APRect.left, (INT16)APRect.top-5, (INT16)APRect.right-(INT16)APRect.left, 5, pStr, TINYFONT1, &curX, &curY);
+		// Find width of this string.
+		UINT16 usTotalWidth = StringPixLength ( pStr, TINYFONT1 );
+
+		// Draw to screen
+		gprintfdirty( curX, curY, pStr );
+		mprintf( curX, curY, pStr);
+
+		// Redefine area size based on total width plus a margin of 2 pixels.
+		usTotalWidth = usTotalWidth + 6;
+		INT16 sCenter = (INT16)((APRect.right + APRect.left) / 2);
+		APRect.left = sCenter - (usTotalWidth / 2);
+		APRect.right = sCenter + (usTotalWidth / 2);
+	}
+
+	/////////////// DISTANCE APERTURE SIZE
+	{
+		SetFont( TINYFONT1 );
+
+		// Find coordinates, using full string ("X.X x")
+		swprintf( pStr, L"%3.2f", iMaxAperture );
+		FindFontCenterCoordinates( (INT16)MagRect.left, (INT16)MagRect.top-5, (INT16)MagRect.right-(INT16)MagRect.left, 5, pStr, TINYFONT1, &curX, &curY);
+		// Find width of this string.
+		UINT16 usTotalWidth = StringPixLength ( pStr, TINYFONT1 );
+
+		// Draw to screen
+		gprintfdirty( curX, curY, pStr );
+		mprintf( curX, curY, pStr);
+
+		// Redefine area size based on total width plus a margin of 2 pixels.
+		usTotalWidth = usTotalWidth + 6;
+		INT16 sCenter = (INT16)((MagRect.right + MagRect.left) / 2);
+		MagRect.left = sCenter - (usTotalWidth / 2);
+		MagRect.right = sCenter + (usTotalWidth / 2);
+	}
+#endif
+
+	//////////////////// BURST/AUTO LABEL AND BULLETS
+	if (pSoldier->bDoBurst)
+	{
+		SetFont( TINYFONT1 );
+		SetFontBackground( FONT_MCOLOR_BLACK );
+		SetFontForeground( FONT_MCOLOR_WHITE );
+
+		////////////////////////////////////////////////////////////////////////////////
+		// We need to calculate how many bullets to display, and how much space they
+		// take, so that we can center them horizontally on the CTH indicator.
+		// This works slightly differently for Autofire and Burst.
+
+		UINT8 ubNumBullets = 0;
+		UINT8 ubBulletWidth = 4;
+		UINT8 ubTotalWidth = 0;
+		UINT32 uiMaxAutofire = 0;
+		UINT32 uiMaxBulletsToDisplay = 0;
+		UINT32 uiSpacesToDisplay = 0;
+
+		if (pSoldier->bDoAutofire)
+		{
+			// Number of COLORED bullets to display is the number of bullets we want to fire.
+			ubNumBullets = pSoldier->bDoAutofire;
+
+			// How many bullets are left in the gun?
+			UINT32 uiBulletsLeft = pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft;
+
+			UINT32 uiCurBullet = uiBulletsLeft;
+			while( uiCurBullet > 0 )
+			{
+				// We work backwards from the total number of bullets left, to find out the number of bullets
+				// that can be fired given the current number of APs left.
+
+				// Store Soldier Autofire variable into a temp. We do this to fool the AP Calculation formula.
+				UINT8 TempDoAutofire = pSoldier->bDoAutofire;
+				pSoldier->bDoAutofire = uiCurBullet;
+
+				//Get AP cost to fire this many bullets
+				INT16 sAPCosts = CalcTotalAPsToAttack( pSoldier, gCTHDisplay.iTargetGridNo, TRUE, pSoldier->aiData.bShownAimTime);
+
+				// Switch back.
+				pSoldier->bDoAutofire = TempDoAutofire;
+
+				// Have we reached a number of bullets that can be fired with the current APs?
+				if( !uiMaxAutofire && EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) )
+				{
+					// Set it.
+					uiMaxAutofire = uiCurBullet;
+				}
+
+				//Decrement until zero.
+				uiCurBullet--;
+			}
+
+			// Display no more than X bullets on screen!
+			uiMaxBulletsToDisplay = __min(uiMaxAutofire, 15);
+
+			// Calculate how many spaces to display. Currently, a space is displayed after every 5 bullets.
+			uiSpacesToDisplay = (uiMaxBulletsToDisplay-1) / 5;
+
+			// Calculate the total width of this display in pixels. Spaces and bullets have the same width.
+			ubTotalWidth = ubBulletWidth * (uiMaxBulletsToDisplay + uiSpacesToDisplay);
+		}
+		else
+		{
+			// Number of COLORED bullets to display is the number of bullets we want to fire.
+			ubNumBullets = GetShotsPerBurst( &(pSoldier->inv[ pSoldier->ubAttackingHand ]) );
+
+			// Display no more than X bullets on screen!
+			uiMaxBulletsToDisplay = __min(ubNumBullets, 15);
+
+			// Calculate how many spaces to display. Currently, a space is displayed after every 5 bullets.
+			uiSpacesToDisplay = (uiMaxBulletsToDisplay-1) / 5;
+
+			// Calculate the total width of this display in pixels. Spaces and bullets have the same width.
+			ubTotalWidth = ubBulletWidth * (uiMaxBulletsToDisplay + uiSpacesToDisplay);
+		}
+
+		// Tracks the number of spaces we've drawn on screen so far.
+		UINT16 usNumSpacesShown = 0;
+
+		// AUTO FIRE
+		if (pSoldier->bDoAutofire)
+		{
+			// Draw greyed-out bullets, indicating how many bullets CAN be added to the volley given our
+			// current remaining APs.
+			for (UINT8 x = 0; x < (uiMaxBulletsToDisplay); x++)
+			{
+				// Find starting point for drawing
+				INT16 sLeft = (((INT16)ModeRect.left + (INT16)ModeRect.right)/2) - (ubTotalWidth/2);
+				INT16 sTop = (INT16)ModeRect.top;
+
+				// If we've drawn 5,10,15,etc. bullets, add a space.
+				if (x > 0 && x%5 == 0)
+				{
+					usNumSpacesShown++;
+				}
+
+				// Offset adds up the number of bullets and spaces we've already drawn.
+				INT16 sCurOffset = ubBulletWidth * (x+usNumSpacesShown);
+				
+				// Draw a bullet here!
+				BltVideoObjectFromIndex( FRAME_BUFFER, guiCTHImage, 8, sLeft + sCurOffset, sTop, VO_BLT_SRCTRANSPARENCY, NULL );
+
+				// If the number of bullets that can be fired is greater than the number of bullets we can display,
+				// and we've just now drawn the last displayable bullet, then...
+				if (x == uiMaxBulletsToDisplay-1 && uiMaxBulletsToDisplay < uiMaxAutofire)
+				{
+					// Draw a shaded plus sign at the end.
+					BltVideoObjectFromIndex( FRAME_BUFFER, guiCTHImage, 9, sLeft + sCurOffset + ubBulletWidth, sTop+2, VO_BLT_SRCTRANSPARENCY, NULL );
+				}
+			}
+
+			// Draw colored bullets. These show how many bullets we've set to fire with the current volley.
+			usNumSpacesShown = 0;
+			for (UINT8 x = 0; x < ubNumBullets; x++)
+			{
+				// Set start point for drawing
+				INT16 sLeft = (((INT16)ModeRect.left + (INT16)ModeRect.right)/2) - (ubTotalWidth/2);
+				INT16 sTop = (INT16)ModeRect.top;
+
+				// Calculate offset based on the number of bullets and spaces already drawn.
+				INT16 sCurOffset = ubBulletWidth * (x+usNumSpacesShown);
+
+				// If we're drawing more bullets than can be displayed on-screen...
+				if (x == uiMaxBulletsToDisplay)
+				{
+					// Draw a colored plus sign at the end.
+					BltVideoObjectFromIndex( FRAME_BUFFER, guiCTHImage, 10, sLeft + sCurOffset, sTop+2, VO_BLT_SRCTRANSPARENCY, NULL );
+					// Set x to NumBullets to end the loop
+					x = ubNumBullets;
+				}
+				else
+				{
+					// If we've drawn 5,10,15,etc. bullets, increase the number of spaces drawn.
+					if (x > 0 && x%5 == 0)
+					{
+						usNumSpacesShown++;
+					}
+					// Recalculate offset to take any new spaces into account.
+					INT16 sCurOffset = ubBulletWidth * (x+usNumSpacesShown);
+					// Draw a colored bullet here.
+					BltVideoObjectFromIndex( FRAME_BUFFER, guiCTHImage, 7, sLeft + sCurOffset, sTop, VO_BLT_SRCTRANSPARENCY, NULL );
+				}
+			}
+
+			// Redefine area size based on total width plus a margin of 2 pixels.
+			ubTotalWidth = ubTotalWidth + 6;
+			INT16 sCenter = (INT16)((ModeRect.right + ModeRect.left) / 2);
+			ModeRect.left = sCenter - (ubTotalWidth / 2);
+			ModeRect.right = sCenter + (ubTotalWidth / 2);
+
+		}
+		// BURST FIRE
+		else
+		{
+			// Draw colored bullets. These show how many bullets we've set to fire with the current burst.
+			usNumSpacesShown = 0;
+			UINT16 usTotalWidth = 0;
+			UINT8 x;
+			for (x = 0; x < ubNumBullets; x++)
+			{
+				// Set start point for drawing
+				INT16 sLeft = (((INT16)ModeRect.left + (INT16)ModeRect.right)/2) - (ubTotalWidth/2);
+				INT16 sTop = (INT16)ModeRect.top;
+
+				// Calculate offset based on the number of bullets and spaces already drawn.
+				INT16 sCurOffset = ubBulletWidth * (x+usNumSpacesShown);
+
+				// If we're drawing more bullets than can be displayed on-screen...
+				if (x == uiMaxBulletsToDisplay)
+				{
+					// Draw a colored plus sign at the end.
+					BltVideoObjectFromIndex( FRAME_BUFFER, guiCTHImage, 10, sLeft + sCurOffset, sTop+2, VO_BLT_SRCTRANSPARENCY, NULL );
+					// Set x to NumBullets to end the loop
+					x = ubNumBullets;
+					usTotalWidth += 5;
+				}
+				else
+				{
+					// If we've drawn 5,10,15,etc. bullets, increase the number of spaces drawn.
+					if (x > 0 && x%5 == 0)
+					{
+						usNumSpacesShown++;
+					}
+					// Recalculate offset to take any new spaces into account.
+					INT16 sCurOffset = ubBulletWidth * (x+usNumSpacesShown);
+					// Draw a colored bullet here.
+					BltVideoObjectFromIndex( FRAME_BUFFER, guiCTHImage, 7, sLeft + sCurOffset, sTop, VO_BLT_SRCTRANSPARENCY, NULL );
+				}
+			}
+			usTotalWidth += ubBulletWidth * ((x+1)+usNumSpacesShown)+4;
+			INT16 sCenter = (INT16)((ModeRect.right + ModeRect.left) / 2);
+			ModeRect.left = sCenter - (ubTotalWidth / 2);
+			ModeRect.right = sCenter + (ubTotalWidth / 2);
+		}
+	}
+
+	/////////////// SINGLE-SHOT.
+	else
+	{
+		// Draw a label that says "SINGLE" instead of bullets.
+		SetFont( TINYFONT1 );
+		SetFontBackground( FONT_MCOLOR_BLACK );
+		SetFontForeground( FONT_MCOLOR_WHITE );
+
+		swprintf( pStr, gzNCTHlabels[ 0 ] );
+		FindFontCenterCoordinates( (INT16)ModeRect.left, (INT16)ModeRect.top, (INT16)ModeRect.right-(INT16)ModeRect.left, 10, pStr, TINYFONT1, &curX, &curY);
+		gprintfdirty( curX, curY, pStr );
+		mprintf( curX, curY, pStr);
+
+		UINT16 usTotalWidth = StringPixLength( pStr, TINYFONT1 ) + 6;
+		INT16 sCenter = (INT16)((ModeRect.right + ModeRect.left) / 2);
+		ModeRect.left = sCenter - (usTotalWidth / 2);
+		ModeRect.right = sCenter + (usTotalWidth / 2);
+	}
+
+	/////////////// AIM LEVELS
+	{
+		// Calculate number of allowed aiming levels on this gun.
+		INT8 ubAllowedLevels = AllowedAimingLevels( pSoldier, gCTHDisplay.iTargetGridNo );
+
+		// Number of ticks to display, and the number of spaces between them.
+		UINT8 ubNumTicks = ((ubAllowedLevels-1)*2)+1;
+		UINT8 ubNumSpaces = ubNumTicks-1;
+
+		// Width of the tick image plus (or minus) a mandatory margin.
+		UINT8 ubAimTickWidth = 5;
+
+		// Total width of the aiming display if using no extra spacing and MAXIMUM allowed aiming levels (currently 8)
+		UINT8 ubAimMaxTotalWidth = ubAimTickWidth * ((8 * 2)-1);
+
+		// Total width of the aiming display if using no extra spacing and as many levels as allowed by the gun.
+		UINT8 ubAimPlainWidth = ubAimTickWidth * ubNumTicks;
+
+		// Find the largest space width possible without exceeding the maximum width. We do this by
+		// finding the difference between MaxTotal width and Plain width, and dividing it by the number of spaces
+		// we've got.
+		UINT8 ubAimFinalOffset = 0;
+		UINT8 ubAimFinalWidth = 0;
+		if (ubNumSpaces > 0)
+		{
+			UINT8 ubAimBestOffset = (ubAimMaxTotalWidth - ubAimPlainWidth) / ubNumSpaces;
+
+			// Final offset is whichever is smallest - the largest width, or the width of a single tick.
+			ubAimFinalOffset = __min(ubAimBestOffset, ubAimTickWidth);
+		}
+		// else leave at 0
+
+		ubAimFinalOffset += ubAimTickWidth;
+
+		// Final width of the entire display, taking all ticks and spaces into account.
+		ubAimFinalWidth = ubAimTickWidth + (ubAimFinalOffset * ubNumSpaces);
+
+		// Find offset from center.
+		UINT8 ubAimLeftOffset = ubAimFinalWidth / 2;
+
+		// Find starting coordinates for this display
+		sTop = (INT16)AimRect.top;
+		sLeft = (INT16)((AimRect.left+AimRect.right)/2) - ubAimLeftOffset;
+
+		// Draw empty ticks.
+		for (UINT8 x = 0; x < (ubAllowedLevels*2)-1; x++)
+		{
+			INT16 sOffset = x * ubAimFinalOffset;
+			if (gfDisplayFullCountRing)
+			{
+				if (ubAllowedLevels - abs((ubAllowedLevels-(x+1))) >= pSoldier->aiData.bShownAimTime)
+				{
+					// Red empty tick - unusable aim level with current AP!
+					BltVideoObjectFromIndex( FRAME_BUFFER, guiCTHImage, 6, sLeft + sOffset, sTop, VO_BLT_SRCTRANSPARENCY, NULL );
+				}
+				else
+				{
+					// Orange empty tick - Used aim tick.
+					BltVideoObjectFromIndex( FRAME_BUFFER, guiCTHImage, 4, sLeft + sOffset, sTop, VO_BLT_SRCTRANSPARENCY, NULL );
+				}
+			}
+			else
+			{
+				// grey empty tick
+				BltVideoObjectFromIndex( FRAME_BUFFER, guiCTHImage, 0, sLeft + sOffset, sTop, VO_BLT_SRCTRANSPARENCY, NULL );
+			}
+		}
+
+		// Draw Filled Ticks
+		if (pSoldier->aiData.bShownAimTime)
+		{
+			// Tick on the left
+			INT16 sNewLeft = sLeft + (ubAimFinalOffset * (pSoldier->aiData.bShownAimTime-1));
+			if (gfDisplayFullCountRing)
+			{
+				BltVideoObjectFromIndex( FRAME_BUFFER, guiCTHImage, 5, sNewLeft, sTop, VO_BLT_SRCTRANSPARENCY, NULL );
+			}
+			else
+			{
+				BltVideoObjectFromIndex( FRAME_BUFFER, guiCTHImage, 1, sNewLeft, sTop, VO_BLT_SRCTRANSPARENCY, NULL );
+			}
+
+			// Tick on the right
+			sNewLeft = sLeft + (ubAimFinalOffset * (ubNumSpaces-(pSoldier->aiData.bShownAimTime-1)));
+			if (gfDisplayFullCountRing)
+			{
+				BltVideoObjectFromIndex( FRAME_BUFFER, guiCTHImage, 5, sNewLeft, sTop, VO_BLT_SRCTRANSPARENCY, NULL );
+			}
+			else
+			{
+				BltVideoObjectFromIndex( FRAME_BUFFER, guiCTHImage, 1, sNewLeft, sTop, VO_BLT_SRCTRANSPARENCY, NULL );
+			}
+		}
+
+		ubAimFinalWidth += 6;
+		INT16 sCenter = (INT16)((AimRect.right + AimRect.left) / 2);
+		AimRect.left = sCenter - (ubAimFinalWidth / 2);
+		AimRect.right = sCenter + (ubAimFinalWidth / 2);
+
+	}
+
+	// Delete CTH indicator STIs from memory.
+	DeleteVideoObjectFromIndex( guiCTHImage );
+
+	///////////////////////////////////////////////////////////////////////////////////////
+	// HEADROCK HAM 4: Drawing the CTH indicator to the Frame Buffer
+	//
+	// Early on I ran into issues concerning drawing this indicator on the screen. At first I naturally
+	// wanted to draw it on the Cursor Buffer, the same way as the old indicator. Unfortunately,
+	// the size of the Cursor Buffer is quite limited (~35x35 pixels) and is governed by the size of the STIs used
+	// for the mouse cursor itself. After much trial and error, it became obvious that it was impossible to draw
+	// a large indicator (as required by the NCTH system) directly onto the mouse buffer.
+	// 
+	// Fortunately, I found out that it was possible to draw into the Frame Buffer instead, without leaving
+	// graphical glitches behind. I could also dynamically define the area to draw into as I pleased. Furthermore,
+	// I managed to make this drawing behave the same as a mouse cursor would, by having it follow the mouse
+	// position.
+	//
+	// The end result is a bit of an ugly workaround: We're drawing what is essentially a mouse cursor without referring
+	// to ANY part of the mouse cursor system (except the location of the mouse). This is the only way I could make it
+	// work, and so far it works flawlessly.
+
+	// Create a pointer to the Frame Buffer which we are going to draw directly into.
+	UINT32 uiPitch;
+	UINT16 *ptrBuf = (UINT16*)LockVideoSurface( FRAME_BUFFER, &uiPitch );
+	uiPitch >>= 1;
+
+	///////////////////////////////////////////////////////////////////////////////
+	// Begin drawing
+
+	sLeft = gsVIEWPORT_START_X;
+	sTop = gsVIEWPORT_WINDOW_START_Y;
+	sRight = gsVIEWPORT_END_X;
+	sBottom = gsVIEWPORT_WINDOW_END_Y;
+
+	INT16 lastY = 0;
+	INT16 diffY = 0;
+	UINT32 uiAperture = __max(2,(UINT32)iAperture);
+	UINT32 uiMaxAperture = __max(2,(UINT32)iMaxAperture);
+	UINT32 uiApertureBarLength = 10;
+
+	INT32 cnt = 0;
+
+	// Vertical bias makes the circle "flatter" and "wider" in prone and crouched stance.
+	FLOAT dVerticalBias = gGameCTHConstants.VERTICAL_BIAS;
+	switch (gAnimControl[ pSoldier->usAnimState ].ubEndHeight)
+	{
+		case ANIM_STAND:
+			dVerticalBias = 1.0;
+			break;
+		case ANIM_PRONE:
+			// no change
+			break;
+		case ANIM_CROUCH:
+			dVerticalBias = 1.0f + ((dVerticalBias - 1.0f) * 0.66f);
+			break;
+	}
+
+	// Circumference tells us how many pixels to draw, hopefully.
+	FLOAT RADIANS_IN_CIRCLE = (FLOAT)(PI * 2);
+	INT32 Circ = 0;
+
+	Circ = (INT32)((iMaxAperture * RADIANS_IN_CIRCLE) * dVerticalBias);
+	if(gGameSettings.fOptions[ TOPTION_CTH_CURSOR ])
+	{
+		// Draw outer circle
+		for (INT32 iCurPoint = 0; iCurPoint < Circ; iCurPoint++)
+		{
+			curX = (INT16)(iMaxAperture * cos((iCurPoint * RADIANS_IN_CIRCLE)/Circ));
+			curY = (INT16)((iMaxAperture * dVerticalBias) * sin((iCurPoint * RADIANS_IN_CIRCLE)/Circ));
+			INT16 firstX = curX;
+			INT16 firstY = curY;
+
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+curX, sStartScreenY+curY+(INT16)zOffset, usCApertureBar );
+
+			// Draw a border circle which is 1 point wider
+			curX = (INT16)((iMaxAperture+1) * cos((iCurPoint * RADIANS_IN_CIRCLE)/Circ));
+			curY = (INT16)(((iMaxAperture * dVerticalBias)+1) * sin((iCurPoint * RADIANS_IN_CIRCLE)/Circ));
+
+			if (curX != firstX || curY != firstY)
+				DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+curX, sStartScreenY+curY+(INT16)zOffset, usCApertureBorder );
+
+			// Draw a border circle which is 1 point narrower
+			curX = (INT16)((iMaxAperture-1) * cos((iCurPoint * RADIANS_IN_CIRCLE)/Circ));
+			curY = (INT16)(((iMaxAperture * dVerticalBias)-1) * sin((iCurPoint * RADIANS_IN_CIRCLE)/Circ));
+
+			if (curX != firstX || curY != firstY)
+				DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+curX, sStartScreenY+curY+(INT16)zOffset, usCApertureBorder );
+		}
+
+		Circ = (INT32)((iAperture * RADIANS_IN_CIRCLE) * dVerticalBias);
+		// Draw inner circle
+		for (INT32 iCurPoint = 0; iCurPoint < Circ; iCurPoint++)
+		{
+			curX = (INT16)(iAperture * cos((iCurPoint * RADIANS_IN_CIRCLE)/Circ));
+			curY = (INT16)((iAperture * dVerticalBias) * sin((iCurPoint * RADIANS_IN_CIRCLE)/Circ));
+			INT16 firstX = curX;
+			INT16 firstY = curY;
+
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+curX, sStartScreenY+curY+(INT16)zOffset, usCApertureBar );
+
+			// Draw a border circle which is 1 point wider
+			curX = (INT16)((iAperture+1) * cos((iCurPoint * RADIANS_IN_CIRCLE)/Circ));
+			curY = (INT16)(((iAperture * dVerticalBias)+1) * sin((iCurPoint * RADIANS_IN_CIRCLE)/Circ));
+
+			if (curX != firstX || curY != firstY)
+				DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+curX, sStartScreenY+curY+(INT16)zOffset, usCApertureBorder );
+
+			// Draw a border circle which is 1 point narrower
+			curX = (INT16)((iAperture-1) * cos((iCurPoint * RADIANS_IN_CIRCLE)/Circ));
+			curY = (INT16)(((iAperture * dVerticalBias)-1) * sin((iCurPoint * RADIANS_IN_CIRCLE)/Circ));
+
+			if (curX != firstX || curY != firstY)
+				DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+curX, sStartScreenY+curY+(INT16)zOffset, usCApertureBorder );
+		}
+
+		// Aperture Crosshairs
+		for (INT16 cnt = (INT16)(iAperture); cnt <= (INT16)(iAperture + uiApertureBarLength); cnt++)
+		{
+			// Horizontal Aperture Crosshairs
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+cnt, sStartScreenY+(INT16)zOffset, usCApertureBar );
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX-cnt, sStartScreenY+(INT16)zOffset, usCApertureBar );
+
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+cnt, (sStartScreenY+1)+(INT16)zOffset, usCApertureBar );
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX-cnt, (sStartScreenY+1)+(INT16)zOffset, usCApertureBar );
+
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+cnt, (sStartScreenY-1)+(INT16)zOffset, usCApertureBar );
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX-cnt, (sStartScreenY-1)+(INT16)zOffset, usCApertureBar );
+
+			// Darker borders
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+cnt, (sStartScreenY+2)+(INT16)zOffset, usCApertureBorder );
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX-cnt, (sStartScreenY+2)+(INT16)zOffset, usCApertureBorder );
+
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+cnt, (sStartScreenY-2)+(INT16)zOffset, usCApertureBorder );
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX-cnt, (sStartScreenY-2)+(INT16)zOffset, usCApertureBorder );
+
+		}
+		for (INT16 cnt = (INT16)(iAperture * dVerticalBias); cnt <= (INT16)((iAperture * dVerticalBias) + uiApertureBarLength); cnt++)
+		{
+			// Vertical Aperture Crosshairs
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX, (sStartScreenY+cnt)+(INT16)zOffset, usCApertureBar );
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX, (sStartScreenY-cnt)+(INT16)zOffset, usCApertureBar );
+
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+1, (sStartScreenY+cnt)+(INT16)zOffset, usCApertureBar );
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+1, (sStartScreenY-cnt)+(INT16)zOffset, usCApertureBar );
+
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX-1, (sStartScreenY+cnt)+(INT16)zOffset, usCApertureBar );
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX-1, (sStartScreenY-cnt)+(INT16)zOffset, usCApertureBar );
+
+			// Darker borders
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+2, (sStartScreenY+cnt)+(INT16)zOffset, usCApertureBorder );
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX+2, (sStartScreenY-cnt)+(INT16)zOffset, usCApertureBorder );
+
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX-2, (sStartScreenY+cnt)+(INT16)zOffset, usCApertureBorder );
+			DrawCTHPixelToBuffer( ptrBuf, uiPitch, sLeft, sTop, sRight, sBottom, sStartScreenX-2, (sStartScreenY-cnt)+(INT16)zOffset, usCApertureBorder );
+		}
+	}
+
+	// Unlock the Frame Buffer.
+	UnLockVideoSurface( FRAME_BUFFER );
+
+	return (TRUE);
 }
 
 void RenderOverlayMessage( VIDEO_OVERLAY *pBlitter )

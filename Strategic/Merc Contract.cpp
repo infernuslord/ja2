@@ -1039,7 +1039,7 @@ void CalculateMedicalDepositRefund( SOLDIERTYPE *pSoldier )
 #ifdef JA2UB
 //no UB
 #else
-		AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_REFUND, AIM_MEDICAL_DEPOSIT_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), pSoldier->usMedicalDeposit, pSoldier->ubProfile );
+		AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_REFUND, AIM_MEDICAL_DEPOSIT_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), pSoldier->usMedicalDeposit, pSoldier->ubProfile, TYPE_EMAIL_EMAIL_EDT );
 #endif
 	}
 	//else if the merc is a dead, refund NOTHING!!
@@ -1052,7 +1052,7 @@ void CalculateMedicalDepositRefund( SOLDIERTYPE *pSoldier )
 #ifdef JA2UB
 //no UB
 #else
-		AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_NO_REFUND, AIM_MEDICAL_DEPOSIT_NO_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), pSoldier->usMedicalDeposit, pSoldier->ubProfile );
+		AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_NO_REFUND, AIM_MEDICAL_DEPOSIT_NO_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), pSoldier->usMedicalDeposit, pSoldier->ubProfile, TYPE_EMAIL_EMAIL_EDT );
 #endif
 	}
 	//else the player is injured, refund a partial amount
@@ -1068,7 +1068,7 @@ void CalculateMedicalDepositRefund( SOLDIERTYPE *pSoldier )
 #ifdef JA2UB
 // no UB
 #else
-		AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND, AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), iRefundAmount, pSoldier->ubProfile );
+		AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND, AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), iRefundAmount, pSoldier->ubProfile, TYPE_EMAIL_EMAIL_EDT );
 #endif
 	}
 }

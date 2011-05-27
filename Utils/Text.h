@@ -46,10 +46,79 @@ enum
 
 
 //Ja25 UB
+//Editor
+//Editor Taskbar Creation.cpp
+extern STR16 iEditorItemStatsButtonsText[];
+extern STR16 FaceDirs[8];
+extern STR16 iEditorMercsToolbarText[];
+extern STR16 iEditorBuildingsToolbarText[];
+extern STR16 iEditorItemsToolbarText[];
+extern STR16 iEditorMapInfoToolbarText[];
+extern STR16 iEditorOptionsToolbarText[];
+extern STR16 iEditorTerrainToolbarText[];
+extern STR16 iEditorTaskbarInternalText[];
+//Editor Taskbar Utils.cpp
+extern STR16 iRenderMapEntryPointsAndLightsText[];
+extern STR16 iBuildTriggerNameText[];
+extern STR16 iRenderDoorLockInfoText[];
+extern STR16 iRenderEditorInfoText[];
+//EditorBuildings.cpp
+extern STR16 iUpdateBuildingsInfoText[];
+extern STR16 iRenderDoorEditingWindowText[];
+//EditorItems.cpp
+extern STR16 pInitEditorItemsInfoText[];
+extern STR16 pDisplayItemStatisticsTex[];
+extern STR16 pUpdateMapInfoText[];
+//EditorMercs.cpp
+extern CHAR16 gszScheduleActions[ 11 ][20];	// NUM_SCHEDULE_ACTIONS = 11
+extern STR16 zDiffNames[5];	// NUM_DIFF_LVLS = 5
+extern STR16 EditMercStat[12];
+extern STR16 EditMercOrders[8];
+extern STR16 EditMercAttitudes[6];
+extern STR16 pDisplayEditMercWindowText[];
+extern STR16 pCreateEditMercWindowText[];
+extern STR16 pDisplayBodyTypeInfoText[];
+extern STR16 pUpdateMercsInfoText[];
+extern CHAR16 pRenderMercStringsText[][100];
+extern STR16 pClearCurrentScheduleText[];
+extern STR16 pCopyMercPlacementText[];
+extern STR16 pPasteMercPlacementText[];
+//editscreen.cpp
+extern STR16 pEditModeShutdownText[];
+extern STR16 pHandleKeyboardShortcutsText[];
+extern STR16 pPerformSelectedActionText[];
+extern STR16 pWaitForHelpScreenResponseText[];
+extern STR16 pAutoLoadMapText[];
+extern STR16 pShowHighGroundText[];
+//Item Statistics.cpp
+//extern CHAR16 gszActionItemDesc[ 34 ][ 30 ];	// NUM_ACTIONITEMS = 34
+extern STR16 pUpdateItemStatsPanelText[];
+extern STR16 pSetupGameTypeFlagsText[];
+extern STR16 pSetupGunGUIText[];
+extern STR16 pSetupArmourGUIText[];
+extern STR16 pSetupExplosivesGUIText[];
+extern STR16 pSetupTriggersGUIText[];
+//Sector Summary.cpp
+extern STR16 pCreateSummaryWindowText[];
+extern STR16 pRenderSectorInformationText[];
+extern STR16 pRenderItemDetailsText[];
+extern STR16 pRenderSummaryWindowText[];
+extern STR16 pUpdateSectorSummaryText[];
+extern STR16 pSummaryLoadMapCallbackText[];
+extern STR16 pReportErrorText[];
+extern STR16 pRegenerateSummaryInfoForAllOutdatedMapsText[];
+extern STR16 pSummaryUpdateCallbackText[];
+extern STR16 pApologizeOverrideAndForceUpdateEverythingText[];
+//selectwin.cpp
+extern STR16 pDisplaySelectionWindowGraphicalInformationText[];
+//Cursor Modes.cpp
+extern STR16 wszSelType[6];
+//--
+
 extern	STR16	gzNewLaptopMessages[];
 extern	STR16	zNewTacticalMessages[];
 extern CHAR16  gszAimPages[ 6 ][ 20 ];
-extern CHAR16		zGrod[][500];
+extern CHAR16  zGrod[][500];
 extern STR16 pCreditsJA2113[];
 extern CHAR16 ShortItemNames[MAXITEMS][80];
 extern CHAR16 ItemNames[MAXITEMS][80];
@@ -149,10 +218,7 @@ extern STR16 pImpPopUpStrings[];
 extern STR16 pImpButtonText[];
 extern STR16 pExtraIMPStrings[];
 extern STR16 pFilesTitle[];
-
-extern CHAR16 pFilesSenderList [255][128];
-
-//extern STR16 pFilesSenderList[];
+extern STR16 pFilesSenderList[];
 extern STR16 pHistoryLocations[];
 //extern STR16 pHistoryAlternateStrings[];
 extern STR16 pHistoryStrings[];
@@ -217,6 +283,7 @@ extern STR16 pSkillTraitBeginIMPStrings[];
 extern STR16 sgAttributeSelectionText[];
 extern STR16 pCharacterTraitBeginIMPStrings[];
 extern STR16 gzIMPCharacterTraitText[];
+extern STR16 gzIMPAttitudesText[];
 extern STR16 gzIMPColorChoosingText[];
 extern STR16 sColorChoiceExplanationTexts[];
 extern STR16 gzIMPDisabilityTraitText[];
@@ -234,6 +301,9 @@ extern STR16 sEnemyTauntsGotHit[];
 extern STR16 gzFacilityErrorMessage[];
 extern STR16 gzFacilityAssignmentStrings[];
 extern STR16 gzFacilityRiskResultStrings[];
+
+// HEADROCK HAM 4: Text for the new CTH indicator.
+extern STR16 gzNCTHlabels[];
 
 enum
 {
@@ -430,6 +500,7 @@ enum
 	STR_SNOW_WASHED_OFF,		
 
 	STR_CANNOT_ATTACH_SLOT,
+	STR_CANNOT_ATTACH_ANY_SLOT,
 	
 	TEXT_NUM_STR_MESSAGE,
 };
@@ -496,17 +567,44 @@ extern CHAR16		zTalkMenuStrings[][ SMALL_STRING_LENGTH ];
 extern STR16		gzMoneyAmounts[6];
 extern CHAR16		gzProsLabel[10];
 extern CHAR16		gzConsLabel[10];
+// HEADROCK HAM 4: Text for the UDB tabs
+extern STR16 gzItemDescTabButtonText[ 3 ];
+extern STR16 gzItemDescTabButtonShortText[ 3 ];
+extern STR16 gzItemDescGenHeaders[ 4 ];
+extern STR16 gzItemDescGenIndexes[ 4 ];
+// HEADROCK HAM 4: Added list of condition strings
+extern STR16		gConditionDesc[ 9 ];
+
 extern CHAR16		gMoneyStatsDesc[][ 13 ];
 // HEADROCK: Altered value to 16 //WarmSteel - And I need 17.
 extern CHAR16		gWeaponStatsDesc[][ 17 ];
 // HEADROCK: Added externs for Item Description Box icon and stat tooltips
 // Note that I've inflated some of these to 20 to avoid issues.
-extern STR16		gzWeaponStatsFasthelp[ 29 ];
-extern STR16		gzWeaponStatsFasthelpTactical[ 29 ];
+extern STR16		gzWeaponStatsFasthelp[ 32 ];
+extern STR16		gzWeaponStatsFasthelpTactical[ 32 ];
 extern STR16		gzAmmoStatsFasthelp[ 20 ];
 extern STR16		gzArmorStatsFasthelp[ 20 ];
 extern STR16		gzExplosiveStatsFasthelp[ 20 ];
 extern STR16		gzMiscItemStatsFasthelp[ 34 ];
+// HEADROCK HAM 4: New tooltip texts
+extern STR16		gzUDBButtonTooltipText[ 3 ];
+extern STR16		gzUDBHeaderTooltipText[ 4 ];
+extern STR16		gzUDBGenIndexTooltipText[ 4 ];
+extern STR16		gzUDBAdvIndexTooltipText[ 5 ];
+extern STR16		szUDBGenWeaponsStatsTooltipText[ 22 ];
+extern STR16		szUDBGenWeaponsStatsExplanationsTooltipText[ 22 ];
+extern STR16		szUDBGenArmorStatsTooltipText[ 3 ];
+extern STR16		szUDBGenArmorStatsExplanationsTooltipText[ 3 ];
+extern STR16		szUDBGenAmmoStatsTooltipText[ 3 ];
+extern STR16		szUDBGenAmmoStatsExplanationsTooltipText[ 3 ];
+extern STR16		szUDBGenExplosiveStatsTooltipText[ 18 ];
+extern STR16		szUDBGenExplosiveStatsExplanationsTooltipText[ 18 ];
+extern STR16		szUDBGenSecondaryStatsTooltipText[ 26 ];
+extern STR16		szUDBGenSecondaryStatsExplanationsTooltipText[ 26 ];
+extern STR16		szUDBAdvStatsTooltipText[ 48 ];
+extern STR16		szUDBAdvStatsExplanationsTooltipText[ 48 ];
+extern STR16		szUDBAdvStatsExplanationsTooltipTextForWeapons[ 48 ];
+
 // Headrock: End Externs
 extern STR16		sKeyDescriptionStrings[2];
 extern CHAR16		zHealthStr[][13];
@@ -1559,7 +1657,7 @@ enum
 	GIO_HARD_TEXT,
 	GIO_INSANE_TEXT,
 
-	GIO_OK_TEXT,
+	GIO_START_TEXT,
 	GIO_CANCEL_TEXT,
 
 	GIO_GAME_SAVE_STYLE_TEXT,
@@ -1635,9 +1733,11 @@ enum
 	MPJ_PING_TEXT,
 	MPJ_HANDLE_INVALID,
 	MPJ_SERVERIP_INVALID,
-	MPJ_SERVERPORT_INVALID,
+	MPJ_SERVERPORT_INVALID,	
 	TEXT_NUM_MPJ_TEXT
 };
+
+extern STR16	gzMPJHelpText[];
 
 extern STR16	gzMPJScreenText[];
 //Multiplayer Host Screen
@@ -1674,11 +1774,39 @@ enum
 	MPH_ENABLECIV_TEXT,
 	MPH_USENIV_TEXT,
 	MPH_OVERRIDEMAXAI_TEXT,
-	MPH_SYNC_CLIENT_MP_DIR,
+	MPH_SYNC_GAME_DIRECTORY,
 	MPH_FILE_TRANSFER_DIR_TEXT,
 	MPH_FILE_TRANSFER_DIR_INVALID,
 	MPH_FILE_TRANSFER_DIR_TEXT_ADDITIONAL,
 	MPH_FILE_TRANSFER_DIR_NOT_EXIST,
+	MPH_1,
+	MPH_2,
+	MPH_3,
+	MPH_4,
+	MPH_5,
+	MPH_6,
+	MPH_YES,
+	MPH_NO,	
+	MPH_MORNING,
+	MPH_AFTERNOON,
+	MPH_NIGHT,
+	MPH_CASH_LOW,
+	MPH_CASH_MEDIUM,
+	MPH_CASH_HIGH,
+	MPH_CASH_UNLIMITED,
+	MPH_TIME_NEVER,
+	MPH_TIME_SLOW,
+	MPH_TIME_MEDIUM,
+	MPH_TIME_FAST,
+	MPH_DAMAGE_VERYLOW,
+	MPH_DAMAGE_LOW,
+	MPH_DAMAGE_NORMAL,
+	MPH_HIRE_RANDOM,
+	MPH_HIRE_NORMAL,
+	MPH_EDGE_RANDOM,
+	MPH_EDGE_SELECTABLE,
+	MPH_DISABLE,
+	MPH_ALLOW,
 	TEXT_NUM_MPH_TEXT,
 };
 extern STR16	gzMPHScreenText[];
@@ -1861,6 +1989,8 @@ extern STR16 New113Message[];
 extern STR16 New113MERCMercMailTexts[];
 extern STR16 MissingIMPSkillsDescriptions[];
 
+extern STR16 New113AIMMercMailTexts[];	// WANNE: new WF Merc text, that does not exist in Email.edt
+
 // HEADROCK: HAM Messages
 extern STR16 New113HAMMessage[];
 enum
@@ -1906,6 +2036,9 @@ enum
 	MSG113_BLOODCATS_AMBUSH_PREVENTED,
 	MSG113_SOLDIER_HIT_TO_GROIN,
 
+	MSG113_ENEMY_FOUND_DEAD_BODY,
+	MSG113_AMMO_SPEC_STRING,
+
 	TEXT_NUM_MSG113,
 };
 
@@ -1915,7 +2048,6 @@ extern STR16 NewInvMessage[];
 // WANNE - MP: New multiplayer messages
 extern STR16 MPServerMessage[];
 extern STR16 MPClientMessage[];
-extern STR16 MPHelp[];
 
 // WANNE: Some Chinese specific strings that needs to be in unicode!
 extern STR16 ChineseSpecString1;

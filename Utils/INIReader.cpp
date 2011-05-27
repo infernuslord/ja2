@@ -149,7 +149,7 @@ int CIniReader::ReadInteger(const STR8	szSection, const STR8	szKey, int iDefault
 #ifndef USE_VFS
 	return GetPrivateProfileInt(szSection,	szKey, iDefaultValue, m_szFileName);
 #else
-	return m_oProps.getIntProperty(szSection, szKey, iDefaultValue);
+	return (int)(m_oProps.getIntProperty(szSection, szKey, iDefaultValue));
 #endif
 }
 
@@ -245,7 +245,7 @@ FLOAT CIniReader::ReadFloat(const STR8 szSection, const STR8 szKey, FLOAT defaul
 	return iniValueReadFromFile;
 }
 
-BOOLEAN CIniReader::ReadBoolean(const STR8 szSection, const STR8 szKey, bool defaultValue)
+BOOLEAN CIniReader::ReadBoolean(const STR8 szSection, const STR8 szKey, bool defaultValue, bool bolDisplayError)
 {
 #ifndef USE_VFS
 	char szResult[255];
@@ -272,10 +272,12 @@ BOOLEAN CIniReader::ReadBoolean(const STR8 szSection, const STR8 szKey, bool def
 	char szDefault[255];
 	sprintf(szDefault, "%s", defaultValue? "TRUE" : "FALSE");
 #endif
-	std::stringstream errMessage;
-	errMessage << "The value [" << szSection << "][" << szKey << "] = \"" << szResult << "\" "
-		<< "in file [" << this->m_szFileName << "] is neither TRUE nor FALSE.  The value " << szDefault << " will be used.";
-	iniErrorMessages.push(errMessage.str());
+	if(bolDisplayError){
+		std::stringstream errMessage;
+		errMessage << "The value [" << szSection << "][" << szKey << "] = \"" << szResult << "\" "
+			<< "in file [" << this->m_szFileName << "] is neither TRUE nor FALSE.  The value " << szDefault << " will be used.";
+		iniErrorMessages.push(errMessage.str());
+	}
 	return defaultValue;
 }
 

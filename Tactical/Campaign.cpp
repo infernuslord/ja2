@@ -1345,7 +1345,7 @@ void HandleUnhiredMercDeaths( INT32 iProfileID )
 		if ( gProfilesAIM[ iProfileID ].ProfilId == iProfileID )  //new profiles by Jazz
 		{
 			//send an email to the player telling the player that a merc died
-			AddEmailWithSpecialData(MERC_DIED_ON_OTHER_ASSIGNMENT, MERC_DIED_ON_OTHER_ASSIGNMENT_LENGTH, AIM_SITE, GetWorldTotalMin(), 0, iProfileID );
+			AddEmailWithSpecialData(MERC_DIED_ON_OTHER_ASSIGNMENT, MERC_DIED_ON_OTHER_ASSIGNMENT_LENGTH, AIM_SITE, GetWorldTotalMin(), 0, iProfileID, TYPE_EMAIL_EMAIL_EDT );
 		}
 #endif
 	}
@@ -1644,8 +1644,11 @@ UINT8 CurrentPlayerProgressPercentage(void)
 	// And failsafes here. I'm not 100% sure about these though: I've never personally seen progress 
 	// values go over 100, and I don't think they SHOULD... Can the game handle values > 100? Should it?
 	usCurrentProgress = __min(100, usCurrentProgress);
+	usCurrentProgress = __max(0, usCurrentProgress);
 	// No less than 0, or the minimum set in the INI file.
-	usCurrentProgress = __max(gGameExternalOptions.ubGameProgressMinimum, __max(0, usCurrentProgress));
+	UINT32 uiMinProgress = __max(gGameExternalOptions.ubGameProgressMinimum, 0);
+	usCurrentProgress = __max(uiMinProgress, usCurrentProgress);
+
 
 	return((UINT8)usCurrentProgress);
 	
@@ -1976,7 +1979,27 @@ void MERCMercWentUpALevelSendEmail( UINT8 ubMercMercIdValue )
 #else
 	UINT8 ubEmailOffset = 0;
 	int iMsgLength = 0;
-
+	
+	UINT8 pMerc = 0;
+	UINT8 iMerc = 0;
+	UINT8 oMerc = 0;
+	
+	// Read from EmailMercAvailable.xml
+	if ( ReadXMLEmail == TRUE )
+	{		
+	oMerc = ubMercMercIdValue;				
+	iMerc = oMerc * 1;
+	
+	if ( oMerc != 0 )
+		pMerc = oMerc + 1;
+	else
+		pMerc = 0;
+	if ( gProfilesMERC[ubMercMercIdValue].ProfilId == ubMercMercIdValue )
+		AddEmailTypeXML( pMerc, iMerc, iMerc, GetWorldTotalMin(), -1 , TYPE_EMAIL_MERC_LEVEL_UP);
+	}
+	else
+	{
+	// Read from Email.edt and sender (nickname) from MercProfiles.xml
 	// WANNE: TODO: Tex, Biggins, Stoggy and Gaston have special handling because they are the new MERC merc in 1.13
 	// There is no letter template in Email.edt. We have them hardcoded in the source code.
 	if (ubMercMercIdValue == 124 || ubMercMercIdValue == 125 || ubMercMercIdValue == 126 || ubMercMercIdValue == 127)
@@ -2012,7 +2035,8 @@ void MERCMercWentUpALevelSendEmail( UINT8 ubMercMercIdValue )
 		ubEmailOffset = MERC_UP_LEVEL_BIFF + MERC_UP_LEVEL_LENGTH_BIFF * ( ubMercMercIdValue ); 
 	}
 
-	AddEmail( ubEmailOffset, iMsgLength, SPECK_FROM_MERC, GetWorldTotalMin(), -1);
-
-	#endif
+	AddEmail( ubEmailOffset, iMsgLength, SPECK_FROM_MERC, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT_NAME_MERC);
+	
+	}
+#endif
 }

@@ -87,8 +87,6 @@ class SOLDIERTYPE;
 extern BOOLEAN		gfTacticalDoHeliRun;
 extern BOOLEAN		gfFirstHeliRun;
 
-//BOOLEAN		gfFirstTimeInGameHeliCrash = FALSE;
-
 // ATE: Globals that dictate where the mercs will land once being hired
 // Default to Omerta
 // Saved in general saved game structure
@@ -103,7 +101,7 @@ void AddItemToMerc( UINT8 ubNewMerc, INT16 sItemType );
 
 #define	NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH		7
 
-INT32	gsInitialHeliGridNo[ NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH ] =
+UINT32	gsInitialHeliGridNo[ NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH ] =
 {
 	0,
 	0,
@@ -126,7 +124,7 @@ INT16	gsInitialHeliRandomTimes[ NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH ] =
 };
 
 
-INT16		GetInitialHeliGridNo( );
+UINT32		GetInitialHeliGridNo( );
 UINT16	GetInitialHeliRandomTime();
 #endif
 INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
@@ -149,7 +147,7 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 
 
     //hayden, 7 member team limit setable in ini
-	if( NumberOfMercsOnPlayerTeam() >= gGameExternalOptions.ubGameMaximumNumberOfPlayerMercs || (is_client && NumberOfMercsOnPlayerTeam() >= MAX_MERCS) )
+	if( NumberOfMercsOnPlayerTeam() >= gGameExternalOptions.ubGameMaximumNumberOfPlayerMercs || (is_client && NumberOfMercsOnPlayerTeam() >= cMaxMercs) )
 		return( MERC_HIRE_OVER_PLAYER_LIMIT );
 
 	// ATE: if we are to use landing zone, update to latest value
@@ -171,7 +169,7 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 	MercCreateStruct.bTeam								= SOLDIER_CREATE_AUTO_TEAM;
 	MercCreateStruct.fCopyProfileItemsOver= pHireMerc->fCopyProfileItemsOver;
 	
-	if(!ALLOW_EQUIP && is_networked)
+	if(!cAllowMercEquipment && is_networked)
 		MercCreateStruct.fCopyProfileItemsOver=0;//hayden : server overide
 
 	if ( !TacticalCreateSoldier( &MercCreateStruct, &iNewIndex ) )
@@ -491,7 +489,13 @@ void MercArrivesCallback(	UINT8	ubSoldierID )
 	else
 	{
 		// OK, otherwise, set them in north area, so once we load again, they are here.
+#ifdef JA2UB
 		pSoldier->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
+#else
+		//pSoldier->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
+		pSoldier->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
+		pSoldier->usStrategicInsertionData = gGameExternalOptions.iInitialMercArrivalLocation;
+#endif
 	}
 
 	if ( pSoldier->ubStrategicInsertionCode != INSERTION_CODE_CHOPPER )
@@ -843,10 +847,10 @@ void CheckForValidArrivalSector( )
 	}
 }
 #ifdef JA2UB
-INT16	GetInitialHeliGridNo( )
+UINT32	GetInitialHeliGridNo( )
 {
 	UINT8	ubCnt;
-	INT32	sGridNo;
+	UINT32	sGridNo;
 
 	for( ubCnt=0; ubCnt<NUM_INITIAL_GRIDNOS_FOR_HELI_CRASH-1; ubCnt++)
 	{

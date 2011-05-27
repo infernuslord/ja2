@@ -2808,7 +2808,7 @@ void HaventMadeImpMercEmailCallBack()
 			//{
 				//send a follow up email to the player
 				LaptopSaveInfo.fSentImpWarningAlready = TRUE;
-				AddEmail( IMP_EMAIL_AGAIN, IMP_EMAIL_AGAIN_LENGTH, CHAR_PROFILE_SITE, GetWorldTotalMin( ), -1 );
+				AddEmail( IMP_EMAIL_AGAIN, IMP_EMAIL_AGAIN_LENGTH, CHAR_PROFILE_SITE, GetWorldTotalMin( ), -1 ,-1, TYPE_EMAIL_EMAIL_EDT);
 			//}
 		}
 	}
@@ -2818,7 +2818,7 @@ void HaventMadeImpMercEmailCallBack()
 	if( ( LaptopSaveInfo.fIMPCompletedFlag == FALSE ) && ( LaptopSaveInfo.fSentImpWarningAlready == FALSE ) )
 	{
 		LaptopSaveInfo.fSentImpWarningAlready = TRUE;
-		AddEmail(IMP_EMAIL_AGAIN,IMP_EMAIL_AGAIN_LENGTH,1, GetWorldTotalMin( ), -1 );
+		AddEmail(IMP_EMAIL_AGAIN,IMP_EMAIL_AGAIN_LENGTH,1, GetWorldTotalMin( ), -1, -1, TYPE_EMAIL_EMAIL_EDT );
 	}
 #endif
 }

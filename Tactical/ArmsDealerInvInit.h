@@ -81,4 +81,5 @@ extern DEALER_POSSIBLE_INV gRaulInventory[MAXITEMS+1];
 extern DEALER_POSSIBLE_INV gPerkoInventory[MAXITEMS+1];
 #endif
 extern DEALER_POSSIBLE_INV gFredoInventory[MAXITEMS+1];
+
 #endif

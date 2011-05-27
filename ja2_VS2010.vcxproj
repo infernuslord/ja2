@@ -114,7 +114,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>bin\VS2010\$(Configuration)\</OutDir>
     <IntDir>build\VS2010\$(ProjectName)_$(Configuration)\</IntDir>
-    <TargetName>JA2_EN_Release.exe</TargetName>
+    <TargetName>JA2_PO_Release.exe</TargetName>
     <TargetExt />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MapEditor|Win32'">
@@ -183,7 +183,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>Multiplayer\raknet;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Winmm.lib;RakNetLibStatic.lib;ws2_32.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)\JA2_EN_Release.exe</OutputFile>
+      <OutputFile>$(OutDir)\JA2_PO_Release.exe</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MapEditor|Win32'">
@@ -244,7 +244,6 @@
     <ClCompile Include="JA2 Splash.cpp" />
     <ClCompile Include="jascreens.cpp" />
     <ClCompile Include="Language Defines.cpp" />
-    <ClCompile Include="legion cfg.cpp" />
     <ClCompile Include="Loading Screen.cpp" />
     <ClCompile Include="MainMenuScreen.cpp" />
     <ClCompile Include="MessageBoxScreen.cpp" />
@@ -256,7 +255,6 @@
     <ClCompile Include="MPXmlTeams.cpp" />
     <ClCompile Include="Multiplayer\client.cpp" />
     <ClCompile Include="Multiplayer\server.cpp" />
-    <ClCompile Include="Multiplayer\test_space.cpp" />
     <ClCompile Include="Multiplayer\transfer_rules.cpp" />
     <ClCompile Include="Options Screen.cpp" />
     <ClCompile Include="profiler.cpp" />
@@ -286,7 +284,6 @@
     <ClInclude Include="JA2Prototypes.h" />
     <ClInclude Include="jascreens.h" />
     <ClInclude Include="Language Defines.h" />
-    <ClInclude Include="legion cfg.h" />
     <ClInclude Include="Loading Screen.h" />
     <ClInclude Include="local.h" />
     <ClInclude Include="mainmenuscreen.h" />
@@ -300,7 +297,6 @@
     <ClInclude Include="Multiplayer\connect.h" />
     <ClInclude Include="Multiplayer\fresh_header.h" />
     <ClInclude Include="Multiplayer\network.h" />
-    <ClInclude Include="Multiplayer\test_space.h" />
     <ClInclude Include="Multiplayer\transfer_rules.h" />
     <ClInclude Include="Options Screen.h" />
     <ClInclude Include="profiler.h" />

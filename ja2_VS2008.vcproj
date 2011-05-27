@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="ja2"
 	ProjectGUID="{B112F6BA-AF32-489C-B405-916C0F182D10}"
 	RootNamespace="ja2"
@@ -600,10 +600,6 @@
 					>
 				</File>
 				<File
-					RelativePath="Multiplayer\test_space.h"
-					>
-				</File>
-				<File
 					RelativePath=".\Multiplayer\transfer_rules.h"
 					>
 				</File>
@@ -617,10 +613,6 @@
 				</File>
 				<File
 					RelativePath="Multiplayer\server.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Multiplayer\test_space.cpp"
 					>
 				</File>
 				<File

@@ -353,16 +353,19 @@ void InteractWithOpenableStruct( SOLDIERTYPE *pSoldier, STRUCTURE *pStructure, U
 			if ( pDoor )
 			{
 				if ( DoTrapCheckOnStartingMenu( pSoldier, pDoor ) )
-		{
-			fTrapsFound = TRUE;
-		}
+				{
+					fTrapsFound = TRUE;
+				}
 			}
 
 			// Pull Up Menu
-		if ( !fTrapsFound )
-		{
-			InitDoorOpenMenu( pSoldier, pStructure, ubDirection, TRUE );
-		}
+			if ( !fTrapsFound )
+			{
+				// HEADROCK HAM 4: Why not just close the object? Why do we need a menu if there's only one option on it (CLOSE)?
+				// P.S. I don't think it's even possible for opened structures to be trapped to begin with.
+				//InitDoorOpenMenu( pSoldier, pStructure, ubDirection, TRUE );
+				pSoldier->ChangeSoldierState( GetAnimStateForInteraction( pSoldier, fDoor, CLOSE_DOOR ), 0, FALSE );
+			}
 		}
 		else
 		{

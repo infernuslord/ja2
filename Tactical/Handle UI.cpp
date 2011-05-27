@@ -242,6 +242,8 @@ INT16		gsTreeRevealYPos;
 
 // taken out of header to remove multiple symbol definitions (jonathanl)
 BOOLEAN		gfUICtHBar;
+// HEADROCK HAM 4: A new Struct to contain all CTH display data
+CTHDISPLAY gCTHDisplay;
 // HEADROCK HAM B1/2: Created an array to hold CTH of different bullets for Burst/Auto CTH Bar.
 UINT8		gbCtH[ 10 ];
 UINT8		gbCtHBurstCount;
@@ -510,28 +512,6 @@ void GetMercOknoDirection( UINT8 ubSoldierID, BOOLEAN *pfGoDown, BOOLEAN *pfGoUp
 	if ( pSoldier->pathing.bLevel == 0 && ( pSoldier->ubDirection == NORTH || pSoldier->ubDirection == EAST || pSoldier->ubDirection == SOUTH || pSoldier->ubDirection == WEST ))
 	{
 		if ( FindHeigherLevelOkno( pSoldier, pSoldier->sGridNo, pSoldier->ubDirection, &bNewDirection ) )
-		{
-			*pfGoUp = TRUE;
-		}
-	}
-}
-
-void GetMercFenceDirection( UINT8 ubSoldierID, BOOLEAN *pfGoDown, BOOLEAN *pfGoUp )
-{
-	INT8							bNewDirection;
-	SOLDIERTYPE				*pSoldier;
-
-	*pfGoDown = FALSE;
-	*pfGoUp   = FALSE;
-	
-	if ( !GetSoldier( &pSoldier, ubSoldierID ) )
-	{
-		return;
-	}
-
-	if ( pSoldier->pathing.bLevel == 0 )
-	{
-		if ( FindHeigherLevelFence( pSoldier, pSoldier->sGridNo, pSoldier->ubDirection, &bNewDirection ) )
 		{
 			*pfGoUp = TRUE;
 		}
@@ -2060,7 +2040,7 @@ UINT32 UIHandleCMoveMerc( UI_EVENT *pUIEvent )
 					if(!(gTacticalStatus.uiFlags & INCOMBAT) && pSoldier->flags.ZipperFlag)
 					{
 						pSoldier->flags.ZipperFlag=FALSE;
-						RenderBackpackButtons(0);
+						RenderBackpackButtons(ACTIVATE_BUTTON);
 					}
 				}
 				// FOR REALTIME - DO MOVEMENT BASED ON STANCE!
@@ -5099,7 +5079,7 @@ UINT32 UIHandleTOnTerrain( UI_EVENT *pUIEvent )
 	gUIDisplayActionPointsOffY = 3;
 
 	// Set # of APs
-	gsCurrentActionPoints = 6;
+	gsCurrentActionPoints = APBPConstants[AP_TALK];
 
 	// Determine if we can afford!
 	if ( !EnoughPoints( pSoldier, gsCurrentActionPoints, 0, FALSE ) )

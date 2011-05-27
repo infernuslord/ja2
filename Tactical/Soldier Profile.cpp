@@ -105,7 +105,9 @@ MERCPROFILESTRUCT_OLD_WF gMercProfilesUB[ NUM_PROFILES ];
 MERCPROFILESTRUCT_OLD_WF gMercProfilesOut[ NUM_PROFILES ];
 #endif
 
-extern UINT8 gubItemDroppableFlag[NUM_INV_SLOTS];
+//Random Stats 
+RANDOM_STATS_VALUES gRandomStatsValue[NUM_PROFILES];
+void RandomStats ();
 
 INT8 gbSkillTraitBonus[NUM_SKILLTRAITS_OT] =
 {
@@ -433,6 +435,76 @@ BOOLEAN LoadNewSystemMercsToSaveGameFile( HWFILE hFile )
 	return( TRUE );
 }
 
+//Random stats
+void RandomStats ()
+{
+UINT32 cnt;
+INT8 bBaseAttribute = 0;
+MERCPROFILESTRUCT * pProfile;
+
+	for ( cnt = 0; cnt < NUM_PROFILES; cnt++ )
+	{
+		if ( gRandomStatsValue[cnt].Enabled == TRUE )
+			{
+						bBaseAttribute = gRandomStatsValue[cnt].BaseAttribute + ( 4 * gRandomStatsValue[cnt].ExpLevel );
+						pProfile = &(gMercProfiles[cnt]);
+					
+						pProfile->bExpLevel = gRandomStatsValue[cnt].ExpLevel;
+
+						if ( gRandomStatsValue[cnt].RandomLife == TRUE )
+							{
+								pProfile->bLifeMax = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+								pProfile->bLife = pProfile->bLifeMax;
+							}	
+							
+						if ( gRandomStatsValue[cnt].RandomAgility == TRUE )
+							{
+								pProfile->bAgility = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}							
+							
+						if ( gRandomStatsValue[cnt].RandomLeadership == TRUE )
+							{
+								pProfile->bLeadership = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}							
+														
+						if ( gRandomStatsValue[cnt].RandomDexterity == TRUE )
+							{
+								pProfile->bDexterity = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}	
+							
+						if ( gRandomStatsValue[cnt].RandomWisdom == TRUE )
+							{
+								pProfile->bWisdom = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}	
+							
+						if ( gRandomStatsValue[cnt].RandomMarksmanship == TRUE )
+							{
+								pProfile->bMarksmanship = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}	
+							
+						if ( gRandomStatsValue[cnt].RandomMedical == TRUE )
+							{
+								pProfile->bMedical = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}
+							
+						if ( gRandomStatsValue[cnt].RandomMechanical == TRUE )
+							{
+								pProfile->bMechanical = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}	
+
+						if ( gRandomStatsValue[cnt].RandomExplosive == TRUE )
+							{
+								pProfile->bExplosive = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}	
+
+						if ( gRandomStatsValue[cnt].RandomStrength == TRUE )
+							{
+								pProfile->bStrength = (bBaseAttribute + Random( 9 ) + Random( 8 ));
+							}								
+			}
+	}
+}
+
 // WANNE - BMP: DONE!
 BOOLEAN LoadMercProfiles(void)
 {
@@ -548,7 +620,18 @@ BOOLEAN LoadMercProfiles(void)
 			return(FALSE);
 		}
 
-		// WANNE - BMP: NEED TESTING!
+		
+		
+		// WANNE: For the new WF merc, there is no entry in prof.dat, so we have to reset some flags manually!		
+		if (uiLoop >= 170)
+		{
+			gMercProfiles[uiLoop].ubMiscFlags = 0;
+			gMercProfiles[uiLoop].ubMiscFlags2 = 0;
+			gMercProfiles[uiLoop].ubMiscFlags3 = 0;
+
+			gMercProfiles[uiLoop].uiTotalCostToDate = 0;
+		}
+
 		// WANNE - BMP: DONE!
 		//<SB> convert old MERCPROFILESTRUCT to new MERCPROFILESTRUCT
 		gMercProfiles[uiLoop].sGridNo = gMercProfiles[uiLoop]._old_sGridNo;
@@ -559,7 +642,8 @@ BOOLEAN LoadMercProfiles(void)
 		prof.dat until we're sure we want to replace it with the xml file.
 			Because the new WF mercs don't have entries in the prof*.dat files, we need to always load their equipment from
 			MercStaringGear.xml, regardless of the inventory system we're going to use.*/
-		if(UsingNewInventorySystem() == true || uiLoop >= 170){
+		if(UsingNewInventorySystem() == true || uiLoop >= 170 )
+		{
 			// Start by resetting all profile inventory values to 0
 			gMercProfiles[uiLoop].clearInventory();
 			gMercProfiles[uiLoop].ubInvUndroppable = 0;
@@ -615,43 +699,7 @@ BOOLEAN LoadMercProfiles(void)
 		// Setup face index value
 		// Default is the ubCharNum
 		gMercProfiles[uiLoop].ubFaceIndex = (UINT8)uiLoop;
-/*
-		if ( !gGameOptions.fGunNut )
-		{
 
-			// CJC: replace guns in profile if they aren't available
-			for ( uiLoop2 = 0; uiLoop2 < gMercProfiles[uiLoop].inv.size(); uiLoop2++ )
-			{
-				usItem = gMercProfiles[uiLoop].inv[ uiLoop2 ];
-
-				if ( ( Item[ usItem ].usItemClass & IC_GUN ) && ExtendedGunListGun( usItem ) )
-				{
-					usNewGun = StandardGunListReplacement( usItem );
-					if ( usNewGun != NOTHING )
-					{
-						gMercProfiles[uiLoop].inv[ uiLoop2 ] = usNewGun;
-
-						// must search through inventory and replace ammo accordingly
-						for ( uiLoop3 = 0; uiLoop3 < gMercProfiles[ uiLoop ].inv.size(); uiLoop3++ )
-						{
-							usAmmo = gMercProfiles[ uiLoop ].inv[ uiLoop3 ];
-							if ( (Item[ usAmmo ].usItemClass & IC_AMMO) )
-							{
-								usNewAmmo = FindReplacementMagazineIfNecessary( usItem, usAmmo, usNewGun );
-								if (usNewAmmo != NOTHING )
-								{
-									// found a new magazine, replace...
-									gMercProfiles[ uiLoop ].inv[ uiLoop3 ] = usNewAmmo;
-								}
-							}
-						}
-					}
-				}
-
-			}
-
-		} // end of if not gun nut
-*/
 		//ATE: Calculate some inital attractiveness values for buddy's inital equipment...
 		// Look for gun and armour
 		gMercProfiles[uiLoop].bMainGunAttractiveness		= -1;
@@ -675,27 +723,7 @@ BOOLEAN LoadMercProfiles(void)
 					gMercProfiles[uiLoop].bArmourAttractiveness = min(128,Armour[ Item[ usItem ].ubClassIndex ].ubProtection);
 				}
 			}
-		}
-
-
-		// OK, if we are a created slot, this will get overriden at some time..
-
-		/* tais: moved the gear price calculation code down below profex, more info at the comment there
-
-		//add up the items the merc has for the usOptionalGearCost
-		gMercProfiles[ uiLoop ].usOptionalGearCost = 0;
-		for ( uiLoop2 = 0; uiLoop2< gMercProfiles[ uiLoop ].inv.size(); uiLoop2++ )
-		{
-			if ( gMercProfiles[ uiLoop ].inv[ uiLoop2 ] != NOTHING )
-			{
-				//get the item
-				usItem = gMercProfiles[ uiLoop ].inv[ uiLoop2 ];
-
-				//add the cost
-				gMercProfiles[ uiLoop ].usOptionalGearCost += Item[ usItem ].usPrice;
-			}
-		}
-		*/
+		}	
 
 		//These variables to get loaded in
 		gMercProfiles[ uiLoop ].fUseProfileInsertionInfo = FALSE;
@@ -730,27 +758,13 @@ BOOLEAN LoadMercProfiles(void)
 				tempGearCost += Item[ usItem ].usPrice;
 			}
 		}
-		
-		if(UsingNewInventorySystem() == false && gGameOptions.ubAttachmentSystem == ATTACHMENT_OLD )
-		{
-		for ( uiLoop2 = 0; uiLoop2< gMercProfiles[ uiLoop ].inv.size(); uiLoop2++ )
-		{
-			if( gMercProfiles[uiLoop].inv[ uiLoop2 ] == 97 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 1346 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 99 
-				|| gMercProfiles[uiLoop].inv[ uiLoop2 ] == 1347 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 584 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 551 ) 
-				gMercProfiles[uiLoop].inv[ uiLoop2 ] = 129; 	
-			
-			if( gMercProfiles[uiLoop].inv[ uiLoop2 ] == 117 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 349 || gMercProfiles[uiLoop].inv[ uiLoop2 ] == 1263 )
-				gMercProfiles[uiLoop].inv[ uiLoop2 ] = 71; 				
-		}	
-		}		
-						
 		//tais: added optional price modifier for gearkits, reads the xml tag mPriceMod from MercStartingGear.xml
 		if(gMercProfileGear[uiLoop][0].PriceModifier != 0 &&
 			gMercProfileGear[uiLoop][0].PriceModifier <= 200 &&
 			gMercProfileGear[uiLoop][0].PriceModifier >= -100)
 		{
 			FLOAT mod;
-			mod = (FLOAT) (gMercProfileGear[uiLoop][0].PriceModifier + 100) / 100;
+			mod = (FLOAT) (gMercProfileGear[uiLoop][0].PriceModifier + 100) / 100.0f;
 			gMercProfiles[ uiLoop ].usOptionalGearCost = (UINT16)(tempGearCost * mod);
 		}
 		else
@@ -760,7 +774,24 @@ BOOLEAN LoadMercProfiles(void)
 
 		// ----- WANNE.PROFILE: New Profile Loading - BEGIN
 		if ( gGameExternalOptions.fReadProfileDataFromXML == FALSE )
-		{						
+		{	
+			// WANNE: If all 4 (Friendly, Direct, Threaten, Recruit) are not set, set them to 100.
+			// These 4 values cannot be edit in Proedit if Merc Index >= 75.
+			// If we set these to 100 (which means it is equal the leadership of the merc), we fix the bug that the 4 UB Merc (Stogie, Tex, Gaston, Biggins) cannot recruit NPCs or do special quests).
+			if (uiLoop >= FIRST_NPC)
+			{
+				if (gMercProfiles[ uiLoop ].usApproachFactor[0] == 0 &&
+					gMercProfiles[ uiLoop ].usApproachFactor[1] == 0 &&
+					gMercProfiles[ uiLoop ].usApproachFactor[2] == 0 &&
+					gMercProfiles[ uiLoop ].usApproachFactor[3] == 0)
+				{
+					gMercProfiles[ uiLoop ].usApproachFactor[0] = 100;
+					gMercProfiles[ uiLoop ].usApproachFactor[1] = 100;
+					gMercProfiles[ uiLoop ].usApproachFactor[2] = 100;
+					gMercProfiles[ uiLoop ].usApproachFactor[3] = 100;
+				}
+			}
+
 			// AIM und MERC ( 0 - 51 )
 			if (uiLoop < 51)
 			{

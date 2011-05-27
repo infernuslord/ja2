@@ -38,6 +38,8 @@ extern UINT16 CivLastNames[MAXCIVLASTNAMES][10];
 
 #define	LOCKED_NO_NEWGRIDNO			2
 
+// WANNE: Yes I know, we support up to 254 profiles, but because of compatibility, profile Id = 200
+// is not a valid profil. We in MercProfiles.xml, the profile id = 200 should not be used!
 #define	NO_PROFILE			200
 
 #define	BATTLE_SND_LOWER_VOLUME		1
@@ -699,6 +701,7 @@ public:
 	//	Use this instead of the old method of calling memset.
 	//	Note that the constructor does this automatically.
 	void initialize();
+	bool	exists();
 
 	// Note: Place all non-POD items at the end (after endOfPOD)
 	// The format of this structure affects what is written into and read from various
@@ -765,8 +768,12 @@ public:
 	// WORLD POSITION STUFF
 	FLOAT											dXPos;
 	FLOAT											dYPos;
-	FLOAT											dOldXPos;
-	FLOAT											dOldYPos;
+	// HEADROCK HAM 4: These two vars are appropriated for the new Shooting Mechanism.
+	// They represent the soldier's position at the start of his turn.
+	//FLOAT											dOldXPos;
+	//FLOAT											dOldYPos; 
+	INT16											sOldXPos;
+	INT16											sOldYPos;
 	INT32												sInitialGridNo;
 	INT32												sGridNo;
 	UINT8												ubDirection;
@@ -819,6 +826,16 @@ public:
 	INT8												bTargetLevel;
 	INT8												bTargetCubeLevel;
 	INT32												sLastTarget;
+	// HEADROCK HAM 4: the muzzle offset of the shooter's previous bullet. (NCTH)
+	FLOAT												dPrevMuzzleOffsetX;
+	FLOAT												dPrevMuzzleOffsetY;
+	// HEADROCK HAM 4: Two more values. These record the shooter's previous Counter Force applied on the gun.
+	FLOAT												dPrevCounterForceX;
+	FLOAT												dPrevCounterForceY;
+	// CHRISL: Track initial offsets for autofire
+	FLOAT												dInitialMuzzleOffsetX;
+	FLOAT												dInitialMuzzleOffsetY;
+
 	INT8												bTilesMoved;
 	FLOAT												dNextBleed;
 
@@ -1153,6 +1170,7 @@ public:
 
 	// Debugging data - not saved
 	INT32 sPlotSrcGrid;
+	//std::vector<UINT32>	CTH;
 
 
 public:
@@ -1269,9 +1287,9 @@ public:
 	void BeginTyingToFall( void );
 	
 	//legion by Jazz
-	void BeginSoldierFence( void  ); 
-	void BeginSoldierFenceUp( void  );
+	void BeginSoldierClimbWall( void  ); 
 	void BeginSoldierClimbWindow( void );
+	void BeginSoldierClimbWallUp( void  ); 
 	
 	void HandleAnimationProfile( UINT16	usAnimState, BOOLEAN fRemove );
 	void HandleSoldierTakeDamageFeedback( void );
@@ -1541,8 +1559,10 @@ public:
 	// WORLD POSITION STUFF
 	FLOAT											dXPos;
 	FLOAT											dYPos;
-	FLOAT											dOldXPos;
-	FLOAT											dOldYPos;
+	//FLOAT											dOldXPos; // HEADROCK HAM 4: These values have been reappropriated.
+	//FLOAT											dOldYPos; // not sure what's going to happen with this though.
+	INT16											sOldXPos;
+	INT16											sOldYPos;
 	INT32												sInitialGridNo;
 	INT32												sGridNo;
 	UINT8												ubDirection;
@@ -2125,4 +2145,5 @@ public:
 }; // OLDSOLDIERTYPE_101;	
 
 #endif
+
 

@@ -1,5 +1,5 @@
-#ifndef _UNDERGROUNDINIT_H
-#define _UNDERGROUNDINIT_H
+#ifndef _LUAINITNPCS_H
+#define _LUAINITNPCS_H
 
 #include "Types.h"
 

@@ -33,6 +33,7 @@
 #endif
 #include "BobbyRMailOrder.h"
 
+#include "Luaglobal.h"
 #include "connect.h"
 #include "LuaInitNPCs.h"
 
@@ -711,10 +712,11 @@ void HandleNPCSystemEvent( UINT32 uiEvent )
 					{
 						// KP knows money is gone, hasn't told player, if this event is called then the 2
 						// days are up... send email
+
 #ifdef JA2UB
 // no UB
-#else
-						AddEmail( KING_PIN_LETTER, KING_PIN_LETTER_LENGTH, KING_PIN, GetWorldTotalMin(), -1 );
+#else						
+						AddEmail( KING_PIN_LETTER, KING_PIN_LETTER_LENGTH, KING_PIN, GetWorldTotalMin(), -1, -1 , TYPE_EMAIL_EMAIL_EDT );
 #endif
 						StartQuest( QUEST_KINGPIN_MONEY, 5, MAP_ROW_D );
 						// add event to send terrorists two days from now
@@ -817,7 +819,7 @@ void HandleNPCSystemEvent( UINT32 uiEvent )
 #ifdef JA2UB
 // no UB
 #else
-				AddEmail( ENRICO_MIGUEL, ENRICO_MIGUEL_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1 );
+				AddEmail( ENRICO_MIGUEL, ENRICO_MIGUEL_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1, -1 , TYPE_EMAIL_EMAIL_EDT);
 #endif
 				break;
 
@@ -839,8 +841,10 @@ void HandleNPCSystemEvent( UINT32 uiEvent )
 
 void HandleEarlyMorningEvents( void )
 {
+#ifdef LUA_STRATEGY_EVENT_HANDLER
+	LetLuaHandleEarlyMorningEvents(0);
+#else
 
-#if 0
 	UINT32					cnt;
 	UINT32					uiAmount;
 
@@ -851,10 +855,10 @@ void HandleEarlyMorningEvents( void )
 		//new profiles by Jazz
 		if ( gProfilesRPC[cnt].ProfilId == cnt || gProfilesNPC[cnt].ProfilId == cnt || gProfilesVehicle[cnt].ProfilId == cnt )
 		{
-		gMercProfiles[cnt].bFriendlyOrDirectDefaultResponseUsedRecently = FALSE;
-		gMercProfiles[cnt].bRecruitDefaultResponseUsedRecently = FALSE;
-		gMercProfiles[cnt].bThreatenDefaultResponseUsedRecently = FALSE;
-		gMercProfiles[cnt].ubMiscFlags2 &= (~PROFILE_MISC_FLAG2_BANDAGED_TODAY);
+			gMercProfiles[cnt].bFriendlyOrDirectDefaultResponseUsedRecently = FALSE;
+			gMercProfiles[cnt].bRecruitDefaultResponseUsedRecently = FALSE;
+			gMercProfiles[cnt].bThreatenDefaultResponseUsedRecently = FALSE;
+			gMercProfiles[cnt].ubMiscFlags2 &= (~PROFILE_MISC_FLAG2_BANDAGED_TODAY);
 		}
 	}
 	// reset Father Walker's drunkenness level!
@@ -1074,8 +1078,6 @@ void HandleEarlyMorningEvents( void )
 		CheckForMissingHospitalSupplies();
 	}
 #endif
-
-	LetLuaHandleEarlyMorningEvents(0);
 }
 
 void MakeCivGroupHostileOnNextSectorEntrance( UINT8 ubCivGroup )

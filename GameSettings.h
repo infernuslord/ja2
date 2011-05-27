@@ -52,7 +52,7 @@ enum
 	TOPTION_ALLOW_SOLDIER_TOOLTIPS,
 	TOPTION_USE_AUTO_SAVE,
 	TOPTION_SILENT_SKYRIDER,
-	TOPTION_LOW_CPU_USAGE,
+	//TOPTION_LOW_CPU_USAGE,
 	TOPTION_ENHANCED_DESC_BOX,
 
 	// arynn
@@ -61,14 +61,30 @@ enum
 	// HEADROCK HAM 3.6:
 	TOPTION_STAT_PROGRESS_BARS,
 
+	
+
+	// HEADROCK HAM 4:
+	TOPTION_ALT_MAP_COLOR,
+
 	// WANNE: Moved alternate bullets graphics (tracers) to options
 	TOPTION_ALTERNATE_BULLET_GRAPHICS,
+
+	// CHRISL: HAM 4: Activate/Deactivate NCTH mode
+	TOPTION_USE_NCTH,
+
+	// WANNE:	
+	TOPTION_SHOW_TACTICAL_FACE_GEAR,
+	TOPTION_SHOW_TACTICAL_FACE_ICONS,
 
 	// arynn: Debug/Cheat
 	TOPTION_CHEAT_MODE_OPTIONS_HEADER,
 	TOPTION_FORCE_BOBBY_RAY_SHIPMENTS,			// force all pending Bobby Ray shipments
 	TOPTION_CHEAT_MODE_OPTIONS_END,
 	TOPTION_DEBUG_MODE_OPTIONS_HEADER,			// an example options screen options header (pure text)                                                         
+	
+	// HEADROCK HAM 4:
+	TOPTION_REPORT_MISS_MARGIN,
+	
 	TOPTION_SHOW_RESET_ALL_OPTIONS,				// failsafe show/hide option to reset all options 
 	TOPTION_RESET_ALL_OPTIONS,					// a do once and reset self option (button like effect)                                                         
 	TOPTION_RETAIN_DEBUG_OPTIONS_IN_RELEASE,	// allow debug options that were set in debug.exe to continue in a rel.exe (debugging release can be beneficial)
@@ -194,6 +210,8 @@ typedef struct
 } GAME_OPTIONS;
 
 bool UsingNewInventorySystem();
+bool UsingNewAttachmentSystem();
+bool UsingNewCTHSystem();
 BOOLEAN IsNIVModeValid(bool checkRes = true);
 
 // Snap: Options read from an INI file in the default of custom Data directory
@@ -680,6 +698,9 @@ typedef struct
 	// HEADROCK HAM B2.5: Realistic tracers - CTH increased by this amount whenever a tracer is fired. 0 = off.
 	UINT8 ubCTHBumpPerTracer;
 
+	// CHRISL: Exeternalize the minimum range at which tracers can improve autofire hit chance
+	UINT16 ubMinRangeTracerEffect;
+
 	// HEADROCK HAM B2.6: Increased aiming costs?
 	BOOLEAN fIncreasedAimingCost;
 
@@ -690,12 +711,19 @@ typedef struct
 	BOOLEAN fDynamicAimingTime;
 
 	// allow old behaviour
-	BOOLEAN fAimLevelsDependOnDistance;
+	BOOLEAN fAimLevelsDependOnDistance; // feel free to dump this option
+	INT32 iAimLevelsCompatibilityOption; // but not this one
 
 	//WarmSteel - These determine in which group each scope belongs. Needed for dynamic aiming limits.
 	INT16 sVeryHighPowerScope;
 	INT16 sHighPowerScope;
 	INT16 sMediumPowerScope;
+
+	//CHRISL: AI Sniper fields
+	BOOLEAN fAISniperElite;
+	UINT16 fAISniperRange;
+	UINT16 fAISniperChance;
+	UINT16 fAISniperChanceWithSR;
 
 	// HEADROCK HAM B2.6: Controls how much effect target movement has on aiming
 	FLOAT iMovementEffectOnAiming;
@@ -712,8 +740,9 @@ typedef struct
 	// HEADROCK HAM B2.6/2/1: Toggle new Burst/Auto CTH bars: 0=neither, 1=both, 2=Burst, 3=Auto
 	UINT8 ubNewCTHBars;
 
-	// HEADROCK HAM B2.6: Toggle whether AI checks for larger magazine when wanting to suppress at a distance
-	BOOLEAN fIncreaseAISuppressionFire;
+	// CHRISL: Changed from a simple flag to two externalized values for more modder control over AI suppression
+	UINT16 ubAISuppressionMinimumMagSize;
+	UINT16 ubAISuppressionMinimumAmmo;
 
 	// HEADROCK HAM B2.7: Change the speed of skill progression. (defaults set to JA2 normal)
 	UINT16 usHealthSubpointsToImprove;
@@ -785,6 +814,9 @@ typedef struct
 
 	// HEADROCK HAM 3: If enabled, tooltipping over Bobby Ray's weapons will show a list of possible attachments to those weapons.
 	BOOLEAN fBobbyRayTooltipsShowAttachments;
+
+	// CHRISL: Converts the AutoFireToHitBonus value to a percentage for CTH calculations
+	UINT8 ubFlatAFTHBtoPrecentMultiplier;
 
 	// HEADROCK HAM 3.1: Divisor for the AP-to-Ready cost charge on first aiming click, when extra aiming costs are enabled. 0 = No ready-time-based charge.
 	UINT8 ubFirstAimReadyCostDivisor;
@@ -948,8 +980,8 @@ typedef struct
 	BOOLEAN fEnableInventoryPoolQ;		
 	
 	//legion by Jazz
-	BOOLEAN fShowTacticalFaceGear; //legion 2
-	BOOLEAN fShowTacticalFaceIcons; //legion 2
+	//BOOLEAN fShowTacticalFaceGear; //legion 2
+	//BOOLEAN fShowTacticalFaceIcons; //legion 2
 	INT8 bTacticalFaceIconStyle;
 	
 	//Enemy Names Group Legion 2 by Jazz
@@ -968,6 +1000,9 @@ typedef struct
 	UINT8 ubChanceTonyAvailable; // silversurfer/SANDRO
 	
 	BOOLEAN fStandUpAfterBattle;
+	
+	INT32 iInitialMercArrivalLocation;
+	
 } GAME_EXTERNAL_OPTIONS;
 
 typedef struct
@@ -1213,6 +1248,111 @@ typedef struct
 
 } SKILL_TRAIT_VALUES;
 
+// HEADROCK HAM 4: Constants used as coefficients by the various parts of the new CTH system.
+typedef struct
+{
+	UINT32 NORMAL_SHOOTING_DISTANCE;		// Distance at which 1x magnification is 100% effective. This is a major component of the entire shooting mechanism.
+	FLOAT DEGREES_MAXIMUM_APERTURE;			// Maximum possible aperture for a 100% muzzle sway shot. Decrease to make all shots more accurate.
+	FLOAT RANGE_COEFFICIENT;				// Determines maximum range which decides when gravity forces bullets to drop
+	FLOAT GRAVITY_COEFFICIENT;				// Changes the way gravity works in the game. Higher values mean bullets don't drop as quickly after reaching max range.
+	FLOAT VERTICAL_BIAS;					// This float can be used to reduce the chance of missing too far upwards or downwards (compared to left/right).
+	FLOAT SCOPE_RANGE_MULTIPLIER;			// Adjusts the minimum effective range of scopes
+	FLOAT SIDE_FACING_DIVISOR;				// Deals with a visual error in NCTH relating to shooting at a target who is facing directly perpendicular to the shooters facing.
+
+	FLOAT BASE_EXP;				// Importance of Experience for BASE CTH
+	FLOAT BASE_MARKS;				// Importance of Marksmanship for BASE CTH
+	FLOAT BASE_WIS;				// Importance of Wisdom for BASE CTH
+	FLOAT BASE_DEX;				// Importance of Dexterity for BASE CTH
+
+	FLOAT BASE_LOW_MORALE;		// Applied gradually when morale is below 50.
+	FLOAT BASE_HIGH_MORALE;		// Applied gradually when morale is above 50.
+	FLOAT BASE_PSYCHO;			// Applied for each level of PSYCHO trait
+	FLOAT BASE_SHOOTING_UPWARDS;	// Applied gradually for shooting at a higher target. Decreases with distance.
+	FLOAT BASE_INJURY;			// Applied gradually for injuries
+	FLOAT BASE_DRUNK[4];			// Applied for drunkness levels
+	FLOAT BASE_FATIGUE;			// Applied gradually for fatigue
+	FLOAT BASE_SAME_TARGET;		// Applied for shooting at the same target again
+	FLOAT BASE_GASSED;			// Applied for shooting while breathing gas
+	FLOAT BASE_BEING_BANDAGED;	// Applied for shooting while being bandaged
+	FLOAT BASE_SHOCK;				// Applied gradually for shock points
+	FLOAT BASE_AGILE_TARGET;		// Applied gradually for agile or experienced target
+	FLOAT BASE_TARGET_INVISIBLE;	// Applied for shooting at a target you can't see
+	FLOAT BASE_DRAW_COST;			// Applied per 1 AP of the weapon's Ready Cost, under 100AP.
+	FLOAT BASE_TWO_GUNS;			// Gun Difficulty Multiplier for shooting two guns
+	FLOAT BASE_ONE_HANDED;		// Gun Difficulty Multiplier for shooting a pistol with one hand.
+	FLOAT BASE_STANDING_STANCE;	// Gun Difficulty Multiplier for shooting from a standing stance
+	FLOAT BASE_CROUCHING_STANCE;	// Gun Difficulty Multiplier for shooting from a crouched stance
+	FLOAT BASE_PRONE_STANCE;		// Gun Difficulty Multiplier for shooting from a prone stance
+	FLOAT BASE_HEAVY_WEAPON;		// Gun Difficulty Multiplier for shooting a launcher
+	FLOAT BASE_DIFFICULTY[6];		// Applied for game difficulty
+
+	FLOAT AIM_EXP;				// Importance of Experience for AIMING CTH
+	FLOAT AIM_MARKS;				// Importance of Marksmanship for AIMING CTH
+	FLOAT AIM_WIS;				// Importance of Wisdom for AIMING CTH
+	FLOAT AIM_DEX;				// Importance of Dexterity for AIMING CTH
+
+	FLOAT AIM_TOO_CLOSE_SCOPE;	// Applied per tile closer than the scope's minimum range.
+	FLOAT AIM_GUN_CONDITION;		// Applied per point of condition below 50.
+	FLOAT AIM_LOW_MORALE;			// Applied gradually when morale is below 50.
+	FLOAT AIM_HIGH_MORALE;		// Applied gradually when morale is above 50.
+	FLOAT AIM_PSYCHO;				// Applied for each level of PSYCHO trait
+	FLOAT AIM_VISIBILITY;			// Applied for bad visibility
+	FLOAT AIM_SHOOTING_UPWARDS;	// Applied gradually for shooting at a higher target. Decreases with distance.
+	FLOAT AIM_INJURY;				// Applied gradually for injuries
+	FLOAT AIM_DRUNK[4];			// Applied for drunkness levels
+	FLOAT AIM_FATIGUE;			// Applied gradually for fatigue
+	FLOAT AIM_GASSED;				// Applied for shooting while breathing gas
+	FLOAT AIM_BEING_BANDAGED;		// Applied for shooting while being bandaged
+	FLOAT AIM_SHOCK;				// Applied gradually for shock points
+	FLOAT AIM_TARGET_INVISIBLE;	// Applied for shooting at a target you can't see
+	FLOAT AIM_SNIPER_SKILL;		// Applied as percentage bonus to CTH cap, once per each level.
+	FLOAT AIM_DRAW_COST;			// Applied per 1 AP of the weapon's Ready Cost, under 100AP.
+	FLOAT AIM_STANDING_STANCE;	// Gun Difficulty multiplier for shooting a heavy gun when standing
+	FLOAT AIM_CROUCHING_STANCE;	// Gun Difficulty multiplier for shooting a heavy gun from a crouched stance
+	FLOAT AIM_PRONE_STANCE;		// Gun Difficulty multiplier for shooting a heavy gun when prone, before bipod bonuses
+	FLOAT AIM_TWO_GUNS;			// Gun Difficulty multiplier for shooting two guns (halved for each Ambidextrous level)
+	FLOAT AIM_ONE_HANDED;			// Gun Difficulty multiplier for firing a pistol with one hand.
+	FLOAT AIM_HEAVY_WEAPON;		// Gun Difficulty multiplier for shooting a launcher (halved for each Heavy Weapons level)
+	FLOAT AIM_DIFFICULTY[6];		// Applied for game difficulty
+
+	FLOAT MOVEMENT_MRK;
+	FLOAT MOVEMENT_WIS;
+	FLOAT MOVEMENT_DEX;
+	FLOAT MOVEMENT_EXP_LEVEL;
+	UINT32 MOVEMENT_TRACKING_DIFFICULTY;
+	FLOAT MOVEMENT_PENALTY_PER_TILE;
+
+	FLOAT PRE_RECOIL_WIS;
+	FLOAT PRE_RECOIL_EXP_LEVEL;
+	FLOAT PRE_RECOIL_AUTO_WEAPONS_SKILL;
+
+	FLOAT RECOIL_MAX_COUNTER_STR;
+	FLOAT RECOIL_MAX_COUNTER_AGI;
+	FLOAT RECOIL_MAX_COUNTER_EXP_LEVEL;
+	FLOAT RECOIL_MAX_COUNTER_FORCE;
+	FLOAT RECOIL_MAX_COUNTER_CROUCH;
+	FLOAT RECOIL_MAX_COUNTER_PRONE;
+	FLOAT RECOIL_COUNTER_ACCURACY_MIN_ERROR;
+	FLOAT RECOIL_COUNTER_ACCURACY_DEX;
+	FLOAT RECOIL_COUNTER_ACCURACY_WIS;
+	FLOAT RECOIL_COUNTER_ACCURACY_AGI;
+	FLOAT RECOIL_COUNTER_ACCURACY_EXP_LEVEL;
+	FLOAT RECOIL_COUNTER_ACCURACY_AUTO_WEAPONS_DIVISOR;
+	FLOAT RECOIL_COUNTER_ACCURACY_TRACER_BONUS;
+	FLOAT RECOIL_COUNTER_ACCURACY_ANTICIPATION;
+	FLOAT RECOIL_COUNTER_ACCURACY_COMPENSATION;
+	FLOAT RECOIL_COUNTER_FREQUENCY_AGI;
+	FLOAT RECOIL_COUNTER_FREQUENCY_EXP_LEVEL;
+	FLOAT RECOIL_COUNTER_FREQUENCY_AUTO_WEAPONS_DIVISOR;
+
+	UINT8 RECOIL_COUNTER_INCREMENT;
+	UINT8 RECOIL_COUNTER_INCREMENT_TRACER;
+	UINT32 NORMAL_RECOIL_DISTANCE;
+	FLOAT MAX_BULLET_DEV;
+	BOOLEAN RANGE_EFFECTS_DEV;
+
+} CTH_CONSTANTS;
+
 //This structure will contain general Ja2 settings	NOT individual game settings.
 extern GAME_SETTINGS		gGameSettings;
 
@@ -1224,6 +1364,9 @@ extern GAME_EXTERNAL_OPTIONS gGameExternalOptions;
 
 extern SKILL_TRAIT_VALUES gSkillTraitValues;  // SANDRO - added this one
 
+// HEADROCK HAM 4: CTH constants read from a separate INI file
+extern CTH_CONSTANTS gGameCTHConstants;
+
 // WDS - Automatically try to save when an assertion failure occurs
 extern bool alreadySaving;
 
@@ -1233,6 +1376,8 @@ BOOLEAN LoadGameSettings();
 void LoadGameExternalOptions();
 void LoadSkillTraitsExternalSettings(); // SANDRO - added this one
 void LoadGameAPBPConstants();
+// HEADROCK HAM 4: Read CTH/Shooting coefficients from file
+void LoadCTHConstants();
 void FreeGameExternalOptions();
 
 void InitGameOptions();

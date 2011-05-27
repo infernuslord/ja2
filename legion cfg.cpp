@@ -108,9 +108,6 @@ Legion2Dane	gLegion2Dane; //legion
 UINT32	ProfileNum_Legion[NUM_PROFILES];
 SLOTY_LEGION_VALUES gLegionSloty[NUM_PROFILES];
 
-SOUND_PROFILE_VALUES gSoundProfileValue[NUM_PROFILES];
-RANDOM_STATS_VALUES gRandomStatsValue[NUM_PROFILES];
-
 #define				GAME_LEGION_OPTIONS_FILE	"UB_Options.ini"
 #define				LAPTOP_OPTIONS_FILE	"Ja2_laptop.ini"
 
@@ -150,7 +147,7 @@ BOOLEAN JA2EncryptedFileReadNEW( HWFILE hFile, PTR pDest, UINT32 uiBytesToRead, 
 	UINT8		ubArrayIndex = 0;
 	//UINT8		ubLastNonBlank = 0;
 	UINT8		ubLastByte = 0;
-	UINT8		ubLastByteForNextLoop;
+//	UINT8		ubLastByteForNextLoop;
 	BOOLEAN	fRet;
 	UINT8 *	pMemBlock;
 
@@ -320,73 +317,6 @@ void WFtoUB ()
 
 }
 #endif
-
-void RandomStats ()
-{
-UINT32 cnt;
-INT8 bBaseAttribute = 0;
-MERCPROFILESTRUCT * pProfile;
-
-	for ( cnt = 0; cnt < NUM_PROFILES; cnt++ )
-	{
-		if ( gRandomStatsValue[cnt].Enabled == TRUE )
-			{
-				//if ( gRandomStatsValue[cnt].uiIndex == cnt )
-				//	{
-						bBaseAttribute = gRandomStatsValue[cnt].BaseAttribute + ( 4 * gRandomStatsValue[cnt].ExpLevel );
-						pProfile = &(gMercProfiles[cnt]);
-					
-						pProfile->bExpLevel = gRandomStatsValue[cnt].ExpLevel;
-
-						if ( gRandomStatsValue[cnt].RandomLife == TRUE )
-							{
-								pProfile->bLifeMax = (bBaseAttribute + Random( 9 ) + Random( 8 ));
-								pProfile->bLife = pProfile->bLifeMax;
-							}	
-							
-						if ( gRandomStatsValue[cnt].RandomAgility == TRUE )
-							{
-								pProfile->bAgility = (bBaseAttribute + Random( 9 ) + Random( 8 ));
-							}							
-							
-						if ( gRandomStatsValue[cnt].RandomLeadership == TRUE )
-							{
-								pProfile->bLeadership = (bBaseAttribute + Random( 9 ) + Random( 8 ));
-							}							
-														
-						if ( gRandomStatsValue[cnt].RandomDexterity == TRUE )
-							{
-								pProfile->bDexterity = (bBaseAttribute + Random( 9 ) + Random( 8 ));
-							}	
-							
-						if ( gRandomStatsValue[cnt].RandomWisdom == TRUE )
-							{
-								pProfile->bWisdom = (bBaseAttribute + Random( 9 ) + Random( 8 ));
-							}	
-							
-						if ( gRandomStatsValue[cnt].RandomMarksmanship == TRUE )
-							{
-								pProfile->bMarksmanship = (bBaseAttribute + Random( 9 ) + Random( 8 ));
-							}	
-							
-						if ( gRandomStatsValue[cnt].RandomMedical == TRUE )
-							{
-								pProfile->bMedical = (bBaseAttribute + Random( 9 ) + Random( 8 ));
-							}
-							
-						if ( gRandomStatsValue[cnt].RandomMechanical == TRUE )
-							{
-								pProfile->bMechanical = (bBaseAttribute + Random( 9 ) + Random( 8 ));
-							}	
-
-						if ( gRandomStatsValue[cnt].RandomExplosive == TRUE )
-							{
-								pProfile->bExplosive = (bBaseAttribute + Random( 9 ) + Random( 8 ));
-							}								
-				//	}	
-			}
-	}
-}
 
 #ifdef JA2UB
 
@@ -738,7 +668,7 @@ void LoadGameLegionOptions()
 		
 	//Campaign Section
 	
-	gGameLegionOptions.EnemyXML = iniReader.ReadBoolean("Campaign","USE_ENEMY_XML", TRUE);
+	gGameLegionOptions.EnemyXML = TRUE; //iniReader.ReadBoolean("Campaign","USE_ENEMY_XML", TRUE);
 	gGameLegionOptions.ADD_RANDOM_ENEMY_TO_SECTOR_UB = iniReader.ReadBoolean("Campaign","ADD_RANDOM_ENEMY_TO_SECTOR", FALSE);
 	gGameLegionOptions.StrategicMovementCostsXML = iniReader.ReadBoolean("Campaign","STRATEGIC_MOVEMENT_COSTS_XML", FALSE);
 	gGameLegionOptions.CampaignSector = iniReader.ReadBoolean("Campaign","MAKE_STRATEGIC_MOVEMENT_COSTS", FALSE);
@@ -754,7 +684,21 @@ void LoadGameLegionOptions()
 
 	//gGameLegionOptions.RISRAPORT  = iniReader.ReadBoolean("Laptop","RIS_RAPORT",  TRUE);
 	
+	gGameLegionOptions.SWITCHINMORRISAREA_GRIDNOa = iniReader.ReadInteger("Unfinished Business","SWITCH_IN_MORRIS_AREA_GRIDNO", 15231);	
+	gGameLegionOptions.SWITCHTOLAUNCHMISSLES_GRIDNO1a = iniReader.ReadInteger("Unfinished Business","SWITCH_TO_LAUNCH_MISSLES_GRIDNO1", 14268);	
+	gGameLegionOptions.SWITCHTOLAUNCHMISSLES_GRIDNO1a = iniReader.ReadInteger("Unfinished Business","SWITCH_TO_LAUNCH_MISSLES_GRIDNO2", 15708);	
+	gGameLegionOptions.RADIOLOCATORS_GRIDNO1a = iniReader.ReadInteger("Unfinished Business","RADIO_LOCATORS_GRIDNO1", 15070);	
+	gGameLegionOptions.RADIOLOCATORS_GRIDNO2a = iniReader.ReadInteger("Unfinished Business","RADIO_LOCATORS_GRIDNO2", 14744);	
+	gGameLegionOptions.POWERGENSECTOR_GRIDNO1a = iniReader.ReadInteger("Unfinished Business","POWERGEN_SECTOR_GRIDNO1", 15100);	
+	gGameLegionOptions.POWERGENSECTOR_GRIDNO2a = iniReader.ReadInteger("Unfinished Business","POWERGEN_SECTOR_GRIDNO2", 12220);	
+	gGameLegionOptions.POWERGENSECTOR_GRIDNO3a = iniReader.ReadInteger("Unfinished Business","POWERGEN_SECTOR_GRIDNO3", 14155);	
+	gGameLegionOptions.POWERGENSECTOR_GRIDNO4a = iniReader.ReadInteger("Unfinished Business","POWERGEN_SECTOR_GRIDNO4", 13980);	
 	
+	gGameLegionOptions.POWERGENSECTOREXITGRID_GRIDNO1a = iniReader.ReadInteger("Unfinished Business","POWERGEN_SECTOR_EXITGRID_GRIDNO", 19749);	
+	gGameLegionOptions.POWERGENFANSOUND_GRIDNO1a = iniReader.ReadInteger("Unfinished Business","POWERGEN_FAN_SOUND_GRIDNO1", 10979);	
+	gGameLegionOptions.POWERGENFANSOUND_GRIDNO2a = iniReader.ReadInteger("Unfinished Business","POWERGEN_FAN_SOUND_GRIDNO2", 19749);	
+	gGameLegionOptions.STARTFANBACKUPAGAIN_GRIDNOa = iniReader.ReadInteger("Unfinished Business","START_FANBACKUP_AGAIN_GRIDNO", 10980);	
+	gGameLegionOptions.STOPPOWERGENFAN_GRIDNOa = iniReader.ReadInteger("Unfinished Business","STOP_POWERGEN_FAN_GRIDNO", 10980);	
 
 
 //	gGameLegionOptions.BobbyRayInventory_UB = iniReader.ReadBoolean("Unfinished Business","INIT_BOBBYRAY_INVENTORY", FALSE);

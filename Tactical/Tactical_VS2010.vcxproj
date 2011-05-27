@@ -61,7 +61,6 @@
     <ClInclude Include="Inventory Choosing.h" />
     <ClInclude Include="Item Types.h" />
     <ClInclude Include="Items.h" />
-    <ClInclude Include="Ja25_Tactical.h" />
     <ClInclude Include="Keys.h" />
     <ClInclude Include="LOS.h" />
     <ClInclude Include="Map Information.h" />
@@ -145,7 +144,6 @@
     <ClCompile Include="Inventory Choosing.cpp" />
     <ClCompile Include="Item Types.cpp" />
     <ClCompile Include="Items.cpp" />
-    <ClCompile Include="Ja25_Tactical.cpp" />
     <ClCompile Include="Keys.cpp" />
     <ClCompile Include="LOS.cpp" />
     <ClCompile Include="Map Information.cpp" />
@@ -184,7 +182,6 @@
     <ClCompile Include="Vehicles.cpp" />
     <ClCompile Include="Weapons.cpp" />
     <ClCompile Include="World Items.cpp" />
-    <ClCompile Include="XML_AlteringAttachments.cpp" />
     <ClCompile Include="XML_AmmoStrings.cpp" />
     <ClCompile Include="XML_AmmoTypes.cpp" />
     <ClCompile Include="XML_Armour.cpp" />
@@ -208,14 +205,13 @@
     <ClCompile Include="XML_HiddenNames.cpp" />
     <ClCompile Include="XML_IMPItemChoices.cpp" />
     <ClCompile Include="XML_IncompatibleAttachments.cpp" />
-    <ClCompile Include="XML_ItemSlotAssign.cpp" />
     <ClCompile Include="XML_Launchable.cpp" />
     <ClCompile Include="XML_LBEPocket.cpp" />
     <ClCompile Include="XML_LoadBearingEquipment.cpp" />
     <ClCompile Include="XML_Magazine.cpp" />
     <ClCompile Include="XML_MercStartingGear.cpp" />
     <ClCompile Include="XML_Merge.cpp" />
-    <ClCompile Include="XML_NASIncompatibleAttachments.cpp" />
+    <ClCompile Include="XML_NewFaceGear.cpp" />
     <ClCompile Include="XML_Opinions.cpp" />
     <ClCompile Include="XML_Profiles.cpp" />
     <ClCompile Include="XML_Qarray.cpp" />

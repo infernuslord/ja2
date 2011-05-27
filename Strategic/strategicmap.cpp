@@ -126,6 +126,7 @@
 #include "SaveLoadGame.h"
 #include "Strategic Mines.h"
 #include "Strategic Mines LUA.h"
+#include "UndergroundInit.h"
 
 #include "sgp_logger.h"
 
@@ -318,9 +319,10 @@ STR8 pHortStrings[]={
 // HEADROCK HAM 3.6: Array to hold user-defined sector names
 CHAR16 gzSectorNames[256][4][MAX_SECTOR_NAME_LENGTH];
 
-CHAR16 gzSectorUndergroundNames1[256][4][MAX_SECTOR_NAME_LENGTH]; 
-CHAR16 gzSectorUndergroundNames2[256][4][MAX_SECTOR_NAME_LENGTH]; 
-CHAR16 gzSectorUndergroundNames3[256][4][MAX_SECTOR_NAME_LENGTH]; 
+// moved to lua
+//CHAR16 gzSectorUndergroundNames1[256][4][MAX_SECTOR_NAME_LENGTH]; 
+//CHAR16 gzSectorUndergroundNames2[256][4][MAX_SECTOR_NAME_LENGTH]; 
+//CHAR16 gzSectorUndergroundNames3[256][4][MAX_SECTOR_NAME_LENGTH]; 
 
 BOOLEAN ReadInStrategicMapSectorTownNames(STR fileName, BOOLEAN localizedVersion);
 
@@ -1904,7 +1906,7 @@ BOOLEAN	SetCurrentWorldSector( INT16 sMapX, INT16 sMapY, INT8 bMapZ )
 			{
 				if (is_networked)
 				{
-					if(is_server && ENEMY_ENABLED==1)
+					if(is_server && gEnemyEnabled == 1)
 						PrepareEnemyForSectorBattle();
 				}
 				else
@@ -1931,7 +1933,7 @@ BOOLEAN	SetCurrentWorldSector( INT16 sMapX, INT16 sMapY, INT8 bMapZ )
 			{
 				if (is_networked)
 				{
-					if(is_server && CREATURE_ENABLED==1)
+					if(is_server && gCreatureEnabled == 1)
 						PrepareCreaturesForBattle();
 				}
 				else
@@ -2104,8 +2106,8 @@ BOOLEAN	SetCurrentWorldSector( INT16 sMapX, INT16 sMapY, INT8 bMapZ )
 
 		if( !(gTacticalStatus.uiFlags & LOADING_SAVED_GAME ) )
 		{
-			if( (gubMusicMode != MUSIC_TACTICAL_ENEMYPRESENT && gubMusicMode != MUSIC_TACTICAL_BATTLE) ||
-				(!NumHostilesInSector( sMapX, sMapY, bMapZ ) && gubMusicMode == MUSIC_TACTICAL_ENEMYPRESENT) )
+			if( (GetMusicMode() != MUSIC_TACTICAL_ENEMYPRESENT && GetMusicMode() != MUSIC_TACTICAL_BATTLE) ||
+				(!NumHostilesInSector( sMapX, sMapY, bMapZ ) && GetMusicMode() == MUSIC_TACTICAL_ENEMYPRESENT) )
 			{
 				// ATE; Fade FA.T....
 				SetMusicFadeSpeed( 5 );
@@ -2273,7 +2275,7 @@ void PrepareLoadedSector()
 
 		if (is_networked)
 		{
-			if( is_server && fAddCivs && CIV_ENABLED==1)//hayden its around here we apply .ini choices for Ai
+			if( is_server && fAddCivs && gCivEnabled == 1)//hayden its around here we apply .ini choices for Ai
 			{
 				AddSoldierInitListTeamToWorld( CIV_TEAM, 255 );
 			}
@@ -2285,7 +2287,7 @@ void PrepareLoadedSector()
 
 		if (is_networked)
 		{
-			if(is_server && MILITIA_ENABLED==1)
+			if(is_server && gMilitiaEnabled == 1)
 				AddSoldierInitListTeamToWorld( MILITIA_TEAM, 255 );
 		}
 		else
@@ -2295,7 +2297,7 @@ void PrepareLoadedSector()
 		
 		if (is_networked)
 		{
-			if(is_server && CREATURE_ENABLED==1)
+			if(is_server && gCreatureEnabled == 1)
 				AddSoldierInitListBloodcats();
 		}
 		else
@@ -2335,11 +2337,11 @@ void PrepareLoadedSector()
 		// Haydent
 		if (is_networked)
 		{
-			if(is_server && CREATURE_ENABLED==1)
+			if(is_server && gCreatureEnabled == 1)
 				PrepareCreaturesForBattle();
 
 			// Haydent
-			if(is_server && MILITIA_ENABLED==1)
+			if(is_server && gMilitiaEnabled == 1)
 				PrepareMilitiaForTactical(FALSE);
 		}
 		else
@@ -2362,7 +2364,7 @@ void PrepareLoadedSector()
 		
 		if (is_networked)
 		{
-			if(is_server && CIV_ENABLED==1)
+			if(is_server && gCivEnabled == 1)
 				AddProfilesNotUsingProfileInsertionData(); //hayden: is just for civ's
 		}
 		else
@@ -2377,7 +2379,7 @@ void PrepareLoadedSector()
 		{
 			if (is_networked)
 			{
-				if(is_server && ENEMY_ENABLED==1)
+				if(is_server && gEnemyEnabled == 1)
 					fEnemyPresenceInThisSector = PrepareEnemyForSectorBattle();
 			}
 			else
@@ -3088,13 +3090,21 @@ void UpdateMercInSector( SOLDIERTYPE *pSoldier, INT16 sSectorX, INT16 sSectorY, 
 					// Are we in Omerta!
 					if ( sSectorX == gWorldSectorX && gWorldSectorX == 9 && sSectorY == gWorldSectorY && gWorldSectorY == 1 && bSectorZ == gbWorldSectorZ && gbWorldSectorZ == 0 )
 					{
+						// TODO.WANNE: Hardcoded grid number
 						// Try another location and walk into map
 						pSoldier->sInsertionGridNo = 4379;//dnl!!!
 					}
 					else
 					{
+					#ifdef JA2UB
 						pSoldier->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
-						pSoldier->sInsertionGridNo				 = gMapInformation.sNorthGridNo;
+						pSoldier->sInsertionGridNo		   = gMapInformation.sNorthGridNo;
+					#else
+						//pSoldier->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
+						//pSoldier->sInsertionGridNo				 = gMapInformation.sNorthGridNo;
+						pSoldier->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
+						pSoldier->sInsertionGridNo = gGameExternalOptions.iInitialMercArrivalLocation;
+					#endif
 					}
 					break;
 				case INSERTION_CODE_CHOPPER:
@@ -3105,6 +3115,7 @@ void UpdateMercInSector( SOLDIERTYPE *pSoldier, INT16 sSectorX, INT16 sSectorY, 
 					return;
 					break;
 				default:
+					// TODO.WANNE: Hardcoded grid number
 					pSoldier->sInsertionGridNo = 12880;//dnl!!!
 					DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String( "Improper insertion code %d given to UpdateMercsInSector", pSoldier->ubStrategicInsertionCode ) );
 					break;
@@ -3187,7 +3198,6 @@ void GetSectorIDString( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ , STR16 zS
 	SECTORINFO *pSector = NULL;
 	UNDERGROUND_SECTORINFO *pUnderground;
 	INT8		bTownNameID;
-	INT8		bMineIndex;
 	UINT8 ubSectorID = 0;
 	UINT8 ubLandType = 0;
 
@@ -3195,11 +3205,15 @@ void GetSectorIDString( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ , STR16 zS
 	{
 		//swprintf( zString, L"%s", pErrorStrings[0] );
 	}
-	else if( bSectorZ != 0 )
+	else if( bSectorZ != 0 ) // UNDERGROUND SECTORS
 	{
-			////////////////////////////////////
+		pUnderground = FindUnderGroundSector( sSectorX, sSectorY, bSectorZ );
+
+		#if 0 // reading sector names from lua now
+		////////////////////////////////////
 		// Read and verify XML sector names
 		
+		INT8		bMineIndex;
 		ubSectorID = (UINT8)SECTOR( sSectorX, sSectorY );
 		AssertGE(ubSectorID, 0);
 		AssertLT(ubSectorID,256);
@@ -3240,92 +3254,95 @@ void GetSectorIDString( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ , STR16 zS
 			fSectorHasXMLNames = FALSE;
 		}
 
-		if (fSectorHasXMLNames)
+		if (fSectorHasXMLNames) // UNDERGROUND XML
 		{
-	
-		pUnderground = FindUnderGroundSector( sSectorX, sSectorY, bSectorZ );
-
-		if ( pUnderground )
-		{
-		
-			bMineIndex = GetIdOfMineForSector( sSectorX, sSectorY, bSectorZ );
-			if( bMineIndex != -1 )
+			if ( pUnderground )
 			{
-				swprintf( zString, L"%c%d: %s %s", 'A' + sSectorY - 1, sSectorX, pTownNames[ GetTownAssociatedWithMine( bMineIndex ) ], pwMineStrings[ 0 ] );
-			}	
-			else if ( pUnderground->fVisited )
-			{
-				if (fDetailed)
-				{			
-					wcscat( zString, zDetailedExploredUnderground );	
+				bMineIndex = GetIdOfMineForSector( sSectorX, sSectorY, bSectorZ );
+				if( bMineIndex != -1 )
+				{
+					swprintf( zString, L"%c%d: %s %s", 'A' + sSectorY - 1, sSectorX, pTownNames[ GetTownAssociatedWithMine( bMineIndex ) ], pwMineStrings[ 0 ] );
+				}	
+				else if ( pUnderground->fVisited )
+				{
+					if (fDetailed)
+					{			
+						wcscat( zString, zDetailedExploredUnderground );	
+					}
+					else
+					{
+						wcscat( zString, zExploredUnderground );
+					}
 				}
 				else
 				{
-					wcscat( zString, zExploredUnderground );
+					if (fDetailed)
+					{
+						wcscat( zString, zDetailedUnexploredUnderground );
+					}
+					else
+					{
+						wcscat( zString, zUnexploredUnderground );
+					}
+				}
+
+				if (pUnderground->ubNumCreatures)
+					swprintf( zString, L"%c%d: %s", 'A' + sSectorY - 1, sSectorX, pLandTypeStrings[ CREATURE_LAIR ] );
+				//else
+				//	swprintf( zString, L"%c%d-%d", 'A' + sSectorY - 1, sSectorX, bSectorZ );
+			}		
+		}
+		else // UNDERGROUND HARDCODED
+		{	
+			pUnderground = FindUnderGroundSector( sSectorX, sSectorY, bSectorZ );
+			if( pUnderground && ( pUnderground->fVisited || gfGettingNameFromSaveLoadScreen ) )
+			{
+				bMineIndex = GetIdOfMineForSector( sSectorX, sSectorY, bSectorZ );
+				if( bMineIndex != -1 )
+				{
+					swprintf( zString, L"%c%d: %s %s", 'A' + sSectorY - 1, sSectorX, pTownNames[ GetTownAssociatedWithMine( bMineIndex ) ], pwMineStrings[ 0 ] );
+				}
+				else switch( SECTOR( sSectorX, sSectorY ) )
+				{
+					case SEC_A10:
+						swprintf( zString, L"A10: %s", pLandTypeStrings[ REBEL_HIDEOUT ] );
+						break;
+					case SEC_J9:
+						swprintf( zString, L"J9: %s", pLandTypeStrings[ TIXA_DUNGEON ] );
+						break;
+					case SEC_K4:
+						swprintf( zString, L"K4: %s", pLandTypeStrings[ ORTA_BASEMENT ] );
+						break;
+					case SEC_O3:
+						swprintf( zString, L"O3: %s", pLandTypeStrings[ TUNNEL ] );
+						break;
+					case SEC_P3:
+						swprintf( zString, L"P3: %s", pLandTypeStrings[ SHELTER ] );
+						break;
+					default:
+						if (pUnderground->ubNumCreatures)
+							swprintf( zString, L"%c%d: %s", 'A' + sSectorY - 1, sSectorX, pLandTypeStrings[ CREATURE_LAIR ] );
+						else
+							swprintf( zString, L"%c%d-%d", 'A' + sSectorY - 1, sSectorX, bSectorZ );
+						break;
 				}
 			}
 			else
-			{
-				if (fDetailed)
-				{
-					wcscat( zString, zDetailedUnexploredUnderground );
-				}
-				else
-				{
-					wcscat( zString, zUnexploredUnderground );
-				}
-			}
-
-			if (pUnderground->ubNumCreatures)
-				swprintf( zString, L"%c%d: %s", 'A' + sSectorY - 1, sSectorX, pLandTypeStrings[ CREATURE_LAIR ] );
-			//else
-			//	swprintf( zString, L"%c%d-%d", 'A' + sSectorY - 1, sSectorX, bSectorZ );
-
-		}		
-
-} 
-else
-{	
-		pUnderground = FindUnderGroundSector( sSectorX, sSectorY, bSectorZ );
-		if( pUnderground && ( pUnderground->fVisited || gfGettingNameFromSaveLoadScreen ) )
-		{
-			bMineIndex = GetIdOfMineForSector( sSectorX, sSectorY, bSectorZ );
-			if( bMineIndex != -1 )
-			{
-				swprintf( zString, L"%c%d: %s %s", 'A' + sSectorY - 1, sSectorX, pTownNames[ GetTownAssociatedWithMine( bMineIndex ) ], pwMineStrings[ 0 ] );
-			}
-			else switch( SECTOR( sSectorX, sSectorY ) )
-			{
-				case SEC_A10:
-					swprintf( zString, L"A10: %s", pLandTypeStrings[ REBEL_HIDEOUT ] );
-					break;
-				case SEC_J9:
-					swprintf( zString, L"J9: %s", pLandTypeStrings[ TIXA_DUNGEON ] );
-					break;
-				case SEC_K4:
-					swprintf( zString, L"K4: %s", pLandTypeStrings[ ORTA_BASEMENT ] );
-					break;
-				case SEC_O3:
-					swprintf( zString, L"O3: %s", pLandTypeStrings[ TUNNEL ] );
-					break;
-				case SEC_P3:
-					swprintf( zString, L"P3: %s", pLandTypeStrings[ SHELTER ] );
-					break;
-				default:
-					if (pUnderground->ubNumCreatures)
-						swprintf( zString, L"%c%d: %s", 'A' + sSectorY - 1, sSectorX, pLandTypeStrings[ CREATURE_LAIR ] );
-					else
-						swprintf( zString, L"%c%d-%d", 'A' + sSectorY - 1, sSectorX, bSectorZ );
-					break;
+			{ //Display nothing
+				wcscpy( zString, L"" );
 			}
 		}
-		else
-		{ //Display nothing
-			wcscpy( zString, L"" );
-		}
-}
+	#else
+
+		// TODO: the code is riddled with (potential) buffer overruns
+		// this totally needs to be fixed sometime
+		// anyway, only trying to not create another one here
+		// found calls to this function with buffers as small as 50 elements
+		g_luaUnderground.GetSectorName(sSectorX, sSectorY, bSectorZ, pUnderground, zString, 50, fDetailed);
+
+	#endif
 	}
-	else
+	else // SECTORS ABOVE GROUND
 	{
 
 		bTownNameID = StrategicMap[ CALCULATE_STRATEGIC_INDEX( sSectorX, sSectorY ) ].bNameId;
@@ -3354,7 +3371,7 @@ else
 			fSectorHasXMLNames = FALSE;
 		}
 
-		if (fSectorHasXMLNames)
+		if (fSectorHasXMLNames) // ABOVE GROUND XML
 		{
 			// HEADROCK HAM 3.6: The program can now read custom names from XML for all above-ground sectors.
 			// In the event that a specific name or set of names is missing, the program generates a default
@@ -3399,110 +3416,110 @@ else
 				}
 			}
 		}
-		else
+		else // ABOVE GROUND HARDCODED
 		{
 			// Default JA2 Name selection
-		if ( bTownNameID == BLANK_SECTOR )
-		{
-			// OK, build string id like J11
-			// are we dealing with the unfound towns?
-			switch( ubSectorID )
+			if ( bTownNameID == BLANK_SECTOR )
 			{
-				case SEC_D2: //Chitzena SAM
-					if( !fSamSiteFound[ SAM_SITE_ONE ] )
-						wcscat( zString, pLandTypeStrings[ TROPICS ] );
-					else if( fDetailed )
-						wcscat( zString, pLandTypeStrings[ TROPICS_SAM_SITE ] );
-					else
-						wcscat( zString, pLandTypeStrings[ SAM_SITE ] );
-					break;
-				case SEC_D15: //Drassen SAM
-					if( !fSamSiteFound[ SAM_SITE_TWO ] )
-						wcscat( zString, pLandTypeStrings[ SPARSE ] );
-					else if( fDetailed )
-						wcscat( zString, pLandTypeStrings[ SPARSE_SAM_SITE ] );
-					else
-						wcscat( zString, pLandTypeStrings[ SAM_SITE ] );
-					break;
-				case SEC_I8: //Cambria SAM
-					if( !fSamSiteFound[ SAM_SITE_THREE ] )
-						wcscat( zString, pLandTypeStrings[ SAND ] );
-					else if( fDetailed )
-						wcscat( zString, pLandTypeStrings[ SAND_SAM_SITE ] );
-					else
-						wcscat( zString, pLandTypeStrings[ SAM_SITE ] );
-					break;
-				default:
-					wcscat( zString, pLandTypeStrings[ ubLandType ] );
-					break;
-			}
-		}
-		else
-		{
-			switch( ubSectorID )
-			{
-				case SEC_B13:
-					if( fDetailed )
-						wcscat( zString, pLandTypeStrings[ DRASSEN_AIRPORT_SITE ] );
-					else
-						wcscat( zString, pTownNames[ DRASSEN ] );
-					break;
-				case SEC_F8:
-					if( fDetailed )
-						wcscat( zString, pLandTypeStrings[ CAMBRIA_HOSPITAL_SITE ] );
-					else
-						wcscat( zString, pTownNames[ CAMBRIA ] );
-					break;
-				case SEC_J9: //Tixa
-					if( !fFoundTixa )
-						wcscat( zString, pLandTypeStrings[ SAND ] );
-					else
-						wcscat( zString, pTownNames[ TIXA ] );
-					break;
-				case SEC_K4: //Orta
-					if( !fFoundOrta )
-						wcscat( zString, pLandTypeStrings[ SWAMP ] );
-					else
-						wcscat( zString, pTownNames[ ORTA ] );
-					break;
-				case SEC_N3:
-					if( fDetailed )
-						wcscat( zString, pLandTypeStrings[ MEDUNA_AIRPORT_SITE ] );
-					else
-						wcscat( zString, pTownNames[ MEDUNA ] );
-					break;
-				default:
-					if( ubSectorID == SEC_N4 && fSamSiteFound[ SAM_SITE_FOUR ] )
-					{	//Meduna's SAM site
-						if( fDetailed )
-							wcscat( zString, pLandTypeStrings[ MEDUNA_SAM_SITE ] );
+				// OK, build string id like J11
+				// are we dealing with the unfound towns?
+				switch( ubSectorID )
+				{
+					case SEC_D2: //Chitzena SAM
+						if( !fSamSiteFound[ SAM_SITE_ONE ] )
+							wcscat( zString, pLandTypeStrings[ TROPICS ] );
+						else if( fDetailed )
+							wcscat( zString, pLandTypeStrings[ TROPICS_SAM_SITE ] );
 						else
 							wcscat( zString, pLandTypeStrings[ SAM_SITE ] );
-					}
-					else
-					{	//All other towns that are known since beginning of the game.
-						wcscat( zString, pTownNames[ bTownNameID ] );
+						break;
+					case SEC_D15: //Drassen SAM
+						if( !fSamSiteFound[ SAM_SITE_TWO ] )
+							wcscat( zString, pLandTypeStrings[ SPARSE ] );
+						else if( fDetailed )
+							wcscat( zString, pLandTypeStrings[ SPARSE_SAM_SITE ] );
+						else
+							wcscat( zString, pLandTypeStrings[ SAM_SITE ] );
+						break;
+					case SEC_I8: //Cambria SAM
+						if( !fSamSiteFound[ SAM_SITE_THREE ] )
+							wcscat( zString, pLandTypeStrings[ SAND ] );
+						else if( fDetailed )
+							wcscat( zString, pLandTypeStrings[ SAND_SAM_SITE ] );
+						else
+							wcscat( zString, pLandTypeStrings[ SAM_SITE ] );
+						break;
+					default:
+						wcscat( zString, pLandTypeStrings[ ubLandType ] );
+						break;
+				}
+			}
+			else
+			{
+				switch( ubSectorID )
+				{
+					case SEC_B13:
 						if( fDetailed )
-						{
-							switch( ubSectorID )
-							{ //Append the word, "mine" for town sectors containing a mine.
-								case SEC_B2:
-								case SEC_D4:
-								case SEC_D13:
-								case SEC_H3:
-								case SEC_H8:
-								case SEC_I14:
-									wcscat( zString, L" " ); //space
-									wcscat( zString, pwMineStrings[ 0 ] ); //then "Mine"
-									break;
+							wcscat( zString, pLandTypeStrings[ DRASSEN_AIRPORT_SITE ] );
+						else
+							wcscat( zString, pTownNames[ DRASSEN ] );
+						break;
+					case SEC_F8:
+						if( fDetailed )
+							wcscat( zString, pLandTypeStrings[ CAMBRIA_HOSPITAL_SITE ] );
+						else
+							wcscat( zString, pTownNames[ CAMBRIA ] );
+						break;
+					case SEC_J9: //Tixa
+						if( !fFoundTixa )
+							wcscat( zString, pLandTypeStrings[ SAND ] );
+						else
+							wcscat( zString, pTownNames[ TIXA ] );
+						break;
+					case SEC_K4: //Orta
+						if( !fFoundOrta )
+							wcscat( zString, pLandTypeStrings[ SWAMP ] );
+						else
+							wcscat( zString, pTownNames[ ORTA ] );
+						break;
+					case SEC_N3:
+						if( fDetailed )
+							wcscat( zString, pLandTypeStrings[ MEDUNA_AIRPORT_SITE ] );
+						else
+							wcscat( zString, pTownNames[ MEDUNA ] );
+						break;
+					default:
+						if( ubSectorID == SEC_N4 && fSamSiteFound[ SAM_SITE_FOUR ] )
+						{	//Meduna's SAM site
+							if( fDetailed )
+								wcscat( zString, pLandTypeStrings[ MEDUNA_SAM_SITE ] );
+							else
+								wcscat( zString, pLandTypeStrings[ SAM_SITE ] );
+						}
+						else
+						{	//All other towns that are known since beginning of the game.
+							wcscat( zString, pTownNames[ bTownNameID ] );
+							if( fDetailed )
+							{
+								switch( ubSectorID )
+								{ //Append the word, "mine" for town sectors containing a mine.
+									case SEC_B2:
+									case SEC_D4:
+									case SEC_D13:
+									case SEC_H3:
+									case SEC_H8:
+									case SEC_I14:
+										wcscat( zString, L" " ); //space
+										wcscat( zString, pwMineStrings[ 0 ] ); //then "Mine"
+										break;
+								}
 							}
 						}
-					}
-					break;
+						break;
+				}
 			}
 		}
 	}
-}
 }
 
 
@@ -3859,8 +3876,16 @@ BEGINNING_LOOP:
 		{
 			if ( !OK_CONTROLLABLE_MERC( curr->pSoldier ) )
 			{
-				RemoveCharacterFromSquads( curr->pSoldier );
-				goto BEGINNING_LOOP;
+				if(OK_CONTROL_MERC(curr->pSoldier) && curr->pSoldier->bAssignment == VEHICLE && pGroup->fVehicle)
+				{
+					//CHRISL: passengers in a vehicle movement group will not pass the OK_CONTROLLABLE_MERC check because their assignment is not "ON_DUTY".
+					//	The above conditions should allow passengers in a vehicle movement group to remain in the group.
+				}
+				else
+				{
+					RemoveCharacterFromSquads( curr->pSoldier );
+					goto BEGINNING_LOOP;
+				}
 			}
 			curr = curr->next;
 		}
@@ -4694,9 +4719,6 @@ void SetupNewStrategicGame( )
 	AddEveryDayStrategicEvent( EVENT_DAILY_EARLY_MORNING_EVENTS, EARLY_MORNING_TIME, 0 );
 	//Daily Update BobbyRay Inventory
 	AddEveryDayStrategicEvent( EVENT_DAILY_UPDATE_BOBBY_RAY_INVENTORY, BOBBYRAY_UPDATE_TIME, 0 );
-
-	
-	
 	//Daily Update of the M.E.R.C. site.
 	AddEveryDayStrategicEvent( EVENT_DAILY_UPDATE_OF_MERC_SITE, 0, 0 );
 
@@ -6506,12 +6528,12 @@ void HandleEmailBeingSentWhenEnteringSector( INT16 sMapX, INT16 sMapY, INT8 bMap
 				if( pSoldier == NULL || gMercProfiles[ 60 ].bMercStatus == MERC_IS_DEAD ) //MANUEL
 				{
 					//email 8a
-					AddEmail( EMAIL_MIGUELSORRY, EMAIL_MIGUELSORRY_LENGTH, MAIL_MIGUEL,  GetWorldTotalMin() , -1);
+					AddEmail( EMAIL_MIGUELSORRY, EMAIL_MIGUELSORRY_LENGTH, MAIL_MIGUEL,  GetWorldTotalMin() , -1,-1 ,TYPE_EMAIL_EMAIL_EDT);
 				}
 				else
 				{
 					//email 8b
-					AddEmail( EMAIL_MIGUELMANUEL, EMAIL_MIGUELMANUEL_LENGTH, MAIL_MIGUEL,  GetWorldTotalMin() , -1);
+					AddEmail( EMAIL_MIGUELMANUEL, EMAIL_MIGUELMANUEL_LENGTH, MAIL_MIGUEL,  GetWorldTotalMin() , -1,-1, TYPE_EMAIL_EMAIL_EDT);
 				}
 
 				//Remeber we sent it
@@ -6526,7 +6548,7 @@ void HandleEmailBeingSentWhenEnteringSector( INT16 sMapX, INT16 sMapY, INT8 bMap
 			//and we havent sent it before
 			if( !( gJa25SaveStruct.ubEmailFromSectorFlag & SECTOR_EMAIL__POWER_GEN ) )
 			{
-				AddEmail( EMAIL_MIGUELSICK, EMAIL_MIGUELSICK_LENGTH, MAIL_MIGUEL,  GetWorldTotalMin(), -1 );
+				AddEmail( EMAIL_MIGUELSICK, EMAIL_MIGUELSICK_LENGTH, MAIL_MIGUEL,  GetWorldTotalMin(), -1 ,-1, TYPE_EMAIL_EMAIL_EDT);
 
 				//Remeber we sent it
 				gJa25SaveStruct.ubEmailFromSectorFlag |= SECTOR_EMAIL__POWER_GEN;
@@ -6545,7 +6567,7 @@ void HandleEmailBeingSentWhenEnteringSector( INT16 sMapX, INT16 sMapY, INT8 bMap
 			//If Jerry isnt dead
 			if( gMercProfiles[ 76 ].bMercStatus != MERC_IS_DEAD ) //JERRY
 			{
-				AddEmail( EMAIL_PILOTFOUND, EMAIL_PILOTFOUND_LENGTH, MAIL_ENRICO,  GetWorldTotalMin() , -1);
+				AddEmail( EMAIL_PILOTFOUND, EMAIL_PILOTFOUND_LENGTH, MAIL_ENRICO,  GetWorldTotalMin() , -1, -1, TYPE_EMAIL_EMAIL_EDT);
 			}
 
 			//Remeber we sent it

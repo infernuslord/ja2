@@ -434,7 +434,8 @@ void BuildUndergroundSectorInfoList()
 
 	TrashUndergroundSectorInfo();
 
-	if (LetLuaBuildUndergroundSectorInfoList())
+	//if (LetLuaBuildUndergroundSectorInfoList())
+	g_luaUnderground.InitializeSectorList();
 		// lua script succeeded
 		return;
 

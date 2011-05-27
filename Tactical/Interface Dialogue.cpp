@@ -3034,6 +3034,7 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 
 			case NPC_ACTION_START_BLOODCAT_QUEST:
 				StartQuest( QUEST_BLOODCATS, gWorldSectorX, gWorldSectorY );
+				SetFactTrue( FACT_PLAYER_KNOWS_ABOUT_BLOODCAT_LAIR); 
 				break;
 
 			case NPC_ACTION_START_MINE:
@@ -5509,7 +5510,7 @@ void ReplaceMineEntranceGraphicWithCollapsedEntrance()
 
 void HandleCannotAffordNpcMsgBox()
 {
-	CHAR16	zString[512];
+//	CHAR16	zString[512];
 	if( !gfDisplayMsgBoxSayingCantAffordNPC )
 	{
 		return;

@@ -3083,7 +3083,9 @@ BOOLEAN HookerInRoom( UINT8 ubRoom )
 
 void PerformItemAction( INT32 sGridNo, OBJECTTYPE * pObj )
 {
+#if 0 
 	STRUCTURE * pStructure;
+#endif
 	UINT32 i;
 		
 		for (i = ACTION_ITEM_OPEN_DOOR; i <= ACTION_ITEM_NEW; i++ )

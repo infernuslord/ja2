@@ -53,9 +53,11 @@
 #define		GIO_TOGGLE_TEXT_COLOR					FONT_MCOLOR_WHITE
 
 //buttons
-#define		GIO_BTN_OK_X							iScreenWidthOffset + ((320 - 115) / 2)
-#define		GIO_BTN_OK_Y							iScreenHeightOffset + 435
-#define		GIO_CANCEL_X							iScreenWidthOffset + 320 + 105
+#define		GIO_CANCEL_X							iScreenWidthOffset + ((320 - 115) / 2)  
+
+#define		GIO_BTN_START_X							iScreenWidthOffset + 320 + 105
+#define		GIO_BTN_START_Y							iScreenHeightOffset + 435
+ 
 
 //main title
 #define		GIO_MAIN_TITLE_X						0
@@ -124,6 +126,27 @@
 #define		GIO_TIMED_TURN_SETTING_Y				GIO_IRON_MAN_SETTING_Y
 #define		GIO_TIMED_TURN_SETTING_WIDTH			GIO_DIF_SETTING_WIDTH
 
+// INI File
+#define		JA2SP_INI_FILENAME						"ja2_sp.ini"
+
+// INI Section
+#define		JA2SP_INI_INITIAL_SECTION				"JA2 Singleplayer Initial Settings"
+
+// INI Properties
+#define		JA2SP_DIFFICULTY_LEVEL					"DIFFICULTY_LEVEL"
+#define		JA2SP_BOBBY_RAY_SELECTION				"BOBBY_RAY_SELECTION"
+#define		JA2SP_MAX_IMP_CHARACTERS				"MAX_IMP_CHARACTERS"
+#define		JA2SP_PROGRESS_SPEED_OF_ITEM_CHOICES	"PROGRESS_SPEED_OF_ITEM_CHOICES"
+#define		JA2SP_SKILL_TRAITS						"SKILL_TRAITS"
+#define		JA2SP_INVENTORY_ATTACHMENTS				"INVENTORY_ATTACHMENTS"
+#define		JA2SP_GAME_STYLE						"GAME_STYLE"
+#define		JA2SP_ENEMIES_DROP_ALL_ITEMS			"ENEMIES_DROP_ALL_ITEMS"
+#define		JA2SP_EXTRA_DIFFICULTY					"EXTRA_DIFFICULTY"
+#define		JA2SP_AVAILABLE_ARSENAL					"AVAILABLE_ARSENAL"
+#define		JA2SP_NUMBER_OF_TERRORISTS				"NUMBER_OF_TERRORISTS"
+#define		JA2SP_SECRET_WEAPON_CACHES				"SECRET_WEAPON_CACHES"
+
+
 
 //Difficulty settings
 enum
@@ -153,7 +176,7 @@ enum
 
 	NUM_TEXT_STYLES,
 };
-#else
+#endif
 enum
 {
 	GIO_REALISTIC,
@@ -161,7 +184,7 @@ enum
 
 	NUM_GAME_STYLES,
 };
-#endif
+
 
 // Iron man mode
 enum
@@ -346,10 +369,10 @@ void NewTraitsNotPossibleMessageBoxCallBack( UINT8 bExitValue );
 #ifdef JA2UB
 UINT32	guiGameTextTogglesImage[ NUM_TEXT_STYLES ];
 UINT32	guiGameTextToggles[ NUM_TEXT_STYLES ];
-#else
+#endif
 UINT32	guiGameStyleTogglesImage[ NUM_GAME_STYLES ];
 UINT32	guiGameStyleToggles[ NUM_GAME_STYLES ];
-#endif
+
 
 #ifdef JA2UB
 void BtnGIOOffStyleCallback(GUI_BUTTON *btn,INT32 reason);
@@ -458,18 +481,9 @@ BOOLEAN SpIniExists()
 {
 	BOOLEAN exists = TRUE;
 
-	if(!getVFS()->fileExists(L"Ja2_sp.ini"))
-	{
-		exists = FALSE;
-		/*SGP_THROW_IFFALSE(getVFS()->createNewFile(L"Ja2_sp.ini"),L"could not create file : Ja2_sp.ini");
-		vfs::tWritableFile* file = getVFS()->getWriteFile(L"Ja2_sp.ini");
-		if(file)
-		{
-			file->openWrite(true);
-			file->close();
-		}*/
-	}
-
+	if(!getVFS()->fileExists(JA2SP_INI_FILENAME))	
+		exists = FALSE;		
+	
 	return exists;
 }
 
@@ -481,13 +495,13 @@ UINT32	GameInitOptionsScreenInit( void )
 	vfs::PropertyContainer props;
 
 	if (SpIniExists())
-		props.initFromIniFile("Ja2_sp.ini");
+		props.initFromIniFile(JA2SP_INI_FILENAME);
 
 	// Difficulty Level (Default: Experienced = 1)
-	gGameOptions.ubDifficultyLevel =  ((UINT8)props.getIntProperty( L"Ja2_sp Settings", L"DIFFICULTY_LEVEL", 1)) + 1;
+	gGameOptions.ubDifficultyLevel =  ((UINT8)props.getIntProperty(JA2SP_INI_INITIAL_SECTION, JA2SP_DIFFICULTY_LEVEL, 1)) + 1;
 
 	// Bobby Ray's Selection (Default: Great = 1)
-	UINT8 ubBobbyRay = (UINT8)props.getIntProperty( L"Ja2_sp Settings", L"BOBBY_RAY_SELECTION", 1);
+	UINT8 ubBobbyRay = (UINT8)props.getIntProperty(JA2SP_INI_INITIAL_SECTION, JA2SP_BOBBY_RAY_SELECTION, 1);
 	switch (ubBobbyRay)
 	{
 		// Normal
@@ -509,19 +523,26 @@ UINT32	GameInitOptionsScreenInit( void )
 	}
 
 	// Max. IMP Characters
-	gGameOptions.ubMaxIMPCharacters	= (gGameExternalOptions.iIMPMaleCharacterCount + gGameExternalOptions.iIMPFemaleCharacterCount); 
+	UINT8 maxIMPCharacterCount = (UINT8)props.getIntProperty(JA2SP_INI_INITIAL_SECTION, JA2SP_MAX_IMP_CHARACTERS, 1);
+	gGameOptions.ubMaxIMPCharacters = min( (gGameExternalOptions.iIMPMaleCharacterCount + gGameExternalOptions.iIMPFemaleCharacterCount), ( max( 1, maxIMPCharacterCount) ));
 
 	// Progress Speed of Item Choices (Default: Normal)
-	gGameOptions.ubProgressSpeedOfItemsChoices =  (UINT8)props.getIntProperty( L"Ja2_sp Settings", L"PROGRESS_SPEED_OF_ITEM_CHOICES", ITEM_PROGRESS_NORMAL);
+	gGameOptions.ubProgressSpeedOfItemsChoices =  (UINT8)props.getIntProperty(JA2SP_INI_INITIAL_SECTION, JA2SP_PROGRESS_SPEED_OF_ITEM_CHOICES, ITEM_PROGRESS_NORMAL);
 
 	// Skill Traits
-	if (gGameExternalOptions.fReadProfileDataFromXML)
-		gGameOptions.fNewTraitSystem	= TRUE;
-	else
-		gGameOptions.fNewTraitSystem	= FALSE;
+	UINT8 ubTraitSystem = (UINT8)props.getIntProperty(JA2SP_INI_INITIAL_SECTION, JA2SP_SKILL_TRAITS, 1);
+	if (!gGameExternalOptions.fReadProfileDataFromXML)
+		ubTraitSystem = 0;
+
+	gGameOptions.fNewTraitSystem = ubTraitSystem;
 
 	// Inventory Attachments (Default: New/New = 2)
-	UINT8 ubInventoryAttachmentSystem = (UINT8)props.getIntProperty( L"Ja2_sp Settings", L"INVENTORY_ATTACHMENTS", 2);
+	UINT8 ubInventoryAttachmentSystem = (UINT8)props.getIntProperty(JA2SP_INI_INITIAL_SECTION, JA2SP_INVENTORY_ATTACHMENTS, 2);
+	
+	// NIV is not allowed
+	if (!IsNIVModeValid(true))
+		ubInventoryAttachmentSystem = 0;
+
 	switch (ubInventoryAttachmentSystem)
 	{
 		// Old / Old
@@ -541,23 +562,17 @@ UINT32	GameInitOptionsScreenInit( void )
 			break;
 	}
 
-	if(IsNIVModeValid() == FALSE)
-	{
-		gGameOptions.ubInventorySystem	= INVENTORY_OLD;
-		gGameOptions.ubAttachmentSystem = ATTACHMENT_OLD;
-	}
-
 	// Game Style (Default: Realistic = 0)
-	gGameOptions.ubGameStyle =  (UINT8)props.getIntProperty( L"Ja2_sp Settings", L"GAME_STYLE", STYLE_REALISTIC);
+	gGameOptions.ubGameStyle =  (UINT8)props.getIntProperty(JA2SP_INI_INITIAL_SECTION, JA2SP_GAME_STYLE, STYLE_REALISTIC);
 
 	// Enemies Drop All Items (Default: Off = 0)
-	gGameOptions.fEnemiesDropAllItems =  (BOOLEAN)props.getIntProperty( L"Ja2_sp Settings", L"ENEMIES_DROP_ALL_ITEMS", 0);
+	gGameOptions.fEnemiesDropAllItems =  (BOOLEAN)props.getIntProperty(JA2SP_INI_INITIAL_SECTION, JA2SP_ENEMIES_DROP_ALL_ITEMS, 0);
 
 	// Extra Difficulty (Default: Save Anytime = 0)
-	gGameOptions.fIronManMode =  (BOOLEAN)props.getIntProperty( L"Ja2_sp Settings", L"EXTRA_DIFFICULTY", 0);
+	gGameOptions.fIronManMode =  (BOOLEAN)props.getIntProperty(JA2SP_INI_INITIAL_SECTION, JA2SP_EXTRA_DIFFICULTY, 0);
 
 	// Available Arsenal (Default: Tons of Guns = 1)
-	gGameOptions.fGunNut =  (BOOLEAN)props.getIntProperty( L"Ja2_sp Settings", L"AVAILABLE_ARSENAL", 1);
+	gGameOptions.fGunNut =  (BOOLEAN)props.getIntProperty(JA2SP_INI_INITIAL_SECTION, JA2SP_AVAILABLE_ARSENAL, 1);
 
 	#ifdef JA2UB
 	// tex and john
@@ -570,8 +585,8 @@ UINT32	GameInitOptionsScreenInit( void )
 	#endif
 	
 	// Secret Weapon Caches (Default: Random = 0)
-	gGameOptions.fEnableAllWeaponCaches =  (BOOLEAN)props.getIntProperty( L"Ja2_sp Settings", L"SECRET_WEAPON_CACHES", 0);
-	
+	gGameOptions.fEnableAllWeaponCaches =  (BOOLEAN)props.getIntProperty(JA2SP_INI_INITIAL_SECTION, JA2SP_SECRET_WEAPON_CACHES, 0);
+
 	gGameOptions.fAirStrikes =  FALSE;
 	gGameOptions.fTurnTimeLimit	= FALSE;
 
@@ -672,11 +687,11 @@ BOOLEAN		EnterGIOScreen()
 
 	//Ok button
 	giGIODoneBtnImage = LoadButtonImage("INTERFACE\\PreferencesButtons.sti", -1,0,-1,2,-1 );
-	guiGIODoneButton = CreateIconAndTextButton( giGIODoneBtnImage, gzGIOScreenText[GIO_OK_TEXT], OPT_BUTTON_FONT,
+	guiGIODoneButton = CreateIconAndTextButton( giGIODoneBtnImage, gzGIOScreenText[GIO_START_TEXT], OPT_BUTTON_FONT,
 													OPT_BUTTON_ON_COLOR, DEFAULT_SHADOW,
 													OPT_BUTTON_OFF_COLOR, DEFAULT_SHADOW,
 													TEXT_CJUSTIFIED,
-													GIO_BTN_OK_X, GIO_BTN_OK_Y, BUTTON_TOGGLE, MSYS_PRIORITY_HIGH,
+													GIO_BTN_START_X, GIO_BTN_START_Y, BUTTON_TOGGLE, MSYS_PRIORITY_HIGH,
 													DEFAULT_MOVE_CALLBACK, BtnGIODoneCallback);
 
 	SpecifyButtonSoundScheme( guiGIODoneButton, BUTTON_SOUND_SCHEME_BIGSWITCH3 );
@@ -688,23 +703,9 @@ BOOLEAN		EnterGIOScreen()
 													OPT_BUTTON_ON_COLOR, DEFAULT_SHADOW,
 													OPT_BUTTON_OFF_COLOR, DEFAULT_SHADOW,
 													TEXT_CJUSTIFIED,
-													GIO_CANCEL_X, GIO_BTN_OK_Y, BUTTON_TOGGLE, MSYS_PRIORITY_HIGH,
+													GIO_CANCEL_X, GIO_BTN_START_Y, BUTTON_TOGGLE, MSYS_PRIORITY_HIGH,
 													DEFAULT_MOVE_CALLBACK, BtnGIOCancelCallback );
 	SpecifyButtonSoundScheme( guiGIOCancelButton, BUTTON_SOUND_SCHEME_BIGSWITCH3 );
-
-		//MP button
-	if(is_networked)
-	{
-	MPgiGIOCancelBtnImage = UseLoadedButtonImage( giGIODoneBtnImage, -1,1,-1,3,-1 );
-	MPguiGIOCancelButton = CreateIconAndTextButton( giGIOCancelBtnImage, gzGIOScreenText[GIO_LOAD_MP_GAME], OPT_BUTTON_FONT,
-													OPT_BUTTON_ON_COLOR, DEFAULT_SHADOW,
-													OPT_BUTTON_OFF_COLOR, DEFAULT_SHADOW,
-													TEXT_CJUSTIFIED,
-													GIO_CANCEL_X-180, GIO_BTN_OK_Y, BUTTON_TOGGLE, MSYS_PRIORITY_HIGH,
-													DEFAULT_MOVE_CALLBACK, MPBtnGIOCancelCallback );
-	SpecifyButtonSoundScheme( guiGIOCancelButton, BUTTON_SOUND_SCHEME_BIGSWITCH3 );
-
-	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	// DIFFICULTY SETTING
@@ -892,7 +893,7 @@ BOOLEAN		EnterGIOScreen()
 													TEXT_CJUSTIFIED,
 													(GIO_TERRORISTS_SETTING_X), (GIO_TERRORISTS_SETTING_Y + 10), BUTTON_TOGGLE, MSYS_PRIORITY_HIGH,
 													DEFAULT_MOVE_CALLBACK, BtnGIOTerroristsRandomCallback);
-													
+
 	guiTerroristsOptionTogglesImage[ GIO_TERRORISTS_ALL ] = UseLoadedButtonImage( guiTraitsOptionTogglesImage[ GIO_TRAITS_OLD ], -1,1,-1,3,-1 );
 	guiTerroristsOptionToggles[ GIO_TERRORISTS_ALL ] = CreateIconAndTextButton( guiTerroristsOptionTogglesImage[ GIO_TERRORISTS_ALL ],  gzGIOScreenText[ GIO_TERRORISTS_ALL_TEXT ], GIO_TOGGLE_TEXT_FONT,
 													GIO_TOGGLE_TEXT_COLOR, NO_SHADOW,
@@ -922,8 +923,8 @@ BOOLEAN		EnterGIOScreen()
 	if( gGameOptions.fEnableAllTerrorists )
 		ButtonList[ guiTerroristsOptionToggles[ GIO_TERRORISTS_ALL ] ]->uiFlags |= BUTTON_CLICKED_ON;
 	else 
-		ButtonList[ guiTerroristsOptionToggles[ GIO_TERRORISTS_RANDOM ] ]->uiFlags |= BUTTON_CLICKED_ON;	
-	
+		ButtonList[ guiTerroristsOptionToggles[ GIO_TERRORISTS_RANDOM ] ]->uiFlags |= BUTTON_CLICKED_ON;		
+
 	#endif
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	// BOBBY RAY SETTING
@@ -991,7 +992,7 @@ BOOLEAN		EnterGIOScreen()
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	// OLD/NEW INVENTORY SETTING
 
-	if (!is_networked && IsNIVModeValid() == TRUE )
+	if (IsNIVModeValid(true) == TRUE )
 	{		
 		giGIOInventorySettingButtonImage[ 0 ]=	UseLoadedButtonImage( giGIODifficultyButtonImage[ 0 ],-1,0,-1,1,-1 );
 		giGIOInventorySettingButtonImage[ 1 ]=	UseLoadedButtonImage( giGIODifficultyButtonImage[ 1 ],-1,2,-1,3,-1 );
@@ -1011,8 +1012,8 @@ BOOLEAN		EnterGIOScreen()
 		MSYS_SetBtnUserData(giGIOInventorySettingButton[0],0, 0 );
 		MSYS_SetBtnUserData(giGIOInventorySettingButton[1],0, 1 );
 
-		if (gGameOptions.ubInventorySystem == INVENTORY_NEW &&
-			gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW)
+		if (UsingNewInventorySystem()==true &&
+			UsingNewAttachmentSystem()==true)
 		{
 			iCurrentInventorySetting = GIO_INV_NEW_NAS;
 		}
@@ -1706,7 +1707,7 @@ void BtnGIOIronManOffCallback(GUI_BUTTON *btn,INT32 reason)
 		ButtonList[ guiGameSaveToggles[ GIO_IRON_MAN ] ]->uiFlags &= ~BUTTON_CLICKED_ON;
 		btn->uiFlags|=(BUTTON_CLICKED_ON);
 			
-		PlayButtonSound( guiGameSaveToggles[ GIO_CAN_SAVE ], BUTTON_SOUND_CLICKED_ON );
+		PlayButtonSound( guiGameStyleToggles[ GIO_CAN_SAVE ], BUTTON_SOUND_CLICKED_ON );
 	}
 }
 void BtnGIOIronManOnCallback(GUI_BUTTON *btn,INT32 reason)
@@ -1721,10 +1722,9 @@ void BtnGIOIronManOnCallback(GUI_BUTTON *btn,INT32 reason)
 		ButtonList[ guiGameSaveToggles[ GIO_CAN_SAVE ] ]->uiFlags &= ~BUTTON_CLICKED_ON;
 		btn->uiFlags|=(BUTTON_CLICKED_ON);
 			
-		PlayButtonSound( guiGameSaveToggles[ GIO_IRON_MAN ], BUTTON_SOUND_CLICKED_ON );
+		PlayButtonSound( guiGameStyleToggles[ GIO_IRON_MAN ], BUTTON_SOUND_CLICKED_ON );
 	}
 }
-
 #ifdef JA2UB
 void BtnGIORpcRandomCallback(GUI_BUTTON *btn,INT32 reason)
 {
@@ -1757,6 +1757,7 @@ void BtnGIORpcAllCallback(GUI_BUTTON *btn,INT32 reason)
 	}
 }
 #else
+
 void BtnGIOTerroristsRandomCallback(GUI_BUTTON *btn,INT32 reason)
 {
 	if (!(btn->uiFlags & BUTTON_ENABLED))
@@ -1897,12 +1898,6 @@ BOOLEAN		ExitGIOScreen()
 
 	DeleteVideoObjectFromIndex( guiGIOSMALLFRAME );
 
-	if(is_networked)
-	{
-		RemoveButton( MPguiGIOCancelButton );
-		UnloadButtonImage( MPgiGIOCancelBtnImage );
-	}
-
 	// Destroy Basic buttons
 	RemoveButton( guiGIOCancelButton );
 	RemoveButton( guiGIODoneButton );
@@ -1979,16 +1974,13 @@ BOOLEAN		ExitGIOScreen()
 
 
 	// Destroy Inventory setting buttons
-	if (!is_networked)
+	if(IsNIVModeValid(true) == TRUE)
 	{
-		if(IsNIVModeValid() == TRUE)
-		{
-			// Destroy Inventory settings
-			RemoveButton( giGIOInventorySettingButton[0] );
-			RemoveButton( giGIOInventorySettingButton[1] );
-			UnloadButtonImage( giGIOInventorySettingButtonImage[0] );
-			UnloadButtonImage( giGIOInventorySettingButtonImage[1] );
-		}
+		// Destroy Inventory settings
+		RemoveButton( giGIOInventorySettingButton[0] );
+		RemoveButton( giGIOInventorySettingButton[1] );
+		UnloadButtonImage( giGIOInventorySettingButtonImage[0] );
+		UnloadButtonImage( giGIOInventorySettingButtonImage[1] );
 	}
 
 	// Destroy Drop All setting buttons
@@ -2098,14 +2090,7 @@ BOOLEAN		RenderGIOScreen()
 	ShadowVideoSurfaceRect( FRAME_BUFFER, iScreenWidthOffset, iScreenHeightOffset, iScreenWidthOffset + 640, iScreenHeightOffset + 480 );
 
 	//Display the title
-	if (!is_networked)
-	{
-		DrawTextToScreen( gzGIOScreenText[ GIO_INITIAL_GAME_SETTINGS ], GIO_MAIN_TITLE_X, GIO_MAIN_TITLE_Y, GIO_MAIN_TITLE_WIDTH, GIO_TITLE_FONT, GIO_TITLE_COLOR, FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED );
-	}
-	else
-	{
-		DrawTextToScreen( gzGIOScreenText[ GIO_INITIAL_GAME_SETTINGS_MP ], GIO_MAIN_TITLE_X, GIO_MAIN_TITLE_Y, GIO_MAIN_TITLE_WIDTH, GIO_TITLE_FONT, GIO_TITLE_COLOR, FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED );
-	}
+	DrawTextToScreen( gzGIOScreenText[ GIO_INITIAL_GAME_SETTINGS ], GIO_MAIN_TITLE_X, GIO_MAIN_TITLE_Y, GIO_MAIN_TITLE_WIDTH, GIO_TITLE_FONT, GIO_TITLE_COLOR, FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED );
 
 	//Display the Dif Settings Title Text
 	RenderGIOSmallSelectionFrame( (GIO_DIF_SETTING_X + 36), (GIO_DIF_SETTING_Y - 3) );
@@ -2147,16 +2132,10 @@ BOOLEAN		RenderGIOScreen()
 	//Display the Terrorists Settings Title Text
 	DisplayWrappedString( (GIO_TERRORISTS_SETTING_X - 6), (UINT16)(GIO_TERRORISTS_SETTING_Y-GIO_GAP_BN_SETTINGS + GIO_TITLE_DISTANCE), GIO_TERRORISTS_SETTING_WIDTH + 14, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ GIO_TERRORISTS_TITLE_TEXT ], FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED );
 
-	// CHRISL
-	if (!is_networked && IsNIVModeValid() == TRUE )
-	{
-		// Display Inventory Settings text
-		RenderGIOSmallSelectionFrame( (GIO_INV_SETTING_X + 36), (GIO_INV_SETTING_Y - 3) );
-		DisplayWrappedString( (UINT16)(GIO_INV_SETTING_X+GIO_OFFSET_TO_TEXT + 1), (UINT16)(GIO_INV_SETTING_Y-GIO_GAP_BN_SETTINGS + GIO_TITLE_DISTANCE - 12), GIO_INV_SETTING_WIDTH, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ GIO_INV_TEXT ], FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED );
-		DisplayWrappedString( (UINT16)(GIO_INV_SETTING_X+GIO_OFFSET_TO_TEXT + 1), (GIO_INV_SETTING_Y+5), GIO_INV_SETTING_WIDTH, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ iCurrentInventorySetting + 54 ], FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED );	
-
-		//DisplayWrappedString( (GIO_INV_SETTING_X - 7), (UINT16)(GIO_INV_SETTING_Y-GIO_GAP_BN_SETTINGS + GIO_TITLE_DISTANCE), GIO_INV_SETTING_WIDTH, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ GIO_INV_TEXT ], FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED );
-	}
+	// Display Inventory Settings text
+	RenderGIOSmallSelectionFrame( (GIO_INV_SETTING_X + 36), (GIO_INV_SETTING_Y - 3) );
+	DisplayWrappedString( (UINT16)(GIO_INV_SETTING_X+GIO_OFFSET_TO_TEXT + 1), (UINT16)(GIO_INV_SETTING_Y-GIO_GAP_BN_SETTINGS + GIO_TITLE_DISTANCE - 12), GIO_INV_SETTING_WIDTH, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ GIO_INV_TEXT ], FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED );
+	DisplayWrappedString( (UINT16)(GIO_INV_SETTING_X+GIO_OFFSET_TO_TEXT + 1), (GIO_INV_SETTING_Y+5), GIO_INV_SETTING_WIDTH, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ iCurrentInventorySetting + 54 ], FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED );	
 
 	//Display the Drop All Settings Title Text
 	DisplayWrappedString( (GIO_DROPALL_SETTING_X - 6), (UINT16)(GIO_DROPALL_SETTING_Y-GIO_GAP_BN_SETTINGS + GIO_TITLE_DISTANCE), GIO_DROPALL_SETTING_WIDTH + 14, 2, GIO_TOGGLE_TEXT_FONT, GIO_TOGGLE_TEXT_COLOR, gzGIOScreenText[ GIO_DROPALL_TITLE_TEXT ], FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED );
@@ -2221,20 +2200,12 @@ void BtnGIODoneCallback(GUI_BUTTON *btn,INT32 reason)
 	{
 		btn->uiFlags &= (~BUTTON_CLICKED_ON );
 
-		if(!is_networked)
+		//if the user doesnt have IRON MAN mode selected
+		if( !DisplayMessageToUserAboutIronManMode() )
 		{
-			//if the user doesnt have IRON MAN mode selected
-			if( !DisplayMessageToUserAboutIronManMode() )
-			{
-				//Confirm the difficulty setting
-				DisplayMessageToUserAboutGameDifficulty();
-			}
+			//Confirm the difficulty setting
+			DisplayMessageToUserAboutGameDifficulty();
 		}
-		else
-		{
-			gubGameOptionScreenHandler = GIO_EXIT;
-		}
-
 
 		InvalidateRegion(btn->Area.RegionTopLeftX, btn->Area.RegionTopLeftY, btn->Area.RegionBottomRightX, btn->Area.RegionBottomRightY);
 	}
@@ -2309,7 +2280,7 @@ UINT8	GetCurrentGameStyleButtonSetting()
 
 	for( cnt=0; cnt<NUM_GAME_STYLES; cnt++)
 	{
-		if( ButtonList[ guiGameTextToggles[ cnt ] ]->uiFlags & BUTTON_CLICKED_ON )
+		if( ButtonList[ guiGameStyleToggles[ cnt ] ]->uiFlags & BUTTON_CLICKED_ON )
 		{
 			return( cnt );
 		}
@@ -2351,9 +2322,9 @@ UINT8	GetCurrentTerroristsButtonSetting()
 {
 	UINT8	cnt;
 
-	for( cnt=0; cnt<NUM_TERRORISTS_OPTIONS; cnt++)
+	for( cnt=0; cnt<NUM_GAME_STYLES; cnt++)
 	{
-		if( ButtonList[ guiRpcOptionToggles[ cnt ] ]->uiFlags & BUTTON_CLICKED_ON )
+		if( ButtonList[ guiTerroristsOptionToggles[ cnt ] ]->uiFlags & BUTTON_CLICKED_ON )
 		{
 			return( cnt );
 		}
@@ -2365,7 +2336,7 @@ UINT8	GetCurrentDropAllButtonSetting()
 {
 	UINT8	cnt;
 
-	for( cnt=0; cnt<NUM_DROPALL_OPTIONS; cnt++)
+	for( cnt=0; cnt<NUM_GAME_STYLES; cnt++)
 	{
 		if( ButtonList[ guiDropAllOptionToggles[ cnt ] ]->uiFlags & BUTTON_CLICKED_ON )
 		{
@@ -2395,7 +2366,7 @@ UINT8	GetCurrentWeaponCachesButtonSetting()
 {
 	UINT8	cnt;
 
-	for( cnt=0; cnt<NUM_CACHES_OPTIONS; cnt++)
+	for( cnt=0; cnt<NUM_GAME_STYLES; cnt++)
 	{
 		if( ButtonList[ guiWeaponCachesOptionToggles[ cnt ] ]->uiFlags & BUTTON_CLICKED_ON )
 		{
@@ -2438,11 +2409,8 @@ void DoneFadeOutForExitGameInitOptionScreen( void )
 	gGameOptions.ubDifficultyLevel = min( NUM_DIFF_SETTINGS, ( max( 1, (iCurrentDifficulty + 1)) )); 
 	#endif
 
-	if (is_networked)
-		gGameOptions.fTurnTimeLimit = TRUE;
-	else
-		gGameOptions.fTurnTimeLimit = FALSE;
-	
+	gGameOptions.fTurnTimeLimit = FALSE;
+		
 	// iron man
 	gGameOptions.fIronManMode = GetCurrentGameSaveButtonSetting();
 
@@ -2463,7 +2431,7 @@ void DoneFadeOutForExitGameInitOptionScreen( void )
 	}
 
 	// CHRISL:
-	if(IsNIVModeValid() == TRUE)
+	if(IsNIVModeValid(true) == TRUE)
 	{
 		switch ( iCurrentInventorySetting)				
 		{

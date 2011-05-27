@@ -61,7 +61,6 @@
 class OBJECTTYPE;
 class SOLDIERTYPE;
 #include "connect.h"
-//#include "test_space.h"
 
 extern INT8 STRAIGHT;
 //extern UINT8 gubSpeedUpAnimationFactor;
@@ -126,7 +125,8 @@ typedef struct
 	UINT8	ubFiller[16];
 } TEAM_TURN_SAVE_STRUCT;
 
-#define MIN_APS_TO_INTERRUPT 4
+// WANNE: Moved to APBPConstants
+//#define MIN_APS_TO_INTERRUPT 4
 
 void ClearIntList( void )
 {
@@ -1040,9 +1040,12 @@ void EndInterrupt( BOOLEAN fMarkInterruptOccurred )
 
 		// resume interrupted interrupt
 		//hayden
-		if (!is_networked) {
+		if (!is_networked) 
+		{
 			StartInterrupt();
-		} else {
+		} 
+		else 
+		{
 			UINT8						nubFirstInterrupter;
 			INT8						nbTeam;
 			SOLDIERTYPE *				npSoldier;
@@ -1060,22 +1063,23 @@ void EndInterrupt( BOOLEAN fMarkInterruptOccurred )
 			}
 			else if(is_server && gTacticalStatus.ubCurrentTeam == 1)//  against ai
 			{
-
 				//hayden
-				send_interrupt( npSoldier ); //
-						if(nbTeam !=0)intAI(npSoldier);						
-						else StartInterrupt();//					
-					//requestAIint( npSoldier );
-					ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"AI is interrupted");
+				send_interrupt( npSoldier );
+
+				if(nbTeam !=0)
+					intAI(npSoldier);						
+				else 
+					StartInterrupt();					
+				
+				ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"AI is interrupted");
 			}
 			else
 			{
-				//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"interrupt for another team"); //may need more work.
+				ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"interrupt for another team"); //may need more work.
 				//ClearIntList();
 				//hayden
 				StartInterrupt();
 				send_interrupt( npSoldier ); //
-
 			}
 		}
 
@@ -1451,7 +1455,7 @@ BOOLEAN StandardInterruptConditionsMet( SOLDIERTYPE * pSoldier, UINT8 ubOpponent
 	}
 
 	// if soldier doesn't have enough APs
-	if ( pSoldier->bActionPoints < MIN_APS_TO_INTERRUPT )
+	if ( pSoldier->bActionPoints < APBPConstants[MIN_APS_TO_INTERRUPT] )
 	{
 		return( FALSE );
 	}
@@ -1702,7 +1706,7 @@ INT8 CalcInterruptDuelPts( SOLDIERTYPE * pSoldier, UINT8 ubOpponentID, BOOLEAN f
 	{
 		if ( ( gAnimControl[ pSoldier->usAnimState ].uiFlags &( ANIM_FIREREADY | ANIM_FIRE ) ))
 		{
-			iPoints=(iPoints+WEAPON_READIED_BONUS);
+			iPoints=(iPoints + cWeaponReadyBonus);
 			
 		}
 	}
@@ -2096,9 +2100,12 @@ void DoneAddingToIntList( SOLDIERTYPE * pSoldier, BOOLEAN fChange, UINT8 ubInter
 		}
 		else
 		{
-			if (!is_networked) {
+			if (!is_networked) 
+			{
 				StartInterrupt();
-			} else {
+			} 
+			else 
+			{
 				UINT8						nubFirstInterrupter;
 				INT8						nbTeam;
 				SOLDIERTYPE *				npSoldier;
@@ -2109,44 +2116,54 @@ void DoneAddingToIntList( SOLDIERTYPE * pSoldier, BOOLEAN fChange, UINT8 ubInter
 								
 				// INTERRUPT is calculated on the server
 				if ((nbTeam > 0) && (nbTeam <6 ) && is_server) //is for AI and are server
-					{
-						ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"interrupt for AI team");
-						
-						// Only display the top message if we (the server) got interrupted
-						if (pSoldier->bTeam == 0)
-							AddTopMessage( COMPUTER_INTERRUPT_MESSAGE, TeamTurnString[ nbTeam ] );
+				{
+					ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"interrupt for AI team");
+					
+					// Only display the top message if we (the server) got interrupted
+					if (pSoldier->bTeam == 0)
+						AddTopMessage( COMPUTER_INTERRUPT_MESSAGE, TeamTurnString[ nbTeam ] );
 
-						send_interrupt( npSoldier );
-						StartInterrupt();
+					send_interrupt( npSoldier );
+					StartInterrupt();
 
-					}
+				}
 				// INTERRUPT is calculated on the server
 				else if(is_server && gTacticalStatus.ubCurrentTeam == 1)//  against ai
-					{
-
-						//hayden
-						send_interrupt( npSoldier ); //
-						if(nbTeam !=0)intAI(npSoldier);						
-						else StartInterrupt();//
-						//requestAIint( npSoldier );
-						ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"AI is interrupted");
-					}
+				{
+					//hayden
+					send_interrupt( npSoldier ); //
+					if(nbTeam !=0)
+						intAI(npSoldier);						
+					else 
+						StartInterrupt();//
+					
+					ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"AI is interrupted");
+				}
 				// INTERRUPT is calculated on the pure client
 				else if(gTacticalStatus.ubCurrentTeam == 0)//its our turn (we are moving)
-				{
-					// Only send interrupt if we (the client) got interrupted
-					send_interrupt( npSoldier );
-					ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"interrupt for another team");
+				{					
+					//// WANNE: Skip the interrupt (against enemy AI) on the pure client, when we are in a coop game!
+					//if (cGameType == MP_TYPE_COOP)
+					//{
+					//	#ifdef BETAVERSION
+					//		ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"interrupt for another team - pure client - skipping problematic interrupt");
+					//	#endif			
+					//}
+					//else
+					//{
+						send_interrupt( npSoldier );
+						ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"interrupt for another team - PROBLEMATIC");
 
-					SOLDIERTYPE* pMerc = MercPtrs[ gusSelectedSoldier ];
-					//AdjustNoAPToFinishMove( pMerc, TRUE );	
-					pMerc->HaultSoldierFromSighting(TRUE);
-					//pMerc->fTurningFromPronePosition = FALSE;// hmmm ??
-					FreezeInterfaceForEnemyTurn();
-					InitEnemyUIBar( 0, 0 );
-					fInterfacePanelDirty = DIRTYLEVEL2;
-					AddTopMessage( COMPUTER_INTERRUPT_MESSAGE, TeamTurnString[ nbTeam ] );
-					gTacticalStatus.fInterruptOccurred = TRUE;	
+						SOLDIERTYPE* pMerc = MercPtrs[ gusSelectedSoldier ];
+						//AdjustNoAPToFinishMove( pMerc, TRUE );	
+						pMerc->HaultSoldierFromSighting(TRUE);
+						//pMerc->fTurningFromPronePosition = FALSE;// hmmm ??
+						FreezeInterfaceForEnemyTurn();
+						InitEnemyUIBar( 0, 0 );
+						fInterfacePanelDirty = DIRTYLEVEL2;
+						AddTopMessage( COMPUTER_INTERRUPT_MESSAGE, TeamTurnString[ nbTeam ] );
+						gTacticalStatus.fInterruptOccurred = TRUE;
+					//}
 				}
 				else
 				{

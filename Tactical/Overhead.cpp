@@ -114,11 +114,11 @@
 #include "Lua Interpreter.h"
 #include "bullets.h"
 #endif
-#include "test_space.h"
 #include "connect.h"
 
+#include "Luaglobal.h"
 #include "LuaInitNPCs.h"
-
+#include "Interface.h"
 #ifdef JA2UB
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
@@ -1758,19 +1758,6 @@ BOOLEAN ExecuteOverhead( )
 										}
 									}
 								}
-								//if(is_client)//hayden
-								//{
-								//	if(pSoldier->flags.fIsSoldierDelayed==TRUE)
-								//	{
-								//		continue;//in position but waiting on other clients
-								//	}
-								//	else
-								//	{
-								//		//ovh_advance=false;
-								//		pSoldier->flags.fIsSoldierDelayed=TRUE;
-								//		request_ovh(pSoldier->ubID);
-								//	}
-								//}
 							}
 
 							if ( ( pSoldier->flags.uiStatusFlags & SOLDIER_PAUSEANIMOVE ) )
@@ -2913,8 +2900,11 @@ BOOLEAN HandleAtNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving )
 	HandleSystemNewAISituation( pSoldier, FALSE );
 
 	
+#ifdef LUA_OVERHEAD
+	LetLuaMyCustomHandleAtNewGridNo(NULL,pSoldier->ubProfile, 0);
+#else
 	//----------------Lua------------------------
-	#if 0
+	
 	
 	if ( pSoldier->bTeam == gbPlayerNum )
 	{
@@ -2932,7 +2922,7 @@ BOOLEAN HandleAtNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving )
 						pSoldier->EVENT_StopMerc( pSoldier->sGridNo, pSoldier->ubDirection );
 						SetFactTrue( FACT_SKYRIDER_CLOSE_TO_CHOPPER );
 						TriggerNPCRecord( SKYRIDER, 15 );
-						SetUpHelicopterForPlayer( 13, MAP_ROW_B );
+						SetUpHelicopterForPlayer( 13, MAP_ROW_B, SKYRIDER );
 					}
 					break;
 
@@ -3010,10 +3000,8 @@ BOOLEAN HandleAtNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving )
 			break;
 		}
 	}
-	
-	#endif
-	
-	LetLuaMyCustomHandleAtNewGridNo(NULL,pSoldier->ubProfile, 0);	
+
+#endif
 
 	return( TRUE );
 }
@@ -3439,9 +3427,6 @@ void HandlePlayerTeamMemberDeath( SOLDIERTYPE *pSoldier )
 			}
 		}
 
-		LuaHandlePlayerTeamMemberDeath( pSoldier->ubProfile, 0 );
-		
-		#if 0
 		// handle stuff for Carmen if Slay is killed
 		switch( pSoldier->ubProfile )
 		{
@@ -3469,7 +3454,7 @@ void HandlePlayerTeamMemberDeath( SOLDIERTYPE *pSoldier )
 			}
 			break;
 		}
-		#endif
+		
 	}
 
 	//Make a call to handle the strategic things, such as Life Insurance, record it in history file etc.
@@ -3531,8 +3516,10 @@ void HandleNPCTeamMemberDeath( SOLDIERTYPE *pSoldierOld )
 
 	if (pSoldierOld->bTeam == CIV_TEAM )
 	{
+		#ifdef JA2UB
+		#else
 		SOLDIERTYPE * pOther;
-
+		#endif
 		// ATE: Added string to player
 		if ( bVisible != -1 && pSoldierOld->ubProfile != NO_PROFILE )
 		{
@@ -3959,7 +3946,7 @@ UINT16 iCounter2;
 		// We need to exclude cases where a kid is not neutral anymore, but is defenceless!
 		if ( pSoldier->bTeam == CIV_TEAM )
 		{
-			// maybe increment num enemy attacked
+		/*	// maybe increment num enemy attacked
 			switch ( pSoldier->ubCivilianGroup )
 			{
 			case REBEL_CIV_GROUP:
@@ -3987,7 +3974,19 @@ UINT16 iCounter2;
 					
 					}	
 				}
+			*/
 			
+			//New Group by Jazz
+			for( iCounter2 = REBEL_CIV_GROUP; iCounter2 < NUM_CIV_GROUPS; iCounter2++ )
+				{	
+					if ( pSoldier->ubCivilianGroup == iCounter2 && zCivGroupName[iCounter2].AddToBattle == TRUE )
+					{
+						if ( FindObjClass( pSoldier, IC_WEAPON ) != NO_SLOT )
+						{
+							gTacticalStatus.bNumFoughtInBattle[ pSoldier->bTeam ]++;
+						}
+					}	
+				}
 			
 		}
 		else
@@ -6089,7 +6088,8 @@ void ExitCombatMode( )
 	}
 
 	// Change music modes
-	gfForceMusicToTense = TRUE;
+	// unused
+	//gfForceMusicToTense = TRUE;
 
 	SetMusicMode( MUSIC_TACTICAL_ENEMYPRESENT );
 
@@ -6486,7 +6486,8 @@ BOOLEAN CheckForEndOfCombatMode( BOOLEAN fIncrementTurnsNotSeen )
 		*/
 
 		// Begin tense music....
-		gfForceMusicToTense = TRUE;
+		// unused
+		//gfForceMusicToTense = TRUE;
 		SetMusicMode( MUSIC_TACTICAL_ENEMYPRESENT );
 
 		return( TRUE );
@@ -6506,7 +6507,7 @@ void DeathNoMessageTimerCallback( void )
 		if (!isOwnTeamWipedOut)
 		{
 			ScreenMsg( FONT_LTGREEN, MSG_CHAT, MPClientMessage[40] );
-			if(!DISABLE_SPEC_MODE)
+			if(!cDisableSpectatorMode)
 			{
 				gTacticalStatus.uiFlags |= SHOW_ALL_MERCS;//hayden
 				ScreenMsg( FONT_YELLOW, MSG_CHAT, MPClientMessage[41] );
@@ -8923,7 +8924,7 @@ void EndBattleWithUnconsciousGuysCallback( UINT8 bExitValue )
 	else	
 	{
 		ScreenMsg( FONT_LTGREEN, MSG_CHAT, MPClientMessage[40] );
-		if(!DISABLE_SPEC_MODE)
+		if(!cDisableSpectatorMode)
 		{
 			gTacticalStatus.uiFlags |= SHOW_ALL_MERCS;//hayden
 			ScreenMsg( FONT_YELLOW, MSG_CHAT, MPClientMessage[41] );

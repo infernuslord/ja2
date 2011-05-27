@@ -132,6 +132,9 @@ BOOLEAN InitializeGame(void)
 	// Load new ini - SANDRO
 	LoadSkillTraitsExternalSettings();
 
+	// HEADROCK HAM 4: Read CTH values
+	LoadCTHConstants();
+
 #ifdef JA2UB
 	LoadGameLegionOptions(); // JA25 UB
 #endif
@@ -220,7 +223,7 @@ void GameLoop(void)
 	InputAtom	InputEvent;
 	POINT		MousePos;
 	UINT32		uiOldScreen=guiCurrentScreen;
-	//clock_t		startTime = clock(); // decrease CPU load patch from defrog
+	clock_t		startTime = clock(); // decrease CPU load patch from defrog
 
 	//DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"GameLoop: get mouse position");
 	GetCursorPos(&MousePos);
@@ -437,7 +440,8 @@ void GameLoop(void)
 	}
 #endif
 
-#if 0
+	// WANNE: Removed Low CPU option
+	/*
 	if( gGameSettings.fOptions[ TOPTION_LOW_CPU_USAGE ] == TRUE )
 	{
 		// decrease CPU load patch from MTX (http://www.ja-galaxy-forum.com/board/ubbthreads.php/ubb/showflat/Number/102405/page/1#Post102405)
@@ -453,11 +457,12 @@ void GameLoop(void)
 		if( sleeptime > 0 )
 			Sleep(sleeptime);
 	}
-#endif
-if ( is_networked )
+	*/
+
+	if ( is_networked )
 	{
-	client_packet();
-	server_packet();
+		client_packet();
+		server_packet();
 	}
 	//DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"GameLoop done");
 }

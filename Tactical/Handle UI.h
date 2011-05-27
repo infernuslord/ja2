@@ -220,6 +220,20 @@ extern BOOLEAN		gTintBulletCounts;
 extern BOOLEAN		gfUIAutofireBulletCount;
 
 extern BOOLEAN		gfUICtHBar;
+// HEADROCK HAM 4: Now a STRUCT containing several variables for CTH display
+typedef struct
+{
+	UINT8 MuzzleSwayPercentage;
+	FLOAT ScopeMagFactor;
+	FLOAT ProjectionFactor;
+	FLOAT FinalMagFactor;
+	INT32 iShooterGridNo;
+	INT32 iTargetGridNo;
+	FLOAT dTargetZ;				// CellZ of target (not tile coordinates!)
+	BOOLEAN	fMaxAimReached;
+} CTHDISPLAY;
+
+extern CTHDISPLAY gCTHDisplay;
 // HEADROCK HAM B1/2: Multiple-bullet CTH bar array (replaces old single integer)
 extern UINT8		gbCtH[ 10 ];
 extern UINT8		gbCtHBurstCount;
@@ -355,6 +369,5 @@ void GetGridNoScreenXY( INT32 sGridNo, INT16 *pScreenX, INT16 *pScreenY );
 
 //Legion by Jazz
 void GetMercOknoDirection( UINT8 ubSoldierID, BOOLEAN *pfGoDown, BOOLEAN *pfGoUp );
-void GetMercFenceDirection( UINT8 ubSoldierID, BOOLEAN *pfGoDown, BOOLEAN *pfGoUp );
 
 #endif

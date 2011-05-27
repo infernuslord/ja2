@@ -37,6 +37,7 @@
 
 #include <vfs/Core/vfs.h>
 
+#include "Luaglobal.h"
 #ifdef JA2UB
 #include "strategicmap.h"
 #include "Map Screen Interface Map.h"
@@ -80,6 +81,7 @@ public:
 	}
 	void Shutdown()
 	{
+		stopVideo(); // if one is still "running"
 		if(_type & VT_SMK)
 		{
 			SmkShutdown();
@@ -113,7 +115,7 @@ public:
 		{
 			return false;
 		}
-		SGP_THROW(L"Invalid Video Player state!");
+		SGP_THROW(L"Invalid Video Player state : last video was not properly stopped ");
 	}
 	
 	void stopVideo()
@@ -134,6 +136,14 @@ public:
 	bool startVideo(std::string const& filename)
 	{
 		if(isPlaying())
+		{
+			return false;
+		}
+
+		// stop running video before starting a new one
+		stopVideo();
+
+		if(filename.empty())
 		{
 			return false;
 		}
@@ -298,38 +308,30 @@ UINT32	IntroScreenInit( void )
 {
 	//Set so next time we come in, we can set up
 	gfIntroScreenEntry = TRUE;
-/*	
-	char fileName[MAX_PATH];
-	
-		// Sender Name List by Jazz
-		strcpy(fileName, TABLEDATA_DIRECTORY);
-		strcat(fileName, INTROFILESFILENAME);
-		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-		THROWIFFALSE(ReadInIntroNames(fileName,FALSE), INTROFILESFILENAME);
-		
-*/
-	CIniReader inireader("IntroVideos2.ini");
-//	Style_JA					= inireader.ReadBoolean("VERSION","STYLE",TRUE);
-	
-	s_VFN[INTRO_REBEL_CRDT]					= inireader.ReadString("INTRO_BEGINNING","INTRO_REBEL_CRDT","INTRO\\Rebel_cr");
-	s_VFN[INTRO_OMERTA]						= inireader.ReadString("INTRO_BEGINNING","INTRO_OMERTA","INTRO\\Omerta");
-	s_VFN[INTRO_PRAGUE_CRDT]				= inireader.ReadString("INTRO_BEGINNING","INTRO_PRAGUE_CRDT","INTRO\\Prague_cr");
-	s_VFN[INTRO_PRAGUE]						= inireader.ReadString("INTRO_BEGINNING","INTRO_PRAGUE","INTRO\\Prague");
 
+	CIniReader inireader("IntroVideos.ini");
+	
+	// BF: If NO_DEFAULT_VALUES is set to true, then only the explicitely used videos will be shown.
+	BOOLEAN no_defaults                        = inireader.ReadBoolean("INTRO", "NO_DEFAULT_VALUES", false);
+
+	s_VFN[INTRO_REBEL_CRDT]					= inireader.ReadString("INTRO_BEGINNING", "INTRO_REBEL_CRDT",  no_defaults ? "" : "INTRO\\Rebel_cr");
+	s_VFN[INTRO_OMERTA]						= inireader.ReadString("INTRO_BEGINNING", "INTRO_OMERTA",      no_defaults ? "" : "INTRO\\Omerta");
+	s_VFN[INTRO_PRAGUE_CRDT]				= inireader.ReadString("INTRO_BEGINNING", "INTRO_PRAGUE_CRDT", no_defaults ? "" : "INTRO\\Prague_cr");
+	s_VFN[INTRO_PRAGUE]						= inireader.ReadString("INTRO_BEGINNING", "INTRO_PRAGUE",      no_defaults ? "" : "INTRO\\Prague");
 
 	//there are no more videos shown for the begining
-	s_VFN[INTRO_END_END_SPEECH_MIGUEL]		= inireader.ReadString("INTRO_ENDING","INTRO_END_END_SPEECH_MIGUEL","INTRO\\Throne_Mig");
-	s_VFN[INTRO_END_END_SPEECH_NO_MIGUEL]	= inireader.ReadString("INTRO_ENDING","INTRO_END_END_SPEECH_NO_MIGUEL","INTRO\\Throne_NoMig");
-	s_VFN[INTRO_END_HELI_FLYBY]				= inireader.ReadString("INTRO_ENDING","INTRO_END_HELI_FLYBY","INTRO\\Heli_FlyBy");
-	s_VFN[INTRO_END_SKYRIDER_HELICOPTER]	= inireader.ReadString("INTRO_ENDING","INTRO_END_SKYRIDER_HELICOPTER","INTRO\\Heli_Sky");
-	s_VFN[INTRO_END_NOSKYRIDER_HELICOPTER]	= inireader.ReadString("INTRO_ENDING","INTRO_END_NOSKYRIDER_HELICOPTER","INTRO\\Heli_NoSky");
+	s_VFN[INTRO_END_END_SPEECH_MIGUEL]		= inireader.ReadString("INTRO_ENDING","INTRO_END_END_SPEECH_MIGUEL",     no_defaults ? "" : "INTRO\\Throne_Mig");
+	s_VFN[INTRO_END_END_SPEECH_NO_MIGUEL]	= inireader.ReadString("INTRO_ENDING","INTRO_END_END_SPEECH_NO_MIGUEL",  no_defaults ? "" : "INTRO\\Throne_NoMig");
+	s_VFN[INTRO_END_HELI_FLYBY]				= inireader.ReadString("INTRO_ENDING","INTRO_END_HELI_FLYBY",            no_defaults ? "" : "INTRO\\Heli_FlyBy");
+	s_VFN[INTRO_END_SKYRIDER_HELICOPTER]	= inireader.ReadString("INTRO_ENDING","INTRO_END_SKYRIDER_HELICOPTER",   no_defaults ? "" : "INTRO\\Heli_Sky");
+	s_VFN[INTRO_END_NOSKYRIDER_HELICOPTER]	= inireader.ReadString("INTRO_ENDING","INTRO_END_NOSKYRIDER_HELICOPTER", no_defaults ? "" : "INTRO\\Heli_NoSky");
 
-	s_VFN[INTRO_SPLASH_SCREEN]				= inireader.ReadString("INTRO_SPLASH","INTRO_SPLASH_SCREEN","INTRO\\SplashScreen");
-	s_VFN[INTRO_SPLASH_1]						= inireader.ReadString("INTRO_SPLASH","INTRO_SPLASH","INTRO\\IPLYLogo");
-	
+	s_VFN[INTRO_SPLASH_SCREEN]				= inireader.ReadString("INTRO_SPLASH","INTRO_SPLASH_SCREEN",    no_defaults ? "" : "INTRO\\SplashScreen");
+	s_VFN[INTRO_SPLASH_1]			= inireader.ReadString("INTRO_SPLASH","INTRO_SPLASH_TALONSOFT", no_defaults ? "" : "INTRO\\IPLYLogo");
+
 	//UB
-	s_VFN[INTRO_HELI_CRASH_SCENE_1]		= inireader.ReadString("INTRO_BEGINNING","INTRO_HELI_CRASH_SCENE","INTRO\\Intro");
-	s_VFN[INTRO_END_SCENE_1]			= inireader.ReadString("INTRO_ENDING","INTRO_END_SCENE","INTRO\\MissileEnding");
+	s_VFN[INTRO_HELI_CRASH_SCENE_1]		= inireader.ReadString("INTRO_BEGINNING","INTRO_HELI_CRASH_SCENE",    no_defaults ? "" : "INTRO\\Intro");
+	s_VFN[INTRO_END_SCENE_1]			= inireader.ReadString("INTRO_ENDING","INTRO_END_SCENE",    no_defaults ? "" : "INTRO\\MissileEnding");
 	
 
 	//there are no more videos shown for the endgame
@@ -396,15 +398,6 @@ Test = 0;
 		return( TRUE );
 	}
 
-#ifndef USE_VFS
-	//if the library doesnt exist, exit
-	if( !IsLibraryOpened( LIBRARY_INTRO ) )
-	{
-		PrepareToExitIntroScreen();
-		return( TRUE );
-	}
-#endif
-
 	//initialize video player
 	s_VP.Initialize();
 
@@ -413,9 +406,6 @@ Test = 0;
 
 	if( iFirstVideoID != -1 )
 	{
-	
-		//Test = 1;
-		
 		StartPlayingIntroFlic( iFirstVideoID );
 
 		guiIntroExitScreen = INTRO_SCREEN;
@@ -441,6 +431,11 @@ void ExitIntroScreen()
 	s_VP.Shutdown();
 }
 
+void StopIntroVideo()
+{
+	s_VP.stopVideo();
+}
+
 void HandleIntroScreen()
 {
 	//if we are exiting this screen, this frame, dont update the screen
@@ -457,12 +452,7 @@ void HandleIntroScreen()
 
 		if( iNextVideoToPlay != -1 )
 		{
-		
-			//Test = 1;
-			
 			StartPlayingIntroFlic( iNextVideoToPlay );
-			
-			
 		}
 		else
 		{
@@ -514,6 +504,7 @@ void GetIntroScreenUserInput()
 			switch( Event.usParam )
 			{
 				case ESC:
+					s_VP.stopVideo();
 					PrepareToExitIntroScreen();
 					break;
 				case SPACE:
@@ -545,23 +536,11 @@ void GetIntroScreenUserInput()
 
 void PrepareToExitIntroScreen()
 {
-
-/*
-#if 0
-
-//Ja25: no begining intro
-	//if its the heli crash intro 
-	if( gbIntroScreenMode == INTRO_HELI_CRASH && Style_JA == TRUE )
-	{
-		//go to the init screen
-//Ja25: no longer going to initscreen ( cause this is now AFTER mapscreen )
-//		guiIntroExitScreen = INIT_SCREEN;
-
-		guiIntroExitScreen = GAME_SCREEN;
-		SetCurrentWorldSector( sSelMapX, sSelMapY, ( UINT8 )iCurrentMapSectorZ );
-	}
+#ifdef LUA_INTRO
+	LuaIntro(0, 0, 0, 0);
+#else
 	//if its the intro at the begining of the game
-	else if( gbIntroScreenMode == INTRO_BEGINNING && Style_JA == FALSE )
+	if( gbIntroScreenMode == INTRO_BEGINNING )
 	{
 		//go to the init screen
 		guiIntroExitScreen = INIT_SCREEN;
@@ -574,16 +553,6 @@ void PrepareToExitIntroScreen()
 		gfDoneWithSplashScreen = TRUE;
 		guiIntroExitScreen = INIT_SCREEN;
 	}
-	else if( gbIntroScreenMode == INTRO_ENDING && Style_JA == TRUE )
-	{
-		guiIntroExitScreen = GAME_SCREEN;
-		SetCurrentWorldSector( 16, 11, 0 );
-
-		EnterTacticalInFinalSector();
-
-		//Dont leave tactical
-		gfEnteringMapScreen = FALSE;
-	}
 	else
 	{
 		//We want to reinitialize the game
@@ -595,57 +564,22 @@ void PrepareToExitIntroScreen()
 
 	gfIntroScreenExit = TRUE;
 #endif
-*/
-
-LuaIntro(0, 0, 0, 0);
-
 }
 
 
 EGameVideos GetNextIntroVideo( EGameVideos uiCurrentVideo )
 {
 	EGameVideos iStringToUse = INTRO_NO_VIDEO;
-	
-/*
-#if 0
-if ( Style_JA == TRUE )
-{
-	//switch on whether it is the beginging or the end game video
-	switch( gbIntroScreenMode )
+#ifdef LUA_INTRO
+	switch( Test )
 	{
-		case INTRO_HELI_CRASH:
-			switch( uiCurrentVideo )
-			{
-				case INTRO_FIRST_VIDEO:
-					iStringToUse = INTRO_HELI_CRASH_SCENE_1;
-					break;
-			}
-			break;
-
-		//end game
-		case INTRO_ENDING:
-		{
-			switch( uiCurrentVideo )
-			{
-				case INTRO_FIRST_VIDEO:
-					iStringToUse = INTRO_END_SCENE_1;
-					break;
-			}
-		}
-		break;
-
-		case INTRO_SPLASH:
-				switch( uiCurrentVideo )
-			{
-				case INTRO_FIRST_VIDEO:
-				iStringToUse = INTRO_SPLASH_SCREEN;
-				break;
-			}				
+		case 0:
+		LuaIntro(1, uiCurrentVideo, 0, 0);
+		iStringToUse = (EGameVideos)iStringToUseLua;
+		//Test = 1;
 		break;
 	}
-	
-} else
-{
+#else
 	//switch on whether it is the beginging or the end game video
 	switch( gbIntroScreenMode )
 	{
@@ -722,23 +656,7 @@ if ( Style_JA == TRUE )
 			break;
 	}
 
-}
-
 #endif
-*/
-
-	switch( Test )
-	{
-		case 0:
-		LuaIntro(1, uiCurrentVideo, 0, 0);
-		iStringToUse = (EGameVideos)iStringToUseLua;
-		//Test = 1;
-		break;
-	}
-
-//LuaIntro(1, uiCurrentVideo, 0, 0);
-//iStringToUse = (EGameVideos)iStringToUseLua;
-
 	return( iStringToUse );
 }
 
@@ -767,13 +685,10 @@ void StartPlayingIntroFlic( EGameVideos iIndexOfFlicToPlay )
 
 void SetIntroType( INT8 bIntroType )
 {
-/*
-#if 0
-	if( bIntroType == INTRO_HELI_CRASH && Style_JA == TRUE )
-	{
-		gbIntroScreenMode = INTRO_HELI_CRASH;
-	}
-	else if( bIntroType == INTRO_BEGINNING && Style_JA == FALSE )
+#ifdef LUA_INTRO
+	LuaIntro(2, 0, bIntroType, 0);
+#else
+	if( bIntroType == INTRO_BEGINNING )
 	{
 		gbIntroScreenMode = INTRO_BEGINNING;
 	}
@@ -785,10 +700,7 @@ void SetIntroType( INT8 bIntroType )
 	{
 		gbIntroScreenMode = INTRO_SPLASH;
 	}
-	
 #endif
-*/
-LuaIntro(2, 0, bIntroType, 0);
 }
 
 
@@ -802,7 +714,7 @@ void DisplaySirtechSplashScreen()
 
 	VOBJECT_DESC VObjectDesc;
 	memset( &VObjectDesc, 0, sizeof( VOBJECT_DESC ) );
-	VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
+	VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE | VOBJECT_CREATE_FROMPNG_FALLBACK;
 	FilenameForBPP("INTERFACE\\SirtechSplash.sti", VObjectDesc.ImageFile);
 //	FilenameForBPP("INTERFACE\\TShold.sti", VObjectDesc.ImageFile);
 

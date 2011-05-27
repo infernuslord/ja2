@@ -18,6 +18,30 @@
 #define		HEAD_INV_SLOT_WIDTH				43
 #define		HEAD_INV_SLOT_HEIGHT			24
 
+#define		NUM_UDB_GEN_LINES	12
+#define		NUM_UDB_ADV_LINES	12
+ 
+// HEADROCK HAM 4: These rectangle definitions are used in UDB to determine locations for icons, data, and tooltip
+// regions. They replace the plethora of region data provided in EDB.
+typedef struct
+{
+	INT16 sLeft;
+	INT16 sTop;
+	INT16 sRight;
+	INT16 sBottom;
+} INV_DESC_REGIONS;
+
+extern INV_DESC_REGIONS gItemDescLBEBackground[4]; // Coordinates for displaying LBE background image
+extern INV_DESC_REGIONS gItemDescGenHeaderRegions[3]; // Header text regions for various parts of the General Tab
+extern INV_DESC_REGIONS gItemDescGenIndexRegions[3][4]; // Index text regions for various parts of the General Tab
+extern INV_DESC_REGIONS gItemDescGenRegions[NUM_UDB_GEN_LINES * 2][4]; // Data regions, 4 sub-columns each
+extern INV_DESC_REGIONS gItemDescGenSecondaryRegions[26]; // Secondary data regions, 3x5 for now (possible 3x6?)
+extern INV_DESC_REGIONS gItemDescTextRegions[7]; // Main description regions
+extern INV_DESC_REGIONS gItemDescAdvIndexRegions[1][4];
+extern INV_DESC_REGIONS gItemDescAdvRegions[NUM_UDB_ADV_LINES][4]; // Advanced data regions, 4 sub-columns each
+
+// ODB arrays
+extern INV_DESC_REGIONS gODBItemDescRegions[4][8]; // Four regions of eight sub-regions each.
 
 //CHRISL: moved from Interface Items.cpp
 typedef struct
@@ -83,13 +107,6 @@ extern INT16	ITEMDESC_NAME_X;
 extern INT16	ITEMDESC_NAME_Y;
 extern INT16	ITEMDESC_ITEM_X;
 extern INT16	ITEMDESC_ITEM_Y;
-extern INT16	ITEMDESC_DESC_START_X;
-extern INT16	ITEMDESC_DESC_START_Y;
-extern INT16	ITEMDESC_PROS_START_X;
-extern INT16	ITEMDESC_PROS_START_Y;
-extern INT16	ITEMDESC_CONS_START_X;
-extern INT16	ITEMDESC_CONS_START_Y;
-extern INT16	ITEMDESC_DESC_WIDTH;
 extern INT16	ITEMDESC_ITEM_STATUS_X;
 extern INT16	ITEMDESC_ITEM_STATUS_Y;
 extern INT16	ITEMDESC_ITEM_STATUS_HEIGHT;
@@ -191,11 +208,12 @@ BOOLEAN HandleCompatibleAmmoUI( SOLDIERTYPE *pSoldier, INT8 bInvPos, BOOLEAN fOn
 //											-	if == 1 will only dirty the name space and then set counter to 0
 //	Last parameter used mainly for when mouse is over item
 
+void RenderBulletIcon(OBJECTTYPE *pObject, UINT32 ubStatusIndex = 0);
 void INVRenderItem( UINT32 uiBuffer, SOLDIERTYPE * pSoldier, OBJECTTYPE	*pObject, INT16 sX, INT16 sY, INT16 sWidth, INT16 sHeight, UINT8 fDirtyLevel, UINT8 *pubHighlightCounter, UINT8 ubStatusIndex, BOOLEAN fOutline, INT16 sOutlineColor, UINT8 iter = 0 );
 // CHRISL: Add a new function that will be used to render a pocket silhouette
 void INVRenderSilhouette( UINT32 uiBugger, INT16 PocketIndex, INT16 SilIndex, INT16 sX, INT16 sY, INT16 sWideth, INT16 sHeight);
 // CHRISL: New function to handle display of inventory quantities based on item current in cursor
-void RenderPocketItemCapacity( UINT32 uiWhichBuffer, UINT8 pCapacity, INT16 bPos, SOLDIERTYPE *pSoldier, OBJECTTYPE *pObj, INT16 sX, INT16 sY );
+void RenderPocketItemCapacity( UINT32 uiWhichBuffer, INT8 pCapacity, INT16 bPos, SOLDIERTYPE *pSoldier, OBJECTTYPE *pObj, INT16 sX, INT16 sY );
 // CHRISL: New function to display items stored in an LBENODE
 void RenderLBENODEItems( OBJECTTYPE *pObj, int subObject );
 // CHRISL: New function to setup GSMInvData based on game options
@@ -240,6 +258,8 @@ void DeleteKeyRingPopup( );
 
 
 void ShutdownKeyRingInterface( void );
+void ShutdownInventoryInterface( void );
+
 BOOLEAN InKeyRingPopup( void );
 void BeginKeyRingItemPointer( SOLDIERTYPE *pSoldier, UINT8 ubKeyRingPosition );
 

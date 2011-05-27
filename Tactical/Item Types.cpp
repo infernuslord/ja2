@@ -20,7 +20,7 @@ int gLastLBEUniqueID = 0;
 
 extern UINT32			guiCurrentItemDescriptionScreen;
 extern BOOLEAN			fShowMapInventoryPool;
-extern BOOLEAN AutoPlaceObjectInInventoryStash( OBJECTTYPE *pItemPtr, INT32 sGridNo );
+//extern BOOLEAN AutoPlaceObjectInInventoryStash( OBJECTTYPE *pItemPtr, INT32 sGridNo );
 
 bool IsSlotAnLBESlot(int slot)
 {
@@ -205,7 +205,7 @@ BOOLEAN MoveItemsToActivePockets( SOLDIERTYPE *pSoldier, std::vector<INT8>& LBES
 					//DBrot: changed to bitwise comparison
 					UINT32 newPack = LoadBearingEquipment[Item[pObj->usItem].ubClassIndex].lbeCombo;
 					UINT32 chkPack = LoadBearingEquipment[Item[pSoldier->inv[i].usItem].ubClassIndex].lbeCombo;
-					if(newPack == 0 || (newPack & chkPack == 0))
+					if(newPack == 0 || (newPack & chkPack) == 0)
 						continue;
 				}
 				if(CanItemFitInPosition(pSoldier, &(pSoldier->inv[LBESlots[x]]), i, FALSE))
@@ -227,7 +227,8 @@ BOOLEAN MoveItemsToActivePockets( SOLDIERTYPE *pSoldier, std::vector<INT8>& LBES
 	{
 		if(pSoldier->inv[LBESlots[i]].exists() == false)	// No item in pocket
 			continue;
-		if(guiCurrentItemDescriptionScreen == MAP_SCREEN && fShowMapInventoryPool)
+		AutoPlaceObjectToWorld(pSoldier, &pSoldier->inv[LBESlots[i]]);
+		/*if(guiCurrentItemDescriptionScreen == MAP_SCREEN && fShowMapInventoryPool)
 		{
 			AutoPlaceObjectInInventoryStash(&pSoldier->inv[LBESlots[i]], pSoldier->sGridNo);
 		}
@@ -235,7 +236,7 @@ BOOLEAN MoveItemsToActivePockets( SOLDIERTYPE *pSoldier, std::vector<INT8>& LBES
 		{
 			AddItemToPool( pSoldier->sGridNo, &pSoldier->inv[LBESlots[i]], 1, pSoldier->pathing.bLevel, 0 , -1 );
 			NotifySoldiersToLookforItems( );
-		}
+		}*/
 		DeleteObj(&pSoldier->inv[LBESlots[i]]);
 	}
 
@@ -471,7 +472,10 @@ LBENODE* OBJECTTYPE::GetLBEPointer(unsigned int index)
 			}
 		}
 	}
-	return NULL;
+	//CHRISL: if the LBEArray is empty, we probably need to force the creation of an entry so that future functions don't crash.
+	//return NULL;
+	LBEArray.resize(1);
+	return &(*LBEArray.begin());
 }
 
 bool OBJECTTYPE::exists()
@@ -596,7 +600,7 @@ int OBJECTTYPE::ForceAddObjectsToStack(OBJECTTYPE& sourceObject, int howMany)
 		Assert(sourceObject.exists() == true);
 		usItem = sourceObject.usItem;
 		this->fFlags = sourceObject.fFlags;
-		this->usAttachmentSlotIndexVector = sourceObject.usAttachmentSlotIndexVector;
+		//this->usAttachmentSlotIndexVector = sourceObject.usAttachmentSlotIndexVector;
 	}
 	Assert(sourceObject.usItem == usItem);
 
@@ -650,7 +654,7 @@ int OBJECTTYPE::AddObjectsToStack(OBJECTTYPE& sourceObject, int howMany, SOLDIER
 		Assert(sourceObject.exists() == true);
 		usItem = sourceObject.usItem;
 		this->fFlags = sourceObject.fFlags;
-		this->usAttachmentSlotIndexVector = sourceObject.usAttachmentSlotIndexVector;
+		//this->usAttachmentSlotIndexVector = sourceObject.usAttachmentSlotIndexVector;
 	}
 	Assert(sourceObject.usItem == usItem);
 
@@ -788,7 +792,7 @@ bool OBJECTTYPE::RemoveObjectAtIndex(unsigned int index, OBJECTTYPE* destObject)
 		destObject->fFlags = fFlags;
 		//handles weight calc and ubNumber too
 		destObject->SpliceData((*this), 1, spliceIter);
-		destObject->usAttachmentSlotIndexVector = usAttachmentSlotIndexVector;
+		//destObject->usAttachmentSlotIndexVector = usAttachmentSlotIndexVector;
 	}
 	else {
 		objectStack.erase(spliceIter);
@@ -893,7 +897,7 @@ BOOLEAN StackedObjectData::RemoveAttachmentAtIndex(UINT8 index, attachmentList::
 	attachmentList::iterator iter = attachments.begin();
 	for (int x = 0; iter != attachments.end(); ++x, ++iter) {
 		if(x == index){
-			if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
+			if(UsingNewAttachmentSystem()==true){
 				OBJECTTYPE null;
 				iter = attachments.erase(iter);
 				if(returnIter){
@@ -917,7 +921,7 @@ BOOLEAN StackedObjectData::RemoveAttachmentAtIndex(UINT8 index, attachmentList::
 
 attachmentList::iterator StackedObjectData::RemoveAttachmentAtIter(attachmentList::iterator iter)
 {
-	if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
+	if(UsingNewAttachmentSystem()==true){
 		OBJECTTYPE null;
 		iter = attachments.erase(iter);
 		iter = attachments.insert(iter, null);
@@ -930,7 +934,7 @@ attachmentList::iterator StackedObjectData::RemoveAttachmentAtIter(attachmentLis
 
 BOOLEAN StackedObjectData::AddAttachmentAtIndex(UINT8 index, OBJECTTYPE Attachment)
 {
-	AssertMsg(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW, "Cannot use the AddAttachmentAtIndex function without NAS");
+	AssertMsg(UsingNewAttachmentSystem()==true, "Cannot use the AddAttachmentAtIndex function without NAS");
 
 	attachmentList::iterator iter = attachments.begin();
 	for (int x = 0; iter != attachments.end(); ++x, ++iter) {
@@ -1219,7 +1223,7 @@ OBJECTTYPE::OBJECTTYPE(const OBJECTTYPE& src)
 		this->fFlags = src.fFlags;
 		this->ubMission = src.ubMission;
 		this->objectStack = src.objectStack;
-		this->usAttachmentSlotIndexVector = src.usAttachmentSlotIndexVector;
+		//this->usAttachmentSlotIndexVector = src.usAttachmentSlotIndexVector;
 	}
 }
 
@@ -1234,7 +1238,7 @@ OBJECTTYPE& OBJECTTYPE::operator=(const OBJECTTYPE& src)
 		this->fFlags = src.fFlags;
 		this->ubMission = src.ubMission;
 		this->objectStack = src.objectStack;
-		this->usAttachmentSlotIndexVector = src.usAttachmentSlotIndexVector;
+		//this->usAttachmentSlotIndexVector = src.usAttachmentSlotIndexVector;
 	}
 	return *this;
 }
@@ -1341,6 +1345,14 @@ OBJECTTYPE& OBJECTTYPE::operator=(const OLD_OBJECTTYPE_101& src)
 			}
 		}
 
+		//CHRISL: Deal with NAS
+/*		if(UsingNewAttachmentSystem()==true){
+			for(int x = 0; x < max(ubNumberOfObjects, 1); ++x) {
+				std::vector<UINT16>	usAttachmentSlotIndexVector = GetItemSlots(this, x);
+				if((*this)[x]->attachments.size() != usAttachmentSlotIndexVector.size())
+					(*this)[x]->attachments.resize(usAttachmentSlotIndexVector.size());
+			}
+		}*/
 		RemoveProhibitedAttachments(NULL, this, this->usItem);
 		//just a precaution
 		//ADB ubWeight has been removed, see comments in OBJECTTYPE

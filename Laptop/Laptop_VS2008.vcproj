@@ -884,6 +884,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\XML_Email.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\XML_EmailMercAvailable.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\XML_EmailMercLevelUp.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\XML_IMPPortraits.cpp"
 				>
 			</File>

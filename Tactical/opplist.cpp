@@ -2893,7 +2893,7 @@ void RemoveOneOpponent(SOLDIERTYPE *pSoldier)
  {
 	DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("Oppcnt for %d (%s) tried to go below 0", pSoldier->ubID, pSoldier->name ) );
 	#ifdef JA2BETAVERSION
-		ScreenMsg( MSG_FONT_YELLOW, MSG_UI_FEEDBACK,	L"Opponent counter dropped below 0 for person %d (%s).	Please inform Sir-tech of this, and what has just been happening in the game.", pSoldier->ubID, pSoldier->name );
+		ScreenMsg( MSG_FONT_YELLOW, MSG_UI_FEEDBACK,	L"Opponent counter dropped below 0 for person %d (%s). Please inform Sir-tech of this, and what has just been happening in the game.", pSoldier->ubID, pSoldier->name );
 	#endif
 	pSoldier->aiData.bOppCnt = 0;
  }
@@ -3506,7 +3506,7 @@ void OurTeamSeesSomeone( SOLDIERTYPE * pSoldier, INT8 bNumReRevealed, INT8 bNumN
 	if ( ( gTacticalStatus.uiFlags & INCOMBAT ) )
 	{
 		// If we are NOT in any music mode...
-		if ( gubMusicMode == MUSIC_NONE )
+		if ( GetMusicMode() == MUSIC_NONE )
 		{
 			SetMusicMode( MUSIC_TACTICAL_BATTLE );
 		}
@@ -5784,7 +5784,8 @@ void ProcessNoise(UINT8 ubNoiseMaker, INT32 sGridNo, INT8 bLevel, UINT8 ubTerrTy
 				if (pSoldier->aiData.bOppList[ubNoiseMaker] == SEEN_CURRENTLY)
 				{
 					// civilians care about gunshots even if they come from someone they can see
-					if ( !( pSoldier->aiData.bNeutral && ubNoiseType == NOISE_GUNFIRE ) )
+					// ChrisL: Crows will fly away if they hear any noise
+					if ( !( pSoldier->aiData.bNeutral && ubNoiseType == NOISE_GUNFIRE ) && pSoldier->ubBodyType != CROW )
 					{
 						continue;		// then who cares whether he can also hear the guy?
 					}
@@ -5806,9 +5807,18 @@ void ProcessNoise(UINT8 ubNoiseMaker, INT32 sGridNo, INT8 bLevel, UINT8 ubTerrTy
 							case WARDEN:
 							case GENERAL:
 							case SERGEANT:
-							case CONRAD:
-								// ignore soldier team
-								continue;
+							case CONRAD:	
+								// WANNE: This fixes the bug, that Conrad, when he is in OUR team, cannot interrupt enemies!!!
+								if (pSoldier->bTeam == OUR_TEAM)
+								{
+									// WANNE: Allow interrupt, if one of those guys is in OUR team!
+									break;
+								}
+								else
+								{
+									// No interrupt for those 4 guys
+									continue;
+								}
 							default:
 								break;
 						}
@@ -6977,7 +6987,8 @@ void RecalculateOppCntsDueToNoLongerNeutral( SOLDIERTYPE * pSoldier )
 				if ( pOpponent->aiData.bOppList[pSoldier->ubID] == SEEN_CURRENTLY )
 				{
 					// have to add to opponent's oppcount as well since we just became non-neutral
-					AddOneOpponent( pOpponent );
+					//CHRISL: If we do this, Bloodcats get counted at opponents multiple times and never get removed from the OppCnt variable.
+					//AddOneOpponent( pOpponent );
 				}
 			}
 		}

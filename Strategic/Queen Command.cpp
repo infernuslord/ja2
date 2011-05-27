@@ -260,6 +260,7 @@ UINT8 NumEnemiesInSector( INT16 sSectorX, INT16 sSectorY )
 UINT8 NumStationaryEnemiesInSector( INT16 sSectorX, INT16 sSectorY )
 {
 	SECTORINFO *pSector;
+
 	AssertGE( sSectorX, MINIMUM_VALID_X_COORDINATE);
 	AssertLE( sSectorX, MAXIMUM_VALID_X_COORDINATE );
 	AssertGE( sSectorY, MINIMUM_VALID_Y_COORDINATE);
@@ -271,9 +272,9 @@ UINT8 NumStationaryEnemiesInSector( INT16 sSectorX, INT16 sSectorY )
 		return( 0 );
 	}
 
- Ensure_RepairedGarrisonGroup( &gGarrisonGroup, &giGarrisonArraySize );	 /* added NULL fix, 2007-03-03, Sgt. Kolja */
+	Ensure_RepairedGarrisonGroup( &gGarrisonGroup, &giGarrisonArraySize );	 /* added NULL fix, 2007-03-03, Sgt. Kolja */
 
-  // don't count roadblocks as stationary garrison, we want to see how many enemies are in them, not question marks
+	// don't count roadblocks as stationary garrison, we want to see how many enemies are in them, not question marks
 	if ( gGarrisonGroup[ pSector->ubGarrisonID ].ubComposition == ROADBLOCK )
 	{
 		// pretend they're not stationary
@@ -575,7 +576,7 @@ BOOLEAN PrepareEnemyForSectorBattle()
 	pSector = &SectorInfo[ SECTOR( gWorldSectorX, gWorldSectorY ) ];
 
 	// OJW - 20090403 - override max ai in co-op
-	if (is_networked && is_server && OVERRIDE_MAX_AI == 1)
+	if (is_networked && is_server && gMaxEnemiesEnabled == 1)
 	{
 		float totalEnemies = (float)(pSector->ubNumAdmins + pSector->ubNumTroops + pSector->ubNumElites);
 		ubTotalAdmins = (unsigned int)(((float)pSector->ubNumAdmins / totalEnemies) * mapMaximumNumberOfEnemies);
@@ -1364,7 +1365,7 @@ void AddPossiblePendingEnemiesToBattle()
 	// haydent
 	if (is_networked)
 	{
-		if ((is_client && !is_server) || ENEMY_ENABLED==0)
+		if ((is_client && !is_server) || gEnemyEnabled == 0)
 		{
 			return;
 		}
@@ -1970,11 +1971,10 @@ void EndCaptureSequence( )
 void EnemyCapturesPlayerSoldier( SOLDIERTYPE *pSoldier )
 {
 	UINT32					i;
-  BOOLEAN       fMadeCorpse;
-  INT32         iNumEnemiesInSector;
+	BOOLEAN       fMadeCorpse;
+	INT32         iNumEnemiesInSector;
 
-
-// TODO.WANNE: Hardcoded grid number
+	// TODO.WANNE: Hardcoded grid number
 	static INT32 sAlmaCaptureGridNos[] = { 9208, 9688, 9215 }; //dnl!!!
 	static INT32 sAlmaCaptureItemsGridNo[] = { 12246, 12406, 13046 }; //dnl!!!
 
@@ -1982,19 +1982,18 @@ void EnemyCapturesPlayerSoldier( SOLDIERTYPE *pSoldier )
 
 	AssertNotNIL(pSoldier);
 
-
-  // ATE: Check first if ! in player captured sequence already
+	// ATE: Check first if ! in player captured sequence already
 	// CJC Dec 1 2002: fixing multiple captures
 	if ( ( gStrategicStatus.uiFlags & STRATEGIC_PLAYER_CAPTURED_FOR_RESCUE ) && (gStrategicStatus.uiFlags & STRATEGIC_PLAYER_CAPTURED_FOR_ESCAPE) )
-  {
-    return;
-  }
+	{
+		return;
+	}
 
-  // ATE: If maximum prisoners captured, return!
-  if ( gStrategicStatus.ubNumCapturedForRescue > 3 )
-  {
-    return;
-  }
+	// ATE: If maximum prisoners captured, return!
+	if ( gStrategicStatus.ubNumCapturedForRescue > 3 )
+	{
+	return;
+	}
 
 
   // If this is an EPC , just kill them...

@@ -37,8 +37,6 @@
 class OBJECTTYPE;
 class SOLDIERTYPE;
 
-//extern	BOOLEAN		gfFirstTimeInGameHeliCrash; //JA25 UB
-
 // Adds a soldier to a world gridno and set's direction
 void AddSoldierToSectorGridNo( SOLDIERTYPE *pSoldier, INT32 sGridNo, UINT8 ubDirection, BOOLEAN fUseAnimation, UINT16 usAnimState, UINT16 usAnimCode );
 

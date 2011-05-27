@@ -5,6 +5,29 @@
 #include "Soldier Profile Type.h"
 #include "Merc Hiring.h"
 
+typedef struct
+{
+	UINT16 uiIndex;
+	BOOLEAN Enabled;
+	INT8 BaseAttribute;
+	INT8 ExpLevel;
+	BOOLEAN RandomLife;
+	BOOLEAN RandomAgility;
+	BOOLEAN RandomLeadership;
+	BOOLEAN RandomDexterity;
+	BOOLEAN RandomWisdom;
+	BOOLEAN RandomMarksmanship;
+	BOOLEAN RandomMedical;
+	BOOLEAN RandomMechanical;
+	BOOLEAN RandomExplosive;
+	BOOLEAN RandomScientific;
+	BOOLEAN RandomStrength;
+
+} RANDOM_STATS_VALUES;
+
+extern RANDOM_STATS_VALUES gRandomStatsValue[NUM_PROFILES];
+extern void RandomStats ();
+
 extern INT8 gbSkillTraitBonus[NUM_SKILLTRAITS_OT];
 extern UINT8 gubTerrorists[];
 extern INT16 gsTerroristSector[][5][2];
@@ -224,7 +247,6 @@ enum NPCIDs
 	NPC169,
 #endif	
 	NPC170 = NPC169 + 84,
-
 } ;
 
 BOOLEAN LoadMercProfiles(void);

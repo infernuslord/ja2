@@ -807,7 +807,7 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 			break;
 			/*
 		case FACT_SKYRIDER_CLOSE_TO_CHOPPER:
-			SetUpHelicopterForPlayer( 13, MAP_ROW_B );
+			SetUpHelicopterForPlayer( 13, MAP_ROW_B , SKYRIDER );
 			break;
 			*/
 		case FACT_SPIKE_AT_DOOR:
@@ -1161,6 +1161,10 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 			gubFact[usFact] = ItemTypeExistsAtLocation( 10472, ROCKET_RIFLE, 0, NULL );
 			break;
 
+		case FACT_PABLO_ALIVE:
+			gubFact[usFact] = gMercProfiles[ PABLO ].bMercStatus != MERC_IS_DEAD;
+			break;
+
 		case FACT_DOREEN_ALIVE:
 			gubFact[usFact] = gMercProfiles[ DOREEN ].bMercStatus != MERC_IS_DEAD;
 			break;
@@ -1431,13 +1435,13 @@ void InternalEndQuest( UINT8 ubQuest, INT16 sSectorX, INT16 sSectorY, BOOLEAN fU
 		//Remeber that we should send email in the next sector
 		gJa25SaveStruct.fSendEmail_10_NextSector = TRUE;
 
-		AddEmail( EMAIL_PILOTMISSING, EMAIL_PILOTMISSING_LENGTH, MAIL_ENRICO,  GetWorldTotalMin() ,-1);
-		AddEmail( EMAIL_MAKECONTACT, EMAIL_MAKECONTACT_LENGTH, MAIL_ENRICO,  GetWorldTotalMin() ,-1);
+		AddEmail( EMAIL_PILOTMISSING, EMAIL_PILOTMISSING_LENGTH, MAIL_ENRICO,  GetWorldTotalMin() ,-1,-1, TYPE_EMAIL_EMAIL_EDT);
+		AddEmail( EMAIL_MAKECONTACT, EMAIL_MAKECONTACT_LENGTH, MAIL_ENRICO,  GetWorldTotalMin() ,-1,-1, TYPE_EMAIL_EMAIL_EDT);
 
 		//Merc and Aim emails
-		AddEmail( EMAIL_AIM_PROMOTION_1, EMAIL_AIM_PROMOTION_1_LENGTH, AIM_SITE,  GetWorldTotalMin(),-1 );
-		AddEmail( EMAIL_MERC_PROMOTION_1, EMAIL_MERC_PROMOTION_1_LENGTH, SPECK_FROM_MERC,  GetWorldTotalMin(),-1);
-		AddEmail( EMAIL_AIM_PROMOTION_2, EMAIL_AIM_PROMOTION_2_LENGTH, AIM_SITE,  GetWorldTotalMin(),-1 );
+		AddEmail( EMAIL_AIM_PROMOTION_1, EMAIL_AIM_PROMOTION_1_LENGTH, AIM_SITE,  GetWorldTotalMin(),-1 ,-1, TYPE_EMAIL_EMAIL_EDT);
+		AddEmail( EMAIL_MERC_PROMOTION_1, EMAIL_MERC_PROMOTION_1_LENGTH, SPECK_FROM_MERC,  GetWorldTotalMin(),-1,-1, TYPE_EMAIL_EMAIL_EDT);
+		AddEmail( EMAIL_AIM_PROMOTION_2, EMAIL_AIM_PROMOTION_2_LENGTH, AIM_SITE,  GetWorldTotalMin(),-1 ,-1, TYPE_EMAIL_EMAIL_EDT);
 
 		//Manuel
 		{
@@ -1448,7 +1452,7 @@ void InternalEndQuest( UINT8 ubQuest, INT16 sSectorX, INT16 sSectorY, BOOLEAN fU
 			if( pSoldier != NULL )
 			{
 				//Add the Manuel email
-				AddEmail( EMAIL_MANUEL, EMAIL_MANUEL_LENGTH, MAIL_ENRICO,  GetWorldTotalMin() ,-1);
+				AddEmail( EMAIL_MANUEL, EMAIL_MANUEL_LENGTH, MAIL_ENRICO,  GetWorldTotalMin() ,-1, -1, TYPE_EMAIL_EMAIL_EDT);
 			}
 		}
 
@@ -1458,7 +1462,7 @@ void InternalEndQuest( UINT8 ubQuest, INT16 sSectorX, INT16 sSectorY, BOOLEAN fU
 			if( gubFact[ FACT_PLAYER_IMPORTED_SAVE_MIGUEL_DEAD ] == FALSE )
 			{
 				//Add the miguel email
-				AddEmail( EMAIL_MIGUELHELLO, EMAIL_MIGUELHELLO_LENGTH, MAIL_MIGUEL,  GetWorldTotalMin(),-1 );
+				AddEmail( EMAIL_MIGUELHELLO, EMAIL_MIGUELHELLO_LENGTH, MAIL_MIGUEL,  GetWorldTotalMin(),-1, -1, TYPE_EMAIL_EMAIL_EDT);
 			}
 		}
 

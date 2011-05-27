@@ -460,10 +460,17 @@ INT32 AddItemToWorld( INT32 sGridNo, OBJECTTYPE *pObject, UINT8 ubLevel, UINT16 
 			// OJW - 20091002 - Explosives
 			if (is_networked && is_client)
 			{
-				if (soldierID == -1)
-					soldierID = gWorldItems[ iItemIndex ].object[0]->data.misc.ubBombOwner - 2; // undo the hack
+				SOLDIERTYPE* pSoldier = NULL;
 
-				SOLDIERTYPE* pSoldier = MercPtrs[ soldierID ];
+				if (soldierID == -1)
+				{
+					if (gWorldItems[ iItemIndex ].object[0]->data.misc.ubBombOwner > 1)
+					{
+						soldierID = gWorldItems[ iItemIndex ].object[0]->data.misc.ubBombOwner - 2; // undo the hack
+						pSoldier = MercPtrs[ soldierID ];
+					}
+				}
+
 				if (pSoldier != NULL)
 				{
 					// if soldier is on our team, or is AI and we are the server
@@ -597,13 +604,7 @@ void LoadWorldItemsFromMap( INT8 **hBuffer, float dMajorMapVersion, int ubMinorM
 				{ //no match, so don't add item to world
 					continue;
 				}
-/*				
-			
-				if ( Item[ dummyItem.object.usItem ].newinv == TRUE && gGameOptions.ubInventorySystem == INVENTORY_OLD && gGameOptions.ubInventorySystem == INVENTORY_OLD && gGameOptions.ubAttachmentSystem == ATTACHMENT_OLD )
-				{
-				RemoveItemFromPool( dummyItem.sGridNo, i, dummyItem.ubLevel );
-				}
-	
+/*
 				if ( !gGameOptions.fGunNut )
 				{
 					UINT16	usReplacement;

@@ -17,7 +17,11 @@
 	#include "render dirty.h"
 #endif
 #include "Strategic Movement.h"
+#include "UndergroundInit.h"
 #include <string>
+
+extern HVSURFACE ghFrameBuffer;
+extern BOOLEAN gfSchedulesHosed;
 
 #ifdef JA2UB
 	#include "Ja25_Tactical.h"
@@ -27,9 +31,7 @@ UINT8 gubLastLoadingScreenID = LOADINGSCREEN_NOTHING;
 BOOLEAN bShowSmallImage = FALSE;
 SECTOR_LOADSCREENS gSectorLoadscreens[MAX_SECTOR_LOADSCREENS];
 
-extern HVSURFACE ghFrameBuffer;
-extern BOOLEAN gfSchedulesHosed;
-
+static INT16 requestedX, requestedY, requestedZ;
 static STR8 szSector;
 static STR8 szSectorMap[MAP_WORLD_Y][MAP_WORLD_X] =	{
 	{"N",	"N" ,"N" ,"N" ,"N" ,"N" ,"N" ,"N" ,"N" ,"N" , "N" , "N" , "N" , "N" , "N" , "N" , "N"	,"N"},
@@ -114,28 +116,36 @@ UINT8 GetLoadScreenID(INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ)
 	const UINT8 ubSectorID = SECTOR( sSectorX, sSectorY );
 	const BOOLEAN fNight = NightTime(); //before 5AM or after 9PM
 
-	// Which map layer? (ground, basement 1-3)?
-	switch( bSectorZ )
+	requestedX = sSectorX; requestedY = sSectorY; requestedZ = bSectorZ;
+
+	/* User made system - BEGIN */
+	if (gGameExternalOptions.gfUseExternalLoadscreens)
 	{
-		// Ground
-		case 0:
+		if (bSectorZ != 0)
+		{
+			szSector = szSectorMap [sSectorY][sSectorX]; // not really necessary, I guess
+			return UNDERGROUND;
+		}
 
-			/* User made system - BEGIN */
-			if (gGameExternalOptions.gfUseExternalLoadscreens)
-			{
-				switch( ubSectorID )
-				{
-					case SEC_A9:
-						szSector = "A9";
-						return DidGameJustStart() ? HELI : (fNight ? NIGHT : DAY);
-					default:
-						szSector = szSectorMap [sSectorY][sSectorX];
-						return fNight ? NIGHT : DAY;
-				}
-			} /* WANNE: User made System - END */
+		switch( ubSectorID )
+		{
+			case SEC_A9:
+				szSector = "A9";
+				return DidGameJustStart() ? HELI : (fNight ? NIGHT : DAY);
+			default:
+				szSector = szSectorMap [sSectorY][sSectorX];
+				return fNight ? NIGHT : DAY;
+		}
+	} /* WANNE: User made System - END */
 
-			/* WANNE: Sir-Tech System - BEGIN */
-			else
+	/* WANNE: Sir-Tech System - BEGIN */
+	else
+	{
+		// Which map layer? (ground, basement 1-3)?
+		switch( bSectorZ )
+		{
+			// Ground
+			case 0:
 			{
 				switch( ubSectorID )
 				{
@@ -299,31 +309,33 @@ UINT8 GetLoadScreenID(INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ)
    default:
    */
 #else
-		// Basement Level 1
-		case 1:
-			switch( ubSectorID )
-			{
-				case SEC_A10:	//Miguel's basement
-				case SEC_I13:	//Alma prison dungeon
-				case SEC_J9:	//Tixa prison dungeon
-				case SEC_K4:	//Orta weapons plant
-				case SEC_O3:	//Meduna
-				case SEC_P3:	//Meduna
-					return LOADINGSCREEN_BASEMENT;
-				default:		//rest are mines
-					return LOADINGSCREEN_MINE;
-			}
-		// Basement Level 2 and 3
-		case 2:
-		case 3:
-			//all level 2 and 3 maps are caves!
-			return LOADINGSCREEN_CAVE;
-		default:
-#endif		
-			// shouldn't ever happen
-			Assert( FALSE );
-			return fNight ? LOADINGSCREEN_NIGHTGENERIC : LOADINGSCREEN_DAYGENERIC;
-	}
+			// Basement Level 1
+			case 1:
+				switch( ubSectorID )
+				{
+					case SEC_A10:	//Miguel's basement
+					case SEC_I13:	//Alma prison dungeon
+					case SEC_J9:	//Tixa prison dungeon
+					case SEC_K4:	//Orta weapons plant
+					case SEC_O3:	//Meduna
+					case SEC_P3:	//Meduna
+						return LOADINGSCREEN_BASEMENT;
+					default:		//rest are mines
+						return LOADINGSCREEN_MINE;
+				}
+			// Basement Level 2 and 3
+			case 2:
+			case 3:
+				//all level 2 and 3 maps are caves!
+				return LOADINGSCREEN_CAVE;
+			default:
+#endif
+				// shouldn't ever happen
+				Assert( FALSE );
+				return fNight ? LOADINGSCREEN_NIGHTGENERIC : LOADINGSCREEN_DAYGENERIC;
+		}
+	
+	} /* WANNE: Sir-Tech System - END */
 }
 
 static void BuildLoadscreenFilename(std::string& dst, const char* path, int resolution, const char* ext)
@@ -334,19 +346,22 @@ static void BuildLoadscreenFilename(std::string& dst, const char* path, int reso
 	switch (resolution)
 	{
 		case 1:
-			dst.append("_800x600.");
+			dst.append("_800x600");
 			break;
 		case 2:
-			dst.append("_1024x768.");
+			dst.append("_1024x768");
 			break;
 		default:
-			dst.append(".");
 			break;
 	}
 
 	if (ext)
+	{
+		dst.append(".");
 		dst.append(ext);
+	}
 	else
+		// This might suck later on. If it does, remove it.
 		dst.append(".sti");
 }
 
@@ -359,27 +374,32 @@ void DisplayLoadScreenWithID( UINT8 ubLoadScreenID )
 	UINT32				uiLoadScreen;
 	STRING512			smallImage = {0};
 	
-	STRING512 xName;
-	char szFullImagePath[80];
+//	STRING512 xName;
+//	char szFullImagePath[80];
 	STRING512			sImage = {0};
 
 	bShowSmallImage = FALSE;
 
-	vs_desc.fCreateFlags = VSURFACE_CREATE_FROMFILE | VSURFACE_SYSTEM_MEM_USAGE;
+	vs_desc.fCreateFlags = VSURFACE_CREATE_FROMFILE | VSURFACE_SYSTEM_MEM_USAGE | VSURFACE_CREATE_FROMPNG_FALLBACK;
 
-	const BOOLEAN fExternalLS = (DAY <= ubLoadScreenID && ubLoadScreenID <= NIGHT_ALT) && (szSector != NULL);
+	const BOOLEAN fExternalLS = (szSector != NULL) && ((DAY <= ubLoadScreenID && ubLoadScreenID <= NIGHT_ALT) || (ubLoadScreenID == UNDERGROUND));
+								
 
 	if (fExternalLS)
 	{
 		// Get the image path
-		const char * imagePath;
-		const char * imageFormat;
+		std::string imagePath;
+		std::string imageFormat;
 
 		// Start screen
 		if (ubLoadScreenID == HELI)
 		{
 			imagePath = gSectorLoadscreens[0].szDay;
 			imageFormat = gSectorLoadscreens[0].szImageFormat;
+		}
+		else if (ubLoadScreenID == UNDERGROUND)
+		{
+			g_luaUnderground.GetLoadscreen(requestedX, requestedY, requestedZ, imagePath, imageFormat);
 		}
 		else
 		{
@@ -410,7 +430,7 @@ void DisplayLoadScreenWithID( UINT8 ubLoadScreenID )
 					switch (ubLoadScreenID)
 					{
 						case DAY:
-							imagePath = gSectorLoadscreens[i].szDay;	
+							imagePath = gSectorLoadscreens[i].szDay;
 							break;
 						case DAY_ALT:
 							imagePath = gSectorLoadscreens[i].szDayAlt;
@@ -419,23 +439,23 @@ void DisplayLoadScreenWithID( UINT8 ubLoadScreenID )
 							imagePath = gSectorLoadscreens[i].szNight;
 							break;
 						case NIGHT_ALT:
-							imagePath = gSectorLoadscreens[i].szNightAlt;
+							imagePath = gSectorLoadscreens[i].szNight;
 							break;
 					}
 					break;
 				}
 			}
 		}
-	
+
 		// Small image: 640x480
 		std::string strSmallImage;
-		BuildLoadscreenFilename(strSmallImage, imagePath, 0, imageFormat);
+		BuildLoadscreenFilename(strSmallImage, imagePath.c_str(), 0, imageFormat.c_str());
 		strSmallImage.copy(smallImage, sizeof(smallImage)-1);
 
 		// Actual image, depending on the resolution
 		std::string strBigImage;
-		BuildLoadscreenFilename(strBigImage, imagePath, iResolution, imageFormat);
-		strBigImage.copy(vs_desc.ImageFile, sizeof(vs_desc.ImageFile)-1);		
+		BuildLoadscreenFilename(strBigImage, imagePath.c_str(), iResolution, imageFormat.c_str());
+		strBigImage.copy(vs_desc.ImageFile, sizeof(vs_desc.ImageFile)-1);
 		
 		
 		if ( !FileExists(vs_desc.ImageFile) )
@@ -443,15 +463,14 @@ void DisplayLoadScreenWithID( UINT8 ubLoadScreenID )
 			// Small image: 640x480
 		std::string strSmallImage("LOADSCREENS\\");
 		std::string strBigImage("LOADSCREENS\\");
-		BuildLoadscreenFilename(strSmallImage, LoadScreenNames[1], 0, imageFormat);
+		BuildLoadscreenFilename(strSmallImage, LoadScreenNames[1], 0, imageFormat.c_str());
 		strSmallImage.copy(smallImage, sizeof(smallImage)-1);
 
 		// Actual image, depending on the resolution
-		BuildLoadscreenFilename(strBigImage, LoadScreenNames[1], iResolution, imageFormat);
+		BuildLoadscreenFilename(strBigImage, LoadScreenNames[1], iResolution, imageFormat.c_str());
 		strBigImage.copy(vs_desc.ImageFile, sizeof(vs_desc.ImageFile)-1);		
 		
 		}
-		
 	}
 	else
 	{
@@ -487,7 +506,7 @@ void DisplayLoadScreenWithID( UINT8 ubLoadScreenID )
 	{
 		BOOLEAN fOk = FALSE;
 
-		if(AddVideoSurface(&vs_desc, &uiLoadScreen))
+		if(FileExists(vs_desc.ImageFile) && AddVideoSurface(&vs_desc, &uiLoadScreen))
 			fOk = TRUE;
 		else
 		{
@@ -496,7 +515,7 @@ void DisplayLoadScreenWithID( UINT8 ubLoadScreenID )
 			bShowSmallImage = TRUE;
 			strncpy(vs_desc.ImageFile, smallImage, sizeof(vs_desc.ImageFile)-1);
 
-			if (AddVideoSurface(&vs_desc, &uiLoadScreen))
+			if (FileExists(vs_desc.ImageFile) && AddVideoSurface(&vs_desc, &uiLoadScreen))
 				fOk = TRUE;
 		}
 

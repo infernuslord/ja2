@@ -93,7 +93,7 @@ class SOLDIERTYPE;
 #define		DIALOGUE_DEFAULT_SUBTITLE_WIDTH		200
 #define		TEXT_DELAY_MODIFIER			60
 
-
+SOUND_PROFILE_VALUES gSoundProfileValue[NUM_PROFILES];
 
 typedef struct
 {
@@ -1960,23 +1960,20 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 //					sprintf( zFileName,"NPC_SPEECH\\g_%03d_%03d.wav",ubCharacterNum,usQuoteNum );
 //				}
 //			#else
-
-				if ( gSoundProfileValue[ubCharacterNum].EnabledSound == TRUE )
+			if ( gSoundProfileValue[ubCharacterNum].EnabledSound == TRUE )
+			{
+				sprintf( zFileName,"NPC_SPEECH\\d_%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
+				if ( !FileExists( zFileName ) )
 				{
-					sprintf( zFileName,"NPC_SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
-					if ( !FileExists( zFileName ) )
-					{
-					sprintf( zFileName,"NPC_SPEECH\\%03d_%03d.wav",ubCharacterNum,usQuoteNum );
-					}
-				
+					sprintf( zFileName,"NPC_SPEECH\\d_%03d_%03d.wav",ubCharacterNum,usQuoteNum );
 				}
-				
+			}
 //			#endif
 		}
 		else
 		{
 			// assume EDT files are in EDT directory on HARD DRIVE
-			sprintf( zFileName,"NPCDATA\\%03d.EDT", ubCharacterNum );
+			sprintf( zFileName,"NPCDATA\\d_%03d.EDT", ubCharacterNum );
 		}
 	}
 	//else if ( ubCharacterNum >= FIRST_RPC && ubCharacterNum < GASTON &&
@@ -2028,7 +2025,6 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 			//	if( ubCharacterNum >= FIRST_RPC && ubCharacterNum < GASTON && gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
 				//new profiles by Jazz
 				if ( ( gProfilesRPC[ubCharacterNum].ProfilId == ubCharacterNum || gProfilesNPC[ubCharacterNum].ProfilId == ubCharacterNum || gProfilesVehicle[ubCharacterNum].ProfilId == ubCharacterNum ) && gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )	
-
 				{
 //inshy: fix for UB-1.13 version only					sprintf( zFileName,"SPEECH\\r_%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
 				if ( gSoundProfileValue[ubCharacterNum].EnabledSound == TRUE )
@@ -2067,30 +2063,20 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 						}
 //</SB>
 					}
-					
-				}
+					}
 				}
 				else
 			#endif
-			{	// build name of wav file (characternum + quotenum)
-
+			{
 				if ( gSoundProfileValue[ubCharacterNum].EnabledSound == TRUE )
 				{
-                                     sprintf( zFileName,"SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
-				
-
-					if ( !FileExists( zFileName ) )
-					{
-#ifdef JA2UB
+				// build name of wav file (characternum + quotenum)
+				sprintf( zFileName,"SPEECH\\%03d_%03d.ogg",ubCharacterNum,usQuoteNum );
+				if ( !FileExists( zFileName ) )
+				{
 					sprintf( zFileName,"SPEECH\\%03d_%03d.wav",ubCharacterNum,usQuoteNum );
-#else
-					sprintf( zFileName,"SPEECH\\%03d_%03d.wav",ubCharacterNum,usQuoteNum );
-#endif
-					}
-				
 				}
-				
-				
+				}
 			}
 		}
 		else
@@ -2121,30 +2107,33 @@ BOOLEAN DialogueDataFileExistsForProfile( UINT8 ubCharacterNum, UINT16 usQuoteNu
 BOOLEAN GetDialogue( UINT8 ubCharacterNum, UINT16 usQuoteNum, UINT32 iDataSize, STR16 zDialogueText, UINT32 *puiSoundID, CHAR8 *zSoundString )
 {
 	STR8 pFilename;
+	BOOLEAN fTextAvailable = FALSE;
 
 	// first things first	- grab the text (if player has SUBTITLE PREFERENCE ON)
 	//if ( gGameSettings.fOptions[ TOPTION_SUBTITLES ] )
 	{
-			if ( DialogueDataFileExistsForProfile( ubCharacterNum, 0, FALSE, &pFilename ) )
-			{
-				LoadEncryptedDataFromFile( pFilename, zDialogueText, usQuoteNum * iDataSize, iDataSize );
-				if(zDialogueText[0] == 0)
+		if ( DialogueDataFileExistsForProfile( ubCharacterNum, 0, FALSE, &pFilename ) )
 		{
-					swprintf( zDialogueText, L"I have no text in the EDT file ( %d ) %S", usQuoteNum, pFilename );
+			LoadEncryptedDataFromFile( pFilename, zDialogueText, usQuoteNum * iDataSize, iDataSize );
+			if(zDialogueText[0] == 0)
+			{
+				swprintf( zDialogueText, L"I have no text in the EDT file ( %d ) %S", usQuoteNum, pFilename );
+
+#ifndef JA2BETAVERSION
+				return( FALSE );
+#endif
+			}
+			else
+				fTextAvailable = TRUE;
+		}
+		else
+		{
+			swprintf( zDialogueText, L"I have no text in the file ( %d ) %S", usQuoteNum , pFilename );
 
 #ifndef JA2BETAVERSION
 			return( FALSE );
 #endif
 		}
-			}
-			else
-			{
-				swprintf( zDialogueText, L"I have no text in the file ( %d ) %S", usQuoteNum , pFilename );
-
-#ifndef JA2BETAVERSION
-			return( FALSE );
-#endif
-			}
 	}
 
 
@@ -2164,23 +2153,24 @@ BOOLEAN GetDialogue( UINT8 ubCharacterNum, UINT16 usQuoteNum, UINT32 iDataSize, 
 		CHAR8 sString[512];
 
 		sprintf( sString, "ERROR: Missing file for character # %d, quote # %d", ubCharacterNum, usQuoteNum );
-	ShowCursor(TRUE);
-	ShowCursor(TRUE);
-	ShutdownWithErrorBox( sString );
+		ShowCursor(TRUE);
+		ShowCursor(TRUE);
+		ShutdownWithErrorBox( sString );
 	}
 */
 
 //#endif
+
+	*puiSoundID = NO_SAMPLE;
 
 	// get speech if applicable
 	if ( gGameSettings.fOptions[ TOPTION_SPEECH ] )
 	{
 		// Load it into memory!
 		*puiSoundID = SoundLoadSample(	pFilename );
-
 	}
 
- return(TRUE);
+	return (*puiSoundID != NO_SAMPLE) || fTextAvailable;
 }
 
 

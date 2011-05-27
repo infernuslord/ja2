@@ -39,7 +39,9 @@
 	#include "Facilities.h"
 #endif
 
+#include "Luaglobal.h"
 #include "LuaInitNPCs.h"
+#include "Interface.h"
 
 // the max loyalty rating for any given town
 #define MAX_LOYALTY_VALUE 100
@@ -709,6 +711,18 @@ void HandleMurderOfCivilian( SOLDIERTYPE *pSoldier, BOOLEAN fIntentional )
 	// if civilian belongs to a civilian group
 	if ( pSoldier->ubCivilianGroup != NON_CIV_GROUP )
 	{
+		//New Group by Jazz
+		for( iCounter2 = REBEL_CIV_GROUP; iCounter2 < NUM_CIV_GROUPS; iCounter2++ )	
+			{	
+				if (zCivGroupName[iCounter2].Loyalty == FALSE)
+					return;					
+			}
+	}
+	
+	/*
+	// if civilian belongs to a civilian group
+	if ( pSoldier->ubCivilianGroup != NON_CIV_GROUP )
+	{
 		// and it's one that is hostile to the player's cause
 		switch ( pSoldier->ubCivilianGroup )
 		{
@@ -728,7 +742,7 @@ void HandleMurderOfCivilian( SOLDIERTYPE *pSoldier, BOOLEAN fIntentional )
 		
 		
 	}
-
+	*/
 	// set killer team
 	bKillerTeam = Menptr[ pSoldier->ubAttackerID ].bTeam;
 
@@ -1618,8 +1632,7 @@ void DecrementTownLoyaltyEverywhere( UINT32 uiLoyaltyDecrease )
 }
 // this applies the change to every town differently, depending on the distance from the event
 void HandleGlobalLoyaltyEvent( UINT8 ubEventType, INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ)
-{
-//	INT32 iLoyaltyChange;
+{	
 	INT8 bTownId = 0;
 
 	if( bSectorZ == 0 )
@@ -1633,11 +1646,12 @@ void HandleGlobalLoyaltyEvent( UINT8 ubEventType, INT16 sSectorX, INT16 sSectorY
 	{
 		return;
 	}
-	
-	LuaHandleGlobalLoyaltyEvent( ubEventType, sSectorX, sSectorY, bSectorZ, 0 );
-	
+			
 	//move to lua scripts StrategicTownLoyalty.lua
-	#if 0
+#ifdef LUA_STRATEGY_TOWN_LOYALTY
+	LuaHandleGlobalLoyaltyEvent( ubEventType, sSectorX, sSectorY, bSectorZ, 0 );
+#else
+	INT32 iLoyaltyChange;
 
 	// determine what the base loyalty change of this event type is worth
 	// these are->hundredths<- of loyalty points, so choose appropriate values accordingly!
@@ -1696,7 +1710,7 @@ void HandleGlobalLoyaltyEvent( UINT8 ubEventType, INT16 sSectorX, INT16 sSectorY
 
 	AffectAllTownsLoyaltyByDistanceFrom( iLoyaltyChange, sSectorX, sSectorY, bSectorZ);
 	
-	#endif
+#endif
 }
 
 
@@ -1877,11 +1891,12 @@ void CheckIfEntireTownHasBeenLost( INT8 bTownId, INT16 sSectorX, INT16 sSectorY 
 
 void HandleLoyaltyChangeForNPCAction( UINT8 ubNPCProfileId )
 {
-
-	LetHandleLoyaltyChangeForNPCAction( ubNPCProfileId, 0 );
-
 	//move to lua scripts StrategicTownLoyalty.lua
-	#if 0
+
+#ifdef LUA_STRATEGY_TOWN_LOYALTY
+		LetHandleLoyaltyChangeForNPCAction( ubNPCProfileId, 0 );
+#else
+
 	switch ( ubNPCProfileId )
 	{
 		case MIGUEL:

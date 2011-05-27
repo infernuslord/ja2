@@ -45,6 +45,8 @@
 	#include "Interface.h"
 #endif
 
+#include "Animation Control.h"
+
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -955,7 +957,7 @@ BOOLEAN TurnSoldierIntoCorpse( SOLDIERTYPE *pSoldier, BOOLEAN fRemoveMerc, BOOLE
 							}
 						}
 
-						if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
+						if(UsingNewAttachmentSystem()==true){
 							ReduceAttachmentsOnGunForNonPlayerChars(pSoldier, pObj);
 						}
 					// HEADROCK HAM B2.8: Militia will drop items only if allowed.
@@ -1891,7 +1893,7 @@ void ReduceAmmoDroppedByNonPlayerSoldiers( SOLDIERTYPE *pSoldier, INT32 iInvSlot
 void ReduceAttachmentsOnGunForNonPlayerChars(SOLDIERTYPE *pSoldier, OBJECTTYPE * pObj){
 	
 	//Not meant for use in OAS.
-	Assert(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW);
+	Assert(UsingNewAttachmentSystem()==true);
 	
 	//OBJECTTYPE * pObj = &(pSoldier->inv[ invSlot ]);
 	

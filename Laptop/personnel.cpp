@@ -808,56 +808,58 @@ void RenderPersonnelStats( INT32 iId, INT32 iSlot )
 	}
 }
 
+// ID -> fortlaufende ID, und nicht die mercID
+// -> bei aktuellen Merc passt es
+// -> bei departed Merc wird die MercId anstatt der fortlaufenden ID übergeben!!
 void RenderPersonnelFace(INT32 iId, INT32 iSlot, BOOLEAN fDead, BOOLEAN fFired, BOOLEAN fOther )
 {
+	// Get the profile id (from profileId or slotId)
+	INT32 profileId = iId;
+	if (profileId == -1)
+	{
+		profileId = MercPtrs[iSlot]->ubProfile;
+	}
+
 	char sTemp[100];
 	HVOBJECT hFaceHandle;
 	VOBJECT_DESC	VObjectDesc;
 	// draw face to soldier iId in slot iSlot
 
+	// Currently active merc!
 	// special case?..player generated merc
-	if (fCurrentTeamMode) {
-		if( ( 50 < 	MercPtrs[iId]->ubProfile )&&( 57 > 	MercPtrs[iId]->ubProfile ) ) 
+	if (fCurrentTeamMode) 
+	{
+		if( ( 50 < 	profileId )&&( 57 > 	profileId ) ) 
 		{
-			sprintf( sTemp, "%s%03d.sti", FACES_DIR, 	gMercProfiles[ MercPtrs[iId]->ubProfile	].ubFaceIndex );
+			sprintf( sTemp, "%s%03d.sti", FACES_DIR, gMercProfiles[profileId].ubFaceIndex );
 		} 
 		else 
-		{
-			if (gGameExternalOptions.fReadProfileDataFromXML)
-			{
-				// HEADROCK PROFEX: Do not read direct profile number, instead, look inside the profile for a ubFaceIndex value.
-				sprintf(sTemp, "%s%02d.sti", FACES_DIR,	gMercProfiles[Menptr[ iId ].ubProfile].ubFaceIndex);
-			}
-			else
-			{
-				sprintf(sTemp, "%s%02d.sti", FACES_DIR,	Menptr[ iId ].ubProfile);
-			}
+		{			
+			sprintf(sTemp, "%s%02d.sti", FACES_DIR,	gMercProfiles[profileId].ubFaceIndex);			
 		}
 
-		if( MercPtrs[iId]->flags.uiStatusFlags & SOLDIER_VEHICLE ) {
+		// TODO: Check if needed!
+		if( MercPtrs[iSlot]->flags.uiStatusFlags & SOLDIER_VEHICLE ) 
+		{
 			return;
 		}
-	} else {
+	} 
+	// departed mercs
+	else 
+	{
 		//if this is not a valid merc
-		if( !fDead && !fFired && !fOther ) {
+		if( !fDead && !fFired && !fOther ) 
+		{
 			return;
 		}
 
-		if( ( 50 < 	iId )&&( 57 > 	iId ) ) 
+		if( ( 50 < profileId )&&( 57 > profileId ) ) 
 		{
-			sprintf( sTemp, "%s%03d.sti", FACES_DIR, 	gMercProfiles[ iId	].ubFaceIndex );
+			sprintf( sTemp, "%s%03d.sti", FACES_DIR, gMercProfiles[profileId].ubFaceIndex );
 		} 
 		else 
 		{
-			if (gGameExternalOptions.fReadProfileDataFromXML)
-			{
-				// HEADROCK PROFEX: Do not read direct profile number, instead, look inside the profile for a ubFaceIndex value.
-				sprintf(sTemp, "%s%02d.sti", FACES_DIR,	gMercProfiles[Menptr[ iId ].ubProfile].ubFaceIndex );
-			}
-			else
-			{
-				sprintf(sTemp, "%s%02d.sti", FACES_DIR,	iId );
-			}
+			sprintf(sTemp, "%s%02d.sti", FACES_DIR,	gMercProfiles[profileId].ubFaceIndex );			
 		}
 	}
 
@@ -868,34 +870,45 @@ void RenderPersonnelFace(INT32 iId, INT32 iSlot, BOOLEAN fDead, BOOLEAN fFired, 
 	//Blt face to screen to
 	GetVideoObject(&hFaceHandle, guiFACE);
 
-	if (fCurrentTeamMode) {
-		if( MercPtrs[iId]->stats.bLife <= 0 ) {
+	if (fCurrentTeamMode) 
+	{
+		if( MercPtrs[iSlot]->stats.bLife <= 0 ) 
+		{
 			hFaceHandle->pShades[ 0 ]		= Create16BPPPaletteShaded( hFaceHandle->pPaletteEntry, DEAD_MERC_COLOR_RED, DEAD_MERC_COLOR_GREEN, DEAD_MERC_COLOR_BLUE, TRUE );
 			//set the red pallete to the face
 			SetObjectHandleShade( guiFACE, 0 );
 		}
-	} else {
-		if (fDead == TRUE) {
+	} 
+	else 
+	{
+		if (fDead == TRUE)
+		{
 			hFaceHandle->pShades[ 0 ]		= Create16BPPPaletteShaded( hFaceHandle->pPaletteEntry, DEAD_MERC_COLOR_RED, DEAD_MERC_COLOR_GREEN, DEAD_MERC_COLOR_BLUE, TRUE );
 			//set the red pallete to the face
 			SetObjectHandleShade( guiFACE, 0 );
 		}
 	}
 
-	BltVideoObject(FRAME_BUFFER, hFaceHandle, 0,IMAGE_BOX_X+(iSlot*IMAGE_BOX_WIDTH), IMAGE_BOX_Y, VO_BLT_SRCTRANSPARENCY,NULL);
+	// TODO:Check
+	BltVideoObject(FRAME_BUFFER, hFaceHandle, 0,IMAGE_BOX_X, IMAGE_BOX_Y, VO_BLT_SRCTRANSPARENCY,NULL);
 
 	//if the merc is dead, display it
-	if (!fCurrentTeamMode) {
-		INT32 iHeightOfText = DisplayWrappedString(IMAGE_BOX_X, (UINT16)(IMAGE_BOX_Y+IMAGE_FULL_NAME_OFFSET_Y), IMAGE_NAME_WIDTH, 1, PERS_FONT, PERS_FONT_COLOR, gMercProfiles[ iId	].zName, 0, FALSE, CENTER_JUSTIFIED | DONT_DISPLAY_TEXT );
+	if (!fCurrentTeamMode)
+	{
+		INT32 iHeightOfText = DisplayWrappedString(IMAGE_BOX_X, (UINT16)(IMAGE_BOX_Y+IMAGE_FULL_NAME_OFFSET_Y), IMAGE_NAME_WIDTH, 1, PERS_FONT, PERS_FONT_COLOR, gMercProfiles[profileId].zName, 0, FALSE, CENTER_JUSTIFIED | DONT_DISPLAY_TEXT );
 
 		//if the string will rap
-		if( ( iHeightOfText - 2 ) > GetFontHeight( PERS_FONT ) ) {
+		if( ( iHeightOfText - 2 ) > GetFontHeight( PERS_FONT ) ) 
+		{
 			//raise where we display it, and rap it
-			DisplayWrappedString(IMAGE_BOX_X, (UINT16)(IMAGE_BOX_Y+IMAGE_FULL_NAME_OFFSET_Y - GetFontHeight( PERS_FONT )), IMAGE_NAME_WIDTH, 1, PERS_FONT, PERS_FONT_COLOR, gMercProfiles[ iId	].zName, 0, FALSE, CENTER_JUSTIFIED);
-		} else {
-			DrawTextToScreen( gMercProfiles[ iId	].zName, IMAGE_BOX_X, (UINT16)(IMAGE_BOX_Y+IMAGE_FULL_NAME_OFFSET_Y), IMAGE_NAME_WIDTH, PERS_FONT, PERS_FONT_COLOR, 0, FALSE, CENTER_JUSTIFIED );
+			DisplayWrappedString(IMAGE_BOX_X, (UINT16)(IMAGE_BOX_Y+IMAGE_FULL_NAME_OFFSET_Y - GetFontHeight( PERS_FONT )), IMAGE_NAME_WIDTH, 1, PERS_FONT, PERS_FONT_COLOR, gMercProfiles[profileId].zName, 0, FALSE, CENTER_JUSTIFIED);
+		} 
+		else 
+		{
+			DrawTextToScreen( gMercProfiles[profileId].zName, IMAGE_BOX_X, (UINT16)(IMAGE_BOX_Y+IMAGE_FULL_NAME_OFFSET_Y), IMAGE_NAME_WIDTH, PERS_FONT, PERS_FONT_COLOR, 0, FALSE, CENTER_JUSTIFIED );
 		}
 	}
+
 	DeleteVideoObjectFromIndex(guiFACE);
 }
 
@@ -1623,8 +1636,17 @@ void DisplayCharStats(INT32 iId, INT32 iSlot)
 		// Added by SANDRO
 		case 15:
 		// Character Trait
-			mprintf((INT16)(pPersonnelScreenPoints[23].x+(iSlot*TEXT_BOX_WIDTH)),(pPersonnelScreenPoints[23].y + 15),pPersonnelRecordsHelpTexts[43]); //L"Character:"
-			swprintf(sString, gzIMPCharacterTraitText[gMercProfiles[Menptr[iId].ubProfile].bCharacterTrait]);
+
+			// WANNE: With old trait system, display "Attitudes" instead of "Character"
+			if (gGameOptions.fNewTraitSystem)			
+				mprintf((INT16)(pPersonnelScreenPoints[23].x+(iSlot*TEXT_BOX_WIDTH)),(pPersonnelScreenPoints[23].y + 15),pPersonnelRecordsHelpTexts[43]); //L"Character:"
+			else
+				mprintf((INT16)(pPersonnelScreenPoints[23].x+(iSlot*TEXT_BOX_WIDTH)),(pPersonnelScreenPoints[23].y + 15),pPersonnelRecordsHelpTexts[45]); //L"Attitudes:"
+
+			if ( gGameOptions.fNewTraitSystem)
+				swprintf(sString, gzIMPCharacterTraitText[gMercProfiles[Menptr[iId].ubProfile].bCharacterTrait]);
+			else
+				swprintf(sString, gzIMPAttitudesText[gMercProfiles[Menptr[iId].ubProfile].bAttitude]);
 
 			FindFontRightCoordinates((INT16)(pPersonnelScreenPoints[23].x+(iSlot*TEXT_BOX_WIDTH)),0,TEXT_BOX_WIDTH-20,0,sString, PERS_FONT,	&sX, &sY);
 			mprintf(sX,(pPersonnelScreenPoints[23].y + 15),sString);
@@ -1637,8 +1659,8 @@ void DisplayCharStats(INT32 iId, INT32 iSlot)
 			{
 				MSYS_RemoveRegion( &gSkillTraitHelpTextRegion[5] );
 			}
-			MSYS_DefineRegion( &gSkillTraitHelpTextRegion[5], ( sX - 3 ), (UINT16)( pPersonnelScreenPoints[23].y + 10),
-							( sX + StringPixLength(sString,PERS_FONT) + 3 ), (UINT16)( pPersonnelScreenPoints[23].y + 17 ), MSYS_PRIORITY_HIGH,
+			MSYS_DefineRegion( &gSkillTraitHelpTextRegion[5], ( sX - 3 ), (UINT16)( pPersonnelScreenPoints[23].y + 15),	// 10
+							( sX + StringPixLength(sString,PERS_FONT) + 3 ), (UINT16)( pPersonnelScreenPoints[23].y + 23 ), MSYS_PRIORITY_HIGH,	// 17
 								MSYS_NO_CURSOR, MSYS_NO_CALLBACK, NULL );
 			//MSYS_DefineRegion( &gSkillTraitHelpTextRegion[3], (UINT16)( pPersonnelScreenPoints[23].x + 147 ), (UINT16)(pPersonnelScreenPoints[23].y + 4),
 			//				(UINT16)( pPersonnelScreenPoints[23].x + 166 ), (UINT16)(pPersonnelScreenPoints[23].y + 15), MSYS_PRIORITY_HIGH,
@@ -1646,7 +1668,10 @@ void DisplayCharStats(INT32 iId, INT32 iSlot)
 			MSYS_AddRegion( &gSkillTraitHelpTextRegion[5] );
 			fAddedTraitRegion[5] = TRUE;
 			// Assign the text
-			AssignPersonnelCharacterTraitHelpText( gMercProfiles[Menptr[iId].ubProfile].bCharacterTrait );
+
+			// Only new traits have help text
+			if (gGameOptions.fNewTraitSystem)
+				AssignPersonnelCharacterTraitHelpText( gMercProfiles[Menptr[iId].ubProfile].bCharacterTrait );
 
 		break;
 
@@ -2145,32 +2170,19 @@ void DisplayPicturesOfCurrentTeam( void )
 		} // if
 
 		SOLDIERTYPE *pSoldier = MercPtrs[currentTeamList[currentOnSreenIndex]];
-		if ((50 < pSoldier->ubProfile) && (57 > pSoldier->ubProfile)) {
+		if ((50 < pSoldier->ubProfile) && (57 > pSoldier->ubProfile)) 
+		{
 			sprintf( sTemp, "%s%03d.sti", SMALL_FACES_DIR, 	gMercProfiles[ pSoldier->ubProfile	].ubFaceIndex );
-		} else {
+		} 
+		else 
+		{
 			if ( pSoldier->ubProfile < 100 ) 
 			{
-				if (gGameExternalOptions.fReadProfileDataFromXML)
-				{
-					// HEADROCK PROFEX: Do not read direct profile number, instead, look inside the profile for a ubFaceIndex value.
-					sprintf(sTemp, "%s%02d.sti", SMALL_FACES_DIR, gMercProfiles[ pSoldier->ubProfile	].ubFaceIndex);
-				}
-				else
-				{
-					sprintf(sTemp, "%s%02d.sti", SMALL_FACES_DIR, pSoldier->ubProfile);
-				}
+				sprintf(sTemp, "%s%02d.sti", SMALL_FACES_DIR, gMercProfiles[ pSoldier->ubProfile	].ubFaceIndex);				
 			} 
 			else 
 			{
-				if (gGameExternalOptions.fReadProfileDataFromXML)
-				{
-					// HEADROCK PROFEX: Do not read direct profile number, instead, look inside the profile for a ubFaceIndex value.
-					sprintf(sTemp, "%s%03d.sti", SMALL_FACES_DIR, gMercProfiles[ pSoldier->ubProfile	].ubFaceIndex);
-				}
-				else
-				{
-					sprintf(sTemp, "%s%03d.sti", SMALL_FACES_DIR, pSoldier->ubProfile);
-				}
+				sprintf(sTemp, "%s%03d.sti", SMALL_FACES_DIR, gMercProfiles[ pSoldier->ubProfile	].ubFaceIndex);				
 			} // else
 		} // else
 
@@ -2272,27 +2284,41 @@ void PersonnelPortraitCallback( MOUSE_REGION * pRegion, INT32 iReason )
 void DisplayFaceOfDisplayedMerc( )
 {
 	// if showing inventory, leave
-	if (fCurrentTeamMode) {
-		if (currentTeamIndex == -1) {
+	if (fCurrentTeamMode) 
+	{
+		if (currentTeamIndex == -1) 
+		{
 			return;
 		}
 		DisplayHighLightBox();
-		RenderPersonnelFace(currentTeamList[currentTeamIndex], 0, FALSE, FALSE, FALSE );
+		RenderPersonnelFace(-1, currentTeamList[currentTeamIndex], FALSE, FALSE, FALSE );
 		DisplayCharName(currentTeamList[currentTeamIndex], 0 );
-		if( gubPersonnelInfoState == PRSNL_INV ) {
+		if( gubPersonnelInfoState == PRSNL_INV ) 
+		{
 			return;
 		}
+
 		RenderPersonnelStats(currentTeamList[currentTeamIndex], 0 );
-	} else {
-		if (iCurrentPersonSelectedId == -1) {
+	} 
+	else 
+	{
+		if (iCurrentPersonSelectedId == -1) 
+		{
 			return;
 		}
+
 		DisplayHighLightBox();
+
+		// Hier dürfte der Aufruf falsch sein
+
 		RenderPersonnelFace(	GetIdOfPastMercInSlot( iCurrentPersonSelectedId ), 0, IsPastMercDead( iCurrentPersonSelectedId ), IsPastMercFired( iCurrentPersonSelectedId ), IsPastMercOther( iCurrentPersonSelectedId ) );
 		DisplayDepartedCharName(	GetIdOfPastMercInSlot( iCurrentPersonSelectedId ), 0, GetTheStateOfDepartedMerc( GetIdOfPastMercInSlot( iCurrentPersonSelectedId	) ) );
-		if( gubPersonnelInfoState == PRSNL_INV ) {
+		
+		if( gubPersonnelInfoState == PRSNL_INV ) 
+		{
 			return;
 		}
+		
 		DisplayDepartedCharStats( GetIdOfPastMercInSlot( iCurrentPersonSelectedId ), 0, GetTheStateOfDepartedMerc( GetIdOfPastMercInSlot( iCurrentPersonSelectedId	) ) );
 	}
 }
@@ -4700,32 +4726,19 @@ void DisplayPortraitOfPastMerc( INT32 iId , INT32 iCounter, BOOLEAN fDead, BOOLE
 	HVOBJECT hFaceHandle;
 	VOBJECT_DESC	VObjectDesc;
 
-	if( ( 50 < 	iId	)&&( 57 > 	iId	) ) {
+	if( ( 50 < 	iId	)&&( 57 > 	iId	) ) 
+	{
 		sprintf( sTemp, "%s%03d.sti", SMALL_FACES_DIR, 	gMercProfiles[ iId ].ubFaceIndex );
-	} else {
+	} 
+	else 
+	{
 		if(	iId	< 100 ) 
 		{
-			if (gGameExternalOptions.fReadProfileDataFromXML)
-			{
-				// HEADROCK PROFEX: Do not read direct profile number, instead, look inside the profile for a ubFaceIndex value.
-				sprintf(sTemp, "%s%02d.sti", SMALL_FACES_DIR, gMercProfiles[ iId ].ubFaceIndex );
-			}
-			else
-			{
-				sprintf(sTemp, "%s%02d.sti", SMALL_FACES_DIR, iId );
-			}
+			sprintf(sTemp, "%s%02d.sti", SMALL_FACES_DIR, gMercProfiles[ iId ].ubFaceIndex );			
 		} 
 		else 
-		{
-			if (gGameExternalOptions.fReadProfileDataFromXML)
-			{
-				// HEADROCK PROFEX: Do not read direct profile number, instead, look inside the profile for a ubFaceIndex value.
-				sprintf(sTemp, "%s%03d.sti", SMALL_FACES_DIR,	gMercProfiles[ iId ].ubFaceIndex	);
-			}
-			else
-			{
-				sprintf(sTemp, "%s%03d.sti", SMALL_FACES_DIR,	iId	);
-			}
+		{		
+			sprintf(sTemp, "%s%03d.sti", SMALL_FACES_DIR,	gMercProfiles[ iId ].ubFaceIndex	);			
 		}
 	}
 
@@ -8072,6 +8085,8 @@ void AssignPersonnelCharacterTraitHelpText( UINT8 ubCharacterNumber )
 
 	return;
 }
+
+
 // SANDRO - Popup text windows for disability 
 void AssignPersonnelDisabilityHelpText( UINT8 ubDisabilityNumber )
 {
@@ -8115,8 +8130,12 @@ void AssignPersonnelKillsHelpText( INT32 IMercId )
 	}
 	if (gMercProfiles[Menptr[IMercId].ubProfile].records.usKillsCreatures > 0 || fShowRecordsIfZero)
 	{
-		swprintf(atStr, pPersonnelRecordsHelpTexts[ 4 ], gMercProfiles[Menptr[IMercId].ubProfile].records.usKillsCreatures );
-		wcscat( apStr, atStr );
+		// WANNE: Only display the monster info, when we play with monsters!
+		if (gGameExternalOptions.fEnableCrepitus)
+		{
+			swprintf(atStr, pPersonnelRecordsHelpTexts[ 4 ], gMercProfiles[Menptr[IMercId].ubProfile].records.usKillsCreatures );
+			wcscat( apStr, atStr );
+		}
 	}
 	if (gMercProfiles[Menptr[IMercId].ubProfile].records.usKillsTanks > 0 || fShowRecordsIfZero)
 	{
@@ -8393,11 +8412,7 @@ void AssignPersonnelWoundsHelpText( INT32 IMercId )
 		swprintf(atStr, pPersonnelRecordsHelpTexts[ 39 ], gMercProfiles[Menptr[IMercId].ubProfile].records.usTimesWoundedBlasted );
 		wcscat( apStr, atStr );
 	}
-	if (gMercProfiles[Menptr[IMercId].ubProfile].records.usTimesStatDamaged > 0 || fShowRecordsIfZero)
-	{
-		swprintf(atStr, pPersonnelRecordsHelpTexts[ 40 ], gMercProfiles[Menptr[IMercId].ubProfile].records.usTimesStatDamaged );
-		wcscat( apStr, atStr );
-	}
+	
 	if (gMercProfiles[Menptr[IMercId].ubProfile].records.usTimesSurgeryUndergoed > 0 || fShowRecordsIfZero)
 	{
 		if ( gGameOptions.fNewTraitSystem )
@@ -8406,9 +8421,17 @@ void AssignPersonnelWoundsHelpText( INT32 IMercId )
 			wcscat( apStr, atStr );
 		}
 	}
+
 	if (gMercProfiles[Menptr[IMercId].ubProfile].records.usFacilityAccidents > 0 || fShowRecordsIfZero)
 	{
 		swprintf(atStr, pPersonnelRecordsHelpTexts[ 42 ], gMercProfiles[Menptr[IMercId].ubProfile].records.usFacilityAccidents );
+		wcscat( apStr, atStr );
+	}
+
+	// WANNE: Moved to the end
+	if (gMercProfiles[Menptr[IMercId].ubProfile].records.usTimesStatDamaged > 0 || fShowRecordsIfZero)
+	{
+		swprintf(atStr, pPersonnelRecordsHelpTexts[ 40 ], gMercProfiles[Menptr[IMercId].ubProfile].records.usTimesStatDamaged );
 		wcscat( apStr, atStr );
 	}
 

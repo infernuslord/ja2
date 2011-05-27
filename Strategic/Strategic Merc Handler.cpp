@@ -402,9 +402,11 @@ void MercDailyUpdate()
 			}
 		}
 	}
-
-	//Loop through all the profiles
-	for( cnt = 0; cnt < NUM_PROFILES; cnt++)
+	
+	// WANNE: Only send mails from the original 1.13 merc, and not from the wildfire merc,
+	// otherwise we get wrong mails cause of hardcoded Email.edt structure!!!!!	
+	UINT16 numOriginalProfiles = 255;
+	for( cnt = 0; cnt < numOriginalProfiles; cnt++)
 	{
 		pProfile = &(gMercProfiles[ cnt ]);
 
@@ -462,23 +464,68 @@ void MercDailyUpdate()
 					if ( pProfile->ubMiscFlags3 & PROFILE_MISC_FLAG3_PLAYER_LEFT_MSG_FOR_MERC_AT_AIM )
 					{
 						iOffset = AIM_REPLY_BARRY;
+
+						//remove the Flag, so if the merc goes on another assignment, the player can leave an email.
+						pProfile->ubMiscFlags3 &= ~PROFILE_MISC_FLAG3_PLAYER_LEFT_MSG_FOR_MERC_AT_AIM;
 #ifdef JA2UB
 
 						//if the Laptop is NOT broken
 						if( gubQuest[ QUEST_FIX_LAPTOP ] != QUESTINPROGRESS && gGameLegionOptions.LaptopQuestEnabled == TRUE )
 						{
-							//remove the Flag, so if the merc goes on another assignment, the player can leave an email.
-							pProfile->ubMiscFlags3 &= ~PROFILE_MISC_FLAG3_PLAYER_LEFT_MSG_FOR_MERC_AT_AIM;
-
+#endif
+						// Read from EmailMercAvailable.xml
+						UINT8 pMerc = 0;
+						UINT8 iMerc = 0;
+						UINT8 oMerc = 0;
+						
+					if ( ReadXMLEmail == TRUE )
+					{
+						oMerc = cnt;
+						iMerc = oMerc * 1;
+						
+						if ( oMerc != 0 )
+							pMerc = oMerc + 1;
+						else
+							pMerc = 0;
+						if ( gProfilesAIM[cnt].ProfilId == cnt )
+							AddEmailTypeXML( pMerc, iMerc, iMerc, GetWorldTotalMin(), -1 , TYPE_EMAIL_AIM_AVAILABLE);
+					}	
+					else	 
+					{	
+						// Read from Email.edt and sender (nickname) from MercProfiles.xml
+						if (cnt < 170)
+						{
 							// TO DO: send E-mail to player telling him the merc has returned from an assignment
-							AddEmail( ( UINT8 )( iOffset + ( cnt * AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, ( UINT8 )( 6 + cnt ), GetWorldTotalMin(),-1 );
+							AddEmail( ( UINT8 )( iOffset + ( cnt * AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, (UINT8) cnt, GetWorldTotalMin(), -1, -1 , TYPE_EMAIL_EMAIL_EDT_NAME_MERC);
 						}
-#else
-						//remove the Flag, so if the merc goes on another assignment, the player can leave an email.
-						pProfile->ubMiscFlags3 &= ~PROFILE_MISC_FLAG3_PLAYER_LEFT_MSG_FOR_MERC_AT_AIM;
+						else
+						{
+							// Wildfire mercs
+							if (cnt < 178)
+							{
+								UINT16 iMsgLength = cnt;
+								//UINT8 sender = cnt - 119;	// SenderNameList.xml
 
-						// TO DO: send E-mail to player telling him the merc has returned from an assignment
-						AddEmail( ( UINT8 )( iOffset + ( cnt * AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, ( UINT8 )( 6 + cnt ), GetWorldTotalMin(), -1 );
+								// Fake Barry Unger mail, but with the msgLength of the WF merc ID -> Correct in PreProcessEmail()
+								AddEmailWFMercAvailable( ( UINT8 )( iOffset + 0 * AIM_REPLY_LENGTH_BARRY ), iMsgLength, cnt, GetWorldTotalMin(), -1 , TYPE_EMAIL_EMAIL_EDT_NAME_MERC);							
+							}
+							// Generic mail
+							else
+							{
+								// TODO.RW: Send generic mail
+								UINT16 iMsgLength = cnt;
+								//UINT8 sender = cnt - 119;	// SenderNameList.xml
+
+								// Fake Barry Unger mail, but with the msgLength of the WF merc ID -> Correct in PreProcessEmail()
+								AddEmailWFMercAvailable( ( UINT8 )( iOffset + 0 * AIM_REPLY_LENGTH_BARRY ), iMsgLength, cnt, GetWorldTotalMin(), -1 , TYPE_EMAIL_EMAIL_EDT_NAME_MERC);							
+							}
+						}
+					
+					}
+						// WANNE: Should we stop time compression. I don't know.
+						//StopTimeCompression();
+#ifdef JA2UB
+		}
 #endif
 					}
 				}
@@ -1389,9 +1436,28 @@ void HandleAddingAnyAimAwayEmailsWhenLaptopGoesOnline()
 
 					//remove the Flag, so if the merc goes on another assignment, the player can leave an email.
 					pProfile->ubMiscFlags3 &= ~PROFILE_MISC_FLAG3_PLAYER_LEFT_MSG_FOR_MERC_AT_AIM;
-
+					
+						UINT8 pMerc = 0;
+						UINT8 iMerc = 0;
+						UINT8 oMerc = 0;
+						
+					if ( ReadXMLEmail == TRUE )
+					{
+						oMerc = cnt;
+						iMerc = oMerc * 1;
+						
+						if ( oMerc != 0 )
+							pMerc = oMerc + 1;
+						else
+							pMerc = 0;
+						if ( gProfilesAIM[cnt].ProfilId == cnt )
+							AddEmailTypeXML( pMerc, iMerc, iMerc, GetWorldTotalMin(), -1 , TYPE_EMAIL_AIM_AVAILABLE);
+					}
+					else
+					{
 					// TO DO: send E-mail to player telling him the merc has returned from an assignment
-					AddEmail( ( UINT8 )( iOffset + ( cnt * AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, ( UINT8 )( 6 + cnt ), GetWorldTotalMin(),-1 );
+					AddEmail( ( UINT8 )( iOffset + ( cnt * AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, ( UINT8 )( 6 + cnt ), GetWorldTotalMin(),-1 ,-1, TYPE_EMAIL_EMAIL_EDT_NAME_MERC);
+					}
 				}
 			}
 		}

@@ -739,21 +739,22 @@ INT8 DecideActionGreen(SOLDIERTYPE *pSoldier)
 					else
 					{
 						// done!
-						pSoldier->flags.uiStatusFlags &= ~(SOLDIER_BOXER);
-						if (pSoldier->bTeam == gbPlayerNum)
-						{
-							pSoldier->flags.uiStatusFlags &= (~SOLDIER_PCUNDERAICONTROL);
-							TriggerEndOfBoxingRecord( pSoldier );
-						}
-						else if ( CountPeopleInBoxingRing() == 0 )
-						{
-							// Probably disqualified by jumping out of ring; the player
-							// character then didn't trigger the end of boxing record
-							// (and we know from the if statement above that we're
-							// still in a boxing state of some sort...)
-							//TriggerEndOfBoxingRecord( NULL );
 
-							// HEADROCK HAM 3.6: This should trigger Darren's script
+						// WANNE: This should fix the bug if any merc are still under PC control. This could happen after boxing in SAN MONA.
+						SOLDIERTYPE	*pTeamSoldier;
+						for (INT8 bLoop=gTacticalStatus.Team[gbPlayerNum].bFirstID; bLoop <= gTacticalStatus.Team[gbPlayerNum].bLastID; bLoop++)
+						{
+							pTeamSoldier=MercPtrs[bLoop]; 
+
+							if (pTeamSoldier->flags.uiStatusFlags & SOLDIER_PCUNDERAICONTROL)
+								pTeamSoldier->flags.uiStatusFlags &= (~SOLDIER_PCUNDERAICONTROL);
+
+							if (pTeamSoldier->flags.uiStatusFlags & SOLDIER_BOXER)
+								pTeamSoldier->flags.uiStatusFlags &= (~SOLDIER_BOXER);
+						}
+
+						if (pSoldier->bTeam == gbPlayerNum || CountPeopleInBoxingRing() == 0)
+						{
 							TriggerEndOfBoxingRecord( pSoldier );
 						}
 					}
@@ -871,7 +872,7 @@ INT8 DecideActionGreen(SOLDIERTYPE *pSoldier)
 					//if ( SoldierTo3DLocationLineOfSightTest( pSoldier, pCorpse->def.sGridNo, pSoldier->pathing.bLevel, 3, TRUE, CALC_FROM_WANTED_DIR ) )
 					if ( SoldierTo3DLocationLineOfSightTest( pSoldier, pCorpse->def.sGridNo, pCorpse->def.bLevel, 3, TRUE, CALC_FROM_WANTED_DIR ) )
 					{
-						ScreenMsg( MSG_FONT_YELLOW, MSG_INTERFACE, L"Warning: enemy corpse found!!!" );
+						ScreenMsg( MSG_FONT_YELLOW, MSG_INTERFACE, New113Message[MSG113_ENEMY_FOUND_DEAD_BODY]);
 						//pCorpse->def.ubAIWarningValue=0;
 						gRottingCorpse[ cnt ].def.ubAIWarningValue=0;
 						return( AI_ACTION_RED_ALERT );
@@ -2376,10 +2377,8 @@ INT8 DecideActionRed(SOLDIERTYPE *pSoldier, UINT8 ubUnconsciousOK)
 		// current revamp of suppression fire.
 		BOOLEAN fEnableAIAutofire = FALSE;
 
-		if ( gGameExternalOptions.fIncreaseAISuppressionFire && ( ( BestShot.ubPossible && BestShot.ubChanceToReallyHit < 50 ) || (BestShot.ubPossible && BestShot.ubChanceToReallyHit < (INT16)PreRandom(100)) && Menptr[BestShot.ubOpponent].pathing.bLevel == 0 && pSoldier->aiData.bOrders != SNIPER ))
-			fEnableAIAutofire = TRUE;
-
-		else if ( !gGameExternalOptions.fIncreaseAISuppressionFire && ( BestShot.ubPossible && BestShot.ubChanceToReallyHit < 50 && Menptr[BestShot.ubOpponent].pathing.bLevel == 0 && pSoldier->aiData.bOrders != SNIPER ))
+		// CHRISL: Changed from a simple flag to two externalized values for more modder control over AI suppression
+		if ( BestShot.bWeaponIn != -1 && (GetMagSize(&pSoldier->inv[BestShot.bWeaponIn]) >= gGameExternalOptions.ubAISuppressionMinimumMagSize && pSoldier->inv[BestShot.bWeaponIn][0]->data.gun.ubGunShotsLeft >= gGameExternalOptions.ubAISuppressionMinimumAmmo) && ( ( BestShot.ubPossible && BestShot.ubChanceToReallyHit < 50 ) || (BestShot.ubPossible && BestShot.ubChanceToReallyHit < (INT16)PreRandom(100)) && Menptr[BestShot.ubOpponent].pathing.bLevel == 0 && pSoldier->aiData.bOrders != SNIPER ))
 			fEnableAIAutofire = TRUE;
 
 		if (fEnableAIAutofire)
@@ -2395,17 +2394,30 @@ INT8 DecideActionRed(SOLDIERTYPE *pSoldier, UINT8 ubUnconsciousOK)
 			pSoldier->aiData.usActionData = BestShot.sTarget;
 			//pSoldier->aiData.bAimTime			= BestShot.ubAimTime;
 			INT16 ubBurstAPs = 0;
+			FLOAT dTotalRecoil = 0;
 
 			pSoldier->bDoAutofire = 0;
-			do
-			{
-				pSoldier->bDoAutofire++;
-				ubBurstAPs = CalcAPsToAutofire( pSoldier->CalcActionPoints(), &(pSoldier->inv[BestShot.bWeaponIn]), pSoldier->bDoAutofire );
+			if(UsingNewCTHSystem() == true){
+				do
+				{
+					INT8 bRecoilX = 0;
+					INT8 bRecoilY = 0;
+					pSoldier->bDoAutofire++;
+					dTotalRecoil += AICalcRecoilForShot( pSoldier, &(pSoldier->inv[BestShot.bWeaponIn]), pSoldier->bDoAutofire );
+					ubBurstAPs = CalcAPsToAutofire( pSoldier->CalcActionPoints(), &(pSoldier->inv[BestShot.bWeaponIn]), pSoldier->bDoAutofire );
+				}
+				while(	pSoldier->bActionPoints >= BestShot.ubAPCost + ubBurstAPs && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire 
+					&& dTotalRecoil <= 10.0f );
+			} else {
+				do
+				{
+					pSoldier->bDoAutofire++;
+					ubBurstAPs = CalcAPsToAutofire( pSoldier->CalcActionPoints(), &(pSoldier->inv[BestShot.bWeaponIn]), pSoldier->bDoAutofire );
+				}
+				while(	pSoldier->bActionPoints >= BestShot.ubAPCost + ubBurstAPs &&
+					pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire &&
+					GetAutoPenalty(&pSoldier->inv[ pSoldier->ubAttackingHand ], gAnimControl[ pSoldier->usAnimState ].ubEndHeight == ANIM_PRONE)*pSoldier->bDoAutofire <= 80 );
 			}
-			while(	pSoldier->bActionPoints >= BestShot.ubAPCost + ubBurstAPs &&
-				pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire &&
-				GetAutoPenalty(&pSoldier->inv[ pSoldier->ubAttackingHand ], gAnimControl[ pSoldier->usAnimState ].ubEndHeight == ANIM_PRONE)*pSoldier->bDoAutofire <= 80 );
-
 
 			pSoldier->bDoAutofire--;
 
@@ -2420,7 +2432,8 @@ INT8 DecideActionRed(SOLDIERTYPE *pSoldier, UINT8 ubUnconsciousOK)
 				pSoldier->bDoBurst			= 1;
 
 				ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, New113Message[ MSG113_SUPPRESSIONFIRE ] );
-				Menptr[BestShot.ubOpponent].ubSuppressionPoints += pSoldier->bDoAutofire;
+				// HEADROCK HAM 4: This is the stupidest thing ever.
+				// Menptr[BestShot.ubOpponent].ubSuppressionPoints += pSoldier->bDoAutofire;
 				Menptr[BestShot.ubOpponent].ubSuppressorID = pSoldier->ubID;
 				return( AI_ACTION_FIRE_GUN );
 			}
@@ -4649,19 +4662,18 @@ INT16 ubMinAPCost;
 						iChance = (25 / max((BestAttack.ubAimTime + 1),1));
 						switch (pSoldier->aiData.bAttitude)
 						{
-						case DEFENSIVE:		iChance += -5; break;
-						case BRAVESOLO:		iChance +=  5; break;
-						case BRAVEAID:		iChance +=  5; break;
-						case CUNNINGSOLO:	iChance +=  0; break;
-						case CUNNINGAID:	iChance +=  0; break;
-						case AGGRESSIVE:	iChance += 10; break;
-						case ATTACKSLAYONLY:iChance += 30; break;
+							case DEFENSIVE:		iChance += -5; break;
+							case BRAVESOLO:		iChance +=  5; break;
+							case BRAVEAID:		iChance +=  5; break;
+							case CUNNINGSOLO:	iChance +=  0; break;
+							case CUNNINGAID:	iChance +=  0; break;
+							case AGGRESSIVE:	iChance += 10; break;
+							case ATTACKSLAYONLY:iChance += 30; break;
 						}
 
-						// HEADROCK HAM B2.6: Allows control over increased enemy burstfire.
-						if ( gGameExternalOptions.fIncreaseAISuppressionFire && pSoldier->inv[BestAttack.bWeaponIn][0]->data.gun.ubGunShotsLeft > 10 )
-							iChance += 20;
-						else if ( !gGameExternalOptions.fIncreaseAISuppressionFire && pSoldier->inv[BestAttack.bWeaponIn][0]->data.gun.ubGunShotsLeft > 50 )
+						// CHRISL: Changed from a simple flag to two externalized values for more modder control over AI suppression
+						if ( GetMagSize(&pSoldier->inv[BestAttack.bWeaponIn], 0) >= gGameExternalOptions.ubAISuppressionMinimumMagSize && 
+							pSoldier->inv[BestAttack.bWeaponIn][0]->data.gun.ubGunShotsLeft >= gGameExternalOptions.ubAISuppressionMinimumAmmo )
 							iChance += 20;
 
 						// increase chance based on proximity and difficulty of enemy
@@ -4675,10 +4687,10 @@ INT16 ubMinAPCost;
 								iChance += 5 * ( 15 - PythSpacesAway( pSoldier->sGridNo, BestAttack.sTarget ) );
 							}
 						}
+
 						// HEADROCK HAM 3.6: due to the "else", this part of the formula is NEVER hit. Removing.
 						//else if (PythSpacesAway( pSoldier->sGridNo, BestAttack.sTarget ) < 10 && gGameOptions.ubDifficultyLevel > DIF_LEVEL_EASY )
 						if (PythSpacesAway( pSoldier->sGridNo, BestAttack.sTarget ) < 10 && gGameOptions.ubDifficultyLevel > DIF_LEVEL_EASY )
-
 						{
 							iChance += 100;
 						}
@@ -4700,20 +4712,33 @@ INT16 ubMinAPCost;
 			if (IsGunAutofireCapable( &pSoldier->inv[BestAttack.bWeaponIn] ) &&
 				!(Menptr[BestShot.ubOpponent].stats.bLife < OKLIFE) && // don't burst at downed targets
 				(( pSoldier->inv[BestAttack.bWeaponIn][0]->data.gun.ubGunShotsLeft > 1 &&
-				BestAttack.ubAimTime != BURSTING ) || Weapon[pSoldier->inv[BestAttack.bWeaponIn].usItem].NoSemiAuto) )
+				!pSoldier->bDoBurst ) || Weapon[pSoldier->inv[BestAttack.bWeaponIn].usItem].NoSemiAuto) )
 			{
 				DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"DecideActionBlack: ENOUGH APs TO AUTOFIRE, RANDOM CHANCE OF DOING SO");
+				
+				FLOAT dTotalRecoil = 0.0f;
 				pSoldier->bDoAutofire = 0;
-				do
-				{
-					pSoldier->bDoAutofire++;
-					ubBurstAPs = CalcAPsToAutofire( pSoldier->CalcActionPoints(), &(pSoldier->inv[BestAttack.bWeaponIn]), pSoldier->bDoAutofire );
+				if(UsingNewCTHSystem() == true){
+					do
+					{
+						INT8 bRecoilX = 0;
+						INT8 bRecoilY = 0;
+						pSoldier->bDoAutofire++;
+						dTotalRecoil += AICalcRecoilForShot( pSoldier, &(pSoldier->inv[BestShot.bWeaponIn]), pSoldier->bDoAutofire );
+						ubBurstAPs = CalcAPsToAutofire( pSoldier->CalcActionPoints(), &(pSoldier->inv[BestShot.bWeaponIn]), pSoldier->bDoAutofire );
+					}
+					while(	pSoldier->bActionPoints >= BestShot.ubAPCost + ubBurstAPs + sActualAimTime && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire 
+						&& dTotalRecoil <= 10.0f );
+				} else {
+					do
+					{
+						pSoldier->bDoAutofire++;
+						ubBurstAPs = CalcAPsToAutofire( pSoldier->CalcActionPoints(), &(pSoldier->inv[BestAttack.bWeaponIn]), pSoldier->bDoAutofire );
+					}
+					while(	pSoldier->bActionPoints >= BestAttack.ubAPCost + ubBurstAPs &&
+						pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire &&
+						GetAutoPenalty(&pSoldier->inv[ BestAttack.bWeaponIn ], gAnimControl[ pSoldier->usAnimState ].ubEndHeight == ANIM_PRONE)*pSoldier->bDoAutofire <= 80);
 				}
-				while(	pSoldier->bActionPoints >= BestAttack.ubAPCost + ubBurstAPs &&
-					pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire &&
-					GetAutoPenalty(&pSoldier->inv[ BestAttack.bWeaponIn ], gAnimControl[ pSoldier->usAnimState ].ubEndHeight == ANIM_PRONE)*pSoldier->bDoAutofire <= 80);
-
-
 
 				pSoldier->bDoAutofire--;
 				if (pSoldier->bDoAutofire > 0)
@@ -4742,10 +4767,9 @@ INT16 ubMinAPCost;
 							}
 
 
-							// HEADROCK HAM B2.6: Allows control over increased enemy autofire.
-							if ( gGameExternalOptions.fIncreaseAISuppressionFire && pSoldier->inv[BestAttack.bWeaponIn][0]->data.gun.ubGunShotsLeft > 20 )
-								iChance += 30;
-							else if ( !gGameExternalOptions.fIncreaseAISuppressionFire && pSoldier->inv[BestAttack.bWeaponIn][0]->data.gun.ubGunShotsLeft > 50 )
+							// CHRISL: Changed from a simple flag to two externalized values for more modder control over AI suppression
+							if ( GetMagSize(&pSoldier->inv[BestAttack.bWeaponIn], 0) >= gGameExternalOptions.ubAISuppressionMinimumMagSize &&
+								pSoldier->inv[BestAttack.bWeaponIn][0]->data.gun.ubGunShotsLeft >= gGameExternalOptions.ubAISuppressionMinimumAmmo )
 								iChance += 30;
 
 							if ( bInGas )
@@ -4771,20 +4795,24 @@ INT16 ubMinAPCost;
 
 						if ((INT32) PreRandom( 100 ) < iChance || Weapon[pSoldier->inv[BestAttack.bWeaponIn].usItem].NoSemiAuto)
 						{
-							BestAttack.ubAimTime = AUTOFIRING + pSoldier->bDoAutofire;
-							BestAttack.ubAPCost = BestAttack.ubAPCost + CalcAPsToAutofire( pSoldier->CalcActionPoints(), &(pSoldier->inv[BestAttack.bWeaponIn]), pSoldier->bDoAutofire );
+							pSoldier->aiData.bAimTime = BestAttack.ubAimTime ;
+							pSoldier->bDoBurst = 1;
+							BestAttack.ubAPCost = BestAttack.ubAPCost + CalcAPsToAutofire( pSoldier->CalcActionPoints(), &(pSoldier->inv[BestAttack.bWeaponIn]), pSoldier->bDoAutofire ) + sActualAimTime;
+						}
+						else
+						{
+							pSoldier->bDoAutofire = 0;
+							pSoldier->bDoBurst = 0;
 						}
 					}
 				}
-				else
-				{
-					// HEADROCK HAM 3.6: No no no! This line removes all aiming from a potentially deadly single-shot! Commenting out.
-					//pSoldier->aiData.bAimTime			= 0;
-					pSoldier->aiData.bAimTime			= BestAttack.ubAimTime;
-					pSoldier->bDoBurst			= 0;
-					pSoldier->bDoAutofire		= 0;
-					// not enough aps - do somthing else
-				}
+			}
+
+			if (!pSoldier->bDoBurst)
+			{
+				pSoldier->aiData.bAimTime	= BestAttack.ubAimTime;
+				pSoldier->bDoBurst			= 0;
+				pSoldier->bDoAutofire		= 0;
 			}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -4794,6 +4822,10 @@ INT16 ubMinAPCost;
 
 
 
+			// HEADROCK HAM 4: No longer necessary to do here. The conditions above already handle this, specifically
+			// WITHOUT messing with the BestAttack.ubAimTime variable, since that can apply now even when bursting
+			// or autofiring!!
+			/*
 			if (BestAttack.ubAimTime == BURSTING)
 			{
 				pSoldier->aiData.bAimTime			= 0;
@@ -4807,7 +4839,7 @@ INT16 ubMinAPCost;
 				pSoldier->bDoAutofire		= BestAttack.ubAimTime-AUTOFIRING;
 
 				BestAttack.ubAimTime = AUTOFIRING;
-			}
+			}*/
 
 			/*
 			else // defaults already set

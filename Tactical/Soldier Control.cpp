@@ -662,8 +662,9 @@ SOLDIERTYPE& SOLDIERTYPE::operator=(const OLDSOLDIERTYPE_101& src)
 
 		this->dXPos = src.dXPos;
 		this->dYPos = src.dYPos;
-		this->dOldXPos = src.dOldXPos;
-		this->dOldYPos = src.dOldYPos;
+		// HEADROCK HAM 4: Changed from FLOAT to INT32 to record position at beginning of turn.
+		this->sOldXPos = src.sOldXPos;
+		this->sOldYPos = src.sOldYPos;
 		this->sInitialGridNo = src.sInitialGridNo;
 		this->sGridNo = src.sGridNo;
 		this->ubDirection = src.ubDirection;
@@ -710,6 +711,13 @@ SOLDIERTYPE& SOLDIERTYPE::operator=(const OLDSOLDIERTYPE_101& src)
 		this->bTargetLevel = src.bTargetLevel;
 		this->bTargetCubeLevel = src.bTargetCubeLevel;
 		this->sLastTarget = src.sLastTarget;
+
+		// HEADROCK HAM 4: TODO: Added four new variables to soldiertype. MAke sure they don't screw it all up!
+		this->dPrevMuzzleOffsetX = 0.0;
+		this->dPrevMuzzleOffsetY = 0.0;
+		this->dPrevCounterForceX = 0.0;
+		this->dPrevCounterForceY = 0.0;
+
 		this->bTilesMoved = src.bTilesMoved;
 		this->dNextBleed = src.dNextBleed;
 
@@ -1061,7 +1069,12 @@ void SOLDIERTYPE::initialize()
 	memset( &pathing, 0, sizeof(STRUCT_Pathing) );
 }
 
-
+bool SOLDIERTYPE::exists()
+{
+	if(this == NULL)
+		return(FALSE);
+	return (TRUE);
+}
 
 // Ugly temporary solution
 //
@@ -2407,8 +2420,12 @@ BOOLEAN SOLDIERTYPE::CreateSoldierCommon( UINT8 ubBodyType, UINT16 usSoldierID, 
 			// bad anims are: HOPFENCE,
 			// CLIMBDOWNROOF, FALLFORWARD_ROOF,FALLOFF, CLIMBUPROOF
 			if( !gfWorldLoaded &&
-				( usState == HOPFENCE ||
+				( usState == HOPFENCE || usState == JUMPWINDOWS ||
 				usState == CLIMBDOWNROOF ||
+				
+				usState == JUMPDOWNWALL ||
+				usState == JUMPUPWALL ||
+				
 				usState == FALLFORWARD_ROOF ||
 				usState == FALLOFF ||
 				usState == CLIMBUPROOF ) )
@@ -2986,6 +3003,33 @@ BOOLEAN SOLDIERTYPE::EVENT_InitNewSoldierAnim( UINT16 usNewState, UINT16 usStart
 				return( TRUE );
 			}
 		}
+		
+		if ( usNewState == JUMPUPWALL )
+		{
+			if ( this->ubPendingDirection != NO_PENDING_DIRECTION )
+			{
+				this->EVENT_SetSoldierDesiredDirection( this->ubPendingDirection );
+				this->ubPendingDirection = NO_PENDING_DIRECTION;
+				this->usPendingAnimation = JUMPUPWALL;
+				this->flags.fTurningUntilDone	 = TRUE;
+				this->SoldierGotoStationaryStance( );
+				return( TRUE );
+			}
+		}
+
+		if ( usNewState == JUMPDOWNWALL )
+		{
+			if ( this->ubPendingDirection != NO_PENDING_DIRECTION )
+			{
+				this->EVENT_SetSoldierDesiredDirection( this->ubPendingDirection );
+				this->ubPendingDirection = NO_PENDING_DIRECTION;
+				this->usPendingAnimation = JUMPDOWNWALL;
+				this->flags.bTurningFromPronePosition = TURNING_FROM_PRONE_OFF;
+				this->flags.fTurningUntilDone	 = TRUE;
+				this->SoldierGotoStationaryStance( );
+				return( TRUE );
+			}
+		}
 
 		// ATE: Don't raise/lower automatically if we are low on health,
 		// as our gun looks lowered anyway....
@@ -3223,7 +3267,7 @@ BOOLEAN SOLDIERTYPE::EVENT_InitNewSoldierAnim( UINT16 usNewState, UINT16 usStart
 		}
 
 		// ATE: Patch hole for breath collapse for roofs, fences
-		if ( usNewState == CLIMBUPROOF || usNewState == CLIMBDOWNROOF || usNewState == HOPFENCE )
+		if ( usNewState == JUMPUPWALL || usNewState == JUMPDOWNWALL || usNewState == CLIMBUPROOF || usNewState == CLIMBDOWNROOF || usNewState == HOPFENCE || usNewState == JUMPWINDOWS)
 		{
 			// Check for breath collapse if a given animation like
 			if ( this->CheckForBreathCollapse( ) || this->bCollapsed )
@@ -3702,6 +3746,13 @@ BOOLEAN SOLDIERTYPE::EVENT_InitNewSoldierAnim( UINT16 usNewState, UINT16 usStart
 			else
 				DeductPoints( this, GetAPsToJumpFence( this, FALSE ), GetBPsToJumpFence( this, FALSE ) );
 			break;
+			
+		case JUMPWINDOWS:
+			if((UsingNewInventorySystem() == true) && FindBackpackOnSoldier( this ) != ITEM_NOT_FOUND )
+				DeductPoints( this, GetAPsToJumpThroughWindows( this, TRUE ), GetBPsToJumpThroughWindows( this, TRUE ) );
+			else
+				DeductPoints( this, GetAPsToJumpThroughWindows( this, FALSE ), GetBPsToJumpThroughWindows( this, FALSE ) );
+			break;
 
 			// Deduct aps for falling down....
 		case FALLBACK_HIT_STAND:
@@ -3735,6 +3786,22 @@ BOOLEAN SOLDIERTYPE::EVENT_InitNewSoldierAnim( UINT16 usNewState, UINT16 usStart
 			gTacticalStatus.uiFlags |= DISALLOW_SIGHT;
 
 			DeductPoints( this, GetAPsToClimbRoof( this, FALSE), GetBPsToClimbRoof( this, FALSE) ); // changed by SANDRO
+			break;
+			
+		case JUMPDOWNWALL:
+
+			// disable sight
+			gTacticalStatus.uiFlags |= DISALLOW_SIGHT;
+
+			DeductPoints( this, GetAPsToJumpWall( this, TRUE), GetBPsToJumpWall( this, TRUE) ); 
+			break;
+
+		case JUMPUPWALL:
+
+			// disable sight
+			gTacticalStatus.uiFlags |= DISALLOW_SIGHT;
+
+			DeductPoints( this, GetAPsToJumpWall( this, FALSE), GetBPsToJumpWall( this, FALSE) ); 
 			break;
 
 		case JUMP_OVER_BLOCKING_PERSON:
@@ -4036,9 +4103,10 @@ void SOLDIERTYPE::EVENT_InternalSetSoldierPosition( FLOAT dNewXPos, FLOAT dNewYP
 		this->pathing.sFinalDestination = sNewGridNo;
 	}
 
+	// HEADROCK HAM 4: TODO: Figure out whether this has any influence in-game?
 	// Copy old values
-	this->dOldXPos = this->dXPos;
-	this->dOldYPos = this->dYPos;
+	//this->sOldXPos = this->dXPos;
+	//this->sOldYPos = this->dYPos;
 
 	// Set New pos
 	this->dXPos = dNewXPos;
@@ -4300,6 +4368,17 @@ void SOLDIERTYPE::SetSoldierGridNo( INT32 sNewGridNo, BOOLEAN fForceRemove )
 					LightSpriteRoofStatus(this->iLight, TRUE );
 			}
 			else if ( this->usAnimState == CLIMBDOWNROOF )
+			{
+				if(this->iLight!=(-1))
+					LightSpriteRoofStatus(this->iLight, FALSE );
+			}
+			
+			if ( this->usAnimState == JUMPUPWALL )
+			{
+				if(this->iLight!=(-1))
+					LightSpriteRoofStatus(this->iLight, TRUE );
+			}
+			else if ( this->usAnimState == JUMPDOWNWALL )
 			{
 				if(this->iLight!=(-1))
 					LightSpriteRoofStatus(this->iLight, FALSE );
@@ -6580,7 +6659,7 @@ void SOLDIERTYPE::EVENT_InternalSetSoldierDestination( UINT16	usNewDirection, BO
 
 
 	// OK, ATE: If we are side_stepping, calculate a NEW desired direction....
-	if ( this->bReverse && usAnimState == SIDE_STEP )
+	if ( this->bReverse && (usAnimState == SIDE_STEP || usAnimState == ROLL_PRONE_R || usAnimState == ROLL_PRONE_L) )
 	{
 		UINT8 ubPerpDirection;
 
@@ -6688,7 +6767,7 @@ INT8 MultiTiledTurnDirection( SOLDIERTYPE * pSoldier, INT8 bStartDirection, INT8
 void EVENT_InternalSetSoldierDesiredDirection( SOLDIERTYPE *pSoldier, UINT8	ubNewDirection, BOOLEAN fInitalMove, UINT16 usAnimState )
 {
 	//if ( usAnimState == WALK_BACKWARDS )
-	if ( pSoldier->bReverse && usAnimState != SIDE_STEP )
+	if ( pSoldier->bReverse && (usAnimState != SIDE_STEP && usAnimState != ROLL_PRONE_R && usAnimState != ROLL_PRONE_L) )
 	{
 		// OK, check if we are going to go in the exact opposite than our facing....
 		ubNewDirection = gOppositeDirection[ ubNewDirection ];
@@ -7115,6 +7194,14 @@ void SOLDIERTYPE::EVENT_BeginMercTurn( BOOLEAN fFromRealTime, INT32 iRealTimeCou
 			this->aiData.bPassedLastInterrupt = FALSE;
 		}
 	}
+
+	// HEADROCK HAM 4: Store this soldier's X/Y cell coordinates into his SOLDIERTYPE data.
+	INT16 sStartPosX = 0;
+	INT16 sStartPosY = 0;
+	ConvertGridNoToCenterCellXY( this->sGridNo, &sStartPosX, &sStartPosY );
+	this->sOldXPos = sStartPosX;
+	this->sOldYPos = sStartPosY;
+
 }
 
 // UTILITY FUNCTIONS CALLED BY OVERHEAD.H
@@ -7225,6 +7312,19 @@ void SOLDIERTYPE::TurnSoldier( void )
 	if ( this->flags.uiStatusFlags & SOLDIER_LOOK_NEXT_TURNSOLDIER )
 	{
 		if ( ( gAnimControl[ this->usAnimState ].uiFlags & ANIM_STATIONARY && this->usAnimState != CLIMBUPROOF && this->usAnimState != CLIMBDOWNROOF ) )
+		{
+			// HANDLE SIGHT!
+			HandleSight( this,SIGHT_LOOK | SIGHT_RADIO );
+		}
+		// Turn off!
+		this->flags.uiStatusFlags &= (~SOLDIER_LOOK_NEXT_TURNSOLDIER );
+
+		HandleSystemNewAISituation( this, FALSE );
+	}
+	
+	if ( this->flags.uiStatusFlags & SOLDIER_LOOK_NEXT_TURNSOLDIER )
+	{
+		if ( ( gAnimControl[ this->usAnimState ].uiFlags & ANIM_STATIONARY && this->usAnimState != JUMPUPWALL && this->usAnimState != JUMPDOWNWALL ) )
 		{
 			// HANDLE SIGHT!
 			HandleSight( this,SIGHT_LOOK | SIGHT_RADIO );
@@ -8469,7 +8569,7 @@ void SOLDIERTYPE::BeginSoldierClimbFence( void )
 
 void SOLDIERTYPE::BeginSoldierClimbWindow( void )
 {
-	INT8							bDirection;
+	INT8	bDirection;
 
 	// Make sure we hop the correct fence to follow our path!
 	if (this->pathing.usPathIndex < this->pathing.usPathDataSize)
@@ -8489,59 +8589,55 @@ void SOLDIERTYPE::BeginSoldierClimbWindow( void )
 		this->flags.fTurningUntilDone = TRUE;
 		// ATE: Reset flag to go back to prone...
 		this->flags.bTurningFromPronePosition = TURNING_FROM_PRONE_OFF;
-		this->usPendingAnimation = HOPFENCE;
+		this->usPendingAnimation = JUMPWINDOWS; //HOPFENCE;
 	}
-
 }
 
-void SOLDIERTYPE::BeginSoldierFence( void )
+void SOLDIERTYPE::BeginSoldierClimbWall( void )
 {
 	INT8							bNewDirection;
 	UINT8							ubWhoIsThere;
-	
 
-	if ( FindFenceDirection( this, this->sGridNo, this->ubDirection, &bNewDirection ) && ( this->pathing.bLevel == 0 ) )
+	if ( FindWallJumpDirection( this, this->sGridNo, this->ubDirection, &bNewDirection ) && ( this->pathing.bLevel == 0 ) )
 	{
 		if ( EnoughPoints( this, GetAPsToClimbRoof( this, FALSE ), 0, TRUE ) )
 		{
 			//Kaiden: Helps if we look where we are going before we try to climb on top of someone
-		 ubWhoIsThere = WhoIsThere2( NewGridNo( this->sGridNo, (UINT16)DirectionInc(bNewDirection ) ), 1 );
-		 if ( ubWhoIsThere != NOBODY && ubWhoIsThere != this->ubID )
-		 {
-			return;
-		 }
-	   else
-		 {
-
-			if (this->bTeam == gbPlayerNum)
+			ubWhoIsThere = WhoIsThere2( NewGridNo( this->sGridNo, (UINT16)DirectionInc(bNewDirection ) ), 1 );
+			if ( ubWhoIsThere != NOBODY && ubWhoIsThere != this->ubID )
 			{
-				SetUIBusy( this->ubID );
+				return;
 			}
+			else
+			{
+				if (this->bTeam == gbPlayerNum)
+				{
+					SetUIBusy( this->ubID );
+				}
 
-			this->sTempNewGridNo = NewGridNo( this->sGridNo, (UINT16)DirectionInc(bNewDirection ) );
+				this->sTempNewGridNo = NewGridNo( this->sGridNo, (UINT16)DirectionInc(bNewDirection ) );
 
-			this->ubPendingDirection = bNewDirection;
-			this->EVENT_InitNewSoldierAnim( CLIMBUPROOF, 0 , FALSE );
+				this->ubPendingDirection = bNewDirection;
+				this->EVENT_InitNewSoldierAnim( JUMPUPWALL, 0 , FALSE );
 
-			this->InternalReceivingSoldierCancelServices( FALSE );				
-			this->InternalGivingSoldierCancelServices( FALSE );	
-			
-			this->BeginSoldierFenceUp(  );	
-		}		
-
+				this->InternalReceivingSoldierCancelServices( FALSE );				
+				this->InternalGivingSoldierCancelServices( FALSE );		
+				
+			//	this->BeginSoldierClimbWallUp(  );	
+			}		
 		}		
 	}
 
 }
 
-void SOLDIERTYPE::BeginSoldierFenceUp( void )
+void SOLDIERTYPE::BeginSoldierClimbWallUp( void )
 {
 	INT8							bNewDirection;
 	UINT8	ubWhoIsThere;
 
-	if ( FindLowerLevelFence( this, this->sGridNo, this->ubDirection, &bNewDirection ) && ( this->pathing.bLevel > 0 ) )
+	if ( FindLowerLevelWall( this, this->sGridNo, this->ubDirection, &bNewDirection ) && ( this->pathing.bLevel > 0 ) )
 	{
-		if ( EnoughPoints( this, GetAPsToClimbRoof( this, TRUE ), 0, TRUE ) )
+		if ( EnoughPoints( this, GetAPsToJumpWall( this, TRUE ), 0, TRUE ) )
 		{
 			//Kaiden: Helps if we look where we are going before we try to climb on top of someone
 		 ubWhoIsThere = WhoIsThere2( NewGridNo( this->sGridNo, (UINT16)DirectionInc(bNewDirection ) ), 0 );
@@ -8562,10 +8658,12 @@ void SOLDIERTYPE::BeginSoldierFenceUp( void )
 			bNewDirection = gTwoCDirection[ bNewDirection ];
 
 			this->ubPendingDirection = bNewDirection;
-			this->EVENT_InitNewSoldierAnim( CLIMBDOWNROOF, 0 , FALSE );
+			this->EVENT_InitNewSoldierAnim( JUMPDOWNWALL, 0 , FALSE );
 
 			this->InternalReceivingSoldierCancelServices( FALSE );				
-			this->InternalGivingSoldierCancelServices( FALSE );				
+			this->InternalGivingSoldierCancelServices( FALSE );		
+
+			this->BeginSoldierClimbWall( );
 
 		}
 	}
@@ -8573,7 +8671,6 @@ void SOLDIERTYPE::BeginSoldierFenceUp( void )
 
 }
 //------------------------------------------------------------------------------------------
-
 
 UINT32 SleepDartSuccumbChance( SOLDIERTYPE * pSoldier )
 {
@@ -9141,7 +9238,7 @@ UINT8 SOLDIERTYPE::SoldierTakeDamage( INT8 bHeight, INT16 sLifeDeduct, INT16 sBr
 						//add a flag to the item so when all enemies are killed, we can run through and reveal all the enemies items
 						usItemFlags |= WORLD_ITEM_DROPPED_FROM_ENEMY;
 					}
-					if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW){
+					if(UsingNewAttachmentSystem()==true){
 						ReduceAttachmentsOnGunForNonPlayerChars(this, &(this->inv[ HANDPOS ]));
 					}
 					AddItemToPool( this->sGridNo, &(this->inv[ HANDPOS ]), bVisible, this->pathing.bLevel, usItemFlags, -1 ); //Madd: added usItemFlags to function arguments
@@ -9909,7 +10006,7 @@ void SOLDIERTYPE::BeginSoldierClimbDownRoof( void )
 			 bNewDirection = gTwoCDirection[ bNewDirection ];
 
 			 this->ubPendingDirection = bNewDirection;
-			 this->EVENT_InitNewSoldierAnim( CLIMBDOWNROOF, 0 , FALSE );
+			 this->EVENT_InitNewSoldierAnim( JUMPDOWNWALL, 0 , FALSE );
 
 			 this->InternalReceivingSoldierCancelServices( FALSE );
 			 this->InternalGivingSoldierCancelServices( FALSE );
@@ -11320,6 +11417,7 @@ void SOLDIERTYPE::EVENT_SoldierBeginFirstAid( INT32 sGridNo, UINT8 ubDirection )
 
 			if ( !fRefused )
 			{
+				/*
 				if ( CREATURE_OR_BLOODCAT( pTSoldier ) )
 				{
 					// nope!!
@@ -11327,6 +11425,8 @@ void SOLDIERTYPE::EVENT_SoldierBeginFirstAid( INT32 sGridNo, UINT8 ubDirection )
 					ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_UI_FEEDBACK, Message[ STR_REFUSE_FIRSTAID_FOR_CREATURE ] );
 				}
 				else if ( !pTSoldier->aiData.bNeutral && pTSoldier->stats.bLife >= OKLIFE && pTSoldier->bSide != this->bSide )
+				*/
+				if ( !pTSoldier->aiData.bNeutral && pTSoldier->stats.bLife >= OKLIFE && pTSoldier->bSide != this->bSide )
 				{
 					fRefused = TRUE;
 					ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_UI_FEEDBACK, Message[ STR_REFUSE_FIRSTAID ] );
@@ -11636,16 +11736,19 @@ UINT32 SOLDIERTYPE::SoldierDressWound( SOLDIERTYPE *pVictim, INT16 sKitPts, INT1
 			usLifeReturned = pVictim->iHealableInjury * (gSkillTraitValues.ubDOSurgeryHealPercentBase + gSkillTraitValues.ubDOSurgeryHealPercentOnTop * NUM_SKILL_TRAITS( this, DOCTOR_NT ))/100;
 				
 			pVictim->iHealableInjury = 0;
+			//CHRISL: Why would we arbitrarily use all ubPtsLeft when a victim isn't bleeding?  And why would the medical bag, which we have to use in order to 
+			//	do surgery, have any extra benefit?  Plus, the medical back bonus can actually result in ubPtsLeft being HIGHER then it was before we healed the
+			//	victim, which makes no sense.
 			// keep the rest of the points to bandaging if neccessary
-			if (pVictim->bBleeding > 0)
-			{
+			//if (pVictim->bBleeding > 0)
+			//{
 				ubPtsLeft = max(0, (ubPtsLeft - (usLifeReturned / 100)));
-				ubPtsLeft += (ubPtsLeft/2); // we use medical bag so add the bonus for that.
-			}
-			else
-			{
-				ubPtsLeft = 0;
-			}
+			//	ubPtsLeft += (ubPtsLeft/2); // we use medical bag so add the bonus for that.
+			//}
+			//else
+			//{
+			//	ubPtsLeft = 0;
+			//}
 
 			// We are finished !!!
 			this->fDoingSurgery = FALSE;
@@ -11739,9 +11842,9 @@ UINT32 SOLDIERTYPE::SoldierDressWound( SOLDIERTYPE *pVictim, INT16 sKitPts, INT1
 		pVictim->flags.fWarnedAboutBleeding = FALSE;
 	}
 
-
+	//CHRISL: If by some chance ubPtsLeft ends up being higher then uiActual, we'll end up with a huge value since uiActual is an unsigned variable.
 	// if there are any ptsLeft now, then we didn't actually get to use them
-	uiActual = max(0, (uiActual - ubPtsLeft));
+	uiActual = max(0, (INT32)(uiActual - ubPtsLeft));
 
 	// usedAPs equals (actionPts) * (%of possible points actually used)
 	uiUsedAPs = ( uiActual * uiAvailAPs ) / uiPossible;
@@ -12964,6 +13067,10 @@ void HandlePlacingRoofMarker( SOLDIERTYPE *pSoldier, INT32 sGridNo, BOOLEAN fSet
 		return;
 	}
 
+	//CHRISL: If sGridNo is -1, which can be the case if there is a dead merc still listed as part of a unit, crashes will occur
+	if ( sGridNo == -1 )
+		return;
+
 	if ( pSoldier->bTeam != gbPlayerNum )
 	{
 		//return;
@@ -12977,6 +13084,11 @@ void HandlePlacingRoofMarker( SOLDIERTYPE *pSoldier, INT32 sGridNo, BOOLEAN fSet
 
 		// Return if we are still climbing roof....
 		if ( pSoldier->usAnimState == CLIMBUPROOF && !fForce )
+		{
+			return;
+		}
+		
+		if ( pSoldier->usAnimState == JUMPUPWALL && !fForce )
 		{
 			return;
 		}
@@ -13652,6 +13764,9 @@ BOOLEAN SOLDIERTYPE::PlayerSoldierStartTalking( UINT8 ubTargetID, BOOLEAN fValid
 
 	//lal
 	// ATE; Check for normal civs...
+
+	BOOLEAN apsDeducted = FALSE;
+
 	if ( GetCivType( pTSoldier ) != CIV_TYPE_NA )
 	{
 		//lal
@@ -13664,14 +13779,19 @@ BOOLEAN SOLDIERTYPE::PlayerSoldierStartTalking( UINT8 ubTargetID, BOOLEAN fValid
 		{
 			// Deduct points from our guy....
 			DeductPoints( this, sAPCost, 0 );
+			apsDeducted = TRUE;
 
 			StartCivQuote( pTSoldier );
 			return( FALSE );
 		}
 	}
 
-
-
+	// WANNE: This fixes the bug, that APs for talking are not always deducted.
+	if (!apsDeducted)
+	{
+		DeductPoints( this, sAPCost, 0 );
+		apsDeducted = TRUE;
+	}
 
 	// Are we an EPC that is being escorted?
 	if ( pTSoldier->ubProfile != NO_PROFILE && pTSoldier->ubWhatKindOfMercAmI == MERC_TYPE__EPC )
@@ -14011,7 +14131,7 @@ void InternalPlaySoldierFootstepSound( SOLDIERTYPE * pSoldier )
 	// Determine if we are on the floor
 	if ( !( pSoldier->flags.uiStatusFlags & SOLDIER_VEHICLE ) )
 	{
-		if ( pSoldier->usAnimState == HOPFENCE )
+		if ( pSoldier->usAnimState == HOPFENCE || pSoldier->usAnimState == JUMPWINDOWS)
 		{
 			bVolume = HIGHVOLUME;
 		}
@@ -14294,6 +14414,11 @@ void SetSoldierPersonalLightLevel( SOLDIERTYPE *pSoldier )
 		return;
 	}
 
+	if(gpWorldLevelData[pSoldier->sGridNo].pMercHead == NULL)
+	{
+		return;
+	}
+
 	//THe light level for the soldier
 	gpWorldLevelData[pSoldier->sGridNo].pMercHead->ubShadeLevel = 3;
 	gpWorldLevelData[pSoldier->sGridNo].pMercHead->ubSumLights = 5;
@@ -14301,56 +14426,14 @@ void SetSoldierPersonalLightLevel( SOLDIERTYPE *pSoldier )
 	gpWorldLevelData[pSoldier->sGridNo].pMercHead->ubNaturalShadeLevel = 5;
 }
 
-//---legion by JAzz---------------------------------------
-
-void BeginSoldierFence( SOLDIERTYPE *pSoldier )
-{
-	INT8							bNewDirection;
-	UINT8							ubWhoIsThere;
-	
-
-	if ( FindFenceDirection( pSoldier, pSoldier->sGridNo, pSoldier->ubDirection, &bNewDirection ) && ( pSoldier->pathing.bLevel == 0 ) )
-	{
-		if ( EnoughPoints( pSoldier, GetAPsToClimbRoof( pSoldier, FALSE ), 0, TRUE ) )
-		{
-			//Kaiden: Helps if we look where we are going before we try to climb on top of someone
-		 ubWhoIsThere = WhoIsThere2( NewGridNo( pSoldier->sGridNo, (UINT16)DirectionInc(bNewDirection ) ), 1 );
-		 if ( ubWhoIsThere != NOBODY && ubWhoIsThere != pSoldier->ubID )
-		 {
-			return;
-		 }
-	   else
-		 {
-
-			if (pSoldier->bTeam == gbPlayerNum)
-			{
-				SetUIBusy( pSoldier->ubID );
-			}
-
-			pSoldier->sTempNewGridNo = NewGridNo( pSoldier->sGridNo, (UINT16)DirectionInc(bNewDirection ) );
-
-			pSoldier->ubPendingDirection = bNewDirection;
-			pSoldier->EVENT_InitNewSoldierAnim( CLIMBUPROOF, 0 , FALSE );
-
-			pSoldier->InternalReceivingSoldierCancelServices( FALSE );				
-			pSoldier->InternalGivingSoldierCancelServices( FALSE );	
-			
-			BeginSoldierFenceUp( pSoldier );	
-		}		
-
-		}		
-	}
-
-}
-
-void BeginSoldierFenceUp( SOLDIERTYPE *pSoldier )
+void BeginSoldierClimbWallUp( SOLDIERTYPE *pSoldier )
 {
 	INT8							bNewDirection;
 	UINT8	ubWhoIsThere;
 
-	if ( FindLowerLevelFence( pSoldier, pSoldier->sGridNo, pSoldier->ubDirection, &bNewDirection ) && ( pSoldier->pathing.bLevel > 0 ) )
+	if ( FindLowerLevelWall( pSoldier, pSoldier->sGridNo, pSoldier->ubDirection, &bNewDirection ) && ( pSoldier->pathing.bLevel > 0 ) )
 	{
-		if ( EnoughPoints( pSoldier, GetAPsToClimbRoof( pSoldier, TRUE ), 0, TRUE ) )
+		if ( EnoughPoints( pSoldier, GetAPsToJumpWall( pSoldier, TRUE ), 0, TRUE ) )
 		{
 			//Kaiden: Helps if we look where we are going before we try to climb on top of someone
 		 ubWhoIsThere = WhoIsThere2( NewGridNo( pSoldier->sGridNo, (UINT16)DirectionInc(bNewDirection ) ), 0 );
@@ -14371,7 +14454,7 @@ void BeginSoldierFenceUp( SOLDIERTYPE *pSoldier )
 			bNewDirection = gTwoCDirection[ bNewDirection ];
 
 			pSoldier->ubPendingDirection = bNewDirection;
-			pSoldier->EVENT_InitNewSoldierAnim( CLIMBDOWNROOF, 0 , FALSE );
+			pSoldier->EVENT_InitNewSoldierAnim( JUMPDOWNWALL, 0 , FALSE );
 
 			pSoldier->InternalReceivingSoldierCancelServices( FALSE );				
 			pSoldier->InternalGivingSoldierCancelServices( FALSE );				

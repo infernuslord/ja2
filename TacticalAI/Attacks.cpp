@@ -299,7 +299,9 @@ void CalcBestShot(SOLDIERTYPE *pSoldier, ATTACKTYPE *pBestShot, BOOLEAN shootUns
 		}
 		else
 		{
-			ubMaxPossibleAimTime = min(AllowedAimingLevels(pSoldier),pSoldier->bActionPoints - ubMinAPcost);
+			// HEADROCK HAM 3.6: Calculation must take into account APBP constants and other aiming modifications!
+			INT8 bAPsLeft = pSoldier->bActionPoints - ubMinAPcost;
+			ubMaxPossibleAimTime = CalcAimingLevelsAvailableWithAP( pSoldier, pOpponent->sGridNo, bAPsLeft );
 		}
 
 		// consider the various aiming times
@@ -1091,7 +1093,8 @@ void CalcBestThrow(SOLDIERTYPE *pSoldier, ATTACKTYPE *pBestThrow)
 				}
 
 				// calculate the maximum possible aiming time
-				ubMaxPossibleAimTime = min(AllowedAimingLevels(pSoldier),pSoldier->bActionPoints - ubMinAPcost);
+				// HEADROCK HAM 4: Required for new Aiming Level Limits function
+				ubMaxPossibleAimTime = min( AllowedAimingLevels(pSoldier, sGridNo), pSoldier->bActionPoints - ubMinAPcost);
 				DebugMsg(TOPIC_JA2 , DBG_LEVEL_3 , String("Max Possible Aim Time = %d",ubMaxPossibleAimTime ));
 
 				// calc next attack's minimum AP cost (excludes readying & turning)
@@ -1305,7 +1308,8 @@ void CalcBestStab(SOLDIERTYPE *pSoldier, ATTACKTYPE *pBestStab, BOOLEAN fBladeAt
 		iBestHitRate = 0;					 // reset best hit rate to minimum
 
 		// calculate the maximum possible aiming time
-		ubMaxPossibleAimTime = min(AllowedAimingLevels(pSoldier),pSoldier->bActionPoints - ubMinAPCost);
+		// HEADROCK HAM 4: Required for new Aiming Level Limits function
+		ubMaxPossibleAimTime = min(AllowedAimingLevels(pSoldier, pOpponent->sGridNo),pSoldier->bActionPoints - ubMinAPCost);
 		//NumMessage("Max Possible Aim Time = ",ubMaxPossibleAimTime);
 
 		// consider the various aiming times
@@ -2643,11 +2647,9 @@ void CheckIfShotPossible(SOLDIERTYPE *pSoldier, ATTACKTYPE *pBestShot, BOOLEAN s
 //			(suppressionFire  && IsGunAutofireCapable(&pSoldier->inv[pBestShot->bWeaponIn] ) && GetMagSize(pObj) > 30 && (*pObj)[0]->data.gun.ubGunShotsLeft > 20 ))
 		BOOLEAN fEnableAISuppression = FALSE;
 
-		if ( gGameExternalOptions.fIncreaseAISuppressionFire && ((!suppressionFire && ( (IsScoped(pObj) && GunRange(pObj, pSoldier) > MaxNormalDistanceVisible() ) || pSoldier->aiData.bOrders == SNIPER ) ) || // SANDRO - added argument to GunRange()
-			(suppressionFire  && IsGunAutofireCapable(&pSoldier->inv[pBestShot->bWeaponIn]))) )
-			fEnableAISuppression = TRUE;
-		else if ( !gGameExternalOptions.fIncreaseAISuppressionFire && ( (!suppressionFire && ( (IsScoped(pObj) && GunRange(pObj, pSoldier) > MaxNormalDistanceVisible() ) || pSoldier->aiData.bOrders == SNIPER ) ) || // SANDRO - added argument
-			(suppressionFire  && IsGunAutofireCapable(&pSoldier->inv[pBestShot->bWeaponIn] ) && GetMagSize(pObj) > 30 && (*pObj)[0]->data.gun.ubGunShotsLeft > 20 )))
+		// CHRISL: Changed from a simple flag to two externalized values for more modder control over AI suppression
+		if ( ((!suppressionFire && ( (IsScoped(pObj) && GunRange(pObj, pSoldier) > MaxNormalDistanceVisible() ) || pSoldier->aiData.bOrders == SNIPER ) ) || // SANDRO - added argument to GunRange()
+			(suppressionFire  && IsGunAutofireCapable(&pSoldier->inv[pBestShot->bWeaponIn]) && GetMagSize(pObj) >= gGameExternalOptions.ubAISuppressionMinimumMagSize && (*pObj)[0]->data.gun.ubGunShotsLeft >= gGameExternalOptions.ubAISuppressionMinimumAmmo)) )
 			fEnableAISuppression = TRUE;
 
 		if (fEnableAISuppression)
@@ -2799,4 +2801,17 @@ BOOLEAN AIDetermineStealingWeaponAttempt( SOLDIERTYPE * pSoldier, SOLDIERTYPE * 
 	{
 		return( FALSE );	
 	}
+}
+
+// HEADROCK HAM 4: This is required for the AI to be able to assess the length of autofire volleys using the new
+// recoil system. 
+FLOAT AICalcRecoilForShot( SOLDIERTYPE *pSoldier, OBJECTTYPE *pWeapon, UINT8 ubShotNum)
+{
+	INT8 bRecoilX = 0;
+	INT8 bRecoilY = 0;
+	GetRecoil( pSoldier, pWeapon, &bRecoilX, &bRecoilY, ubShotNum );
+	// Return average shooter's ability to control this gun.
+	// HEADROCK HAM 4: TODO: Incorporate items that alter max counter-force.
+	FLOAT AverageRecoil = __max(0, ((FLOAT)sqrt( (FLOAT)(bRecoilX * bRecoilX) + (FLOAT)(bRecoilY * bRecoilY) ) - (gGameCTHConstants.RECOIL_MAX_COUNTER_FORCE * 0.7f) ) );
+	return AverageRecoil;
 }

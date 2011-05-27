@@ -26,6 +26,7 @@
 	#include "GameSettings.h"
 	#include <string>
 #endif
+#include "soldier profile type.h"
 
 #ifdef JA2UB
 #include "Ja25_Tactical.h"
@@ -257,7 +258,10 @@ UINT32 guiEmailMessage;
 UINT32 guiMAILDIVIDER;
 
 INT16 giCurrentIMPSlot = PLAYER_GENERATED_CHARACTER_ID;
-
+EMAIL_MERC_AVAILABLE_VALUES EmailMercAvailableText[NUM_PROFILES];
+EMAIL_MERC_LEVEL_UP_VALUES EmailMercLevelUpText[NUM_PROFILES];
+EMAIL_OTHER_VALUES EmailOtherText[EMAIL_INDEX];
+BOOLEAN ReadXMLEmail = TRUE;
 
 
 // the enumeration of headers
@@ -341,7 +345,7 @@ void PreProcessEmail( EmailPtr pMail );
 void ModifyInsuranceEmails( UINT16 usMessageId, INT32 *iResults, EmailPtr pMail, UINT8 ubNumberOfRecords );
 BOOLEAN ReplaceMercNameAndAmountWithProperData( CHAR16 *pFinishedString, EmailPtr pMail );
 BOOLEAN ReplaceBiffNameWithProperMercName( CHAR16 *pFinishedString, EmailPtr pMail, CHAR16 *pMercName );
-extern UINT16 gusCurShipmentDestinationID;
+extern INT16 gusCurShipmentDestinationID;
 extern CPostalService gPostalService;
 
 
@@ -427,7 +431,7 @@ BOOLEAN EnterEmail()
 	FilenameForBPP("LAPTOP\\maillistdivider.sti", VObjectDesc.ImageFile);
 	CHECKF(AddVideoObject(&VObjectDesc, &guiMAILDIVIDER));
 
-	//AddEmail(IMP_EMAIL_PROFILE_RESULTS, IMP_EMAIL_PROFILE_RESULTS_LENGTH, IMP_PROFILE_RESULTS, GetWorldTotalMin( ) );
+	//AddEmail(IMP_EMAIL_PROFILE_RESULTS, IMP_EMAIL_PROFILE_RESULTS_LENGTH, IMP_PROFILE_RESULTS, GetWorldTotalMin( ), -1, -1 );
 	// initialize mouse regions
 	InitializeMouseRegions();
 
@@ -450,7 +454,7 @@ BOOLEAN EnterEmail()
 	RenderEmail();
 
 
-	//AddEmail( MERC_REPLY_GRIZZLY, MERC_REPLY_LENGTH_GRIZZLY, GRIZZLY_MAIL, GetWorldTotalMin() );
+	//AddEmail( MERC_REPLY_GRIZZLY, MERC_REPLY_LENGTH_GRIZZLY, GRIZZLY_MAIL, GetWorldTotalMin(), -1, -1 );
 	//RenderButtons( );
 
 
@@ -675,7 +679,7 @@ void RenderEmail( void )
 }
 
 //-----------Custom email
-void AddCustomEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition)
+void AddCustomEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition, INT16 iCurrentShipmentDestinationID, UINT8 EmailType)
 {
 	CHAR16 pSubject[320];
 	//MessagePtr pMessageList;
@@ -684,7 +688,7 @@ void AddCustomEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, 
 	
 	LoadEncryptedDataFromFile(EMAIL_EDT_CUSTOM_FILE, pSubject, 640*(iMessageOffset), 640);
 	// add message to list
-	AddEmailMessage(iMessageOffset,iMessageLength, pSubject, iDate, ubSender, FALSE, 0, 0, iCurrentIMPPosition );
+	AddEmailMessage(iMessageOffset,iMessageLength, pSubject, iDate, ubSender, FALSE, 0, 0, iCurrentIMPPosition, iCurrentShipmentDestinationID, EmailType);
 
 	// if we are in fact int he laptop, redraw icons, might be change in mail status
 
@@ -699,7 +703,7 @@ void AddCustomEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, 
 
 //--
 
-void AddEmailWithSpecialData(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iFirstData, UINT32 uiSecondData )
+void AddEmailWithSpecialData(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iFirstData, UINT32 uiSecondData, UINT8 EmailType )
 {
 	CHAR16 pSubject[320];
 	//MessagePtr pMessageList;
@@ -730,7 +734,7 @@ void AddEmailWithSpecialData(INT32 iMessageOffset, INT32 iMessageLength, UINT8 u
 	ReplaceMercNameAndAmountWithProperData( pSubject, &FakeEmail );
 
 	// add message to list
-	AddEmailMessage(iMessageOffset,iMessageLength, pSubject, iDate, ubSender, FALSE, iFirstData, uiSecondData, -1 );
+	AddEmailMessage(iMessageOffset,iMessageLength, pSubject, iDate, ubSender, FALSE, iFirstData, uiSecondData, -1 , -1, EmailType);
 
 	// if we are in fact int he laptop, redraw icons, might be change in mail status
 
@@ -743,13 +747,117 @@ void AddEmailWithSpecialData(INT32 iMessageOffset, INT32 iMessageLength, UINT8 u
 	return;
 }
 
-void AddEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition)
+//--- XML Read Mail ---
+void AddPreReadEmailTypeXML( INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, UINT8 EmailType )
+{
+	CHAR16 pSubject[320];
+	
+	UINT8 subjectLine = 0;
+	if ( EmailType == TYPE_EMAIL_AIM_AVAILABLE )
+	{
+		if (EmailMercAvailableText[subjectLine].szSubject !='\0')
+			wcscpy( pSubject, EmailMercAvailableText[ubSender].szSubject );
+		else
+			wcscpy( pSubject, L"None" );
+	}
+	else if ( EmailType == TYPE_EMAIL_MERC_LEVEL_UP )
+	{
+		if (EmailMercLevelUpText[subjectLine].szSubject !='\0')
+			wcscpy( pSubject, EmailMercLevelUpText[ubSender].szSubject );
+		else
+			wcscpy( pSubject, L"None" );
+	}
+
+	// add message to list
+	AddEmailMessage( iMessageOffset,iMessageLength, pSubject, iDate, ubSender, TRUE, 0, 0, -1, -1 , EmailType );
+
+	// if we are in fact int he laptop, redraw icons, might be change in mail status
+
+	if( fCurrentlyInLaptop == TRUE )
+	{
+	// redraw icons, might be new mail
+	DrawLapTopIcons();
+	}
+
+	return;
+}
+
+void AddEmailTypeXML( INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition, UINT8 EmailType )
+{
+	CHAR16 pSubject[320];
+
+	UINT8 subjectLine = 0;
+	if ( EmailType == TYPE_EMAIL_AIM_AVAILABLE )
+	{
+		if (EmailMercAvailableText[subjectLine].szSubject !='\0')
+			wcscpy( pSubject, EmailMercAvailableText[ubSender].szSubject );
+		else
+			wcscpy( pSubject, L"None" );
+	}
+	else if ( EmailType == TYPE_EMAIL_MERC_LEVEL_UP )
+	{
+		if (EmailMercLevelUpText[subjectLine].szSubject !='\0')
+			wcscpy( pSubject, EmailMercLevelUpText[ubSender].szSubject );
+		else
+			wcscpy( pSubject, L"None" );
+	}
+	/*else if ( EmailType == TYPE_EMAIL_OTHER )
+	{
+		//if (EmailOtherText[subjectLine].szSubject !='\0')
+			wcscpy( pSubject, EmailOtherText[iMessageLength].szSubject );
+		//else
+		//	wcscpy( pSubject, L"None" );
+	}
+	*/
+	AddEmailMessage(iMessageOffset,iMessageLength, pSubject, iDate, ubSender, FALSE, 0, 0, iCurrentIMPPosition, -1, EmailType );
+
+	// if we are in fact int he laptop, redraw icons, might be change in mail status
+
+	if( fCurrentlyInLaptop == TRUE )
+	{
+		// redraw icons, might be new mail
+		DrawLapTopIcons();
+	}
+
+	return;
+}
+
+//--- End XML Read Mail ---
+
+void AddEmailWFMercAvailable(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition, UINT8 EmailType)
+{
+	CHAR16 pSubject[320];
+
+	UINT8 subjectLine = 0;
+
+	// WF mercs
+	if (iMessageLength < 178) // -> see: New113AIMMercMailTexts	
+		subjectLine = (iMessageLength - 170) * 2;
+	// Generic mercs
+	else
+		subjectLine = 16;	// -> see: New113AIMMercMailTexts
+
+		wcscpy( pSubject, New113AIMMercMailTexts[subjectLine] );
+	
+	AddEmailMessage(iMessageOffset,iMessageLength, pSubject, iDate, ubSender, FALSE, 0, 0, iCurrentIMPPosition, -1 , EmailType);
+
+	// if we are in fact int he laptop, redraw icons, might be change in mail status
+
+	if( fCurrentlyInLaptop == TRUE )
+	{
+		// redraw icons, might be new mail
+		DrawLapTopIcons();
+	}
+
+	return;
+}
+
+void AddEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition, INT16 iCurrentShipmentDestinationID, UINT8 EmailType)
 {
 	CHAR16 pSubject[320];
 	//MessagePtr pMessageList;
 	//MessagePtr pMessage;
 	//CHAR16 pMessageString[320];
-	
 #ifdef JA2UB	
 	if (FileExists(EMAIL_EDT_FILE_JA25))
 	{
@@ -764,20 +872,20 @@ void AddEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 
 	LoadEncryptedDataFromFile("BINARYDATA\\Email.edt", pSubject, 640*(iMessageOffset), 640);
 #endif
 	// add message to list
-	AddEmailMessage(iMessageOffset,iMessageLength, pSubject, iDate, ubSender, FALSE, 0, 0, iCurrentIMPPosition );
+	AddEmailMessage(iMessageOffset,iMessageLength, pSubject, iDate, ubSender, FALSE, 0, 0, iCurrentIMPPosition, iCurrentShipmentDestinationID, EmailType);
 
 	// if we are in fact int he laptop, redraw icons, might be change in mail status
 
 	if( fCurrentlyInLaptop == TRUE )
 	{
-	// redraw icons, might be new mail
-	DrawLapTopIcons();
+		// redraw icons, might be new mail
+		DrawLapTopIcons();
 	}
 
 	return;
 }
 
-void AddPreReadEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate)
+void AddPreReadEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate , UINT8 EmailType )
 {
 	CHAR16 pSubject[320];
 	//MessagePtr pMessageList;
@@ -798,7 +906,7 @@ void AddPreReadEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender,
 	LoadEncryptedDataFromFile("BINARYDATA\\Email.edt", pSubject, 640*(iMessageOffset), 640);
 #endif
 	// add message to list
-	AddEmailMessage(iMessageOffset,iMessageLength, pSubject, iDate, ubSender, TRUE, 0, 0, -1 );
+	AddEmailMessage( iMessageOffset,iMessageLength, pSubject, iDate, ubSender, TRUE, 0, 0, -1, -1 , EmailType );
 
 	// if we are in fact int he laptop, redraw icons, might be change in mail status
 
@@ -811,7 +919,7 @@ void AddPreReadEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender,
 	return;
 }
 
-void AddEmailMessage(INT32 iMessageOffset, INT32 iMessageLength,STR16 pSubject, INT32 iDate, UINT8 ubSender, BOOLEAN fAlreadyRead, INT32 iFirstData, UINT32 uiSecondData, INT32 iCurrentIMPPosition )
+void AddEmailMessage(INT32 iMessageOffset, INT32 iMessageLength,STR16 pSubject, INT32 iDate, UINT8 ubSender, BOOLEAN fAlreadyRead, INT32 iFirstData, UINT32 uiSecondData, INT32 iCurrentIMPPosition, INT16 iCurrentShipmentDestinationID, UINT8 EmailType )
 {
 	// will add a message to the list of messages
 	EmailPtr pEmail=pEmailList;
@@ -852,10 +960,24 @@ void AddEmailMessage(INT32 iMessageOffset, INT32 iMessageLength,STR16 pSubject, 
 	//}
 	//pTempEmail->pText[iCounter]=NULL;
 
+	/*
+	// WANNE: Not needed anymore, bug is fixed!!
+	// WANNE: Fix the memory heap problem -> CTD (fix by BirdFlu)
+	// The text for the wildfire merc is too long (> 128 characters)!!
+	// copy subject
+    int _len = wcslen(pSubject);
+    pTempEmail->pSubject = (STR16) MemAlloc( (_len + 1) * sizeof(CHAR16) );
+    memset( pTempEmail->pSubject, 0, sizeof( CHAR16 ) * (_len + 1) );
+    wcsncpy(pTempEmail->pSubject,pSubject,_len);
+    pTempEmail->pSubject[_len] = 0;
+	*/
+	
 	// copy subject
 	pTempEmail->pSubject = (STR16) MemAlloc( 128 * sizeof(CHAR16) );
 	memset( pTempEmail->pSubject, 0, sizeof( CHAR16 ) * 128 );
 	wcscpy(pTempEmail->pSubject,pSubject);
+	
+	pTempEmail->EmailVersion = EmailType;
 
 	// copy offset and length of the actual message in email.edt
 	pTempEmail->usOffset =(UINT16)iMessageOffset;
@@ -865,6 +987,9 @@ void AddEmailMessage(INT32 iMessageOffset, INT32 iMessageLength,STR16 pSubject, 
 	pTempEmail->pSubject[wcslen(pSubject)+1]=0;
 
 	pTempEmail->iCurrentIMPPosition = iCurrentIMPPosition;
+
+	// WANNE.MAIL: Fix
+	pTempEmail->iCurrentShipmentDestinationID = iCurrentShipmentDestinationID;
 
 	// set date and sender, Id
 	if(pEmail)
@@ -1307,10 +1432,19 @@ void SwapMessages(INT32 iIdA, INT32 iIdB)
  pTemp->iId=pA->iId;
  pTemp->fRead=pA->fRead;
  pTemp->fNew=pA->fNew;
- pTemp->usOffset=pA->usOffset;
+ pTemp->usOffset=pA->usOffset; 
+ pTemp->EmailVersion=pA->EmailVersion;
  pTemp->usLength=pA->usLength;
  pTemp->iDate=pA->iDate;
  pTemp->ubSender=pA->ubSender;
+ 
+ if ( pA->EmailVersion == TYPE_EMAIL_AIM_AVAILABLE )
+  wcscpy(pTemp->pSubject,EmailMercAvailableText[pA->ubSender].szSubject);
+ else if ( pA->EmailVersion == TYPE_EMAIL_MERC_LEVEL_UP )
+  wcscpy(pTemp->pSubject,EmailMercLevelUpText[pA->ubSender].szSubject);
+ //else if ( pA->EmailVersion == TYPE_EMAIL_OTHER )
+ // wcscpy(pTemp->pSubject,EmailOtherText[pA->usLength].szSubject);
+ else if ( pA->EmailVersion == TYPE_EMAIL_EMAIL_EDT )				
  wcscpy(pTemp->pSubject,pA->pSubject);
 
  // pA becomes pB
@@ -1318,6 +1452,7 @@ void SwapMessages(INT32 iIdA, INT32 iIdB)
  pA->fRead=pB->fRead;
  pA->fNew=pB->fNew;
  pA->usOffset=pB->usOffset;
+ pA->EmailVersion=pB->EmailVersion;
  pA->usLength=pB->usLength;
  pA->iDate=pB->iDate;
  pA->ubSender=pB->ubSender;
@@ -1328,9 +1463,18 @@ void SwapMessages(INT32 iIdA, INT32 iIdB)
  pB->fRead=pTemp->fRead;
  pB->fNew=pTemp->fNew;
  pB->usOffset=pTemp->usOffset;
+ pB->EmailVersion=pTemp->EmailVersion;
  pB->usLength=pTemp->usLength;
  pB->iDate=pTemp->iDate;
  pB->ubSender=pTemp->ubSender;
+ 
+ if ( pB->EmailVersion == TYPE_EMAIL_AIM_AVAILABLE )
+  wcscpy(pB->pSubject,EmailMercAvailableText[pTemp->ubSender].szSubject);
+ else if ( pB->EmailVersion == TYPE_EMAIL_MERC_LEVEL_UP )
+  wcscpy(pB->pSubject,EmailMercLevelUpText[pTemp->ubSender].szSubject);
+ //else if ( pB->EmailVersion == TYPE_EMAIL_OTHER )
+ // wcscpy(pB->pSubject,EmailOtherText[pTemp->usLength].szSubject);
+ else if ( pB->EmailVersion == TYPE_EMAIL_EMAIL_EDT )
  wcscpy(pB->pSubject, pTemp->pSubject);
 
  // free up memory
@@ -1455,7 +1599,7 @@ void DrawSubject(INT32 iCounter, STR16 pSubject, BOOLEAN fRead)
 	return;
 }
 
-void DrawSender(INT32 iCounter, UINT8 ubSender, BOOLEAN fRead)
+void DrawSender(INT32 iCounter, UINT8 ubSender, BOOLEAN fRead, UINT8 EmailType)
 {
 
 	// draw name of sender in mail viewer
@@ -1474,7 +1618,24 @@ void DrawSender(INT32 iCounter, UINT8 ubSender, BOOLEAN fRead)
 		SetFont( FONT10ARIALBOLD );
 	}
 
-	mprintf(SENDER_X,(( UINT16 )( 4 + MIDDLE_Y + iCounter * MIDDLE_WIDTH ) ) ,pSenderNameList[ubSender]);
+	if ( EmailType == TYPE_EMAIL_AIM_AVAILABLE || EmailType == TYPE_EMAIL_MERC_LEVEL_UP )
+	{
+		if (gMercProfiles[ ubSender ].zNickname !='\0')
+		mprintf(SENDER_X,(( UINT16 )( 4 + MIDDLE_Y + iCounter * MIDDLE_WIDTH ) ) ,gMercProfiles[ ubSender ].zNickname);
+		else
+		mprintf(SENDER_X,(( UINT16 )( 4 + MIDDLE_Y + iCounter * MIDDLE_WIDTH ) ) ,L"None");
+	}
+	else if ( EmailType == TYPE_EMAIL_EMAIL_EDT ) //|| EmailType == TYPE_EMAIL_OTHER )
+	{
+		mprintf(SENDER_X,(( UINT16 )( 4 + MIDDLE_Y + iCounter * MIDDLE_WIDTH ) ) ,pSenderNameList[ubSender]);
+	}
+	else if ( EmailType == TYPE_EMAIL_EMAIL_EDT_NAME_MERC )
+	{
+		if (gMercProfiles[ ubSender ].zNickname !='\0')
+		mprintf(SENDER_X,(( UINT16 )( 4 + MIDDLE_Y + iCounter * MIDDLE_WIDTH ) ) ,gMercProfiles[ ubSender ].zNickname);
+		else
+		mprintf(SENDER_X,(( UINT16 )( 4 + MIDDLE_Y + iCounter * MIDDLE_WIDTH ) ) ,L"None");
+	}
 
 	SetFont( MESSAGE_FONT );
 	SetFontShadow(DEFAULT_SHADOW);
@@ -1559,8 +1720,13 @@ void DisplayEmailList()
 		//draw the icon, sender, date, subject
 		DrawLetterIcon(iCounter,pEmail->fRead );
 		DrawSubject(iCounter, pEmail->pSubject, pEmail->fRead );
-		DrawSender(iCounter, pEmail->ubSender, pEmail->fRead );
-		DrawDate(iCounter, pEmail->iDate, pEmail->fRead );
+		
+		if ( pEmail->EmailVersion == TYPE_EMAIL_AIM_AVAILABLE || pEmail->EmailVersion == TYPE_EMAIL_MERC_LEVEL_UP )
+			DrawSender(iCounter, pEmail->ubSender, pEmail->fRead, pEmail->EmailVersion);
+		else if ( pEmail->EmailVersion == TYPE_EMAIL_EMAIL_EDT || pEmail->EmailVersion == TYPE_EMAIL_EMAIL_EDT_NAME_MERC ) //|| pEmail->EmailVersion == TYPE_EMAIL_OTHER )
+			DrawSender(iCounter, pEmail->ubSender, pEmail->fRead, pEmail->EmailVersion);
+			
+			DrawDate(iCounter, pEmail->iDate, pEmail->fRead );
 
 		iCounter++;
 
@@ -1802,8 +1968,10 @@ INT32 DisplayEmailMessage(EmailPtr pMail)
 	iHeight+=GetFontHeight( MESSAGE_FONT );
 
 	// is there any special event meant for this mail?..if so, handle it
+	if ( pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT )
 	HandleAnySpecialEmailMessageEvents( iOffSet );
 
+	if ( pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT )
 	HandleMailSpecialMessages( ( UINT16 ) ( iOffSet ), &iViewerPositionY, pMail);
 
 	PreProcessEmail( pMail );
@@ -3010,9 +3178,26 @@ void DisplayEmailMessageSubjectDateFromLines( EmailPtr pMail , INT32 iViewerY)
 	mprintf( usX, MESSAGE_FROM_Y + (UINT16)iViewerY, pEmailHeaders[0]);
 
 	// the actual from info
-	mprintf( MESSAGE_HEADER_X+MESSAGE_HEADER_WIDTH-13, MESSAGE_FROM_Y + iViewerY, pSenderNameList[pMail->ubSender]);
-
-
+	if ( pMail->EmailVersion == TYPE_EMAIL_AIM_AVAILABLE || pMail->EmailVersion == TYPE_EMAIL_MERC_LEVEL_UP )
+	{
+		if (gMercProfiles[ pMail->ubSender ].zNickname !='\0')
+		mprintf( MESSAGE_HEADER_X+MESSAGE_HEADER_WIDTH-13, MESSAGE_FROM_Y + iViewerY, gMercProfiles[ pMail->ubSender ].zNickname);
+		else
+		mprintf( MESSAGE_HEADER_X+MESSAGE_HEADER_WIDTH-13, MESSAGE_FROM_Y + iViewerY, L"None");
+	}		
+	else if ( pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT ) //|| pMail->EmailVersion == TYPE_EMAIL_OTHER )
+	{
+		mprintf( MESSAGE_HEADER_X+MESSAGE_HEADER_WIDTH-13, MESSAGE_FROM_Y + iViewerY, pSenderNameList[pMail->ubSender]);
+	}
+	else if ( pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT_NAME_MERC )
+	{
+		if (gMercProfiles[ pMail->ubSender ].zNickname !='\0')
+		mprintf( MESSAGE_HEADER_X+MESSAGE_HEADER_WIDTH-13, MESSAGE_FROM_Y + iViewerY, gMercProfiles[ pMail->ubSender ].zNickname);
+		else
+		mprintf( MESSAGE_HEADER_X+MESSAGE_HEADER_WIDTH-13, MESSAGE_FROM_Y + iViewerY, L"None");
+	}	
+	
+	
 	// print date
 	FindFontRightCoordinates( MESSAGE_HEADER_X+168, ( INT16 ) ( MESSAGE_DATE_Y + (UINT16)iViewerY ),	MESSAGE_HEADER_WIDTH, ( INT16 ) ( MESSAGE_DATE_Y + GetFontHeight ( MESSAGE_FONT ) ) ,pEmailHeaders[2] ,MESSAGE_FONT, &usX, &usY);
 	mprintf( usX, MESSAGE_DATE_Y+ (UINT16)iViewerY , pEmailHeaders[2]);
@@ -3285,6 +3470,11 @@ BOOLEAN HandleMailSpecialMessages( UINT16 usMessageId, INT32 *iResults, EmailPtr
 
 			if (!pMessageRecordList)
 			{
+				// WANNE.MAIL: Fix
+				gusCurShipmentDestinationID = -1;	// Reset
+				gusCurShipmentDestinationID = pMail->iCurrentShipmentDestinationID;
+
+				// Loop through each line of the shipment EDT-file
 				for (int i = 0; i < BOBBYR_SHIPMENT_ARRIVED_LENGTH; i++)
 				{
 					wstrMail.clear();
@@ -3303,11 +3493,15 @@ BOOLEAN HandleMailSpecialMessages( UINT16 usMessageId, INT32 *iResults, EmailPtr
 
 					index = wstrMail.find(L"$DESTINATIONNAME$");
 
-					if (index != wstring::npos)
+					// WANNE.MAIL: Fix
+					if (gusCurShipmentDestinationID > 0)
 					{
-						wstrMail.erase(index, strlen("$DESTINATIONNAME$"));
-						RefToDestinationStruct ds = gPostalService.GetDestination(gusCurShipmentDestinationID);
-						wstrMail.insert(index, ds.wstrName.c_str());
+						if (index != wstring::npos)
+						{
+							wstrMail.erase(index, strlen("$DESTINATIONNAME$"));
+							RefToDestinationStruct ds = gPostalService.GetDestination(gusCurShipmentDestinationID);
+							wstrMail.insert(index, ds.wstrName.c_str());
+						}
 					}
 
 					AddEmailRecordToList((STR16)wstrMail.c_str());
@@ -3578,56 +3772,122 @@ void HandleIMPCharProfileResultsMessage( void)
 	// now the personality intro
 		iOffSet = IMP_RESULTS_ATTITUDE_INTRO;
 		iEndOfSection = IMP_RESULTS_ATTITUDE_LENGTH;
-	iCounter = 0;
+		iCounter = 0;
 
 		while(iEndOfSection > iCounter)
 		{
-		// read one record from email file
-		LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( iOffSet + iCounter ), MAIL_STRING_SIZE );
+			// read one record from email file
+			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( iOffSet + iCounter ), MAIL_STRING_SIZE );
 
-		// add to list
-		AddEmailRecordToList( pString );
+			// add to list
+			AddEmailRecordToList( pString );
 
-		// increment email record counter
-		iCounter++;
+			// increment email record counter
+			iCounter++;
 		}
-
-			// personality itself
-		switch( gMercProfiles[ iCurrentIMPSlot ].bAttitude )
+		
+		// WANNE: Old trait system: attitudes
+		if (!gGameOptions.fNewTraitSystem)
 		{
-			// normal as can be
-		case( ATT_NORMAL ):
-		iOffSet = IMP_ATTITUDE_NORMAL;
-				break;
-			case( ATT_FRIENDLY ):
-				iOffSet = IMP_ATTITUDE_FRIENDLY;
-				break;
-		case( ATT_LONER ):
-				iOffSet = IMP_ATTITUDE_LONER;
-				break;
-			case( ATT_OPTIMIST ):
-				iOffSet = IMP_ATTITUDE_OPTIMIST;
-				break;
-			case( ATT_PESSIMIST ):
-				iOffSet = IMP_ATTITUDE_PESSIMIST;
-				break;
-			case( ATT_AGGRESSIVE ):
-				iOffSet = IMP_ATTITUDE_AGGRESSIVE;
-				break;
-			case( ATT_ARROGANT ):
-				iOffSet = IMP_ATTITUDE_ARROGANT;
-				break;
-		case( ATT_ASSHOLE ):
-				iOffSet = IMP_ATTITUDE_ASSHOLE;
-				break;
-			case( ATT_COWARD ):
-				iOffSet = IMP_ATTITUDE_COWARD;
-				break;
+			// personality itself
+			switch( gMercProfiles[ iCurrentIMPSlot ].bAttitude )
+			{
+				// normal as can be
+				case( ATT_NORMAL ):
+					iOffSet = IMP_ATTITUDE_NORMAL;
+					break;
+				case( ATT_FRIENDLY ):
+					iOffSet = IMP_ATTITUDE_FRIENDLY;
+					break;
+				case( ATT_LONER ):
+					iOffSet = IMP_ATTITUDE_LONER;
+					break;
+				case( ATT_OPTIMIST ):
+					iOffSet = IMP_ATTITUDE_OPTIMIST;
+					break;
+				case( ATT_PESSIMIST ):
+					iOffSet = IMP_ATTITUDE_PESSIMIST;
+					break;
+				case( ATT_AGGRESSIVE ):
+					iOffSet = IMP_ATTITUDE_AGGRESSIVE;
+					break;
+				case( ATT_ARROGANT ):
+					iOffSet = IMP_ATTITUDE_ARROGANT;
+					break;
+				case( ATT_ASSHOLE ):
+					iOffSet = IMP_ATTITUDE_ASSHOLE;
+					break;
+				case( ATT_COWARD ):
+					iOffSet = IMP_ATTITUDE_COWARD;
+					break;
+			}
 
+			// attitude title
+			LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( iOffSet ), MAIL_STRING_SIZE );
 		}
+		// WANNE: New trait system: Character traits
+		else
+		{
+			// WANNE: Try to map "new character traits" to matching old attitudes, so we have meaningful text in IMP mail
+			switch( gMercProfiles[ iCurrentIMPSlot ].bCharacterTrait )
+			{
+				case (CHAR_TRAIT_NORMAL):
+					wcscpy(pString, gzIMPCharacterTraitText[CHAR_TRAIT_NORMAL]);
+					iOffSet = IMP_ATTITUDE_NORMAL;
+					break;
+				case (CHAR_TRAIT_SOCIABLE):
+					wcscpy(pString, gzIMPCharacterTraitText[CHAR_TRAIT_SOCIABLE]);
+					iOffSet = IMP_ATTITUDE_FRIENDLY;
+					break;
+				case (CHAR_TRAIT_LONER):
+					wcscpy(pString, gzIMPCharacterTraitText[CHAR_TRAIT_LONER]);
+					iOffSet = IMP_ATTITUDE_LONER;
+					break;
+				case (CHAR_TRAIT_OPTIMIST):
+					wcscpy(pString, gzIMPCharacterTraitText[CHAR_TRAIT_OPTIMIST]);
+					iOffSet = IMP_ATTITUDE_OPTIMIST;
+					break;
+				case (CHAR_TRAIT_ASSERTIVE):
+					wcscpy(pString, gzIMPCharacterTraitText[CHAR_TRAIT_ASSERTIVE]);
+					iOffSet = IMP_ATTITUDE_OPTIMIST;
+					break;
+				case (CHAR_TRAIT_INTELLECTUAL):
+					wcscpy(pString, gzIMPCharacterTraitText[CHAR_TRAIT_INTELLECTUAL]);
+					iOffSet = IMP_ATTITUDE_FRIENDLY;
+					break;
+				case (CHAR_TRAIT_PRIMITIVE):
+					wcscpy(pString, gzIMPCharacterTraitText[CHAR_TRAIT_PRIMITIVE]);
+					iOffSet = IMP_ATTITUDE_ARROGANT;
+					break;
+				case (CHAR_TRAIT_AGGRESSIVE):
+					wcscpy(pString, gzIMPCharacterTraitText[CHAR_TRAIT_AGGRESSIVE]);
+					iOffSet = IMP_ATTITUDE_AGGRESSIVE;
+					break;
+				case (CHAR_TRAIT_PHLEGMATIC):
+					wcscpy(pString, gzIMPCharacterTraitText[CHAR_TRAIT_PHLEGMATIC]);
+					iOffSet = IMP_ATTITUDE_PESSIMIST;
+					break;
+				case (CHAR_TRAIT_DAUNTLESS):
+					wcscpy(pString, gzIMPCharacterTraitText[CHAR_TRAIT_DAUNTLESS]);
+					iOffSet = IMP_ATTITUDE_AGGRESSIVE;
+					break;
+				case (CHAR_TRAIT_PACIFIST):
+					wcscpy(pString, gzIMPCharacterTraitText[CHAR_TRAIT_PACIFIST]);
+					iOffSet = IMP_ATTITUDE_COWARD;
+					break;
+				case (CHAR_TRAIT_MALICIOUS):
+					wcscpy(pString, gzIMPCharacterTraitText[CHAR_TRAIT_MALICIOUS]);
+					iOffSet = IMP_ATTITUDE_ASSHOLE;
+					break;
+				case (CHAR_TRAIT_SHOWOFF):
+					wcscpy(pString, gzIMPCharacterTraitText[CHAR_TRAIT_SHOWOFF]);
+					iOffSet = IMP_ATTITUDE_ARROGANT;
+					break;
+			}
 
-		// attitude title
-		LoadEncryptedDataFromFile( "BINARYDATA\\Impass.edt", pString, MAIL_STRING_SIZE * ( iOffSet ), MAIL_STRING_SIZE );
+			wcscat(pString, L". ±");
+		}
+		
 		// add to list
 		AddEmailRecordToList( pString );
 
@@ -3965,13 +4225,16 @@ void HandleIMPCharProfileResultsMessage( void)
 			// Ranger
 			if ( ProfileHasSkillTrait( iCurrentIMPSlot, RANGER_NT ) > 0 )
 			{
+				/*
 				if ( gGameExternalOptions.fShowCamouflageFaces == TRUE )
 				{
 					gCamoFace[iCurrentIMPSlot].gCamoface = TRUE;
 					gCamoFace[iCurrentIMPSlot].gUrbanCamoface = FALSE;
 					gCamoFace[iCurrentIMPSlot].gDesertCamoface = FALSE;
 					gCamoFace[iCurrentIMPSlot].gSnowCamoface = FALSE;
-				}	
+				}
+				*/
+
 				wcscpy(pString, MissingIMPSkillsDescriptions[2]);
 				AddEmailRecordToList( pString );
 			}
@@ -4952,6 +5215,7 @@ void ShutDownEmailList()
 	ClearPages();
 }
 
+// Pre Process the mail, when clicking on a mail in the mail list
 void PreProcessEmail( EmailPtr pMail )
 {
 	RecordPtr pTempRecord, pCurrentRecord, pLastRecord , pTempList;
@@ -4973,42 +5237,88 @@ void PreProcessEmail( EmailPtr pMail )
 
 	// WANNE: Get the text and replace name!
 	int iNew113MERCMerc = 0;
-	if (pMail->usLength == MERC_UP_LEVEL_GASTON || pMail->usLength == MERC_UP_LEVEL_STOGIE ||
-		pMail->usLength == MERC_UP_LEVEL_TEX || pMail->usLength == MERC_UP_LEVEL_BIGGENS)
-	{
-		iNew113MERCMerc = pMail->usLength;
-		pMail->usLength = 2;
+	int iNew113AIMMerc = 0;
+	int iEmailMERCMessage = 0;
+	int iEmailAIMMessage = 0;
+	int iEmailOther = 0;
+	
+  if ( pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT )
+	{	
+		if (pMail->usLength == MERC_UP_LEVEL_GASTON || pMail->usLength == MERC_UP_LEVEL_STOGIE ||
+			pMail->usLength == MERC_UP_LEVEL_TEX || pMail->usLength == MERC_UP_LEVEL_BIGGENS)
+		{
+			iNew113MERCMerc = pMail->usLength;
+			pMail->usLength = 2;
+		}
+		else if (pMail->usLength >= 170 && pMail->usLength <= 177)
+		{
+			iNew113AIMMerc = pMail->usLength;
+			pMail->usLength = 2;
+		}
 	}
 
+	if ( pMail->EmailVersion == TYPE_EMAIL_MERC_LEVEL_UP )
+	{
+		iEmailMERCMessage = pMail->usLength;
+		pMail->usLength = 2;	
+	}
+	
+	if ( pMail->EmailVersion == TYPE_EMAIL_AIM_AVAILABLE )
+	{
+		iEmailAIMMessage = pMail->usLength;
+		pMail->usLength = 2;	
+	}	
+	/*
+	if ( pMail->EmailVersion == TYPE_EMAIL_OTHER )	
+	{	
+		iEmailOther = pMail->usLength;
+		pMail->usLength = 6;
+	}
+	*/
 	// list doesn't exist, reload
 	if( !pTempRecord )
 	{
 		while(pMail->usLength > iCounter)
 		{
+			// read one record from email file
 		// read one record from email file
 #ifdef JA2UB
 			if (FileExists(EMAIL_EDT_FILE_JA25))
 			{
+			if ( pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT || pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT_NAME_MERC )
 			LoadEncryptedDataFromFile( EMAIL_EDT_FILE_JA25, pString, MAIL_STRING_SIZE * ( iOffSet + iCounter ), MAIL_STRING_SIZE );
 			}
 			else
 			{
+			if ( pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT || pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT_NAME_MERC )
 			LoadEncryptedDataFromFile( EMAIL_EDT_FILE_JA2, pString, MAIL_STRING_SIZE * ( iOffSet + iCounter ), MAIL_STRING_SIZE );
 			}
 #else
+		if ( pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT || pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT_NAME_MERC )
 		LoadEncryptedDataFromFile( "BINARYDATA\\Email.edt", pString, MAIL_STRING_SIZE * ( iOffSet + iCounter ), MAIL_STRING_SIZE );
 #endif
+			/*
+			if ( pMail->EmailVersion == TYPE_EMAIL_OTHER )	
+			{
+				//if ( iCounter != 29 )
+					wcscpy(pString, L"\0");
+					wcscat( pString, EmailOtherText[iEmailOther].szMessage[pMail->usLength]);	
+				//	wcscat( pString, EmailOtherText[0].szMessage[1]);	
+			}
+			*/	
+			// ----------------
+			// New MERC Merc
+			// ----------------
 			// WANNE: We have a new 1.13 MERC merc (Text, Gaston, Stogie or Biggens)
-			if (iNew113MERCMerc != 0)
+			if (iNew113MERCMerc != 0 )
 			{
 				// WANNE: TODO: Replace "Biff" with the name of the 1.13 merc
-				if (iCounter == 1)
+				if (iCounter == 1 && pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT )
 				{
 					wcscpy(pString, L"\0");
 					if (iNew113MERCMerc == MERC_UP_LEVEL_GASTON)
 					{
-						wcscpy( pString, New113MERCMercMailTexts[0] );
-						
+						wcscpy( pString, New113MERCMercMailTexts[0] );						
 					}
 					else if (iNew113MERCMerc == MERC_UP_LEVEL_STOGIE)
 					{
@@ -5024,7 +5334,72 @@ void PreProcessEmail( EmailPtr pMail )
 					}
 				}
 			}
+
+			// ----------------
+			// New AIM Merc
+			// ----------------
+			// WANNE: We have a new 1.13 MERC merc (Text, Gaston, Stogie or Biggens)
+			if (iNew113AIMMerc != 0)
+			{				
+				wcscpy(pString, L"\0");
+
+				// Only output the mail text, not the subject, cause we already have the subject as text
+				if (iCounter == 1 && pMail->EmailVersion ==  TYPE_EMAIL_EMAIL_EDT )
+				{
+					if (iNew113AIMMerc == 170)
+					{
+						wcscpy( pString, New113AIMMercMailTexts[1] );						
+					}
+					else if (iNew113AIMMerc == 171)
+					{
+						wcscpy( pString, New113AIMMercMailTexts[3] );
+					}
+					else if (iNew113AIMMerc == 172)
+					{
+						wcscpy( pString, New113AIMMercMailTexts[5] );
+					}
+					else if (iNew113AIMMerc == 173)
+					{
+						wcscpy( pString, New113AIMMercMailTexts[7] );
+					}
+					else if (iNew113AIMMerc == 174)
+					{
+						wcscpy( pString, New113AIMMercMailTexts[9] );
+					}
+					else if (iNew113AIMMerc == 175)
+					{
+						wcscpy( pString, New113AIMMercMailTexts[11] );
+					}
+					else if (iNew113AIMMerc == 176)
+					{
+						wcscpy( pString, New113AIMMercMailTexts[13] );
+					}
+					else if (iNew113AIMMerc == 177)
+					{
+						wcscpy( pString, New113AIMMercMailTexts[15] );
+					}
+					// Additional Generic Merc mail message
+					else
+					{
+						wcscpy( pString, New113AIMMercMailTexts[17] );
+					}
+				}
+			}
 			
+			if (iCounter == 1)
+			{
+				if ( pMail->EmailVersion == TYPE_EMAIL_AIM_AVAILABLE )
+				{
+					wcscpy(pString, L"\0");
+					wcscpy( pString, EmailMercAvailableText[iEmailAIMMessage].szMessage);
+				}
+				else if ( pMail->EmailVersion == TYPE_EMAIL_MERC_LEVEL_UP)
+				{
+					wcscpy(pString, L"\0");
+					wcscpy( pString, EmailMercLevelUpText[iEmailMERCMessage].szMessage);				
+				}
+			}
+		
 			// add to list
 			AddEmailRecordToList( pString );
 
@@ -5032,12 +5407,31 @@ void PreProcessEmail( EmailPtr pMail )
 			iCounter++;
 		}
 
+	if ( pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT )
+	{
 		// WANNE: Set the value back
 		if (iNew113MERCMerc != 0)
 		{
 			pMail->usLength = iNew113MERCMerc;
 		}
 
+		// WANNE: Set the value back
+		if (iNew113AIMMerc != 0)
+		{
+			pMail->usLength = iNew113AIMMerc;
+		}
+	}
+		
+		
+	if ( pMail->EmailVersion == TYPE_EMAIL_AIM_AVAILABLE )
+		pMail->usLength = iEmailAIMMessage;
+		
+	if ( pMail->EmailVersion == TYPE_EMAIL_MERC_LEVEL_UP )
+		pMail->usLength = iEmailMERCMessage;
+		
+	//if ( pMail->EmailVersion == TYPE_EMAIL_OTHER )
+	//	pMail->usLength = iEmailOther;
+		
 		giPrevMessageId = giMessageId;
 
 	}
@@ -5476,71 +5870,71 @@ void AddAllEmails()
 #ifdef JA2UB
 //no UB
 #else
-	AddEmail(IMP_EMAIL_INTRO,IMP_EMAIL_INTRO_LENGTH,CHAR_PROFILE_SITE,	GetWorldTotalMin(), -1 );
-	AddEmail(ENRICO_CONGRATS,ENRICO_CONGRATS_LENGTH,MAIL_ENRICO, GetWorldTotalMin(), -1 );
-	AddEmail(IMP_EMAIL_AGAIN,IMP_EMAIL_AGAIN_LENGTH,1, GetWorldTotalMin( ), -1 );
-	AddEmail(MERC_INTRO, MERC_INTRO_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin( ), -1 );
-	AddEmail( MERC_NEW_SITE_ADDRESS, MERC_NEW_SITE_ADDRESS_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1 );
+	AddEmail(IMP_EMAIL_INTRO,IMP_EMAIL_INTRO_LENGTH,CHAR_PROFILE_SITE,	GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT );
+	AddEmail(ENRICO_CONGRATS,ENRICO_CONGRATS_LENGTH,MAIL_ENRICO, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT );
+	AddEmail(IMP_EMAIL_AGAIN,IMP_EMAIL_AGAIN_LENGTH,1, GetWorldTotalMin( ), -1, -1, TYPE_EMAIL_EMAIL_EDT );
+	AddEmail(MERC_INTRO, MERC_INTRO_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin( ), -1, -1, TYPE_EMAIL_EMAIL_EDT );
+	AddEmail( MERC_NEW_SITE_ADDRESS, MERC_NEW_SITE_ADDRESS_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT );
 
-	AddEmail(IMP_EMAIL_PROFILE_RESULTS, IMP_EMAIL_PROFILE_RESULTS_LENGTH, IMP_PROFILE_RESULTS, GetWorldTotalMin( ), -1 );
+	AddEmail(IMP_EMAIL_PROFILE_RESULTS, IMP_EMAIL_PROFILE_RESULTS_LENGTH, IMP_PROFILE_RESULTS, GetWorldTotalMin( ), -1, -1, TYPE_EMAIL_EMAIL_EDT );
 
-	AddEmail( MERC_WARNING, MERC_WARNING_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1);
-	AddEmail( MERC_INVALID, MERC_INVALID_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1);
-	AddEmail( NEW_MERCS_AT_MERC, NEW_MERCS_AT_MERC_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1);
-	AddEmail( MERC_FIRST_WARNING, MERC_FIRST_WARNING_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1);
+	AddEmail( MERC_WARNING, MERC_WARNING_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
+	AddEmail( MERC_INVALID, MERC_INVALID_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
+	AddEmail( NEW_MERCS_AT_MERC, NEW_MERCS_AT_MERC_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
+	AddEmail( MERC_FIRST_WARNING, MERC_FIRST_WARNING_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
 
 	uiOffset = MERC_UP_LEVEL_BIFF;
 	for( uiCnt=0; uiCnt<10; uiCnt++)
 	{
-		AddEmail( uiOffset, MERC_UP_LEVEL_LENGTH_BIFF, SPECK_FROM_MERC, GetWorldTotalMin(), -1 );
+		AddEmail( uiOffset, MERC_UP_LEVEL_LENGTH_BIFF, SPECK_FROM_MERC, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT_NAME_MERC );
 		uiOffset += MERC_UP_LEVEL_LENGTH_BIFF;
 	}
 
-//	AddEmail( ( UINT8 )( AIM_REPLY_BARRY + ( AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, AIM_REPLY_BARRY, GetWorldTotalMin() );
+//	AddEmail( ( UINT8 )( AIM_REPLY_BARRY + ( AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, AIM_REPLY_BARRY, GetWorldTotalMin(), -1, -1 );
 
 	uiOffset = AIM_REPLY_BARRY;
 	for( uiCnt=0; uiCnt<40; uiCnt++)
 	{
-		AddEmail( ( UINT8 )( uiOffset + ( uiCnt * AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, ( UINT8 )( 6 + uiCnt ), GetWorldTotalMin(), -1 );
+		AddEmail( ( UINT8 )( uiOffset + ( uiCnt * AIM_REPLY_LENGTH_BARRY ) ), AIM_REPLY_LENGTH_BARRY, ( UINT8 )( 6 + uiCnt ), GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT_NAME_MERC );
 	}
 
-	AddEmail(OLD_ENRICO_1,OLD_ENRICO_1_LENGTH,MAIL_ENRICO,	GetWorldTotalMin(), -1 );
-	AddEmail(OLD_ENRICO_2,OLD_ENRICO_2_LENGTH,MAIL_ENRICO,	GetWorldTotalMin(), -1 );
-	AddEmail(OLD_ENRICO_3,OLD_ENRICO_3_LENGTH,MAIL_ENRICO,	GetWorldTotalMin(), -1 );
-	AddEmail(RIS_REPORT,RIS_REPORT_LENGTH,RIS_EMAIL,	GetWorldTotalMin(), -1 );
+	AddEmail(OLD_ENRICO_1,OLD_ENRICO_1_LENGTH,MAIL_ENRICO,	GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT );
+	AddEmail(OLD_ENRICO_2,OLD_ENRICO_2_LENGTH,MAIL_ENRICO,	GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT );
+	AddEmail(OLD_ENRICO_3,OLD_ENRICO_3_LENGTH,MAIL_ENRICO,	GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT );
+	AddEmail(RIS_REPORT,RIS_REPORT_LENGTH,RIS_EMAIL,	GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT );
 
-	AddEmail( ENRICO_MIGUEL, ENRICO_MIGUEL_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1 );
-	AddEmail(ENRICO_PROG_20, ENRICO_PROG_20_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1);
-	AddEmail(ENRICO_PROG_55, ENRICO_PROG_55_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1);
-	AddEmail(ENRICO_PROG_80, ENRICO_PROG_80_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1);
-	AddEmail(ENRICO_SETBACK, ENRICO_SETBACK_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1);
-	AddEmail(ENRICO_SETBACK_2, ENRICO_SETBACK_2_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1);
-	AddEmail(LACK_PLAYER_PROGRESS_1, LACK_PLAYER_PROGRESS_1_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1);
-	AddEmail(LACK_PLAYER_PROGRESS_2, LACK_PLAYER_PROGRESS_2_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1);
-	AddEmail(LACK_PLAYER_PROGRESS_3, LACK_PLAYER_PROGRESS_3_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1);
-	AddEmail(ENRICO_CREATURES, ENRICO_CREATURES_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1);
+	AddEmail( ENRICO_MIGUEL, ENRICO_MIGUEL_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT );
+	AddEmail(ENRICO_PROG_20, ENRICO_PROG_20_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
+	AddEmail(ENRICO_PROG_55, ENRICO_PROG_55_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
+	AddEmail(ENRICO_PROG_80, ENRICO_PROG_80_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
+	AddEmail(ENRICO_SETBACK, ENRICO_SETBACK_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
+	AddEmail(ENRICO_SETBACK_2, ENRICO_SETBACK_2_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
+	AddEmail(LACK_PLAYER_PROGRESS_1, LACK_PLAYER_PROGRESS_1_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
+	AddEmail(LACK_PLAYER_PROGRESS_2, LACK_PLAYER_PROGRESS_2_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
+	AddEmail(LACK_PLAYER_PROGRESS_3, LACK_PLAYER_PROGRESS_3_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
+	AddEmail(ENRICO_CREATURES, ENRICO_CREATURES_LENGTH, MAIL_ENRICO, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
 
 
 	//Add an email telling the user that he received an insurance payment
-	AddEmailWithSpecialData( INSUR_PAYMENT, INSUR_PAYMENT_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), 20, 0 );
-	AddEmailWithSpecialData( INSUR_SUSPIC, INSUR_SUSPIC_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), 20, 0 );
-	AddEmailWithSpecialData( INSUR_SUSPIC_2, INSUR_SUSPIC_2_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), 20, 0 );
-	AddEmail( BOBBYR_NOW_OPEN, BOBBYR_NOW_OPEN_LENGTH, BOBBY_R, GetWorldTotalMin(), -1);
-	AddEmail( KING_PIN_LETTER, KING_PIN_LETTER_LENGTH, KING_PIN, GetWorldTotalMin(), -1 );
-	AddEmail( BOBBYR_SHIPMENT_ARRIVED, BOBBYR_SHIPMENT_ARRIVED_LENGTH, BOBBY_R, GetWorldTotalMin(), -1 );
+	AddEmailWithSpecialData( INSUR_PAYMENT, INSUR_PAYMENT_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), 20, 0, TYPE_EMAIL_EMAIL_EDT );
+	AddEmailWithSpecialData( INSUR_SUSPIC, INSUR_SUSPIC_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), 20, 0, TYPE_EMAIL_EMAIL_EDT );
+	AddEmailWithSpecialData( INSUR_SUSPIC_2, INSUR_SUSPIC_2_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), 20, 0, TYPE_EMAIL_EMAIL_EDT );
+	AddEmail( BOBBYR_NOW_OPEN, BOBBYR_NOW_OPEN_LENGTH, BOBBY_R, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
+	AddEmail( KING_PIN_LETTER, KING_PIN_LETTER_LENGTH, KING_PIN, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT );
+	AddEmail( BOBBYR_SHIPMENT_ARRIVED, BOBBYR_SHIPMENT_ARRIVED_LENGTH, BOBBY_R, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT );
 
-	AddEmail( JOHN_KULBA_GIFT_IN_DRASSEN, JOHN_KULBA_GIFT_IN_DRASSEN_LENGTH, JOHN_KULBA, GetWorldTotalMin(), -1 );
+	AddEmail( JOHN_KULBA_GIFT_IN_DRASSEN, JOHN_KULBA_GIFT_IN_DRASSEN_LENGTH, JOHN_KULBA, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT );
 
-	AddEmailWithSpecialData(MERC_DIED_ON_OTHER_ASSIGNMENT, MERC_DIED_ON_OTHER_ASSIGNMENT_LENGTH, AIM_SITE, GetWorldTotalMin(), 0, 0 );
+	AddEmailWithSpecialData(MERC_DIED_ON_OTHER_ASSIGNMENT, MERC_DIED_ON_OTHER_ASSIGNMENT_LENGTH, AIM_SITE, GetWorldTotalMin(), 0, 0, TYPE_EMAIL_EMAIL_EDT );
 
-	AddEmailWithSpecialData( INSUR_1HOUR_FRAUD, INSUR_1HOUR_FRAUD_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), 20, 0 );
+	AddEmailWithSpecialData( INSUR_1HOUR_FRAUD, INSUR_1HOUR_FRAUD_LENGTH, INSURANCE_COMPANY, GetWorldTotalMin(), 20, 0, TYPE_EMAIL_EMAIL_EDT );
 
 	//add an email
-	AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_REFUND, AIM_MEDICAL_DEPOSIT_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), 20, 0 );
+	AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_REFUND, AIM_MEDICAL_DEPOSIT_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), 20, 0, TYPE_EMAIL_EMAIL_EDT );
 
-	AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND, AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), 20, 0 );
+	AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND, AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), 20, 0, TYPE_EMAIL_EMAIL_EDT );
 
-	AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_NO_REFUND, AIM_MEDICAL_DEPOSIT_NO_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), 20, 0 );
+	AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_NO_REFUND, AIM_MEDICAL_DEPOSIT_NO_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), 20, 0, TYPE_EMAIL_EMAIL_EDT );
 #endif
 	
 }

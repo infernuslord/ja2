@@ -240,3 +240,10 @@ INT32 CalcStraightThreatValue( SOLDIERTYPE *pEnemy );
 // SANDRO - added following functions
 BOOLEAN DoctorIsPresent( SOLDIERTYPE * pPatient, BOOLEAN fOnDoctorAssignmentCheck );
 BOOLEAN AIDetermineStealingWeaponAttempt( SOLDIERTYPE * pSoldier, SOLDIERTYPE * ubOpponent );
+
+// HEADROCK HAM 4: Calculate average recoil offset for a shot.
+FLOAT AICalcRecoilForShot( SOLDIERTYPE *pSoldier, OBJECTTYPE *pWeapon, UINT8 ubShotNum);
+
+
+// HEADROCK HAM 4: Calculate average recoil offset for a shot.
+FLOAT AICalcRecoilForShot( SOLDIERTYPE *pSoldier, OBJECTTYPE *pWeapon, UINT8 ubShotNum);

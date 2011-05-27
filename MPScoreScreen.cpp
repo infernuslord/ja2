@@ -474,7 +474,7 @@ BOOLEAN		RenderMPSScreen()
 		}
 	}
 
-	if (PLAYER_BSIDE==MP_TYPE_COOP)
+	if (cGameType==MP_TYPE_COOP)
 	{
 		// CO-OP Mode, show stats for queens army
 		usPosY = MPS_PLAYERLIST_Y + (5 * MPS_PLAYER_GAP); // leave a space between players and AI
@@ -611,9 +611,9 @@ void DoneFadeOutForExitMPSScreen( void )
 #endif
 
 #ifdef JA2UB
-	//SetIntroType( INTRO_BEGINING );
+	//SetIntroType( INTRO_BEGINNING );
 #else
-		SetIntroType( INTRO_BEGINING );
+		SetIntroType( INTRO_BEGINNING );
 #endif
 
 	ExitMPSScreen(); // cleanup please, if we called a fadeout then we didnt do it above

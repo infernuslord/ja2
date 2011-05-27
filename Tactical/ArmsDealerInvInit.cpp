@@ -14,6 +14,7 @@
 	#include "bobbyr.h"
 	#include "Random.h"
 	#include "Shopkeeper Interface.h"
+	#include "connect.h"
 #endif
 
 
@@ -790,7 +791,6 @@ INT8 GetDealersMaxItemAmount( UINT8 ubDealerID, UINT16 usItemIndex )
 		case ARMS_DEALER_MANNY:
 			return( GetMaxItemAmount( gMannyInventory, usItemIndex ) );
 			break;
-			
 
 		default:
 			Assert( FALSE );
@@ -909,8 +909,7 @@ DEALER_POSSIBLE_INV *GetPointerToDealersPossibleInventory( UINT8 ubArmsDealerID 
 
 		case ARMS_DEALER_MANNY:
 			return( gMannyInventory );
-			break;		
-
+			break;
 
 		default:
 			return( NULL );
@@ -1220,7 +1219,14 @@ UINT8 DetermineInitialInvItems( INT8 bArmsDealerID, UINT16 usItemIndex, UINT8 ub
 	ubNumBought = 0;
 	for (ubCnt = 0; ubCnt < ubChances; ubCnt++)
 	{
-		if (ItemTransactionOccurs( bArmsDealerID, usItemIndex, DEALER_BUYING, fUsed))
+		if (!is_networked)
+		{
+			if (ItemTransactionOccurs( bArmsDealerID, usItemIndex, DEALER_BUYING, fUsed))
+			{
+				ubNumBought++;
+			}
+		}
+		else
 		{
 			ubNumBought++;
 		}

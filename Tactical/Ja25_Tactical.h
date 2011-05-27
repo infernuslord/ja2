@@ -134,6 +134,8 @@ extern UINT32	CALICO_900_UB;
 extern void Old_UB_Inventory ();
 extern void New_UB_Inventory ();
 
+extern void InitGridNoUB();
+
 #endif
 
 #endif

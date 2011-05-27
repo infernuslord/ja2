@@ -32,6 +32,12 @@ enum
 	NUM_ICONS
 };
 
+#define	ACTIVATE_BUTTON		0
+#define	DEACTIVATE_BUTTON	1
+#define	ENABLE_BUTTON		2
+#define	DISABLE_BUTTON		3
+#define	UNLOAD_BUTTON		4
+
 #define MAX_ENEMY_NAMES_CHARS		128
 
 typedef struct
@@ -73,6 +79,8 @@ typedef struct
 {
 	UINT16		uiIndex; // add
 	BOOLEAN		Enabled; //add
+	BOOLEAN Loyalty;
+	BOOLEAN AddToBattle;
 	CHAR16	szCurGroup[MAX_ENEMY_NAMES_CHARS];
 
 } CIV_NAMES_VALUES;
@@ -156,15 +164,18 @@ extern UINT32		guiSILHOUETTE;
 extern UINT32		guiCOMPANEL;
 extern UINT32		guiCOMPANELB;
 extern UINT32		guiRADIO;
-extern UINT32		guiPORTRAITICONS;
+extern UINT32		guiPORTRAITICONS;		// Default JA2 portrait icons (+ additional headgear icons from legion)
 extern UINT32		guiBURSTACCUM;
 extern UINT32		guiITEMPOINTERHATCHES;
 
 
 //legion
-extern UINT32		guiPORTRAITICONS_NV; //legion
-extern UINT32		guiPORTRAITICONS_GAS_MASK; //legion
-extern UINT32		guiPORTRAITICONS_GOGLE; //legion
+//extern UINT32		guiPORTRAITICONS_NV;			//legion: NV-Face Graphic
+//extern UINT32		guiPORTRAITICONS_GAS_MASK;		//legion: GASMASK-Face Graphic
+
+// WANNE: Face gear for IMPs in additional file
+//extern UINT32		guiPORTRAITICONS_NV_IMP;
+//extern UINT32		guiPORTRAITICONS_GAS_MASK_IMP;
 
 extern MOUSE_REGION		gViewportRegion;
 extern MOUSE_REGION		gRadarRegion;
@@ -223,8 +234,10 @@ void HandleInterfaceBackgrounds( );
 void BeginOverlayMessage( UINT32 uiFont, STR16 pFontString, ... );
 void EndOverlayMessage( );
 
-
 void DrawSelectedUIAboveGuy( UINT16 usSoldierID );
+
+// HEADROCK HAM 4: Draw the CTH indicator, using values grabbed from the global CTH array
+BOOLEAN DrawCTHIndicator();
 
 void CreateCurrentTacticalPanelButtons( );
 void RemoveCurrentTacticalPanelButtons( );

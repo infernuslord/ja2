@@ -12,6 +12,10 @@ void InitDescStatCoords(OBJECTTYPE *pObject);
 void InitLBECoords();
 void InitEDBCoords(OBJECTTYPE * pObject);
 
+// HEADROCK HAM 4: UDB Secondary Stats column icons (no values)
+void DrawSecondaryStats( OBJECTTYPE * gpItemDescObject );
+void DrawAdvancedStats( OBJECTTYPE * gpItemDescObject );
+void DrawAdvancedValues( OBJECTTYPE *gpItemDescObject );
 void DrawWeaponStats( OBJECTTYPE * gpItemDescObject );
 void DrawAmmoStats( OBJECTTYPE * gpItemDescObject );
 void DrawExplosiveStats( OBJECTTYPE * gpItemDescObject );

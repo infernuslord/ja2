@@ -1276,8 +1276,6 @@ BOOLEAN CanDealerRepairItem( UINT8 ubArmsDealer, UINT16 usItemIndex )
 //#endif
 	switch ( ubArmsDealer )
 	{
-	
-
 		case ARMS_DEALER_ARNIE:
 #ifdef JA2UB
 //Ja25 neither in exp.
@@ -1300,6 +1298,7 @@ BOOLEAN CanDealerRepairItem( UINT8 ubArmsDealer, UINT16 usItemIndex )
 				return(TRUE);
 			}
 			break;
+
 		default:
 			AssertMsg( FALSE, String( "CanDealerRepairItem(), Arms Dealer %d is not a recognized repairman!.	AM 1.", ubArmsDealer ) );
 	}
@@ -1472,7 +1471,7 @@ void AddObjectToArmsDealerInventory( UINT8 ubArmsDealer, OBJECTTYPE *pObject )
 				
 				iter = pData->RemoveAttachmentAtIter(iter);
 					
-				if(gGameOptions.ubAttachmentSystem == ATTACHMENT_NEW)
+				if(UsingNewAttachmentSystem()==true)
 					++iter;
 
 				if (iter == pData->attachments.end()) {

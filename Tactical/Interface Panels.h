@@ -157,4 +157,13 @@ UINT8 FindNextMercInTeamPanel( SOLDIERTYPE *pSoldier, BOOLEAN fGoodForLessOKLife
 // CHRISL: New callback functions for backpack buttons
 BOOLEAN ChangeDropPackStatus(SOLDIERTYPE *pSoldier, BOOLEAN newStatus);
 
+// HEADROCK HAM 4: This variable tells the program what "page" of the description box we are currently looking at.
+// By saving this in memory, we tell the DescBox which background and values to draw, and make sure that we end up
+// on the same page every time we open the description box. UDB buttons allow switching between pages.
+extern UINT8 gubDescBoxPage;
+// Record which line we're looking at. This only applied to the Advanced tab in description boxes.
+extern UINT8 gubDescBoxLine;
+// Record how many lines there are for the current item in the Advanced tab.
+extern UINT8 gubDescBoxTotalAdvLines;
+
 #endif

@@ -383,43 +383,6 @@ void GameInitMercs()
 			NUMBER_OF_BAD_MERCS = NUMBER_OF_BAD_MERCS + 1;
 	}
 	
-//	for(i=0; i<NUMBER_OF_MERCS; i++)
-//		gubMercArray[ i ] = i+BIFF;
-
-	// WANNE - MP: Initialize the the variables for single player
-//	NUMBER_OF_MERCS = 15;
-//	LAST_MERC_ID = 14;
-/*
-	//can now be out of order
-	gubMercArray[ 0 ] = BIFF;
-	gubMercArray[ 1 ] = HAYWIRE;
-	gubMercArray[ 2 ] = GASKET;
-	gubMercArray[ 3 ] = RAZOR;
-	gubMercArray[ 4 ] = FLO;
-	gubMercArray[ 5 ] = GUMPY;
-	gubMercArray[ 6 ] = BUBBA;
-	gubMercArray[ 7 ] = LARRY_NORMAL;		//if changing this values, change in GetMercIDFromMERCArray()
-	gubMercArray[ 8 ] = LARRY_DRUNK;		//if changing this values, change in GetMercIDFromMERCArray()
-	gubMercArray[ 9 ] = NUMB;
-	gubMercArray[ 10 ] = TEX;
-	gubMercArray[ 11 ] = BIGGENS;
-	gubMercArray[ 12 ] = COUGAR;
-	gubMercArray[ 13 ] = GASTON;
-	gubMercArray[ 14 ] = STOGIE;
-	gubMercArray[ 15 ] = 57;//hayden
-	gubMercArray[ 16 ] = 58;
-	gubMercArray[ 17 ] = 59;
-	gubMercArray[ 18 ] = 60;
-	gubMercArray[ 19 ] = 61;
-	gubMercArray[ 20 ] = 63;
-	gubMercArray[ 21 ] = 66;
-	gubMercArray[ 22 ] = 67;
-	gubMercArray[ 23 ] = 68;
-	gubMercArray[ 24 ] = 69;
-	gubMercArray[ 25 ] = 70;
-	gubMercArray[ 26 ] = 72;		
-	gubMercArray[ 27 ] = 64;
-*/
 	LaptopSaveInfo.gubPlayersMercAccountStatus = MERC_NO_ACCOUNT;
 	gubCurMercIndex = 0;
 
@@ -908,7 +871,7 @@ void DailyUpdateOfMercSite( UINT16 usDate)
 		if( LaptopSaveInfo.gubPlayersMercAccountStatus != MERC_ACCOUNT_INVALID )
 		{
 			LaptopSaveInfo.gubPlayersMercAccountStatus = MERC_ACCOUNT_INVALID;
-//			AddEmail( MERC_INVALID, MERC_INVALID_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1);
+//			AddEmail( MERC_INVALID, MERC_INVALID_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
 		}
 	}
 	else if( iNumDays > MERC_NUM_DAYS_TILL_ACCOUNT_SUSPENDED )
@@ -916,7 +879,7 @@ void DailyUpdateOfMercSite( UINT16 usDate)
 		if( LaptopSaveInfo.gubPlayersMercAccountStatus != MERC_ACCOUNT_SUSPENDED )
 		{
 			LaptopSaveInfo.gubPlayersMercAccountStatus = MERC_ACCOUNT_SUSPENDED;
-//			AddEmail( MERC_WARNING, MERC_WARNING_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1);
+//			AddEmail( MERC_WARNING, MERC_WARNING_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
 
 			// Have speck complain next time player come to site
 			LaptopSaveInfo.uiSpeckQuoteFlags |= SPECK_QUOTE__SENT_EMAIL_ABOUT_LACK_OF_PAYMENT;
@@ -927,7 +890,7 @@ void DailyUpdateOfMercSite( UINT16 usDate)
 		if( LaptopSaveInfo.gubPlayersMercAccountStatus != MERC_ACCOUNT_VALID_FIRST_WARNING )
 		{
 			LaptopSaveInfo.gubPlayersMercAccountStatus = MERC_ACCOUNT_VALID_FIRST_WARNING;
-	//		AddEmail( MERC_FIRST_WARNING, MERC_FIRST_WARNING_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1);
+//			AddEmail( MERC_FIRST_WARNING, MERC_FIRST_WARNING_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
 
 			// Have speck complain next time player come to site
 			LaptopSaveInfo.uiSpeckQuoteFlags |= SPECK_QUOTE__SENT_EMAIL_ABOUT_LACK_OF_PAYMENT;
@@ -970,7 +933,7 @@ void DailyUpdateOfMercSite( UINT16 usDate)
 				//if we havent already sent an email this turn
 				if( !fAlreadySentEmailToPlayerThisTurn )
 				{
-				//	AddEmail( NEW_MERCS_AT_MERC, NEW_MERCS_AT_MERC_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin());
+//					AddEmail( NEW_MERCS_AT_MERC, NEW_MERCS_AT_MERC_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), TYPE_EMAIL_EMAIL_EDT);
 					fAlreadySentEmailToPlayerThisTurn = TRUE;
 				}
 				LaptopSaveInfo.gbNumDaysTillFirstMercArrives = -1;
@@ -1176,7 +1139,9 @@ void InitMercVideoFace()
 BOOLEAN	StartSpeckTalking(UINT16 usQuoteNum)
 {
 
-	if(is_networked)return( FALSE );
+	if(is_networked)
+		return( FALSE );
+
 	if( usQuoteNum == MERC_VIDEO_SPECK_SPEECH_NOT_TALKING || usQuoteNum == MERC_VIDEO_SPECK_HAS_TO_TALK_BUT_QUOTE_NOT_CHOSEN_YET )
 		return( FALSE );
 
@@ -1758,7 +1723,6 @@ BOOLEAN	GetSpeckConditionalOpening( BOOLEAN fJustEnteredScreen )
 		usQuoteToSay = 0;
 #endif
 		return( FALSE );
-
 	}
 
 	//if we are done the intro speech, or arrived from a sub page, get out of the function
@@ -2580,7 +2544,7 @@ BOOLEAN ShouldTheMercSiteServerGoDown()
 void GetMercSiteBackOnline()
 {
 	//Add an email telling the user the site is back up
-	AddEmail( MERC_NEW_SITE_ADDRESS, MERC_NEW_SITE_ADDRESS_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1 );
+	AddEmail( MERC_NEW_SITE_ADDRESS, MERC_NEW_SITE_ADDRESS_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1, -1 , TYPE_EMAIL_EMAIL_EDT);
 
 	//Set a flag indicating that the server just went up ( so speck can make a comment when the player next visits the site )
 	LaptopSaveInfo.fFirstVisitSinceServerWentDown = TRUE;
@@ -2741,110 +2705,31 @@ BOOLEAN AreAnyOfTheNewMercsAvailable()
 }
 
 void ShouldAnyNewMercMercBecomeAvailable()
-{
-	BOOLEAN fNewMercAreAvailable = FALSE;
-
-	UINT8 i;
-	BOOLEAN Stop = FALSE;
-	
+{	
 	//Kaiden: Added this if test to make sure that the "New Mercs Available"
 	// e-mail doesn't show up and no unneccessary checks are made when you
 	// have the ALL_MERCS_AT_MERC set to TRUE in the INI file.
 	if(!gGameExternalOptions.fAllMercsAvailable)
 	{
-		for(i=0; i<NUM_PROFILES; i++)
+		for(UINT8 i=0; i<NUM_PROFILES; i++)
 		{
-			if ( Stop == FALSE )
-			{	
 			if ( gConditionsForMercAvailability[i].ProfilId != 0 && gConditionsForMercAvailability[i].NewMercsAvailable == FALSE && gConditionsForMercAvailability[i].StartMercsAvailable == FALSE )
 			{
-				
 				if( CanMercBeAvailableYet( gConditionsForMercAvailability[i].uiIndex ) )
-					{
-						fNewMercAreAvailable = TRUE;
-						Stop = TRUE;
-					}
-			}
+				{
+					//Set up an event to add the merc in x days
+					AddStrategicEvent( EVENT_MERC_SITE_NEW_MERC_AVAILABLE, GetMidnightOfFutureDayInMinutes( 1 ) + 420 + Random( 3 * 60 ), 0 );
+				}
 			}
 		}	
 	}
-	
-	
-/*	if(!gGameExternalOptions.fAllMercsAvailable)
-		{
-			//for bubba
-			//	if( GetMercIDFromMERCArray( LaptopSaveInfo.gubLastMercIndex ) == GUMPY )
-			{
-				if( CanMercBeAvailableYet( MERC_ARRIVES_BUBBA ) )
-				{
-					fNewMercAreAvailable = TRUE;
-				}
-			}
-
-			//for Larry
-			//	if( GetMercIDFromMERCArray( LaptopSaveInfo.gubLastMercIndex ) == LARRY_NORMAL ||
-			//		GetMercIDFromMERCArray( LaptopSaveInfo.gubLastMercIndex ) == LARRY_DRUNK )
-			{
-				if( CanMercBeAvailableYet( MERC_ARRIVES_LARRY ) )
-				{
-					fNewMercAreAvailable = TRUE;
-				}
-			}
-
-			//for Numb
-			//	if( GetMercIDFromMERCArray( LaptopSaveInfo.gubLastMercIndex ) == NUMB )
-			{
-				if( CanMercBeAvailableYet( MERC_ARRIVES_NUMB ) )
-				{
-					fNewMercAreAvailable = TRUE;
-				}
-			}
-#ifdef JA2UB
-//no UB
-#else
-			if( CanMercBeAvailableYet( MERC_ARRIVES_TEX ) )
-			{
-				fNewMercAreAvailable = TRUE;
-			}
-
-			if( CanMercBeAvailableYet( MERC_ARRIVES_BIGGENS ) )
-			{
-				fNewMercAreAvailable = TRUE;
-			}
-#endif
-			//for COUGAR
-			//	if( GetMercIDFromMERCArray( LaptopSaveInfo.gubLastMercIndex ) == COUGAR )
-			{
-				if( CanMercBeAvailableYet( MERC_ARRIVES_COUGAR ) )
-				{
-					fNewMercAreAvailable = TRUE;
-				}
-			}
-
-			if( CanMercBeAvailableYet( MERC_ARRIVES_GASTON ) )
-			{
-				fNewMercAreAvailable = TRUE;
-			}
-
-			if( CanMercBeAvailableYet( MERC_ARRIVES_STOGIE ) )
-			{
-				fNewMercAreAvailable = TRUE;
-			}
-*/
-			//if there is a new merc available
-			if( fNewMercAreAvailable )
-			{
-				//Set up an event to add the merc in x days
-				AddStrategicEvent( EVENT_MERC_SITE_NEW_MERC_AVAILABLE, GetMidnightOfFutureDayInMinutes( 1 ) + 420 + Random( 3 * 60 ), 0 );
-			}
-	//	}
 }
 
 BOOLEAN CanMercBeAvailableYet( UINT8 ubMercToCheck )
 {
-	//if the merc is already available
-	if( gConditionsForMercAvailability[ ubMercToCheck ].ubMercArrayID ) //<= LaptopSaveInfo.gubLastMercIndex )
-		return( FALSE );
+	// WANNE: If we have a drunken profile, skip
+	if (gConditionsForMercAvailability[ ubMercToCheck ].Drunk)
+		return ( FALSE );
 
 	//if the merc is already hired
 	if( !IsMercHireable( GetMercIDFromMERCArray( gConditionsForMercAvailability[ ubMercToCheck ].ubMercArrayID ) ) )
@@ -2862,126 +2747,34 @@ BOOLEAN CanMercBeAvailableYet( UINT8 ubMercToCheck )
 
 void NewMercsAvailableAtMercSiteCallBack( )
 {
-	BOOLEAN fSendEmail=FALSE;
-	
-	BOOLEAN Stop = FALSE;
-	UINT8 i;
-
-		for(i=0; i<NUM_PROFILES; i++)
-		{
-		
-		if ( Stop == FALSE )
-		{			
+	for(UINT8 i=0; i<NUM_PROFILES; i++)
+	{			
 		if ( gConditionsForMercAvailability[i].ProfilId != 0 && gConditionsForMercAvailability[i].NewMercsAvailable == FALSE && gConditionsForMercAvailability[i].StartMercsAvailable == FALSE )
+		{
+			gConditionsForMercAvailability[i].NewMercsAvailable = TRUE;
+			
+			if( CanMercBeAvailableYet( gConditionsForMercAvailability[i].uiIndex ) )
 			{
-				gConditionsForMercAvailability[i].NewMercsAvailable = TRUE;
-				
-				if( CanMercBeAvailableYet( gConditionsForMercAvailability[i].uiIndex ) )
-					{
-					
-					if ( gConditionsForMercAvailability[ gConditionsForMercAvailability[i].uiIndex ].Drunk == TRUE )
-					{
-						LaptopSaveInfo.gubLastMercIndex = gConditionsForMercAvailability[gConditionsForMercAvailability[i].uiAlternateIndex].uiIndex;
-					}
-					else
-					{
-						LaptopSaveInfo.gubLastMercIndex++;
-					}
+				if ( gConditionsForMercAvailability[ gConditionsForMercAvailability[i].uiIndex ].Drunk == TRUE )
+				{
+					LaptopSaveInfo.gubLastMercIndex = gConditionsForMercAvailability[gConditionsForMercAvailability[i].uiAlternateIndex].uiIndex;
+				}
+				else
+				{
+					LaptopSaveInfo.gubLastMercIndex++;
+				}
 
-				//	LaptopSaveInfo.gubLastMercIndex++;
-					gConditionsForMercAvailability[gConditionsForMercAvailability[i].uiIndex].NewMercsAvailable = TRUE;
-					LaptopSaveInfo.ubLastMercAvailableId = gConditionsForMercAvailability[i].uiIndex;
-					gConditionsForMercAvailability[i].StartMercsAvailable = TRUE;
-					fSendEmail = TRUE;
-					Stop = TRUE;
-					}
+				gConditionsForMercAvailability[gConditionsForMercAvailability[i].uiIndex].NewMercsAvailable = TRUE;
+				LaptopSaveInfo.ubLastMercAvailableId = gConditionsForMercAvailability[i].uiIndex;
+				gConditionsForMercAvailability[i].StartMercsAvailable = TRUE;
+				
+				AddEmail( NEW_MERCS_AT_MERC, NEW_MERCS_AT_MERC_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1, -1, TYPE_EMAIL_EMAIL_EDT);
+
+				//new mercs are available
+				LaptopSaveInfo.fNewMercsAvailableAtMercSite = TRUE;
 			}
 		}
 	}
-		
-//	if( GetMercIDFromMERCArray( LaptopSaveInfo.gubLastMercIndex ) == BUBBA )
-		
-/*	{
-		if( CanMercBeAvailableYet( MERC_ARRIVES_BUBBA ) )
-		{
-			LaptopSaveInfo.gubLastMercIndex++;
-			LaptopSaveInfo.ubLastMercAvailableId = MERC_ARRIVES_BUBBA;
-			fSendEmail = TRUE;
-		}
-	}
-
-	//for Larry
-//	if( GetMercIDFromMERCArray( LaptopSaveInfo.gubLastMercIndex ) == LARRY_NORMAL ||
-//			GetMercIDFromMERCArray( LaptopSaveInfo.gubLastMercIndex ) == LARRY_DRUNK )
-	{
-		if( CanMercBeAvailableYet( MERC_ARRIVES_LARRY ) )
-		{
-			LaptopSaveInfo.gubLastMercIndex++;
-			LaptopSaveInfo.ubLastMercAvailableId = MERC_ARRIVES_LARRY;
-			fSendEmail = TRUE;
-		}
-	}
-
-	//for Numb
-//	if( GetMercIDFromMERCArray( LaptopSaveInfo.gubLastMercIndex ) == NUMB )
-	{
-		if( CanMercBeAvailableYet( MERC_ARRIVES_NUMB ) )
-		{
-			LaptopSaveInfo.gubLastMercIndex = 9;
-			LaptopSaveInfo.ubLastMercAvailableId = MERC_ARRIVES_NUMB;
-			fSendEmail = TRUE;
-		}
-	}
-#ifdef JA2UB
-//no UB
-#else
-	if( CanMercBeAvailableYet( MERC_ARRIVES_TEX ) )
-	{
-		LaptopSaveInfo.gubLastMercIndex++;
-		LaptopSaveInfo.ubLastMercAvailableId = MERC_ARRIVES_TEX;
-		fSendEmail = TRUE;
-	}
-
-	if( CanMercBeAvailableYet( MERC_ARRIVES_BIGGENS ) )
-	{
-		LaptopSaveInfo.gubLastMercIndex++;
-		LaptopSaveInfo.ubLastMercAvailableId = MERC_ARRIVES_BIGGENS;
-		fSendEmail = TRUE;
-	}
-#endif
-//for COUGAR
-//	if( GetMercIDFromMERCArray( LaptopSaveInfo.gubLastMercIndex ) == COUGAR )
-	{
-		if( CanMercBeAvailableYet( MERC_ARRIVES_COUGAR ) )
-		{
-			LaptopSaveInfo.gubLastMercIndex++;
-			LaptopSaveInfo.ubLastMercAvailableId = MERC_ARRIVES_COUGAR;
-			fSendEmail = TRUE;
-		}
-	}
-
-	if( CanMercBeAvailableYet( MERC_ARRIVES_GASTON ) )
-	{
-		LaptopSaveInfo.gubLastMercIndex++;
-		LaptopSaveInfo.ubLastMercAvailableId = MERC_ARRIVES_GASTON;
-		fSendEmail = TRUE;
-	}
-
-	if( CanMercBeAvailableYet( MERC_ARRIVES_STOGIE ) )
-	{
-		LaptopSaveInfo.gubLastMercIndex++;
-		LaptopSaveInfo.ubLastMercAvailableId = MERC_ARRIVES_STOGIE;
-		fSendEmail = TRUE;
-	}
-*/
-#ifdef JA2UB
-//no UB
-#else
-	if( fSendEmail )
-		AddEmail( NEW_MERCS_AT_MERC, NEW_MERCS_AT_MERC_LENGTH, SPECK_FROM_MERC, GetWorldTotalMin(), -1);
-#endif
-	//new mercs are available
-	LaptopSaveInfo.fNewMercsAvailableAtMercSite = TRUE;
 }
 
 //used for older saves

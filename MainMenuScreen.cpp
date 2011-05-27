@@ -65,9 +65,8 @@ enum
 };
 
 //#define		MAINMENU_Y				iScreenHeightOffset + 277
-//#define		MAINMENU_Y  			iScreenHeightOffset + 210
-//#define		MAINMENU_Y_SPACE 37
-
+//#define		MAINMENU_Y				iScreenHeightOffset + 210
+//#define		MAINMENU_Y_SPACE		37
 UINT32 MAINMENU_Y;
 UINT32 MAINMENU_X;
 UINT32 MAINMENU_Y_SPACE;
@@ -296,7 +295,7 @@ BOOLEAN InitMainMenu( )
 	VOBJECT_DESC	VObjectDesc;
 
 	//main Menu by JAzz
-	UINT16 i,iCounter2; 
+	UINT16 iCounter2; 
 
 
 //	gfDoHelpScreen = 0;
@@ -440,6 +439,8 @@ void InitDependingGameStyleOptions()
 	LoadGameExternalOptions();
 	// Load new STOMP ini - SANDRO
 	LoadSkillTraitsExternalSettings();
+	// HEADROCK HAM 4: CTH constants
+	LoadCTHConstants();
 
 #ifdef JA2UB
 	LoadGameLegionOptions(); // JA25 UB
@@ -586,6 +587,11 @@ void HandleMainMenuInput()
 
 					if( gfKeyState[ ALT ] )
 						gfLoadGameUponEntry = TRUE;
+
+					// WANNE: Some initializing was missing when directly loading last savegame
+					// form main menu with ALT + C
+					giMAXIMUM_NUMBER_OF_PLAYER_SLOTS = CODE_MAXIMUM_NUMBER_OF_PLAYER_SLOTS;
+					InitDependingGameStyleOptions();
 
 					break;
 
@@ -766,7 +772,7 @@ BOOLEAN CreateDestroyMainMenuButtons( BOOLEAN fCreate )
 												BUTTON_TOGGLE, MSYS_PRIORITY_HIGHEST,
 												DEFAULT_MOVE_CALLBACK, MenuButtonCallback );
 #else
-			/*iMenuButtons[ cnt ] = QuickCreateButton( iMenuImages[ cnt ], (INT16)MAINMENU_X, (INT16)( MAINMENU_Y + ( cnt * MAINMENU_Y_SPACE ) ),
+			/*iMenuButtons[ cnt ] = QuickCreateButton( iMenuImages[ cnt ], (INT16)(420 - gusMainMenuButtonWidths[cnt]/2), (INT16)( MAINMENU_Y + ( cnt * MAINMENU_Y_SPACE ) ),
 												BUTTON_TOGGLE, MSYS_PRIORITY_HIGHEST,
 												DEFAULT_MOVE_CALLBACK, MenuButtonCallback );*/
 

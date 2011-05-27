@@ -483,11 +483,17 @@ void BeginCivQuote( SOLDIERTYPE *pCiv, UINT16 ubCivQuoteID, UINT16 ubEntryID, IN
 UINT16 DetermineCivQuoteEntry( SOLDIERTYPE *pCiv, UINT16 *pubCivHintToUse, BOOLEAN fCanUseHints )
 {
 	UINT8	ubCivType;
+#ifdef JA2UB
+
+#else
 	INT8	bTownId;
-	BOOLEAN	bCivLowLoyalty = FALSE;
-	BOOLEAN	bCivHighLoyalty = FALSE;
 	INT8		bCivHint;
 	INT8	bMineId;
+#endif
+
+	BOOLEAN	bCivLowLoyalty = FALSE;
+	BOOLEAN	bCivHighLoyalty = FALSE;
+
 	BOOLEAN bMiners = FALSE;
 	UINT16 iCounter2;
 	UINT16 FileEDTQUoteID;

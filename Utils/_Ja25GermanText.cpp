@@ -1,4 +1,6 @@
-#pragma setlocale("GERMAN")
+// WANNE: Yes, this should be disabled, otherwise we get weird behavior when running the game with a VS 2005 build!
+//#pragma setlocale("GERMAN")
+
 #ifdef PRECOMPILEDHEADERS
 	#include "Utils All.h"
 	#include "_Ja25GermanText.h"
@@ -27,7 +29,7 @@ STR16 gzIMPSkillTraitsText[]=
 	L"Werfen",
 	L"Lehren",
 	L"Schwere Waffen",
-	L"Automatische Waffen",
+	L"Autom. Waffen",
 	L"Schleichen",
 	L"Beidhändig geschickt",
 	L"Messer",
@@ -38,31 +40,31 @@ STR16 gzIMPSkillTraitsText[]=
 	L"Keine",
 	L"B.S.E. - Spezialisierungen",
 	L"(Experte)",
-
 };
 
 //added another set of skill texts for new major traits
 STR16 gzIMPSkillTraitsTextNewMajor[]=
 {
-	L"Maschinengewehrschütze",	//LOOTF - Alle Namen sehr gewagt, aber wenigstens volldeutsch.
-	L"Grenadier",
+	L"MG-Schütze",	//LOOTF - Alle Namen sehr gewagt, aber wenigstens volldeutsch.
+	L"Grenadier"	,
 	L"Präzisionsschütze",
 	L"Pfadfinder",
-	L"Pistolenakrobat",		//Option: Pistolenschütze
+	L"Pistolenschütze",		//Option: Pistolenschütze
 	L"Faustkämpfer",
 	L"Gruppenführer",		//GrpFhr und ZgFhr sind scheiße, aber mir fällt ohne Dienstgrade nüscht ein
 	L"Mechaniker",			//Option: Techniker
 	L"Sanitäter",			//Option: Rettungsassistent
 
-	L"None",
-	L"I.M.P. Hauptfertigkeiten",
+	L"Nichts",
+	L"B.S.E. Hauptfertigkeiten",
+
 	// second names
-	L"Maschinenkanonier",		//Option "MG-Veteran"?
+	L"MG-Veteran",		//Option "MG-Veteran"?
 	L"Artillerist",
 	L"Scharfschütze",
 	L"Jäger",			//"Ranger" ist toll, aber nicht wirklich deutsch
 	L"Revolverheld",
-	L"Kampfkünstler",		//Kung-Fu-Typ ohne Nennung von Kung-Fu oder Wu-Shu oder derart Zeug, PS: KampfSPORTLER ist kacke
+	L"Kampfsportler",		//Kung-Fu-Typ ohne Nennung von Kung-Fu oder Wu-Shu oder derart Zeug, PS: KampfSPORTLER ist kacke
 	L"Zugführer",
 	L"Ingenieur",
 	L"Arzt",
@@ -76,14 +78,14 @@ STR16 gzIMPSkillTraitsTextNewMinor[]=
 	L"Messerwerfer",		// alt. "Wurfwaffen"
 	L"Nachtmensch",			// alt. "Nachteinsatz"
 	L"Schleicher",			// alt. "Schleichen"
-	L"Läufer",			// alt. "Athletisch"
+	L"Läufer",				// alt. "Athletisch"
 	L"Kraftsportler",		// alt. "Bodybuilding"
 	L"Sprengmeister",		// alt. "Kampfmittel"
 	L"Ausbilder",			// alt. "Lehren"
 	L"Aufklärer",			// alt. "Spähen"
 
-	L"Nichts",
-	L"B.S.E. - Nebenfertigkeiten",
+	L"Keine",
+	L"B.S.E. Nebenfertigkeiten",
 };
 
 //these texts are for help popup windows, describing trait properties
@@ -92,7 +94,7 @@ STR16 gzIMPMajorTraitsHelpTextsAutoWeapons[]=
 	L"+%d%s Trefferchance mit Sturmgewehren\n",
 	L"+%d%s Trefferchance mit Maschinenpistolen\n",
 	L"+%d%s Trefferchance mit Maschinengewehren\n",
-//	L"-%d%s APs benötigt für MG-Feuerstöße (Burst/Auto) abzugeben\n",
+	L"-%d%s APs benötigt für MG-Feuerstöße (Burst/Auto) abzugeben\n",
 	L"-%d%s APs benötigt um Maschinengewehre auszurichten\n",
 	L"Trefferratenabzug bei Feuerstößen reduziert um %d%s\n",
 	L"Reduzierte Chance bei Feuerstößen ungewollt mehr Schüsse abzugeben\n",
@@ -289,7 +291,7 @@ STR16 gzIMPMinorTraitsHelpTextsStealthy[]=
 {
 	L"-%d%s APs zum Schleichen nötig\n",
 	L"+%d%s Chance beim Schleichen kein Geräusch zu erzeugen zu sein\n",
-	L"+%d%s Chance, 'unsichtbar' zu sein wenn man sich nicht verrät ('Stealth')\n",
+	L"+%d%s Chance, 'unsichtbar' zu sein wenn man sich nicht verrät (schleichen)\n",
 	L"Der Abzug der berechneten Sichtdeckung beim Bewegen ist %d%s geringer\n",
 
 };
@@ -411,7 +413,6 @@ STR16 gzIMPDisabilitiesHelpTexts[]=
 	L"Erträgt den Anblick großer Insekten nicht und\nzeigt verringerte Leistung in tropischen Sektoren.",
 	L"Vergisst manchmal seine Befehle und verliert dadurch im Kampf einen Teil seiner APs.",
 	L"Dreht im Umgang mit Waffen manchmal durch und gibt Dauerfeuer.\nIst ihm das mit seiner Waffe nicht möglich, kann das zu Moralabzügen führen.",
-
 };
 
 
@@ -423,7 +424,7 @@ STR16 gzIMPProfileCostText[]=
 
 STR16 zGioNewTraitsImpossibleText[]=
 {
-	L"Sie können das neue Fertigkeitensystem nicht ohne aktivierte PROFEX-Utility benutzen. Suchen Sie in Ihrer JA2_Options.ini den Eintrag: READ_PROFILE_DATA_FROM_XML.",
+	L"Sie können das neue Fertigkeitensystem nicht ohne aktiviertem PROFEX-Utility benutzen. Suchen Sie in Ihrer ja2_options.ini den Eintrag: READ_PROFILE_DATA_FROM_XML.",
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -437,7 +438,8 @@ STR16	gzIronManModeWarningText[]=
 STR16 gzDisplayCoverText[]=
 {
 	L"Deckung: %d/100 %s, Helligkeit: %d/100",
-	L"Waffen-Rchwt.: %d/%d Felder, Trefferwahrsch.: %d/100",
+	L"Waffen-Reichweite: %d/%d Felder, Trefferwahrscheinlichkeit: %d/100",
+	L"Waffen-Reichweite: %d/%d Felder, Lauf-Genauigkeit: %d/100",
 	L"Deckungsanzeige ausschalten",
 	L"Zeige Ansicht für Söldner",
 	L"Zeige Gefahrenbereich für Söldner",
@@ -445,7 +447,7 @@ STR16 gzDisplayCoverText[]=
 	L"Stadt",
 	L"Wüste",
 	L"Schnee", // NOT USED!!!
-	L"Wald and Wüste",
+	L"Wald und Wüste",
 	L"" // yes empty for now
 };
 

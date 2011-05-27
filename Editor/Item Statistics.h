@@ -110,7 +110,7 @@ extern INT8 gbDefaultBombTrapLevel;
 
 extern void SetOwnershipGroup( UINT8 ubNewGroup );
 
-extern CHAR16 gszActionItemDesc[ NUM_ACTIONITEMS ][ 30 ];
+//extern CHAR16 gszActionItemDesc[ NUM_ACTIONITEMS ][ 30 ];
 
 #endif
 #endif

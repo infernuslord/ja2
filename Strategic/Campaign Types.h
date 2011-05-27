@@ -499,8 +499,10 @@ typedef struct UNDERGROUND_SECTORINFO
 	UINT8	ubCreatureHabitat;			//determines how creatures live in this sector (see creature spreading.c)
 	UINT8	ubElitesInBattle, ubTroopsInBattle, ubAdminsInBattle, ubCreaturesInBattle;
 
-	UINT32	uiNumberOfWorldItemsInTempFileThatCanBeSeenByPlayer;
+	// adding these (should not change struct layout due to padding)
+	UINT8	ubMusicMode, ubUnsed;
 
+	UINT32	uiNumberOfWorldItemsInTempFileThatCanBeSeenByPlayer;
 #ifdef JA2UB	
 	BOOLEAN	fCustomSector;
 	BOOLEAN	fCampaignSector;
@@ -516,5 +518,13 @@ typedef struct UNDERGROUND_SECTORINFO
 extern std::vector<SECTORINFO> SectorInfo;
 
 extern UNDERGROUND_SECTORINFO *gpUndergroundSectorInfoHead;
+
+enum CreateMusic
+{
+	CM_COMPAT,
+	CM_AUTO,
+	CM_NEVER,
+	CM_ALWAYS,
+};
 
 #endif

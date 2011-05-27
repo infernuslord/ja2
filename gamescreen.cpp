@@ -98,7 +98,6 @@
 
 #define		ARE_IN_FADE_IN( )		( gfFadeIn || gfFadeInitialized )
 
-
 BOOLEAN	fDirtyRectangleMode = FALSE;
 UINT16	*gpFPSBuffer=NULL;
 // MarkNote
@@ -112,8 +111,6 @@ BOOLEAN		gfPlayAttnAfterMapLoad = FALSE;
 // VIDEO OVERLAYS
 INT32		giFPSOverlay = 0;
 INT32		giCounterPeriodOverlay = 0;
-
-//extern				BOOLEAN		gfFirstTimeInGameHeliCrash;
 
 
 BOOLEAN	gfExitToNewSector					= FALSE;
@@ -134,7 +131,6 @@ extern				BOOLEAN				gfTopMessageDirty;
 extern				BOOLEAN		gfFailedToSaveGameWhenInsideAMessageBox;
 extern				BOOLEAN		gfFirstHeliRun;
 extern				BOOLEAN		gfRenderFullThisFrame;
-//extern				BOOLEAN		gfFirstTimeInGameHeliCrash;
 
 #ifdef JA2UB
 extern				void HandleCannotAffordNpcMsgBox();
@@ -639,7 +635,12 @@ UINT32	MainGameScreenHandle(void)
 			InternalLocateGridNo( gMapInformation.sNorthGridNo, TRUE );
 #endif			
 		// Start heli Run...
+#ifdef JA2UB
 		StartHelicopterRun( gMapInformation.sNorthGridNo );
+#else
+		//StartHelicopterRun( gMapInformation.sNorthGridNo );
+		StartHelicopterRun( gGameExternalOptions.iInitialMercArrivalLocation );
+#endif
 
 		// Update clock by one so that our DidGameJustStatrt() returns now false for things like LAPTOP, etc...
 		SetGameTimeCompressionLevel( TIME_COMPRESS_X1 );

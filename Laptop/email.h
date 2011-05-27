@@ -2,6 +2,7 @@
 #define __EMAIL_H
 
 #include "types.h"
+#include "soldier profile type.h"
 
 // defines
 #define MAX_EMAIL_LINES 10 //max number of lines can be shown in a message
@@ -130,6 +131,28 @@
 
 #define IMP_EMAIL_PROFILE_RESULTS								( EMAIL_AIM_PROMOTION_2 + EMAIL_AIM_PROMOTION_2_LENGTH )
 #define IMP_EMAIL_PROFILE_RESULTS_LENGTH				1
+
+#define IMP_EMAIL_INTRO2					0
+#define IMP_EMAIL_INTRO_LENGTH2	10
+#define ENRICO_CONGRATS2					(IMP_EMAIL_INTRO2 + IMP_EMAIL_INTRO_LENGTH2)					
+#define ENRICO_CONGRATS_LENGTH2	3
+#define IMP_EMAIL_AGAIN2					(ENRICO_CONGRATS2 + ENRICO_CONGRATS_LENGTH2)
+#define IMP_EMAIL_AGAIN_LENGTH2	6
+#define MERC_INTRO2				(IMP_EMAIL_AGAIN2 + IMP_EMAIL_AGAIN_LENGTH2)
+#define MERC_INTRO_LENGTH2		5
+#define MERC_NEW_SITE_ADDRESS2	( MERC_INTRO2 + MERC_INTRO_LENGTH2 )
+#define MERC_NEW_SITE_ADDRESS_LENGTH2 2
+#define AIM_MEDICAL_DEPOSIT_REFUND2 ( MERC_NEW_SITE_ADDRESS2 + MERC_NEW_SITE_ADDRESS_LENGTH2 )
+#define AIM_MEDICAL_DEPOSIT_REFUND_LENGTH2 3
+#define IMP_EMAIL_PROFILE_RESULTS2 ( AIM_MEDICAL_DEPOSIT_REFUND2 + AIM_MEDICAL_DEPOSIT_REFUND_LENGTH2 )
+#define IMP_EMAIL_PROFILE_RESULTS_LENGTH2 1
+#define	MERC_WARNING2							( IMP_EMAIL_PROFILE_RESULTS_LENGTH2 + IMP_EMAIL_PROFILE_RESULTS2 )
+#define	MERC_WARNING_LENGTH2			2
+#define MERC_INVALID2							( MERC_WARNING2 + MERC_WARNING_LENGTH2 )
+#define MERC_INVALID_LENGTH2				2							
+#define	NEW_MERCS_AT_MERC					( MERC_INVALID2 + MERC_INVALID_LENGTH2 )
+#define	NEW_MERCS_AT_MERC_LENGTH	2
+
 #else
 #define IMP_EMAIL_INTRO					0
 #define IMP_EMAIL_INTRO_LENGTH	10
@@ -267,11 +290,11 @@
 //#define MERC_UP_LEVEL_BIGGENS			(MERC_UP_LEVEL_TEX + MERC_UP_LEVEL_TEX_LENGTH)
 //#define MERC_UP_LEVEL_BIGGENS_LENGTH	2
 
+
 #define	MERC_UP_LEVEL_GASTON			165
 #define MERC_UP_LEVEL_STOGIE			166
 #define MERC_UP_LEVEL_TEX				167
 #define MERC_UP_LEVEL_BIGGENS			168
-
 
 struct message{
 	STR16 pString;
@@ -304,6 +327,11 @@ struct email
 	// WANNE: A reference to the IMP position in the gMercProfiles array. 
 	// So we know which analyse email belongs to the imp
 	INT32		iCurrentIMPPosition;
+	
+	UINT8 EmailVersion;
+
+	// WANNE.MAIL: Fix
+	INT16		iCurrentShipmentDestinationID;
 
 	struct	email *Next;
 	struct	email *Prev;
@@ -333,6 +361,11 @@ typedef struct
 	BOOLEAN fNew;
 
 	INT32		iCurrentIMPPosition;
+	
+	UINT8 EmailVersion;
+	
+	// WANNE.MAIL: Fix
+	INT16		iCurrentShipmentDestinationID;
 
 } SavedEmailStruct;
 
@@ -420,12 +453,16 @@ void RenderEmail();
 
 
 // message manipulation
-void AddEmailMessage(INT32 iMessageOffset, INT32 iMessageLength,STR16 pSubject, INT32 iDate, UINT8 ubSender, BOOLEAN fAlreadyRead, INT32 uiFirstData, UINT32 uiSecondData, INT32 iCurrentIMPPosition );
+void AddEmailMessage(INT32 iMessageOffset, INT32 iMessageLength,STR16 pSubject, INT32 iDate, UINT8 ubSender, BOOLEAN fAlreadyRead, INT32 uiFirstData, UINT32 uiSecondData, INT32 iCurrentIMPPosition, INT16 iCurrentShipmentDestinationID, UINT8 EmailType );
 void RemoveEmailMessage(INT32 iId);
 EmailPtr GetEmailMessage(INT32 iId);
 void LookForUnread();
-void AddEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition);
-void AddPreReadEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate);
+void AddEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition, INT16 iCurrentShipmentDestinationID, UINT8 EmailType);
+
+// WANNE: For the new WF merc, when they available again
+void AddEmailWFMercAvailable(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition, UINT8 EmailType);
+
+void AddPreReadEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, UINT8 EmailType );
 BOOLEAN DisplayNewMailBox();
 void CreateDestroyNewMailButton();
 void CreateDestroyDeleteNoticeMailButton();
@@ -435,14 +472,75 @@ void ReDrawNewMailBox( void );
 void ReDisplayBoxes( void );
 void ShutDownEmailList();
 void AddMessageToPages(INT32 iMessageId);
-void AddEmailWithSpecialData(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iFirstData, UINT32 uiSecondData );
+void AddEmailWithSpecialData(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iFirstData, UINT32 uiSecondData, UINT8 EmailType);
 
-void AddCustomEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition);
+void AddCustomEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition, INT16 iCurrentShipmentDestinationID, UINT8 EmailType);
 
 #ifdef JA2BETAVERSION
 	void AddAllEmails();
 #endif
 
+typedef struct
+{
+	UINT8 uiIndex;
+	CHAR16	szMessage[MAIL_STRING_SIZE];
+	CHAR16	szSubject[EMAIL_SUBJECT_LENGTH];
+
+} EMAIL_MERC_AVAILABLE_VALUES;
+
+typedef struct
+{
+	UINT8 uiIndex;
+	CHAR16	szMessage[MAIL_STRING_SIZE];
+	CHAR16	szSubject[EMAIL_SUBJECT_LENGTH];
+
+} EMAIL_MERC_LEVEL_UP_VALUES;
+
+#define EMAIL_INDEX 500
+
+typedef struct
+{
+	UINT8 uiIndex;
+	CHAR16	szMessage[MAIL_STRING_SIZE][30];
+	CHAR16	szSubject[EMAIL_SUBJECT_LENGTH];
+} EMAIL_OTHER_VALUES;
+
+enum {
+	//------------------------------
+	//Read Email.edt
+	// read  message from Email.edt 
+	TYPE_EMAIL_EMAIL_EDT = 0,
+	// read message from Email.edt and nickname (sender) read from MercProfiles.xml
+	TYPE_EMAIL_EMAIL_EDT_NAME_MERC,
+	
+	//-------------------------------
+	//Read *.xml
+	//Read message from Email\EmailMercAvailable.xml.XML and nickname (sender)  read from MercProfiles.xml
+	TYPE_EMAIL_AIM_AVAILABLE,
+	//Read message from Email\EmailMercLevelUp.xml.XML and nickname (sender)  read from MercProfiles.xml
+	TYPE_EMAIL_MERC_LEVEL_UP,
+	
+	//Read from others *.XMLs
+/*	TYPE_EMAIL_ENRICO,
+	TYPE_EMAIL_CHAR_PROFILE_SITE,
+	TYPE_EMAIL_GAME_HELP,
+	TYPE_EMAIL_IMP_PROFILE_RESULTS,
+	TYPE_EMAIL_SPECK_FROM_MERC,
+	TYPE_EMAIL_RIS_EMAIL,
+	TYPE_EMAIL_INSURANCE_COMPANY,
+	TYPE_EMAIL_BOBBY_R,
+	TYPE_EMAIL_KING_PIN,
+	TYPE_EMAIL_JOHN_KULBA,
+	TYPE_EMAIL_AIM_SITE, */
+	TYPE_EMAIL_OTHER,
+};
+
+extern EMAIL_MERC_AVAILABLE_VALUES EmailMercAvailableText[NUM_PROFILES];
+extern EMAIL_MERC_LEVEL_UP_VALUES EmailMercLevelUpText[NUM_PROFILES];
+extern EMAIL_OTHER_VALUES EmailOtherText[EMAIL_INDEX];
+extern BOOLEAN ReadXMLEmail;
+extern void AddEmailTypeXML( INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition, UINT8 EmailType );
+extern void AddPreReadEmailTypeXML( INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, UINT8 EmailType );
 #endif
 
 

@@ -336,7 +336,8 @@ UINT8 HandleActivatedTargetCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos, BOOLEA
 
 	UINT16	reverse = 0;
 
-	UINT8 maxAimLevels = AllowedAimingLevels(pSoldier, GetRangeInCellCoordsFromGridNoDiff( pSoldier->sGridNo, usMapPos ) );
+	// HEADROCK HAM 4: Required for new Aiming Level Limit function
+	UINT8 maxAimLevels = AllowedAimingLevels(pSoldier, usMapPos);
 
 		usInHand = pSoldier->inv[ HANDPOS ].usItem;
 
@@ -382,12 +383,12 @@ UINT8 HandleActivatedTargetCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos, BOOLEA
 				{
 					INT16 sCurAPCosts, sAPCosts;
 
-					sCurAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, 0);
+					sCurAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, pSoldier->aiData.bShownAimTime);
 
 					do
 					{
 						pSoldier->bDoAutofire++;
-						sAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, 0);
+						sAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, pSoldier->aiData.bShownAimTime);
 					}
 					while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && sAPCosts == sCurAPCosts && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire);
 					pSoldier->bDoAutofire--;
@@ -542,12 +543,12 @@ UINT8 HandleActivatedTargetCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos, BOOLEA
 				do
 				{
 					pSoldier->bDoAutofire++;
-					sAPCosts = CalcTotalAPsToAttack( pSoldier, gsBurstLocations[0].sGridNo, TRUE, 0);
+					sAPCosts = CalcTotalAPsToAttack( pSoldier, gsBurstLocations[0].sGridNo, TRUE, pSoldier->aiData.bShownAimTime);
 				}
 				while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire && gbNumBurstLocations >= pSoldier->bDoAutofire);
 				pSoldier->bDoAutofire--;
 
-				gsCurrentActionPoints = CalcTotalAPsToAttack( pSoldier, gsBurstLocations[0].sGridNo, TRUE, 0 );
+				gsCurrentActionPoints = CalcTotalAPsToAttack( pSoldier, gsBurstLocations[0].sGridNo, TRUE, pSoldier->aiData.bShownAimTime );
 			}
 		}
 
@@ -575,34 +576,94 @@ UINT8 HandleActivatedTargetCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos, BOOLEA
 			}
 			else
 			{
+				//usCursor = ACTION_TARGETREDBURST_UICURSOR;
 				usCursor = ACTION_TARGETCONFIRMBURST_UICURSOR;
 
 				// HEADROCK HAM B1: Burst cursor now shows multiple CTH bars (one for each bullet)
 				// and also a Targetted Bodypart indicator.
-				if(pSoldier->bDoAutofire == 0 && gGameSettings.fOptions[ TOPTION_CTH_CURSOR ])
+				//if(pSoldier->bDoAutofire == 0 && gGameSettings.fOptions[ TOPTION_CTH_CURSOR ])
+				if(pSoldier->bDoAutofire == 0)
 				{
-					if (gGameExternalOptions.ubNewCTHBars == 1 || gGameExternalOptions.ubNewCTHBars == 2)
+					if(UsingNewCTHSystem() == true)
 					{
-						// Burst mode only
-						OBJECTTYPE * pInHand;
-						pInHand = &(pSoldier->inv[pSoldier->ubAttackingHand]);
-						// Burst size
-						gbCtHBurstCount = GetShotsPerBurst(pInHand);
-						UINT8 i, saveDoBurst;
-						// Save original burst value (should be 1 always, before the burst has been fired, but
-						// this is just a failsafe
-						saveDoBurst = pSoldier->bDoBurst;
+						//AXP 29.03.2007: Rooftop CtH fix. See below.
+						INT8 bTempTargetLevel = pSoldier->bTargetLevel;
+						pSoldier->bTargetLevel = (INT8) gsInterfaceLevel;
 
-						// For each bullet in the burst
-						for (i=0;i<gbCtHBurstCount;i++)
+						UINT32 uiHitChance;
+						uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, pSoldier->aiData.bShownAimTime, pSoldier->bAimShotLocation );
+						// HEADROCK HAM B2.7: CTH approximation?
+						if (gGameExternalOptions.fApproximateCTH)
+						{	
+							uiHitChance = ChanceToHitApproximation( pSoldier, uiHitChance );
+						}
+						gfUICtHBar = TRUE;
+						gbCtHBurstCount = 0;
+						gCTHDisplay.MuzzleSwayPercentage = (gCTHDisplay.MuzzleSwayPercentage + uiHitChance)/2;
+						gCTHDisplay.iShooterGridNo = pSoldier->sGridNo;
+						gCTHDisplay.iTargetGridNo = usMapPos;
+						
+						// Calculate distance to target
+						FLOAT dDeltaX = (FLOAT)(CenterX( pSoldier->sGridNo ) - CenterX( usMapPos ));
+						FLOAT dDeltaY = (FLOAT)(CenterY( pSoldier->sGridNo ) - CenterY( usMapPos ));
+						FLOAT d2DDistance = sqrt((dDeltaX*dDeltaX)+(dDeltaY*dDeltaY));
+
+						CalcMagFactorSimple( pSoldier, d2DDistance, pSoldier->aiData.bShownAimTime );
+						
+						pSoldier->bTargetLevel = bTempTargetLevel;
+					}
+					else if(gGameSettings.fOptions[ TOPTION_CTH_CURSOR ])
+					{
+						if (gGameExternalOptions.ubNewCTHBars == 1 || gGameExternalOptions.ubNewCTHBars == 2)
+						{
+							// Burst mode only
+							OBJECTTYPE * pInHand;
+							pInHand = &(pSoldier->inv[pSoldier->ubAttackingHand]);
+							// Burst size
+							gbCtHBurstCount = GetShotsPerBurst(pInHand);
+							UINT8 i, saveDoBurst;
+							// Save original burst value (should be 1 always, before the burst has been fired, but
+							// this is just a failsafe
+							saveDoBurst = pSoldier->bDoBurst;
+
+							// For each bullet in the burst
+							for (i=0;i<gbCtHBurstCount;i++)
+							{
+								//AXP 29.03.2007: Rooftop CtH fix. See below.
+								INT8 bTempTargetLevel = pSoldier->bTargetLevel;
+								pSoldier->bTargetLevel = (INT8) gsInterfaceLevel;
+
+								// Calculate hit chance (using the current bDoBurst for burst-penalty calculations)
+								UINT32 uiHitChance;
+								uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, (INT8)(pSoldier->aiData.bShownAimTime ), pSoldier->bAimShotLocation );
+								// HEADROCK HAM B2.7: CTH approximation?
+								if (gGameExternalOptions.fApproximateCTH)
+								{	
+									uiHitChance = ChanceToHitApproximation( pSoldier, uiHitChance );
+								}
+
+								pSoldier->bTargetLevel = bTempTargetLevel;
+
+								// Put result (burst CTH) into the array
+								gbCtH[i] = (gbCtH[i]+uiHitChance)/2;
+
+								// Increase burst size, so that the next time we run CalcChanceToHitGun we'll get a lower
+								// result, based on our Burst Penalty
+								pSoldier->bDoBurst++;
+							}
+							// Reset original burst status
+							pSoldier->bDoBurst = saveDoBurst;
+							// Activate CTH bar display
+							gfUICtHBar = TRUE;
+						}
+						else // One "BASE CTH" bar, JA2 1.13 vanilla
 						{
 							//AXP 29.03.2007: Rooftop CtH fix. See below.
 							INT8 bTempTargetLevel = pSoldier->bTargetLevel;
 							pSoldier->bTargetLevel = (INT8) gsInterfaceLevel;
 
-							// Calculate hit chance (using the current bDoBurst for burst-penalty calculations)
 							UINT32 uiHitChance;
-							uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, 0, pSoldier->bAimShotLocation );
+							uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, (INT8)(pSoldier->aiData.bShownAimTime ), pSoldier->bAimShotLocation );
 							// HEADROCK HAM B2.7: CTH approximation?
 							if (gGameExternalOptions.fApproximateCTH)
 							{	
@@ -611,56 +672,28 @@ UINT8 HandleActivatedTargetCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos, BOOLEA
 
 							pSoldier->bTargetLevel = bTempTargetLevel;
 
-							// Put result (burst CTH) into the array
-							gbCtH[i] = (gbCtH[i]+uiHitChance)/2;
-
-							// Increase burst size, so that the next time we run CalcChanceToHitGun we'll get a lower
-							// result, based on our Burst Penalty
-							pSoldier->bDoBurst++;
+							gfUICtHBar = TRUE;
+							gbCtH[0] = (gbCtH[0]+uiHitChance)/2;
+							gbCtHBurstCount = 1;
 						}
-						// Reset original burst status
-						pSoldier->bDoBurst = saveDoBurst;
-						// Activate CTH bar display
-						gfUICtHBar = TRUE;
-					}
-					else // One "BASE CTH" bar, JA2 1.13 vanilla
-					{
-						//AXP 29.03.2007: Rooftop CtH fix. See below.
-						INT8 bTempTargetLevel = pSoldier->bTargetLevel;
-						pSoldier->bTargetLevel = (INT8) gsInterfaceLevel;
-
-						UINT32 uiHitChance;
-						uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, 0, pSoldier->bAimShotLocation );
-						// HEADROCK HAM B2.7: CTH approximation?
-						if (gGameExternalOptions.fApproximateCTH)
-						{	
-							uiHitChance = ChanceToHitApproximation( pSoldier, uiHitChance );
-						}
-
-						pSoldier->bTargetLevel = bTempTargetLevel;
-
-						gfUICtHBar = TRUE;
-						gbCtH[0] = (gbCtH[0]+uiHitChance)/2;
-						gbCtHBurstCount = 1;
 					}
 				}
 
 				// HEADROCK HAM B2: Now autofire will show both its starting CTH and the CTH of the last
 				// bullet in the volley.
 				
-				else if(pSoldier->bDoAutofire > 0 && gGameSettings.fOptions[ TOPTION_CTH_CURSOR ])
+				//else if(pSoldier->bDoAutofire > 0 && gGameSettings.fOptions[ TOPTION_CTH_CURSOR ])
+				else if(pSoldier->bDoAutofire > 0)
 				{
-					if (gGameExternalOptions.ubNewCTHBars == 1 || gGameExternalOptions.ubNewCTHBars == 3)
+					if(UsingNewCTHSystem() == true)
 					{
-						gbCtHBurstCount = 1;
-
 						//AXP 29.03.2007: Rooftop CtH fix. See below.
 						INT8 bTempTargetLevel = pSoldier->bTargetLevel;
 						pSoldier->bTargetLevel = (INT8) gsInterfaceLevel;
-						
+							
 						UINT32 uiHitChance;
 						// Calculate CTH for the first bullet
-						uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, 0, pSoldier->bAimShotLocation );
+						uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, pSoldier->aiData.bShownAimTime, pSoldier->bAimShotLocation );
 						// HEADROCK HAM B2.7: CTH approximation?
 						if (gGameExternalOptions.fApproximateCTH)
 						{	
@@ -668,31 +701,69 @@ UINT8 HandleActivatedTargetCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos, BOOLEA
 						}
 
 						// CTH for the first bullet is entered into this array, and later displayed
-						gbCtH[0] = (gbCtH[0]+uiHitChance)/2;
+						gCTHDisplay.MuzzleSwayPercentage = (gCTHDisplay.MuzzleSwayPercentage + uiHitChance)/2;
+						gCTHDisplay.iShooterGridNo = pSoldier->sGridNo;
+						gCTHDisplay.iTargetGridNo = usMapPos;
 
-						// Fool the CTH formula into thinking we're already firing the last bullet in the volley,
-						// by artificially altering bDoBurst (which tracks actual burst progression). The CTH formula
-						// calculates Auto Penalty based on bDoBurst - (Autopen * (bDoBurst-1), basically).
-						UINT8 saveDoBurst = pSoldier->bDoBurst;
-						pSoldier->bDoBurst = pSoldier->bDoAutofire;
-						
-						uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, 0, pSoldier->bAimShotLocation );
-						// HEADROCK HAM B2.7: CTH approximation?
-						if (gGameExternalOptions.fApproximateCTH)
-						{	
-							uiHitChance = ChanceToHitApproximation( pSoldier, uiHitChance );
-						}
+						// Flag to tell the program to draw two CTH bars.
+						gfUICtHBar = TRUE;
+						gbCtHBurstCount = 0;
+
+						// Calculate distance to target
+						FLOAT dDeltaX = (FLOAT)(CenterX( pSoldier->sGridNo ) - CenterX( usMapPos ));
+						FLOAT dDeltaY = (FLOAT)(CenterY( pSoldier->sGridNo ) - CenterY( usMapPos ));
+						FLOAT d2DDistance = sqrt((dDeltaX*dDeltaX)+(dDeltaY*dDeltaY));
+
+						CalcMagFactorSimple( pSoldier, d2DDistance, pSoldier->aiData.bShownAimTime );
 
 						pSoldier->bTargetLevel = bTempTargetLevel;
-						// Return Burst State to original value
-						pSoldier->bDoBurst = saveDoBurst;
+					}
+					else if(gGameSettings.fOptions[ TOPTION_CTH_CURSOR ])
+					{
+						if (gGameExternalOptions.ubNewCTHBars == 1 || gGameExternalOptions.ubNewCTHBars == 3)
+						{
+							gbCtHBurstCount = 1;
 
-						// CTH for the last bullet is entered into this array and later displayed.
-						gbCtH[1] = (gbCtH[1]+uiHitChance)/2;
-				
-						// Flag to tell the program to draw two CTH bars.
-						gbCtHAutoFire = TRUE;
-						gfUICtHBar = TRUE;
+							//AXP 29.03.2007: Rooftop CtH fix. See below.
+							INT8 bTempTargetLevel = pSoldier->bTargetLevel;
+							pSoldier->bTargetLevel = (INT8) gsInterfaceLevel;
+							
+							UINT32 uiHitChance;
+							// Calculate CTH for the first bullet
+							uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, (INT8)(pSoldier->aiData.bShownAimTime ), pSoldier->bAimShotLocation );
+							// HEADROCK HAM B2.7: CTH approximation?
+							if (gGameExternalOptions.fApproximateCTH)
+							{	
+								uiHitChance = ChanceToHitApproximation( pSoldier, uiHitChance );
+							}
+
+							// CTH for the first bullet is entered into this array, and later displayed
+							gbCtH[0] = (gbCtH[0]+uiHitChance)/2;
+
+							// Fool the CTH formula into thinking we're already firing the last bullet in the volley,
+							// by artificially altering bDoBurst (which tracks actual burst progression). The CTH formula
+							// calculates Auto Penalty based on bDoBurst - (Autopen * (bDoBurst-1), basically).
+							UINT8 saveDoBurst = pSoldier->bDoBurst;
+							pSoldier->bDoBurst = pSoldier->bDoAutofire;
+							
+							uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, (INT8)(pSoldier->aiData.bShownAimTime ), pSoldier->bAimShotLocation );
+							// HEADROCK HAM B2.7: CTH approximation?
+							if (gGameExternalOptions.fApproximateCTH)
+							{	
+								uiHitChance = ChanceToHitApproximation( pSoldier, uiHitChance );
+							}
+
+							pSoldier->bTargetLevel = bTempTargetLevel;
+							// Return Burst State to original value
+							pSoldier->bDoBurst = saveDoBurst;
+
+							// CTH for the last bullet is entered into this array and later displayed.
+							gbCtH[1] = (gbCtH[1]+uiHitChance)/2;
+					
+							// Flag to tell the program to draw two CTH bars.
+							gbCtHAutoFire = TRUE;
+							gfUICtHBar = TRUE;
+						}
 					}
 				}
 			}
@@ -700,7 +771,7 @@ UINT8 HandleActivatedTargetCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos, BOOLEA
 		else
 		{
 			//DIGICRAB: Graphical CtH
-			if(gGameSettings.fOptions[ TOPTION_CTH_CURSOR ])
+			//if(gGameSettings.fOptions[ TOPTION_CTH_CURSOR ])
 			{
 				//AXP 29.03.2007: Rooftop CtH fix. Temporarily set soldier targetlevel to the real interface
 				//level (selected with TAB), so the first shot after switching TL is calculated correctly
@@ -709,13 +780,20 @@ UINT8 HandleActivatedTargetCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos, BOOLEA
 
 				UINT32 uiHitChance;
 				// SANDRO - precise calculation for throwing knives added
-				if ( Item[ usInHand ].usItemClass == IC_THROWING_KNIFE )
+				if(UsingNewCTHSystem() == true)
 				{
-					uiHitChance = CalcThrownChanceToHit( pSoldier, usMapPos, (INT8)(pSoldier->aiData.bShownAimTime ), pSoldier->bAimShotLocation );
+					uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, (INT8)(pSoldier->aiData.bShownAimTime ), pSoldier->bAimShotLocation );
 				}
 				else
 				{
-					uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, (INT8)(pSoldier->aiData.bShownAimTime ), pSoldier->bAimShotLocation );
+					if ( Item[ usInHand ].usItemClass == IC_THROWING_KNIFE )
+					{
+						uiHitChance = CalcThrownChanceToHit( pSoldier, usMapPos, (INT8)(pSoldier->aiData.bShownAimTime ), pSoldier->bAimShotLocation );
+					}
+					else
+					{
+						uiHitChance = CalcChanceToHitGun( pSoldier, usMapPos, (INT8)(pSoldier->aiData.bShownAimTime ), pSoldier->bAimShotLocation );
+					}
 				}
 				// HEADROCK HAM B2.7: CTH approximation?
 				if (gGameExternalOptions.fApproximateCTH)
@@ -723,13 +801,33 @@ UINT8 HandleActivatedTargetCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos, BOOLEA
 					uiHitChance = ChanceToHitApproximation( pSoldier, uiHitChance );
 				}
 
+				if(UsingNewCTHSystem() == true)
+				{
+					gfUICtHBar = TRUE;
+					gbCtHBurstCount = 0;
+
+					// CTH for the first bullet is entered into this array, and later displayed
+					gCTHDisplay.MuzzleSwayPercentage = (gCTHDisplay.MuzzleSwayPercentage + uiHitChance)/2;
+					gCTHDisplay.iShooterGridNo = pSoldier->sGridNo;
+					gCTHDisplay.iTargetGridNo = usMapPos;
+
+					// Calculate distance to target
+					FLOAT dDeltaX = (FLOAT)(CenterX( pSoldier->sGridNo ) - CenterX( usMapPos ));
+					FLOAT dDeltaY = (FLOAT)(CenterY( pSoldier->sGridNo ) - CenterY( usMapPos ));
+					FLOAT d2DDistance = sqrt((dDeltaX*dDeltaX)+(dDeltaY*dDeltaY));
+
+					CalcMagFactorSimple( pSoldier, d2DDistance, pSoldier->aiData.bShownAimTime );
+				}
+
 				pSoldier->bTargetLevel = bTempTargetLevel;
 
-				gfUICtHBar = TRUE;
-				gbCtHBurstCount = 1;
-				gbCtH[0] = (gbCtH[0]+uiHitChance)/2;
+				if(UsingNewCTHSystem() == false && gGameSettings.fOptions[ TOPTION_CTH_CURSOR ])
+				{
+					gfUICtHBar = TRUE;
+					gbCtHBurstCount = 1;
+					gbCtH[0] = (gbCtH[0]+uiHitChance)/2;
+				}
 			}
-
 			switchVal = pSoldier->aiData.bShownAimTime;
 
 			switch( switchVal )
@@ -2177,7 +2275,8 @@ void HandleRightClickAdjustCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos )
 
 	ubCursor =	GetActionModeCursor( pSoldier );
 
-	UINT8 maxAimLevels = AllowedAimingLevels(pSoldier, GetRangeInCellCoordsFromGridNoDiff( pSoldier->sGridNo, usMapPos ));
+	// HEADROCK HAM 4: Required for new Aiming Level Limit function
+	UINT8 maxAimLevels = AllowedAimingLevels(pSoldier, usMapPos);
 
 	// 'snap' cursor to target tile....
 	if ( gfUIFullTargetFound )
@@ -2211,11 +2310,11 @@ void HandleRightClickAdjustCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos )
 				if(pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft > pSoldier->bDoAutofire )
 				{
 					//Calculate how many bullets we need to fire to add at least one more AP
-					sAPCosts = sCurAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, 0);
+					sAPCosts = sCurAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, pSoldier->aiData.bShownAimTime);
 					while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && sAPCosts <= sCurAPCosts && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft > pSoldier->bDoAutofire)	//Increment the bullet count until we run out of APs or we spend the whole AP
 					{
 						pSoldier->bDoAutofire++;
-						sAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, 0);
+						sAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, pSoldier->aiData.bShownAimTime);
 					}
 
 					//we've stepped over the border and used up one more ap, now let's make sure that it is spent to maximize the bullets
@@ -2225,12 +2324,12 @@ void HandleRightClickAdjustCursor( SOLDIERTYPE *pSoldier, INT32 usMapPos )
 					do
 					{
 						pSoldier->bDoAutofire++;
-						sAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, 0);
+						sAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, pSoldier->aiData.bShownAimTime);
 					}
 					while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && sAPCosts == sCurAPCosts && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire);
 					pSoldier->bDoAutofire--;
 
-					sAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, 0);
+					sAPCosts = CalcTotalAPsToAttack( pSoldier, usMapPos, TRUE, pSoldier->aiData.bShownAimTime);
 
 					if(!EnoughPoints( pSoldier, sAPCosts, 0, FALSE ))		//We've not enough points to fire those bullets
 					{
@@ -3057,7 +3156,7 @@ void HandleWheelAdjustCursor( SOLDIERTYPE *pSoldier, INT32 sMapPos, INT32 sDelta
 
 	ubCursor =	GetActionModeCursor( pSoldier );
 
-	UINT8 maxAimLevels = AllowedAimingLevels(pSoldier);
+	UINT8 maxAimLevels = AllowedAimingLevels(pSoldier, sMapPos);
 
 	// 'snap' cursor to target tile....
 	if ( gfUIFullTargetFound )
@@ -3083,11 +3182,11 @@ void HandleWheelAdjustCursor( SOLDIERTYPE *pSoldier, INT32 sMapPos, INT32 sDelta
 				if(pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft > pSoldier->bDoAutofire )
 				{
 					//Calculate how many bullets we need to fire to add at least one more AP
-					sAPCosts = sCurAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+					sAPCosts = sCurAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, pSoldier->aiData.bShownAimTime);
 					while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && sAPCosts <= sCurAPCosts && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft > pSoldier->bDoAutofire)	//Increment the bullet count until we run out of APs or we spend the whole AP
 					{
 						pSoldier->bDoAutofire++;
-						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, pSoldier->aiData.bShownAimTime);
 					}
 
 					//we've stepped over the border and used up one more ap, now let's make sure that it is spent to maximize the bullets
@@ -3097,12 +3196,12 @@ void HandleWheelAdjustCursor( SOLDIERTYPE *pSoldier, INT32 sMapPos, INT32 sDelta
 					do
 					{
 						pSoldier->bDoAutofire+=sDelta;
-						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, pSoldier->aiData.bShownAimTime);
 					}
 					while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && sAPCosts == sCurAPCosts && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire);
 					pSoldier->bDoAutofire--;
 
-					sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+					sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, pSoldier->aiData.bShownAimTime);
 
 					if(!EnoughPoints( pSoldier, sAPCosts, 0, FALSE ))		//We've not enough points to fire those bullets
 					{
@@ -3273,7 +3372,7 @@ void HandleWheelAdjustCursorWOAB( SOLDIERTYPE *pSoldier, INT32 sMapPos, INT32 sD
 
 	ubCursor =	GetActionModeCursor( pSoldier );
 
-	UINT8 maxAimLevels = AllowedAimingLevels(pSoldier);
+	UINT8 maxAimLevels = AllowedAimingLevels(pSoldier, sMapPos);
 
 	// 'snap' cursor to target tile....
 	if ( gfUIFullTargetFound )
@@ -3301,11 +3400,11 @@ void HandleWheelAdjustCursorWOAB( SOLDIERTYPE *pSoldier, INT32 sMapPos, INT32 sD
 				if(pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft > pSoldier->bDoAutofire )
 				{
 					//Calculate how many bullets we need to fire to add at least one more AP
-					sAPCosts = sCurAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+					sAPCosts = sCurAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, pSoldier->aiData.bShownAimTime);
 					while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && sAPCosts <= sCurAPCosts && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft > pSoldier->bDoAutofire)	//Increment the bullet count until we run out of APs or we spend the whole AP
 					{
 						pSoldier->bDoAutofire++;
-						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, pSoldier->aiData.bShownAimTime);
 					}
 
 					//we've stepped over the border and used up one more ap, now let's make sure that it is spent to maximize the bullets
@@ -3315,12 +3414,12 @@ void HandleWheelAdjustCursorWOAB( SOLDIERTYPE *pSoldier, INT32 sMapPos, INT32 sD
 					do
 					{
 						pSoldier->bDoAutofire+=sDelta;
-						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+						sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, pSoldier->aiData.bShownAimTime);
 					}
 					while(EnoughPoints( pSoldier, sAPCosts, 0, FALSE ) && sAPCosts == sCurAPCosts && pSoldier->inv[ pSoldier->ubAttackingHand ][0]->data.gun.ubGunShotsLeft >= pSoldier->bDoAutofire);
 					pSoldier->bDoAutofire--;
 
-					sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, 0);
+					sAPCosts = CalcTotalAPsToAttack( pSoldier, sMapPos, TRUE, pSoldier->aiData.bShownAimTime);
 
 					if(!EnoughPoints( pSoldier, sAPCosts, 0, FALSE ))		//We've not enough points to fire those bullets
 					{

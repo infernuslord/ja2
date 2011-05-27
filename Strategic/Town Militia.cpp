@@ -431,8 +431,9 @@ void StrategicRemoveMilitiaFromSector(INT16 sMapX, INT16 sMapY, UINT8 ubRank, UI
 {
 	SECTORINFO *pSectorInfo = &( SectorInfo[ SECTOR( sMapX, sMapY ) ] );
 
+	// WANNE: BUGZILLA #357: Fixed assertion when miltia dies.
 	// damn well better have that many around to remove!
-	Assert(pSectorInfo->ubNumberOfCivsAtLevel[ ubRank ] >= ubHowMany);
+	//Assert(pSectorInfo->ubNumberOfCivsAtLevel[ ubRank ] >= ubHowMany);
 
 	//KM : July 21, 1999 patch fix
 	if( pSectorInfo->ubNumberOfCivsAtLevel[ ubRank ] < ubHowMany )
@@ -884,6 +885,11 @@ DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"Militia3");
 		SECTORINFO *pSectorInfo = &( SectorInfo[ SECTOR(pSoldier->sSectorX, pSoldier->sSectorY) ] );
 		BOOLEAN fUnfullSectorFound = FALSE;
 
+		// Test to see if not enough Town Militia
+		// HEADROCK HAM 4: No need for this check anymore. Militia can now be trained separately thanks to being
+		// able to keep them out of cities.
+		/*
+
 		if ( CountMilitia( pSectorInfo ) < gGameExternalOptions.iMaxMilitiaPerSector )
 		{
 			fUnfullSectorFound = TRUE;
@@ -927,6 +933,7 @@ DebugMsg (TOPIC_JA2,DBG_LEVEL_3,"Militia3");
 			DoContinueMilitiaTrainingMessageBox( sSectorX, sSectorY, sString, MSG_BOX_FLAG_OK, CantTrainMobileMilitiaOkBoxCallback );
 			return;
 		}
+		*/
 
 		//////////////////////////////////////////
 		// Capacity check in nearby sectors

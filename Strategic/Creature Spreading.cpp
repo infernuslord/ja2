@@ -107,7 +107,7 @@
 //When either in a cave level with blue lights or there is a creature presence, then
 //we override the normal music with the creature music.	The conditions are maintained
 //inside the function PrepareCreaturesForBattle() in this module.
-BOOLEAN gfUseCreatureMusic = FALSE;
+//BOOLEAN gfUseCreatureMusic = FALSE; // moved to music control.cpp
 BOOLEAN gfCreatureMeanwhileScenePlayed = FALSE;
 enum
 {
@@ -953,7 +953,7 @@ void CreatureAttackTown( UINT8 ubSectorID, BOOLEAN fOverrideTest )
 		case CREATURE_BATTLE_CODE_TACTICALLYADD:
 			if (is_networked)
 			{
-				if(is_server && CREATURE_ENABLED==1)
+				if(is_server && gCreatureEnabled == 1)
 					PrepareCreaturesForBattle();
 			}
 			else
@@ -1228,35 +1228,56 @@ BOOLEAN PrepareCreaturesForBattle()
 	if( !gubCreatureBattleCode )
 	{
 		ubNumColors = LightGetColors( LColors );
+
+		if (! gbWorldSectorZ )
+		{
+			UseCreatureMusic(LColors->peBlue);
+			return FALSE;	//Creatures don't attack overworld with this battle code.
+		}
+
+		pSector = FindUnderGroundSector( gWorldSectorX, gWorldSectorY, gbWorldSectorZ );
+		if( !pSector )
+		{
+			return FALSE;
+		}
+
 		//if( ubNumColors != 1 )
 		//	ScreenMsg( FONT_RED, MSG_ERROR, L"This map has more than one light color -- KM, LC : 1" );
 
 		//By default, we only play creature music in the cave levels (the creature levels all consistently
 		//have blue lights while human occupied mines have red lights.	We always play creature music
 		//when creatures are in the level.
-		if( LColors->peBlue )
-			gfUseCreatureMusic = TRUE;
-		else
-			gfUseCreatureMusic = FALSE;
+		BOOLEAN fCreatures = pSector->ubNumCreatures > 0;
 
-		if( !gbWorldSectorZ )
-			return FALSE;	//Creatures don't attack overworld with this battle code.
-		pSector = FindUnderGroundSector( gWorldSectorX, gWorldSectorY, gbWorldSectorZ );
-		if( !pSector )
+		switch (pSector->ubMusicMode)
+		{
+			case CM_AUTO:
+				UseCreatureMusic(fCreatures);
+				break;
+			case CM_NEVER:
+				UseCreatureMusic(FALSE);
+				break;
+			case CM_ALWAYS:
+				UseCreatureMusic(TRUE);
+				break;
+			case CM_COMPAT:
+			default:
+				UseCreatureMusic(LColors->peBlue || fCreatures);
+				break;
+		}
+
+		if( !fCreatures )
 		{
 			return FALSE;
 		}
-		if( !pSector->ubNumCreatures )
-		{
-			return FALSE;
-		}
-		gfUseCreatureMusic = TRUE; //creatures are here, so play creature music
+		//gfUseCreatureMusic = TRUE; //creatures are here, so play creature music
 		ubCreatureHabitat = pSector->ubCreatureHabitat;
 		ubNumCreatures = pSector->ubNumCreatures;
 	}
 	else
 	{ //creatures are attacking a town sector
-		gfUseCreatureMusic = TRUE;
+		//gfUseCreatureMusic = TRUE;
+		UseCreatureMusic(TRUE);
 		SetMusicMode( MUSIC_TACTICAL_NOTHING );
 		ubCreatureHabitat = MINE_EXIT;
 		ubNumCreatures = gubNumCreaturesAttackingTown;
@@ -1467,7 +1488,8 @@ BOOLEAN SaveCreatureDirectives( HWFILE hFile )
 	{
 		return( FALSE );
 	}
-	FileWrite( hFile, &gfUseCreatureMusic, 1, &uiNumBytesWritten );
+	BOOLEAN fUseCreatureMusic = UsingCreatureMusic();
+	FileWrite( hFile, &fUseCreatureMusic, 1, &uiNumBytesWritten );
 	if( uiNumBytesWritten != sizeof( BOOLEAN ) )
 	{
 		return( FALSE );
@@ -1501,11 +1523,13 @@ BOOLEAN LoadCreatureDirectives( HWFILE hFile, UINT32 uiSavedGameVersion )
 		return( FALSE );
 	}
 
-	FileRead( hFile, &gfUseCreatureMusic, 1, &uiNumBytesRead );
+	BOOLEAN fUseCreatureMusic;
+	FileRead( hFile, &fUseCreatureMusic, 1, &uiNumBytesRead );
 	if( uiNumBytesRead != sizeof( BOOLEAN ) )
 	{
 		return( FALSE );
 	}
+	UseCreatureMusic(fUseCreatureMusic);
 
 	if( uiSavedGameVersion >= 82 )
 	{
