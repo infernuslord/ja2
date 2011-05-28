@@ -611,7 +611,7 @@ STR16 pUpdateMercsInfoText[] =
 	L"LOSOWY",
 	
 	L"Podaj index profilu i naciœnij ENTER. ",
-	L"Wszystkie informacje (statystyki, itd.) bêd¹ pobrane z pliku Prof.dat lub MercStartingGear.xml. ",
+	L"Wszystkie informacje (statystyki, itd.) bêd¹ pobrane z pliku Prof.dat lub MercProfiles25.xml. ",
 	L"Jeœli nie chcesz u¿yæ profilu, to zostaw pole puste i naciœnij ENTER. ",
 	L"Nie podawaj wartoœci '200'! Wartoœæ '200' nie mo¿e byæ profilem! ",
 	L"Wybierz profil od 0 do ",
