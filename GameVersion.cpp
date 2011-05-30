@@ -27,14 +27,14 @@ CHAR16 zVersionLabel[256]		= { L"Beta v. 0.98" };
 
 	//RELEASE BUILD VERSION	
 	#ifdef JA2UB
-		CHAR16		zVersionLabel[256]		= { L"Release Unfinished Business v1.4 - v1.13.4452 (Development Build" };
+		CHAR16		zVersionLabel[256]		= { L"Release Unfinished Business v1.4 - v1.13.4462 (Development Build" };
 	#else
-	CHAR16		zVersionLabel[256]		= { L"Release v1.13.4452 (Development Build)" };
+	CHAR16		zVersionLabel[256]		= { L"Release v1.13.4462 (Development Build)" };
 	#endif
 
 #endif
 										
-CHAR8		czVersionNumber[16]	= { "Build 11.05.27" };		//YY.MM.DD
+CHAR8		czVersionNumber[16]	= { "Build 11.05.30" };		//YY.MM.DD
 CHAR16		zTrackingNumber[16]	= { L"Z" };
 	
 
