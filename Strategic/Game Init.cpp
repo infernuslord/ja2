@@ -109,10 +109,10 @@ void InitCustomStrategicLayer ( void )
 void InitNPCs( void )
 {		
 
-#ifdef LUA_GAME_INIT_NPCS
+//#ifdef LUA_GAME_INIT_NPCS
 	LetLuaGameInit(1);
-#else
-
+//#else
+/*
 	MERCPROFILESTRUCT * pProfile;
 
 	// add the pilot at a random location!
@@ -281,16 +281,16 @@ void InitNPCs( void )
 			pSector->uiFlags |= SF_USE_ALTERNATE_MAP;
 		}
 	}
-
+*/
 	// init hospital variables
 	giHospitalTempBalance = 0;
 	giHospitalRefund = 0;
 	gbHospitalPriceModifier = 0;
 
 	// set up Devin so he will be placed ASAP
-	gMercProfiles[ DEVIN ].bNPCData = 3;
+	//gMercProfiles[ DEVIN ].bNPCData = 3;
 	
-#endif
+//#endif
 
 }
 
