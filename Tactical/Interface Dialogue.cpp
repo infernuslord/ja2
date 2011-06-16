@@ -190,7 +190,7 @@ void DelayedSayingOfMercQuote( UINT32 uiParam );
 void HandleSpecificQuoteWhenLeavingNpcTalkMenu();
 void HaveQualifiedMercSayQuoteAboutNpcWhenLeavingTalkScreen( UINT8 ubNpcProfileID, UINT32 uiQuoteNum );
 void CheckForValidQuotesWhenLeavingDealer( UINT8 ubProfile );
-BOOLEAN IsMineEntranceInSectorI13AtThisGridNo( INT16 sGridNo );
+BOOLEAN IsMineEntranceInSectorI13AtThisGridNo( UINT32 sGridNo );
 void HaveBiggensDetonatingExplosivesByTheMine();
 void ReplaceMineEntranceGraphicWithCollapsedEntrance();
 void HandleCannotAffordNpcMsgBox();
@@ -2666,7 +2666,19 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 				EndMeanwhile( );
 				break;
 			case NPC_ACTION_NO_SCI_FI_END_MEANWHILE:
-
+				if (gGameOptions.ubGameStyle == STYLE_REALISTIC || !gGameExternalOptions.fEnableCrepitus)
+				{
+					// End meanwhile....
+					// End meanwhile....
+					DeleteTalkingMenu();
+					EndMeanwhile( );
+				}
+				else
+				{
+					TriggerNPCRecord( QUEEN, 8 );
+				}
+			
+				/*
 				if ( !( gGameOptions.ubGameStyle == STYLE_SCIFI && gGameExternalOptions.fEnableCrepitus) )
 				{
 					// End meanwhile....
@@ -2678,6 +2690,7 @@ void HandleNPCDoAction( UINT8 ubTargetNPC, UINT16 usActionCode, UINT8 ubQuoteNum
 				{
 					TriggerNPCRecord( QUEEN, 8 );
 				}
+				*/
 			break;
 			case NPC_ACTION_TRIGGER_MARRY_DARYL_PROMPT:
 				DeleteTalkingMenu();
@@ -5392,7 +5405,7 @@ void CheckForValidQuotesWhenLeavingDealer( UINT8 ubProfile )
 
 
 // This function checks if we should replace the mine entrance graphic
-BOOLEAN IsMineEntranceInSectorI13AtThisGridNo( INT16 sGridNo )
+BOOLEAN IsMineEntranceInSectorI13AtThisGridNo( UINT32 sGridNo )
 {
 	// First check current sector......
 	if( gWorldSectorX == 13 && gWorldSectorY == MAP_ROW_I && gbWorldSectorZ == 0 )
@@ -5424,7 +5437,7 @@ void HaveBiggensDetonatingExplosivesByTheMine()
 void ReplaceMineEntranceGraphicWithCollapsedEntrance()
 {
 	UINT16									usTileIndex;
-	UINT16 usGridNo=12745;
+	UINT32 usGridNo=12745;
 
 	//Make sure wed ont blow things up twice
 	//off

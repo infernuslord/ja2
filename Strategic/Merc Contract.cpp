@@ -44,6 +44,10 @@
 #include "GameSettings.h"
 #include "connect.h"
 
+#ifdef JA2UB
+#include "legion cfg.h"
+#endif
+
 void CalculateMedicalDepositRefund( SOLDIERTYPE *pSoldier );
 void NotifyPlayerOfMercDepartureAndPromptEquipmentPlacement( SOLDIERTYPE *pSoldier, BOOLEAN fAddRehireButton );
 void MercDepartEquipmentBoxCallBack( UINT8 bExitValue );
@@ -481,7 +485,7 @@ BOOLEAN	MercContractHandling( SOLDIERTYPE	*pSoldier, UINT8 ubDesiredAction )
 BOOLEAN WillMercRenew( SOLDIERTYPE	*pSoldier, BOOLEAN fSayQuote )
 {
 	UINT8	i;
-	INT8	bMercID;
+	UINT8	bMercID;
 	BOOLEAN fBuddyAround = FALSE;
 	BOOLEAN fUnhappy = FALSE;
 	UINT16 usBuddyQuote=0;
@@ -1038,8 +1042,13 @@ void CalculateMedicalDepositRefund( SOLDIERTYPE *pSoldier )
 		//add an email
 #ifdef JA2UB
 //no UB
+	if( gubQuest[ QUEST_FIX_LAPTOP ] == QUESTDONE || gGameLegionOptions.LaptopQuestEnabled == FALSE )
+	{
+		if ( gGameLegionOptions.fDeadMerc == TRUE )
+			AddEmailWithSpecialData( 27, AIM_MEDICAL_DEPOSIT_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), pSoldier->usMedicalDeposit, pSoldier->ubProfile, TYPE_EMAIL_DEAD_MERC_AIM_SITE_EMAIL_JA2_EDT, TYPE_E_AIM_L2 );
+	}
 #else
-		AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_REFUND, AIM_MEDICAL_DEPOSIT_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), pSoldier->usMedicalDeposit, pSoldier->ubProfile, TYPE_EMAIL_EMAIL_EDT );
+		AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_REFUND, AIM_MEDICAL_DEPOSIT_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), pSoldier->usMedicalDeposit, pSoldier->ubProfile, TYPE_EMAIL_EMAIL_EDT, TYPE_E_NONE );
 #endif
 	}
 	//else if the merc is a dead, refund NOTHING!!
@@ -1051,8 +1060,13 @@ void CalculateMedicalDepositRefund( SOLDIERTYPE *pSoldier )
 		//add an email
 #ifdef JA2UB
 //no UB
+	if( gubQuest[ QUEST_FIX_LAPTOP ] == QUESTDONE || gGameLegionOptions.LaptopQuestEnabled == FALSE )
+	{
+		if ( gGameLegionOptions.fDeadMerc == TRUE )
+			AddEmailWithSpecialData( 217, AIM_MEDICAL_DEPOSIT_NO_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), pSoldier->usMedicalDeposit, pSoldier->ubProfile, TYPE_EMAIL_DEAD_MERC_AIM_SITE_EMAIL_JA2_EDT, TYPE_E_AIM_L3 );
+	}
 #else
-		AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_NO_REFUND, AIM_MEDICAL_DEPOSIT_NO_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), pSoldier->usMedicalDeposit, pSoldier->ubProfile, TYPE_EMAIL_EMAIL_EDT );
+		AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_NO_REFUND, AIM_MEDICAL_DEPOSIT_NO_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), pSoldier->usMedicalDeposit, pSoldier->ubProfile, TYPE_EMAIL_EMAIL_EDT, TYPE_E_NONE );
 #endif
 	}
 	//else the player is injured, refund a partial amount
@@ -1067,8 +1081,13 @@ void CalculateMedicalDepositRefund( SOLDIERTYPE *pSoldier )
 		//add an email
 #ifdef JA2UB
 // no UB
+	if( gubQuest[ QUEST_FIX_LAPTOP ] == QUESTDONE || gGameLegionOptions.LaptopQuestEnabled == FALSE )
+	{
+		if ( gGameLegionOptions.fDeadMerc == TRUE )
+			AddEmailWithSpecialData( 214, AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), iRefundAmount, pSoldier->ubProfile, TYPE_EMAIL_DEAD_MERC_AIM_SITE_EMAIL_JA2_EDT, TYPE_E_AIM_L4 );
+	}
 #else
-		AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND, AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), iRefundAmount, pSoldier->ubProfile, TYPE_EMAIL_EMAIL_EDT );
+		AddEmailWithSpecialData( AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND, AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND_LENGTH, AIM_SITE, GetWorldTotalMin(), iRefundAmount, pSoldier->ubProfile, TYPE_EMAIL_EMAIL_EDT, TYPE_E_NONE );
 #endif
 	}
 }

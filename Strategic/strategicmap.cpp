@@ -345,13 +345,13 @@ void HandleSectorSpecificUnLoadingOfMap( INT16 sMapX, INT16 sMapY, INT8 bMapZ );
 //void MakeAllTeamMembersCrouchedThenStand();
 void HandleMovingTheEnemiesToBeNearPlayerWhenEnteringComplexMap();
 void HandleFortifiedDoor();
-void CreateAndAddMoneyObjectToGround( INT32 sGridNo, INT32 iEasyAmount, INT32 iNormalAmount, INT32 iHardAmount );
+void CreateAndAddMoneyObjectToGround( UINT32 sGridNo, INT32 iEasyAmount, INT32 iNormalAmount, INT32 iHardAmount );
 void HandleGoingUpOrDownStairsForLoadScreensPurposes( INT16 sCurrentlyInSectorZ, INT16 sGoingToSectorZ );
 void HandleMovingEnemiesCloseToEntranceInFirstTunnelMap();
 void HandleMovingEnemiesCloseToEntranceInSecondTunnelMap();
 void HandleFirstPartOfTunnelFanSound();
 void HandlePowerGenFanSoundModification();
-BOOLEAN MoveEnemyFromGridNoToRoofGridNo( INT32 sSourceGridNo, INT32 sDestGridNo );
+BOOLEAN MoveEnemyFromGridNoToRoofGridNo( UINT32 sSourceGridNo, UINT32 sDestGridNo );
 void		HandleMovingEnemiesOntoRoofs();
 #endif
 
@@ -1839,11 +1839,16 @@ void HandleRPCDescriptionOfSector( INT16 sSectorX, INT16 sSectorY, INT16 sSector
 		{
 			if ( sSectorX == ubSectorDescription[ cnt ][ 1 ] && sSectorY == ubSectorDescription[ cnt ][ 0 ] )
 			{
+				if ((gGameOptions.ubGameStyle == STYLE_REALISTIC || !gGameExternalOptions.fEnableCrepitus) && cnt == 3)
+					continue;
+
+				/*
 				// If we're not scifi, skip some
 				if ( !(gGameOptions.ubGameStyle == STYLE_SCIFI && gGameExternalOptions.fEnableCrepitus) && cnt == 3 )
 				{
 					continue;
 				}
+				*/
 
 				SetSectorFlag( sSectorX, sSectorY, ( UINT8 )sSectorZ, SF_HAVE_USED_GUIDE_QUOTE );
 
@@ -3097,8 +3102,10 @@ void UpdateMercInSector( SOLDIERTYPE *pSoldier, INT16 sSectorX, INT16 sSectorY, 
 					else
 					{
 					#ifdef JA2UB
-						pSoldier->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
-						pSoldier->sInsertionGridNo		   = gMapInformation.sNorthGridNo;
+						//pSoldier->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
+						//pSoldier->sInsertionGridNo		   = gMapInformation.sNorthGridNo;
+						pSoldier->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
+						pSoldier->sInsertionGridNo		   = gGameLegionOptions.LOCATEGRIDNO;
 					#else
 						//pSoldier->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
 						//pSoldier->sInsertionGridNo				 = gMapInformation.sNorthGridNo;
@@ -6931,7 +6938,7 @@ void HandleFortifiedDoor()
 	}
 }
 
-void CreateAndAddMoneyObjectToGround( INT32 sGridNo, INT32 iEasyAmount, INT32 iNormalAmount, INT32 iHardAmount )
+void CreateAndAddMoneyObjectToGround( UINT32 sGridNo, INT32 iEasyAmount, INT32 iNormalAmount, INT32 iHardAmount )
 {
 	OBJECTTYPE	Object;
 	INT32				iCash=0;
@@ -6985,7 +6992,7 @@ void HandleMovingEnemiesCloseToEntranceInFirstTunnelMap()
 	UINT32 cnt;
 	BOOLEAN	fDone=FALSE;
 	INT16							sXPos, sYPos;
-	INT16 sGridNos[27]={ 18200, 18360, 18520,
+	UINT32 sGridNos[27]={ 18200, 18360, 18520,
 											 18199, 18359, 18519,
 											 18198, 18358, 18518,
 											 18197, 18357, 18517,
@@ -7043,7 +7050,7 @@ void HandleMovingEnemiesCloseToEntranceInSecondTunnelMap()
 	BOOLEAN	fDone=FALSE;
 	UINT32 cnt;
 	INT16							sXPos, sYPos;
-	INT16 sGridNos[30]={ 4900, 4901, 4902, 4903, 4904, 
+	UINT32 sGridNos[30]={ 4900, 4901, 4902, 4903, 4904, 
 											 5060, 5061, 5062, 5063, 5064,
 											 5220, 5221, 5222, 5223, 5224,
 											 5380, 5381, 5382, 5383, 5384,
@@ -7169,7 +7176,7 @@ void HandleMovingEnemiesOntoRoofs()
 
 
 
-BOOLEAN MoveEnemyFromGridNoToRoofGridNo( INT32 sSourceGridNo, INT32 sDestGridNo )
+BOOLEAN MoveEnemyFromGridNoToRoofGridNo( UINT32 sSourceGridNo, UINT32 sDestGridNo )
 {
 	SOLDIERTYPE *pSoldier=NULL;
 	INT32				cnt;

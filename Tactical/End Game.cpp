@@ -736,8 +736,8 @@ void DoneFadeOutEndCinematic( void )
 	SOLDIERTYPE *pSoldier;
 
 	//Change the currently selecter sector in mapscreen
-	ChangeSelectedMapSector( 16, 11, 0 );
-
+	//ChangeSelectedMapSector( 16, 11, 0 );
+	  ChangeSelectedMapSector( gGameLegionOptions.ubEndDefaultSectorX, gGameLegionOptions.ubEndDefaultSectorY, gGameLegionOptions.ubEndDefaultSectorZ );
 	//
 	// Loop through all the soldiers and move any of them that are in the complex to be in the safe sector near ther
 	//
@@ -751,13 +751,14 @@ void DoneFadeOutEndCinematic( void )
 			if ( GetGroup( pSoldier->ubGroupID ) )
 			{
 				//move them to the 'fake' sector
-				PlaceGroupInSector( pSoldier->ubGroupID, 15, 11, 16, 11, 0, FALSE );
+				//PlaceGroupInSector( pSoldier->ubGroupID, 15, 11, 16, 11, 0, FALSE );
+				  PlaceGroupInSector( pSoldier->ubGroupID, 15, 11, gGameLegionOptions.ubEndDefaultSectorX, gGameLegionOptions.ubEndDefaultSectorY, gGameLegionOptions.ubEndDefaultSectorZ, FALSE );
 			}
 			else
 			{
-				pSoldier->sSectorX = 16;
-				pSoldier->sSectorY = 11;
-				pSoldier->bSectorZ = 0;
+				pSoldier->sSectorX = gGameLegionOptions.ubEndDefaultSectorX; //16;
+				pSoldier->sSectorY = gGameLegionOptions.ubEndDefaultSectorY; //11;
+				pSoldier->bSectorZ = gGameLegionOptions.ubEndDefaultSectorZ; //0;
 			}
 		}
 	}

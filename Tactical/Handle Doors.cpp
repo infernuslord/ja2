@@ -56,7 +56,7 @@ BOOLEAN gfSetPerceivedDoorState = FALSE;
 BOOLEAN HandleDoorsOpenClose( SOLDIERTYPE *pSoldier, INT32 sGridNo, STRUCTURE * pStructure, BOOLEAN fNoAnimations );
 
 #ifdef JA2UB
-void HandleForceingTheTunnelGate( INT16 sGridNo ); //Ja25 UB
+void HandleForceingTheTunnelGate( UINT32 sGridNo ); //Ja25 UB
 #endif
 
 void HandleDoorChangeFromGridNo( SOLDIERTYPE *pSoldier, INT32 sGridNo, BOOLEAN fNoAnimations )
@@ -1572,7 +1572,7 @@ void SetDoorString( INT32 sGridNo )
 
 #ifdef JA2UB
 //Ja25 UB
-void HandleForceingTheTunnelGate( INT16 sGridNo )
+void HandleForceingTheTunnelGate( UINT32 sGridNo )
 {
 	//if this isnt the Last sector of the tunnel
 	if( !( gWorldSectorX == 14 && gWorldSectorY == MAP_ROW_K && gbWorldSectorZ == 1 ) )

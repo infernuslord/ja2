@@ -88,6 +88,65 @@ void IniGlobalGameSetting(lua_State *L)
 	lua_pushinteger(L, gGameExternalOptions.fCanTrueCiviliansBecomeHostile);
 	lua_setglobal(L, "iniCAN_TRUE_CIVILIANS_BECOME_HOSTILE");
 
+	#ifdef JA2UB
+	lua_pushinteger(L, gGameLegionOptions.LOCATEGRIDNO);
+	lua_setglobal(L, "iniNEW_MERC_ARRIVAL_LOCATION");
+	#else
+	lua_pushinteger(L, gGameExternalOptions.iNewMercArrivalLocation);
+	lua_setglobal(L, "iniNEW_MERC_ARRIVAL_LOCATION");
+	#endif
+ 
+	lua_pushinteger(L, gGameExternalOptions.ubDefaultArrivalSectorY);
+	lua_setglobal(L, "iniDEFAULT_ARRIVAL_SECTOR_Y");
+	
+	lua_pushinteger(L, gGameExternalOptions.ubDefaultArrivalSectorX);
+	lua_setglobal(L, "iniDEFAULT_ARRIVAL_SECTOR_X");	
+	
+	#ifdef JA2UB
+	lua_pushinteger(L, gGameLegionOptions.ubEndDefaultSectorX);
+	lua_setglobal(L, "iniDEFAULT_END_SECTOR_X");
+	
+	lua_pushinteger(L, gGameLegionOptions.ubEndDefaultSectorY);
+	lua_setglobal(L, "iniDEFAULT_END_SECTOR_Y");
+	
+	lua_pushinteger(L, gGameLegionOptions.ubEndDefaultSectorZ);
+	lua_setglobal(L, "iniDEFAULT_END_SECTOR_Z");
+	
+	lua_pushinteger(L, gGameLegionOptions.INITIALHELIGRIDNO[ 0 ]);
+	lua_setglobal(L, "iniINITIALHELIGRIDNO1");
+	lua_pushinteger(L, gGameLegionOptions.INITIALHELIGRIDNO[ 1 ]);
+	lua_setglobal(L, "iniINITIALHELIGRIDNO2");
+	lua_pushinteger(L, gGameLegionOptions.INITIALHELIGRIDNO[ 2 ]);
+	lua_setglobal(L, "iniINITIALHELIGRIDNO3");
+	lua_pushinteger(L, gGameLegionOptions.INITIALHELIGRIDNO[ 3 ]);
+	lua_setglobal(L, "iniINITIALHELIGRIDNO4");
+	lua_pushinteger(L, gGameLegionOptions.INITIALHELIGRIDNO[ 4 ]);
+	lua_setglobal(L, "iniINITIALHELIGRIDNO5");
+	lua_pushinteger(L, gGameLegionOptions.INITIALHELIGRIDNO[ 5 ]);
+	lua_setglobal(L, "iniINITIALHELIGRIDNO6");
+	lua_pushinteger(L, gGameLegionOptions.INITIALHELIGRIDNO[ 6 ]);
+	lua_setglobal(L, "iniINITIALHELIGRIDNO7");
+	
+	lua_pushinteger(L, gGameLegionOptions.JerryGridNo);
+	lua_setglobal(L, "iniJERRYGRIDNO");
+	
+	lua_pushboolean(L, gGameLegionOptions.LaptopQuestEnabled);
+	lua_setglobal(L, "iniLAPTOP_QUEST");
+	
+	lua_pushboolean(L, gGameLegionOptions.InJerry);
+	lua_setglobal(L, "iniJERRY");
+	
+	lua_pushboolean(L, gGameLegionOptions.JerryQuotes);
+	lua_setglobal(L, "iniJERRYQUOTES");
+	
+	lua_pushboolean(L, gGameLegionOptions.InGameHeliCrash);
+	lua_setglobal(L, "iniINGAMEHELICRASH");
+	
+	
+	lua_pushboolean(L, gGameLegionOptions.InGameHeli);
+	lua_setglobal(L, "iniINGAMEHELI");
+	#endif
+	
 	// -------------------------------
 	// Other global variables
 	// -------------------------------

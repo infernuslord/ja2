@@ -44,8 +44,6 @@ enum
 	LPTP_MSG__PREVIEW_TEXT,
 };
 
-
-//Ja25 UB
 //Editor
 //Editor Taskbar Creation.cpp
 extern STR16 iEditorItemStatsButtonsText[];

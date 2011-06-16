@@ -909,8 +909,8 @@ typedef struct
 	UINT16 usHelicopterBaseCostPerRedTile;
 
 	// HEADROCK HAM 3.5: Experimental, arrival sectorX/Y.
-	UINT8 ubDefaultArrivalSectorX;
-	UINT8 ubDefaultArrivalSectorY;
+	INT16 ubDefaultArrivalSectorX;
+	INT16 ubDefaultArrivalSectorY;
 
 	// HEADROCK HAM 3.5: Limit bonus from tracers based on range to target. This is a divisor for the effect.
 	UINT8 ubRangeDifficultyAimingWithTracers;

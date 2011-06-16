@@ -136,12 +136,12 @@
 
 //extern	UINT32	guiSaveGameVersion;
 
-//INT32	giNumJA25Sectors = NUM_CAMPAIGN_JA25_SECTORS;
+INT32	giNumJA25Sectors = NUM_CAMPAIGN_JA25_SECTORS;
 
 
 JA25_SAVE_INFO	gJa25SaveStruct;
 
-//JA25_SECTOR_AI	*gJa25AiSectorStruct = NULL;
+JA25_SECTOR_AI	gJa25AiSectorStruct[CUSTOMSECTOR]; //*gJa25AiSectorStruct = NULL;
 
 JA25_SECTOR_AI_MANAGER gJa25StrategicAi;
 
@@ -155,7 +155,7 @@ JA25_SECTOR_AI_MANAGER gJa25StrategicAi;
 
 BOOLEAN		AddEnemiesToInitialSectorH7();
 UINT32		GetNumberOfJA25EnemiesInSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 *pNumAdmins, UINT8 *pNumTroops, UINT8 *pNumElites );
-void			SetNumberJa25EnemiesInSurfaceSector( INT32 iSectorID, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites );
+void		SetNumberJa25EnemiesInSurfaceSector( INT32 iSectorID, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites );
 
 void SetNumberJa25EnemiesInSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites );
 void InitJa25InitialEnemiesInSector();
@@ -1102,11 +1102,12 @@ BOOLEAN SaveJa25SaveInfoToSaveGame( HWFILE hFile )
 	//
 	// Sector Info
 	//
-//	FileWrite( hFile, gJa25AiSectorStruct, sizeof( JA25_SECTOR_AI ) * NUM_CAMPAIGN_JA25_SECTORS, &uiNumBytesWritten );
-//	if( uiNumBytesWritten != sizeof( JA25_SECTOR_AI ) * NUM_CAMPAIGN_JA25_SECTORS )
-//	{
-//		return( FALSE );
-//	}
+
+	FileWrite( hFile, &gJa25AiSectorStruct, sizeof( JA25_SECTOR_AI ) * CUSTOMSECTOR , &uiNumBytesWritten ); //NUM_CAMPAIGN_JA25_SECTORS
+	if( uiNumBytesWritten != sizeof( JA25_SECTOR_AI ) * CUSTOMSECTOR  ) //NUM_CAMPAIGN_JA25_SECTORS 
+	{
+		return( FALSE );
+	}
 
 	// OK, now write out additional sectors
 	/*
@@ -1168,6 +1169,12 @@ BOOLEAN LoadJa25SaveInfoFromSavedGame( HWFILE hFile )
 	// Init array for campaign sectors
 //	giNumJA25Sectors = NUM_CAMPAIGN_JA25_SECTORS;
 ///	gJa25AiSectorStruct = MemAlloc( giNumJA25Sectors * sizeof( JA25_SECTOR_AI ) );
+
+	FileRead( hFile, &gJa25AiSectorStruct, sizeof( JA25_SECTOR_AI ) * CUSTOMSECTOR , &uiNumBytesRead ); //NUM_CAMPAIGN_JA25_SECTORS
+	if( uiNumBytesRead != sizeof( JA25_SECTOR_AI ) * CUSTOMSECTOR  )  //NUM_CAMPAIGN_JA25_SECTORS
+	{
+		return( FALSE );
+	}
 
 //	FileRead( hFile, gJa25AiSectorStruct, sizeof( JA25_SECTOR_AI ) * NUM_CAMPAIGN_JA25_SECTORS, &uiNumBytesRead );
 //	if( uiNumBytesRead != sizeof( JA25_SECTOR_AI ) * NUM_CAMPAIGN_JA25_SECTORS )
@@ -1449,15 +1456,16 @@ BOOLEAN IsJa25GeneralFlagSet( UINT32 uiFlagToCheck )
 
 BOOLEAN InitJa25StrategicSectorAI( BOOLEAN fReset )
 {
-/*	if( fReset )
+	if( fReset )
 	{
 		//Clear out the structures first
 		memset( &gJa25StrategicAi, 0, sizeof( JA25_SECTOR_AI_MANAGER ) );
-
+/*
 		MemFree( gJa25AiSectorStruct ); 
 		giNumJA25Sectors = NUM_CAMPAIGN_JA25_SECTORS;
 		gJa25AiSectorStruct = MemAlloc( sizeof( JA25_SAVE_INFO ) * giNumJA25Sectors );
 		memset( gJa25AiSectorStruct, 0, sizeof( JA25_SAVE_INFO ) * giNumJA25Sectors );
+*/		
 	}
 
 	//Init the sector values
@@ -1466,22 +1474,48 @@ BOOLEAN InitJa25StrategicSectorAI( BOOLEAN fReset )
 		return( FALSE );
 	}
 
-	gJa25StrategicAi.uiTimeOfLastBattleInMinutes = STARTING_TIME / 60 + FIRST_ARRIVAL_DELAY / 60;
+	gJa25StrategicAi.uiTimeOfLastBattleInMinutes = /*STARTING_TIME*/ gGameExternalOptions.iGameStartingTime / 60 + gGameExternalOptions.iFirstArrivalDelay /*FIRST_ARRIVAL_DELAY*/ / 60;
 	gJa25StrategicAi.uiTimeOfLastUpdate = gJa25StrategicAi.uiTimeOfLastBattleInMinutes;
 
 	//The player owns the starting sector
-	gJa25AiSectorStruct[ JA25_H7 ].fPlayerControlled = TRUE;
-*/
+	//gJa25AiSectorStruct[ (UINT8)SECTOR( gGameExternalOptions.ubDefaultArrivalSectorX, gGameExternalOptions.ubDefaultArrivalSectorY ) ].fPlayerControlled = TRUE;
+
+	SectorInfo[ (UINT8)SECTOR( gGameExternalOptions.ubDefaultArrivalSectorX, gGameExternalOptions.ubDefaultArrivalSectorY ) ].fSurfaceWasEverPlayerControlled = TRUE;
+
+
 	return( TRUE );
 }
 
 
 BOOLEAN InitJa25SectorAi()
 {
+UINT32 ubCnt;
 	//
 	// H7: Initial sector
 	//
-/*	gJa25AiSectorStruct[ JA25_H7 ].iSectorID = SEC_H7;
+if ( gGameLegionOptions.pJA2UB == TRUE )
+{
+
+	for( ubCnt=0; ubCnt<CUSTOMSECTOR; ubCnt++)
+	{
+		gJa25AiSectorStruct[ ubCnt ].iSectorID = -1 ;
+		gJa25AiSectorStruct[ ubCnt ].bSectorZ = 0;
+		gJa25AiSectorStruct[ ubCnt ].bBaseNumEnemies = 0;
+		gJa25AiSectorStruct[ ubCnt ].bRandomNumEnemies = 4;
+		gJa25AiSectorStruct[ ubCnt ].bProbabilityOfAttacking = 0;
+		gJa25AiSectorStruct[ ubCnt ].bMaxProbabilityForAttackingSector = 60;
+		gJa25AiSectorStruct[ ubCnt ].ubMinimumProbabiltyBeforeAttack = 0;
+		gJa25AiSectorStruct[ ubCnt ].fAutoDirection = 0;
+		gJa25AiSectorStruct[ ubCnt ].ubInsertionDirection =0;
+		gJa25AiSectorStruct[ ubCnt ].sInsertionGridNo = 0;
+		gJa25AiSectorStruct[ ubCnt ].fCustomSector = TRUE;
+		gJa25AiSectorStruct[ ubCnt ].ubLoadingScreenID =  0;
+		gJa25AiSectorStruct[ ubCnt ].fEnemyEnrouteToAttack = FALSE;
+		gJa25AiSectorStruct[ ubCnt ].fPlayerControlled = FALSE;
+		gJa25AiSectorStruct[ ubCnt ].fPlayerHasLiberatedSectorBefore = FALSE;
+	}
+	
+	gJa25AiSectorStruct[ JA25_H7 ].iSectorID = SEC_H7;
 	gJa25AiSectorStruct[ JA25_H7 ].bSectorZ = 0;
 
 	gJa25AiSectorStruct[ JA25_H7 ].bBaseNumEnemies = 2;
@@ -1491,11 +1525,10 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_H7 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_H7 ].ubMinimumProbabiltyBeforeAttack = 0;
 
-*/
 	//
 	// H8:
 	//
-/*	gJa25AiSectorStruct[ JA25_H8 ].iSectorID = SEC_H8;
+	gJa25AiSectorStruct[ JA25_H8 ].iSectorID = SEC_H8;
 	gJa25AiSectorStruct[ JA25_H8 ].bSectorZ = 0;
 
 	gJa25AiSectorStruct[ JA25_H8 ].bBaseNumEnemies = 2;
@@ -1504,12 +1537,11 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_H8 ].bProbabilityOfAttacking = 3;
 	gJa25AiSectorStruct[ JA25_H8 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_H8 ].ubMinimumProbabiltyBeforeAttack = 5;
-*/
 
 	//
 	// H9:	Guard Post
 	//
-/*	gJa25AiSectorStruct[ JA25_H9 ].iSectorID = SEC_H9;
+	gJa25AiSectorStruct[ JA25_H9 ].iSectorID = SEC_H9;
 	gJa25AiSectorStruct[ JA25_H9 ].bSectorZ = 0;
 
 	gJa25AiSectorStruct[ JA25_H9 ].bBaseNumEnemies = 4;
@@ -1518,12 +1550,11 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_H9 ].bProbabilityOfAttacking = 1;
 	gJa25AiSectorStruct[ JA25_H9 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_H9 ].ubMinimumProbabiltyBeforeAttack = 15;
-*/
 
 	//
 	// H10:	
 	//
-/*	gJa25AiSectorStruct[ JA25_H10 ].iSectorID = SEC_H10;
+	gJa25AiSectorStruct[ JA25_H10 ].iSectorID = SEC_H10;
 	gJa25AiSectorStruct[ JA25_H10 ].bSectorZ = 0;
 
 	gJa25AiSectorStruct[ JA25_H10 ].bBaseNumEnemies = 2;
@@ -1533,11 +1564,10 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_H10 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_H10 ].ubMinimumProbabiltyBeforeAttack = 0;
 
-*/
 	//
 	// I9:
 	//
-/*	gJa25AiSectorStruct[ JA25_I9 ].iSectorID = SEC_I9;
+	gJa25AiSectorStruct[ JA25_I9 ].iSectorID = SEC_I9;
 	gJa25AiSectorStruct[ JA25_I9 ].bSectorZ = 0;
 
 	gJa25AiSectorStruct[ JA25_I9 ].bBaseNumEnemies = 2;
@@ -1547,11 +1577,10 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_I9 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_I9 ].ubMinimumProbabiltyBeforeAttack = 0;
 
-*/
 	//
 	// I10:	Varrez, First Part
 	//
-/*	gJa25AiSectorStruct[ JA25_I10 ].iSectorID = SEC_I10;
+	gJa25AiSectorStruct[ JA25_I10 ].iSectorID = SEC_I10;
 	gJa25AiSectorStruct[ JA25_I10 ].bSectorZ = 0;
 
 	gJa25AiSectorStruct[ JA25_I10 ].bBaseNumEnemies = 2;
@@ -1560,12 +1589,11 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_I10 ].bProbabilityOfAttacking = 10;
 	gJa25AiSectorStruct[ JA25_I10 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_I10 ].ubMinimumProbabiltyBeforeAttack = 0;
-*/
-
+	
 	//
 	// I11:	Varrez, Second Part
 	//
-/*	gJa25AiSectorStruct[ JA25_I11 ].iSectorID = SEC_I11;
+	gJa25AiSectorStruct[ JA25_I11 ].iSectorID = SEC_I11;
 	gJa25AiSectorStruct[ JA25_I11 ].bSectorZ = 0;
 
 	gJa25AiSectorStruct[ JA25_I11 ].bBaseNumEnemies = 0;
@@ -1575,11 +1603,10 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_I11 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_I11 ].ubMinimumProbabiltyBeforeAttack = 20;
 
-*/
 	//
 	// I12
 	//
-/*	gJa25AiSectorStruct[ JA25_I12 ].iSectorID = SEC_I12;
+	gJa25AiSectorStruct[ JA25_I12 ].iSectorID = SEC_I12;
 	gJa25AiSectorStruct[ JA25_I12 ].bSectorZ = 0;
 
 	gJa25AiSectorStruct[ JA25_I12 ].bBaseNumEnemies = 3;
@@ -1589,11 +1616,10 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_I12 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_I12 ].ubMinimumProbabiltyBeforeAttack = 0;
 
-*/
 	//
 	// I13:	Abandoned Mine
 	//
-/*	gJa25AiSectorStruct[ JA25_I13 ].iSectorID = SEC_I13;
+	gJa25AiSectorStruct[ JA25_I13 ].iSectorID = SEC_I13;
 	gJa25AiSectorStruct[ JA25_I13 ].bSectorZ = 0;
 
 	gJa25AiSectorStruct[ JA25_I13 ].bBaseNumEnemies = 2;
@@ -1603,11 +1629,10 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_I13 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_I13 ].ubMinimumProbabiltyBeforeAttack = 0;
 
-*/
 	//
 	// I13:	First Level of Mine
 	//
-/*	gJa25AiSectorStruct[ JA25_I13_1 ].iSectorID = SEC_I13;
+	gJa25AiSectorStruct[ JA25_I13_1 ].iSectorID = SEC_I13;
 	gJa25AiSectorStruct[ JA25_I13_1 ].bSectorZ = 1;
 
 	gJa25AiSectorStruct[ JA25_I13_1 ].bBaseNumEnemies = 0;
@@ -1616,11 +1641,11 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_I13_1 ].bProbabilityOfAttacking = 0;
 	gJa25AiSectorStruct[ JA25_I13_1 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_I13_1 ].ubMinimumProbabiltyBeforeAttack = 0;
-*/
+
 	//
 	// J11:	
 	//
-/*	gJa25AiSectorStruct[ JA25_J11 ].iSectorID = SEC_J11;
+	gJa25AiSectorStruct[ JA25_J11 ].iSectorID = SEC_J11;
 	gJa25AiSectorStruct[ JA25_J11 ].bSectorZ = 0;
 
 	gJa25AiSectorStruct[ JA25_J11 ].bBaseNumEnemies = 3;
@@ -1629,12 +1654,11 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_J11 ].bProbabilityOfAttacking = 3;
 	gJa25AiSectorStruct[ JA25_J11 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_J11 ].ubMinimumProbabiltyBeforeAttack = 0;
-*/
 
 	//
 	// J12:	
 	//
-/*	gJa25AiSectorStruct[ JA25_J12 ].iSectorID = SEC_J12;
+	gJa25AiSectorStruct[ JA25_J12 ].iSectorID = SEC_J12;
 	gJa25AiSectorStruct[ JA25_J12 ].bSectorZ = 0;
 
 	gJa25AiSectorStruct[ JA25_J12 ].bBaseNumEnemies = 3;
@@ -1644,12 +1668,10 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_J12 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_J12 ].ubMinimumProbabiltyBeforeAttack = 0;
 
-*/
-
 	//
 	// J13:	Power Generator
 	//
-/*	gJa25AiSectorStruct[ JA25_J13 ].iSectorID = SEC_J13;
+	gJa25AiSectorStruct[ JA25_J13 ].iSectorID = SEC_J13;
 	gJa25AiSectorStruct[ JA25_J13 ].bSectorZ = 0;
 
 	gJa25AiSectorStruct[ JA25_J13 ].bBaseNumEnemies = 4;
@@ -1659,11 +1681,10 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_J13 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_J13 ].ubMinimumProbabiltyBeforeAttack = 15;
 
-*/
 	//
 	// J13:	Power Generator, First Level
 	//
-/*	gJa25AiSectorStruct[ JA25_J13_1 ].iSectorID = SEC_J13;
+	gJa25AiSectorStruct[ JA25_J13_1 ].iSectorID = SEC_J13;
 	gJa25AiSectorStruct[ JA25_J13_1 ].bSectorZ = 1;
 
 	gJa25AiSectorStruct[ JA25_J13_1 ].bBaseNumEnemies = 0;
@@ -1673,12 +1694,10 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_J13_1 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_J13_1 ].ubMinimumProbabiltyBeforeAttack = 0;
 
-*/
-
 	//
 	// J14:	Tunnel, First Sector
 	//
-/*	gJa25AiSectorStruct[ JA25_J14_1 ].iSectorID = SEC_J14;
+	gJa25AiSectorStruct[ JA25_J14_1 ].iSectorID = SEC_J14;
 	gJa25AiSectorStruct[ JA25_J14_1 ].bSectorZ = 1;
 
 	gJa25AiSectorStruct[ JA25_J14_1 ].bBaseNumEnemies = 0;
@@ -1687,12 +1706,11 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_J14_1 ].bProbabilityOfAttacking = 0;
 	gJa25AiSectorStruct[ JA25_J14_1 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_J14_1 ].ubMinimumProbabiltyBeforeAttack = 0;
-*/
 
 	//
 	// K14:  Tunnel, second part
 	//
-/*	gJa25AiSectorStruct[ JA25_K14_1 ].iSectorID = SEC_K14;
+	gJa25AiSectorStruct[ JA25_K14_1 ].iSectorID = SEC_K14;
 	gJa25AiSectorStruct[ JA25_K14_1 ].bSectorZ = 1;
 
 	gJa25AiSectorStruct[ JA25_K14_1 ].bBaseNumEnemies = 0;
@@ -1701,12 +1719,11 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_K14_1 ].bProbabilityOfAttacking = 0;
 	gJa25AiSectorStruct[ JA25_K14_1 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_K14_1 ].ubMinimumProbabiltyBeforeAttack = 0;
-*/
 
 	//
 	// K15:	Complex, Part 1, Level 0
 	//
-/*	gJa25AiSectorStruct[ JA25_K15 ].iSectorID = SEC_K15;
+	gJa25AiSectorStruct[ JA25_K15 ].iSectorID = SEC_K15;
 	gJa25AiSectorStruct[ JA25_K15 ].bSectorZ = 0;
 
 	gJa25AiSectorStruct[ JA25_K15 ].bBaseNumEnemies = 6;
@@ -1715,12 +1732,11 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_K15 ].bProbabilityOfAttacking = 2;
 	gJa25AiSectorStruct[ JA25_K15 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_K15 ].ubMinimumProbabiltyBeforeAttack = 0;
-*/
 
 	//
 	// K15:	Complex, Part 1, Level 1
 	//
-/*	gJa25AiSectorStruct[ JA25_K15_1 ].iSectorID = SEC_K15;
+	gJa25AiSectorStruct[ JA25_K15_1 ].iSectorID = SEC_K15;
 	gJa25AiSectorStruct[ JA25_K15_1 ].bSectorZ = 1;
 
 	gJa25AiSectorStruct[ JA25_K15_1 ].bBaseNumEnemies = 5;
@@ -1729,12 +1745,11 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_K15_1 ].bProbabilityOfAttacking = 2;
 	gJa25AiSectorStruct[ JA25_K15_1 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_K15_1 ].ubMinimumProbabiltyBeforeAttack = 0;
-*/
 
 	//
 	// K15:	Complex, Part 1, Level 2
 	//
-/*	gJa25AiSectorStruct[ JA25_K15_2 ].iSectorID = SEC_K15;
+	gJa25AiSectorStruct[ JA25_K15_2 ].iSectorID = SEC_K15;
 	gJa25AiSectorStruct[ JA25_K15_2 ].bSectorZ = 2;
 
 	gJa25AiSectorStruct[ JA25_K15_2 ].bBaseNumEnemies = 6;
@@ -1744,11 +1759,10 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_K15_2 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_K15_2 ].ubMinimumProbabiltyBeforeAttack = 0;
 
-*/
 	//
 	// L15:	Complex, Part 2, Level 2
 	//
-/*	gJa25AiSectorStruct[ JA25_L15_2 ].iSectorID = SEC_L15;
+	gJa25AiSectorStruct[ JA25_L15_2 ].iSectorID = SEC_L15;
 	gJa25AiSectorStruct[ JA25_L15_2 ].bSectorZ = 2;
 
 	gJa25AiSectorStruct[ JA25_L15_2 ].bBaseNumEnemies = 5;
@@ -1757,12 +1771,11 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_L15_2 ].bProbabilityOfAttacking = 1;
 	gJa25AiSectorStruct[ JA25_L15_2 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_L15_2 ].ubMinimumProbabiltyBeforeAttack = 0;
-*/
 
 	//
 	// L15:	Complex, Part 2, Level 3
 	//
-/*	gJa25AiSectorStruct[ JA25_L15_3 ].iSectorID = SEC_L15;
+	gJa25AiSectorStruct[ JA25_L15_3 ].iSectorID = SEC_L15;
 	gJa25AiSectorStruct[ JA25_L15_3 ].bSectorZ = 3;
 
 	gJa25AiSectorStruct[ JA25_L15_3 ].bBaseNumEnemies = 0;
@@ -1771,7 +1784,9 @@ BOOLEAN InitJa25SectorAi()
 	gJa25AiSectorStruct[ JA25_L15_3 ].bProbabilityOfAttacking = 0;
 	gJa25AiSectorStruct[ JA25_L15_3 ].bMaxProbabilityForAttackingSector = 60;
 	gJa25AiSectorStruct[ JA25_L15_3 ].ubMinimumProbabiltyBeforeAttack = 0;
-*/
+	
+}
+	
 	return( TRUE );
 };
 
@@ -1805,11 +1820,11 @@ BOOLEAN CanJa25SaiAttack()
 	}
 
 
-//	if( ( gJa25StrategicAi.uiTimeOfLastBattleInMinutes + JA25_MINIMUM_TIME_BETWEEN_ATTACKS ) > uiCurrentTime )
-//	{
-//		//get out
-//		return( FALSE );
-//	}
+	if( ( gJa25StrategicAi.uiTimeOfLastBattleInMinutes + JA25_MINIMUM_TIME_BETWEEN_ATTACKS ) > uiCurrentTime )
+	{
+		//get out
+		return( FALSE );
+	}
 
 	return( TRUE );
 }
@@ -1837,7 +1852,7 @@ void Ja25_UpdateTimeOfEndOfLastBattle( INT16 sSectorX, INT16 sSectorY, INT8 bSec
 	//
 	// Reset timers
 	//
-/*	gsGridNoForMapEdgePointInfo = -1;
+	gsGridNoForMapEdgePointInfo = -1;
 	gJa25StrategicAi.uiTimeOfLastBattleInMinutes = GetWorldTotalMin( );
 
 	gJa25StrategicAi.uiTimeOfLastUpdate = GetWorldTotalMin( );
@@ -1846,9 +1861,8 @@ void Ja25_UpdateTimeOfEndOfLastBattle( INT16 sSectorX, INT16 sSectorY, INT8 bSec
 
 	gJa25SaveStruct.fEnemyShouldImmediatelySeekThePlayer = FALSE;
 	gJa25SaveStruct.bSectorTheEnemyWillSeekEnemy = -1;
-	*/
+	
 }
-
 
 
 void ResetJa25SectorProbabilities()
@@ -1868,17 +1882,19 @@ void ResetJa25SectorProbabilities()
 			gJa25AiSectorStruct[ bCnt ].bCurrentProbability = 0;
 		}
 	}
-	*/
+*/
 }
 
 
 //returns the element into the array of which sector the enemy will attack
 INT8	GetTheFurthestSectorPlayerOwns()
 {
-	//INT8	bCnt;
+	INT8	bCnt;
 	BOOLEAN	fFoundLatest=FALSE;
 	INT8	bSector=-1;
-/*
+	
+if ( gGameLegionOptions.pJA2UB == TRUE )
+{
 	//Loop through from the end of the list
 	for( bCnt=giNumJA25Sectors-1; bCnt>=0; bCnt-- )
 	{
@@ -1892,15 +1908,15 @@ INT8	GetTheFurthestSectorPlayerOwns()
 	if( fFoundLatest )
 	{
 		//do sector specific logic to determine the sector
-		switch( bCnt )
-		{
-			default:
+		//switch( bCnt )
+		//{
+			//default:
 				bSector = bCnt;
-				break;
-		}
+				//break;
+		//}
 	}
 		
-*/
+}
 	//There is no sector
 	return( bSector );
 }
@@ -1908,8 +1924,10 @@ INT8	GetTheFurthestSectorPlayerOwns()
 
 void SetJa25SectorOwnedStatus( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, BOOLEAN fPlayerOwned )
 {
-/*	INT8 bSector;
+	INT8 bSector;
 
+	if ( gGameLegionOptions.pJA2UB == TRUE )
+	{
 	//get the sector id
 	bSector = (INT8)GetJA25SectorID( sSectorX, sSectorY, bSectorZ );
 
@@ -1953,15 +1971,19 @@ void SetJa25SectorOwnedStatus( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, BO
 	{		
 		AddStrategicEvent( EVENT_SECTOR_H8_DONT_WAIT_IN_SECTOR, GetWorldTotalMin() + ( 5 * 60 ), 0 );
 	}
+	
+	}
 
-	*/
 }
 
 
 INT16 GetJA25SectorID( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ )
 {
-/*	INT8 bCnt=0;
+	INT8 bCnt=0;
 	INT16	sSector = 0;
+	
+if ( gGameLegionOptions.pJA2UB == TRUE )
+{
 
 	if ( gJa25AiSectorStruct == NULL )
 	{
@@ -1985,7 +2007,7 @@ INT16 GetJA25SectorID( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ )
 			return( bCnt );
 		}
 	}
-*/
+}
 	//failed to find the array
 	return( -1 );
 }
@@ -2009,12 +2031,14 @@ BOOLEAN	GetSectorJa25SaiWillAttack( INT8 *pbSectorToAttack, INT8 *pbFromDirectio
 
 void JA25_HandleUpdateOfStrategicAi()
 {
-/*	UINT32 uiCurrentTime=0;
+	UINT32 uiCurrentTime=0;
 	INT8	bSectorToAttackID=-1;
 	INT8	bAttackDirection=-1;
 	INT8	bRandom=0;
 	INT16	sGridNo=-1;
 
+if ( gGameLegionOptions.pJA2UB == TRUE )
+{
 	if ( !gJa25AiSectorStruct )
 	{
 		return;
@@ -2129,9 +2153,9 @@ void JA25_HandleUpdateOfStrategicAi()
 		ubNumEnemies = uiBaseNumEnemies + Random( uiRandomNumEnemies );
 
 		//Guarentee no more then 20 enemies in a sector
-		if( ubNumEnemies > MAX_STRATEGIC_TEAM_SIZE )
+		if( ubNumEnemies > gGameExternalOptions.iMaxEnemyGroupSize ) //MAX_STRATEGIC_TEAM_SIZE )
 		{
-			ubNumEnemies = MAX_STRATEGIC_TEAM_SIZE;
+			ubNumEnemies = gGameExternalOptions.iMaxEnemyGroupSize; //MAX_STRATEGIC_TEAM_SIZE;
 		}
 
 		//if there are enemies to attack
@@ -2155,15 +2179,18 @@ void JA25_HandleUpdateOfStrategicAi()
 		}
 	}
 
-	*/
 }
 
+}
 
 BOOLEAN HandleAddEnemiesToSectorPlayerIsntIn( INT16 sSaiSector, UINT8 ubNumEnemies )
 {
-/*	INT16 sSectorX = SECTORX( gJa25AiSectorStruct[ sSaiSector ].iSectorID );
+	INT16 sSectorX = SECTORX( gJa25AiSectorStruct[ sSaiSector ].iSectorID );
 	INT16 sSectorY = SECTORY( gJa25AiSectorStruct[ sSaiSector ].iSectorID );
 	INT8	bSectorZ = gJa25AiSectorStruct[ sSaiSector ].bSectorZ;
+	
+	if ( gGameLegionOptions.pJA2UB == TRUE )
+	{
 
 	if( !( gTacticalStatus.uiFlags & INCOMBAT ) )
 	{
@@ -2177,18 +2204,19 @@ BOOLEAN HandleAddEnemiesToSectorPlayerIsntIn( INT16 sSaiSector, UINT8 ubNumEnemi
 	//Set up flag so enemies will go and find the player in that sector
 	gJa25SaveStruct.fEnemyShouldImmediatelySeekThePlayer = TRUE;
 	gJa25SaveStruct.bSectorTheEnemyWillSeekEnemy = (INT8)sSaiSector;
-*/
+	}
 	return( TRUE );
 }
 
 BOOLEAN HandleAddingEnemiesToSector( INT16 sSaiSector, UINT8 ubNumEnemies, INT8 bAttackDirection, INT16 sGridNo )
 {
-/*	GROUP		*pGroup=NULL;
+	GROUP		*pGroup=NULL;
 	INT16		sSectorToAttack;
 	INT16		sSector;
 	UINT32	uiWorldMin=0;
 	INT8		bLevel=0;
-
+if ( gGameLegionOptions.pJA2UB == TRUE )
+{
 	sSectorToAttack = gJa25AiSectorStruct[ sSaiSector ].iSectorID;
 
 	sSector = sSectorToAttack;
@@ -2293,16 +2321,18 @@ BOOLEAN HandleAddingEnemiesToSector( INT16 sSaiSector, UINT8 ubNumEnemies, INT8 
 	//Set up flag so enemies will go and find the player in that sector
 	gJa25SaveStruct.fEnemyShouldImmediatelySeekThePlayer = TRUE;
 	gJa25SaveStruct.bSectorTheEnemyWillSeekEnemy = (INT8)sSaiSector;
-*/
+}
 	return( TRUE );
 }
 
 void SetEnemiesToFindThePlayerMercs()
 {
-/*	INT32 cnt;
+	INT32 cnt;
 	SOLDIERTYPE             *pSoldier;
 	INT16	sGridNoToGoto=0;
 
+if ( gGameLegionOptions.pJA2UB == TRUE )
+{
 	sGridNoToGoto = GetGridNoEnemyWillSeekWhenAttacking( gJa25SaveStruct.bSectorTheEnemyWillSeekEnemy );
 
 	//Reset fact that we send enemy to find player
@@ -2319,26 +2349,27 @@ void SetEnemiesToFindThePlayerMercs()
 	cnt = gTacticalStatus.Team[ ENEMY_TEAM ].bFirstID;
   for ( pSoldier = MercPtrs[ cnt ]; cnt <= gTacticalStatus.Team[ ENEMY_TEAM ].bLastID; cnt++, pSoldier++)
 	{	
-		if( pSoldier->bLife >= OKLIFE && pSoldier->bActive && pSoldier->bInSector )
+		if( pSoldier->stats.bLife >= OKLIFE && pSoldier->bActive && pSoldier->bInSector )
 		{
 			// send soldier to centre of map, roughly
-			pSoldier->sNoiseGridno = sGridNoToGoto;
+			pSoldier->aiData.sNoiseGridno = sGridNoToGoto;
 			pSoldier->bNoiseLevel = 0;
-			pSoldier->ubNoiseVolume = MAX_MISC_NOISE_DURATION / 2;
+			pSoldier->aiData.ubNoiseVolume = MAX_MISC_NOISE_DURATION / 2;
 
-			pSoldier->bAlertStatus = STATUS_YELLOW;
-			pSoldier->bHasKeys = TRUE;
+			pSoldier->aiData.bAlertStatus = STATUS_YELLOW;
+			pSoldier->flags.bHasKeys = TRUE;
 
-			pSoldier->bOrders = SEEKENEMY;
+			pSoldier->aiData.bOrders = SEEKENEMY;
 		}
 	}
-	*/
+}
 }
 
 INT16 GetGridNoEnemyWillSeekWhenAttacking( INT8 bSaiSector )
 {
 	INT16	sGridNo=0;
-/*
+if ( gGameLegionOptions.pJA2UB == TRUE )
+{
 	switch( bSaiSector )
 	{
 		case JA25_J14_1:
@@ -2368,15 +2399,16 @@ INT16 GetGridNoEnemyWillSeekWhenAttacking( INT8 bSaiSector )
 
 			break;
 	}	
-*/
+}
 	return( sGridNo );
 }
 
 void Ja25SAI_DetermineWhichLevelToAttackFrom( INT16 sSaiSector, INT16 *psSector, INT8 *pbLevel )
 {
-/*	INT8	bLevel=0;
+	INT8	bLevel=0;
 	INT16 sSector=0;
-
+if ( gGameLegionOptions.pJA2UB == TRUE )
+{
 	switch( sSaiSector )
 	{
 		case JA25_K15_1:
@@ -2406,7 +2438,7 @@ void Ja25SAI_DetermineWhichLevelToAttackFrom( INT16 sSaiSector, INT16 *psSector,
 	*psSector = sSector;
 	*pbLevel = bLevel;
 
-	*/
+}
 }
 
 BOOLEAN AreAllPlayerMercTraversingBetweenSectors()
@@ -2583,11 +2615,17 @@ void HandleSayingDontStayToLongWarningInSectorH8()
 	INT32			cnt;
 
 	//if the player has advance passed this sector, leave
-/*	if( gJa25AiSectorStruct[ JA25_H9 ].fPlayerControlled )
+	
+	if( gJa25AiSectorStruct[ JA25_H9 ].fPlayerControlled && gGameLegionOptions.pJA2UB == TRUE )
 	{
 		return;
 	}
-*/
+	
+	if ( SectorInfo[ (UINT8)SECTOR( gGameExternalOptions.ubDefaultArrivalSectorX, gGameExternalOptions.ubDefaultArrivalSectorY ) ].fSurfaceWasEverPlayerControlled == TRUE && gGameLegionOptions.pJA2UB == FALSE )
+	{
+		return;
+	} 
+	
 	//if there are no enemies in the sector, leave
 	if( NumEnemiesInSector( 8, 8 ) > 0 )
 	{
@@ -2681,8 +2719,10 @@ void HandleEnricosUnderstandingEmail()
 
 void HandleRemovingEnemySoldierInitLinksIfPlayerEverWonInSector()
 {
-/*	INT16	sJa25SaiSectorValue;
+	INT16	sJa25SaiSectorValue;
 
+if ( gGameLegionOptions.pJA2UB == TRUE )
+{
 	//Get the Ja25 SAI sector value for the sector that is being attacked
 	sJa25SaiSectorValue = GetJA25SectorID( gWorldSectorX, gWorldSectorY, gbWorldSectorZ );
 
@@ -2692,7 +2732,7 @@ void HandleRemovingEnemySoldierInitLinksIfPlayerEverWonInSector()
 		//Toast the ENEMIES init links
 		RemoveAllEnemySoldierInitListLinks();
 	}
-	*/
+}	
 }
 
 void RemoveAllEnemySoldierInitListLinks()
@@ -2717,10 +2757,13 @@ void RemoveAllEnemySoldierInitListLinks()
 
 void Ja25HandleStartingAnyBattlesInOtherSectors()
 {
-/*	UINT8 ubNumEnemies=0;
+	UINT8 ubNumEnemies=0;
 	UINT8 ubNumPlayers=0;
 	INT8 bCnt;
 	INT8	bSectorX, bSectorY, bSectorZ;
+	
+if  ( gGameLegionOptions.pJA2UB == TRUE )
+{
 
 	//if there is a world loaded
 	if( gWorldSectorX != -1 && gWorldSectorY != -1 && gbWorldSectorZ != -1 )
@@ -2756,7 +2799,7 @@ void Ja25HandleStartingAnyBattlesInOtherSectors()
 			return;
 		}
 	}
-*/
+}
 }
 
 // -1 if enemy isnt supposed to seek player, otherwise SAI sectgor ID get returned
@@ -2822,8 +2865,11 @@ void SetH11NumEnemiesInSector()
 
 BOOLEAN	HaveMercsEverBeenInComplex()
 {
+
+if (gGameLegionOptions.pJA2UB == TRUE )
+{
 	//if the player has liberated K15 level 1
-/*	if( gJa25AiSectorStruct[ JA25_K15_1 ].fPlayerHasLiberatedSectorBefore )
+	if( gJa25AiSectorStruct[ JA25_K15_1 ].fPlayerHasLiberatedSectorBefore )
 	{
 		return( TRUE );
 	}
@@ -2831,7 +2877,21 @@ BOOLEAN	HaveMercsEverBeenInComplex()
 	{
 		return( TRUE );
 	}
-*/
+}	
+else if (gGameLegionOptions.pJA2UB == FALSE )
+{
+	//if the player has liberated K15 level 1
+	if( SectorInfo[ SEC_K15 ].uiTimeLastPlayerLiberated && gbWorldSectorZ == 1 )
+	{
+		return( TRUE );
+	}
+	else if( AreAnyPlayerMercsStillInSector( 15, 11, 1 ) )
+	{
+		return( TRUE );
+	}
+	
+}
+
 	return( FALSE );
 }
 

@@ -19,6 +19,10 @@
 #include "connect.h"
 #include "Strategic Event Handler.h"
 
+#ifdef JA2UB
+#include "legion cfg.h"
+#endif
+
 using namespace std;
 
 /************************************************************************************/
@@ -526,16 +530,26 @@ BOOLEAN CPostalService::DeliverShipment(UINT16 usShipmentID)
 		// WANNE - MP: Do not send email notification from Bobby Ray in a multiplayer game
 		if (!is_networked)
 		{
+		
+		StopTimeCompression();
 #ifdef JA2UB
-//no UB
-			StopTimeCompression();
+
+//no UB		
+	if ( gGameLegionOptions.fBobbyRSite == TRUE )
+	{
+			// Shipment from Bobby Ray
+			if (shs.sSenderID == BOBBYR_SENDER_ID)
+				AddBobbyREmailJA2( 198, 4, BOBBY_R, GetWorldTotalMin(), -1, gusCurShipmentDestinationID, TYPE_EMAIL_BOBBY_R_EMAIL_JA2_EDT);	
+				// Shipment from John Kulba
+			//else
+			//	AddEmail( JOHN_KULBA_GIFT_IN_DRASSEN, JOHN_KULBA_GIFT_IN_DRASSEN_LENGTH, JOHN_KULBA, GetWorldTotalMin(), -1, gusCurShipmentDestinationID, TYPE_EMAIL_EMAIL_EDT);
+	}
 #else
-			StopTimeCompression();
 
 			// Shipment from Bobby Ray
 			if (shs.sSenderID == BOBBYR_SENDER_ID)
 				AddEmail( BOBBYR_SHIPMENT_ARRIVED, BOBBYR_SHIPMENT_ARRIVED_LENGTH, BOBBY_R, GetWorldTotalMin(), -1, gusCurShipmentDestinationID, TYPE_EMAIL_EMAIL_EDT);	
-			// Shipment from John Kulba
+				// Shipment from John Kulba
 			else
 				AddEmail( JOHN_KULBA_GIFT_IN_DRASSEN, JOHN_KULBA_GIFT_IN_DRASSEN_LENGTH, JOHN_KULBA, GetWorldTotalMin(), -1, gusCurShipmentDestinationID, TYPE_EMAIL_EMAIL_EDT);
 #endif

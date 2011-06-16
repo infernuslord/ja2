@@ -54,7 +54,10 @@
 
 #ifdef JA2UB
 #include "Ja25Update.h"
+#include "Ja25 Strategic Ai.h"
 //#include "Map Screen Interface Map.h"
+
+//extern JA25_SECTOR_AI	*gJa25AiSectorStruct;
 #endif
 
 #include "connect.h"
@@ -1815,13 +1818,16 @@ void GroupArrivedAtSector( UINT8 ubGroupID, BOOLEAN fCheckForBattle, BOOLEAN fNe
 		{
 			// check for discovering secret locations
 			INT8 bTownId = GetTownIdForSector( pGroup->ubSectorX, pGroup->ubSectorY );
-
+		#ifdef JA2UB
+		//Ja25:	No tixa, orta or sam site
+		#else
 			if( bTownId == TIXA )
 				SetTixaAsFound();
 			else if( bTownId == ORTA )
 				SetOrtaAsFound();
 			else if( IsThisSectorASAMSector( pGroup->ubSectorX, pGroup->ubSectorY, 0 ) )
 				SetSAMSiteAsFound( GetSAMIdFromSector( pGroup->ubSectorX, pGroup->ubSectorY, 0 ) );
+		#endif
 		}
 
 
@@ -2066,6 +2072,41 @@ void GroupArrivedAtSector( UINT8 ubGroupID, BOOLEAN fCheckForBattle, BOOLEAN fNe
 			}
 		}
 	}
+	
+#ifdef JA2UB
+/*
+//if the enemy group is at its final destination
+	if( !pGroup->fPlayer && GroupAtFinalDestination( pGroup ) )
+	{
+		// Check to see if this is an AI sector
+		INT16 sJa25SaiSectorValue = GetJA25SectorID( pGroup->ubSectorX, pGroup->ubSectorY, pGroup->ubSectorZ );
+
+		if ( sJa25SaiSectorValue != -1 )
+		{
+			// If we were told to attack, reset flag
+			if ( gJa25AiSectorStruct[ sJa25SaiSectorValue ].fEnemyEnrouteToAttack )
+			{
+				gJa25AiSectorStruct[ sJa25SaiSectorValue ].fEnemyEnrouteToAttack = FALSE;
+			}
+		}
+
+*/
+		//add the enemies to the sector
+/*
+		SectorInfo[ SECTOR( pGroup->ubSectorX, pGroup->ubSectorY ) ].ubNumAdmins += pGroup->pEnemyGroup->ubNumAdmins;
+		SectorInfo[ SECTOR( pGroup->ubSectorX, pGroup->ubSectorY ) ].ubNumTroops += pGroup->pEnemyGroup->ubNumTroops;
+		SectorInfo[ SECTOR( pGroup->ubSectorX, pGroup->ubSectorY ) ].ubNumElites += pGroup->pEnemyGroup->ubNumElites;
+		if( fBattleGoingToStart )
+		{
+			SectorInfo[ SECTOR( pGroup->ubSectorX, pGroup->ubSectorY ) ].ubAdminsInBattle = pGroup->pEnemyGroup->ubNumAdmins;
+			SectorInfo[ SECTOR( pGroup->ubSectorX, pGroup->ubSectorY ) ].ubTroopsInBattle = pGroup->pEnemyGroup->ubNumTroops;
+			SectorInfo[ SECTOR( pGroup->ubSectorX, pGroup->ubSectorY ) ].ubElitesInBattle = pGroup->pEnemyGroup->ubNumElites;
+		}
+*/
+	//}
+	
+#endif
+	
 	gfWaitingForInput = FALSE;
 }
 
@@ -2076,10 +2117,15 @@ void HandleNonCombatGroupArrival( GROUP *pGroup, BOOLEAN fMainGroup, BOOLEAN fNe
 {
 	// if any mercs are actually in the group
 
+	
+	#ifdef JA2UB
+	//Ja25 No strategic ai
+	#else
 	if( StrategicAILookForAdjacentGroups( pGroup ) )
 	{ //The routine actually just deleted the enemy group (player's don't get deleted), so we are done!
 		return;
 	}
+	#endif
 
 	if( pGroup->fPlayer )
 	{
@@ -2692,7 +2738,11 @@ void RemovePGroup( GROUP *pGroup )
 	}
 	else
 	{
+		#ifdef JA2UB
+		//Ja25 No strategic ai
+		#else
 		RemoveGroupFromStrategicAILists( pGroup->ubGroupID );
+		#endif
 		MemFree( pGroup->pEnemyGroup );
 	}
 
@@ -4362,7 +4412,12 @@ void ResetMovementForEnemyGroup( GROUP *pGroup )
 	}
 	if( !pGroup->fBetweenSectors || !pGroup->ubNextX || !pGroup->ubNextY )
 	{ //Reset the group's assignment by moving it to the group's original sector as it's pending group.
+	
+		#ifdef JA2UB
+		//Ja25 No strategic ai
+		#else
 		RepollSAIGroup( pGroup );
+		#endif
 		return;
 	}
 
@@ -4764,6 +4819,11 @@ void RandomizePatrolGroupLocation( GROUP *pGroup )
 //roll the dice to see if this will become an ambush random encounter.
 BOOLEAN TestForBloodcatAmbush( GROUP *pGroup )
 {
+
+#ifdef JA2UB
+	//Ja25: No BLoodcat ambushes
+	return( FALSE );
+#else
 	SECTORINFO *pSector;
 	INT32 iHoursElapsed;
 	UINT8 ubSectorID;
@@ -4942,6 +5002,7 @@ BOOLEAN TestForBloodcatAmbush( GROUP *pGroup )
 		gubEnemyEncounterCode = NO_ENCOUNTER_CODE;
 		return FALSE;
 	}
+#endif
 }
 
 void NotifyPlayerOfBloodcatBattle( UINT8 ubSectorX, UINT8 ubSectorY )
@@ -5417,3 +5478,64 @@ BOOLEAN ScoutIsPresentInSquad( INT16 ubSectorNumX, INT16 ubSectorNumY )
 
 	return ( fScoutPresent );
 }
+
+#ifdef JA2UB
+GROUP* CreateNewEnemyGroupDepartingFromSectorUsingZLevel( UINT32 uiSector, UINT8 ubSectorZ, UINT8 ubNumAdmins, UINT8 ubNumTroops, UINT8 ubNumElites )
+{
+	GROUP *pNew;
+	AssertMsg( uiSector >= 0 && uiSector <= 255, String( "CreateNewEnemyGroup with out of range value of %d", uiSector ) );
+	pNew = (GROUP*)MemAlloc( sizeof( GROUP ) );
+	AssertMsg( pNew, "MemAlloc failure during CreateNewEnemyGroup." );
+	memset( pNew, 0, sizeof( GROUP ) );
+	pNew->pEnemyGroup = (ENEMYGROUP*)MemAlloc( sizeof( ENEMYGROUP ) );
+	AssertMsg( pNew->pEnemyGroup, "MemAlloc failure during enemy group creation." );
+	memset( pNew->pEnemyGroup, 0, sizeof( ENEMYGROUP ) );
+	pNew->pWaypoints = NULL;
+	pNew->ubSectorX = (UINT8)SECTORX( uiSector );
+	pNew->ubSectorY = (UINT8)SECTORY( uiSector );
+	pNew->ubSectorZ = ubSectorZ;
+	pNew->ubOriginalSector = (UINT8)uiSector;
+	pNew->fPlayer = FALSE;
+	pNew->ubMoveType = CIRCULAR;
+	pNew->ubNextWaypointID = 0;
+	pNew->ubFatigueLevel = 100;
+	pNew->ubRestAtFatigueLevel = 0;
+	pNew->pEnemyGroup->ubNumAdmins = ubNumAdmins;
+	pNew->pEnemyGroup->ubNumTroops = ubNumTroops;
+	pNew->pEnemyGroup->ubNumElites = ubNumElites;
+	pNew->ubGroupSize = (UINT8)(ubNumAdmins + ubNumTroops + ubNumElites);
+	pNew->ubTransportationMask = FOOT;
+	pNew->fVehicle = FALSE;
+	pNew->ubCreatedSectorID = pNew->ubOriginalSector;
+	pNew->ubSectorIDOfLastReassignment = 255;
+
+#ifdef JA2BETAVERSION
+	{
+		UINT16 str[ 512 ];
+		//if( PlayerMercsInSector( pNew->ubSectorX, pNew->ubSectorY, pNew->ubSectorZ ) || CountAllMilitiaInSector( pNew->ubSectorX, pNew->ubSectorY ) )
+		//{
+		//	swprintf( str, L"Attempting to send enemy troops from player occupied location.  "
+		//								 L"Please ALT+TAB out of the game before doing anything else and send 'Strategic Decisions.txt' "
+		//								 L"and this message.  You'll likely need to revert to a previous save.  If you can reproduce this "
+		//								 L"with a save close to this event, that would really help me! -- KM:0" );
+		//	DoScreenIndependantMessageBox( str, MSG_BOX_FLAG_OK, NULL );
+		//}
+		if( pNew->ubGroupSize > 25 )
+		{
+			swprintf( str, L"Strategic AI warning:  Creating an enemy group containing %d soldiers "
+										 L"(%d admins, %d troops, %d elites) in sector %c%d.  This message is a temporary test message "
+										 L"to evaluate a potential problems with very large enemy groups.",
+										 pNew->ubGroupSize, ubNumAdmins, ubNumTroops, ubNumElites,
+										 pNew->ubSectorY + 'A' - 1, pNew->ubSectorX );
+			DoScreenIndependantMessageBox( str, MSG_BOX_FLAG_OK, NULL );
+		}
+	}
+#endif
+
+	if( AddGroupToList( pNew ) )
+		return pNew;
+	return NULL;
+}
+
+
+#endif

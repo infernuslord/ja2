@@ -5843,7 +5843,7 @@ BOOLEAN PlaceObject( SOLDIERTYPE * pSoldier, INT8 bPos, OBJECTTYPE * pObj )
 						{
 							if(!(gTacticalStatus.uiFlags & INCOMBAT))
 							{
-								INT16		magSize, ubShotsLeft;
+								UINT16		magSize, ubShotsLeft;
 								OBJECTTYPE	tempClip;
 								OBJECTTYPE	tempStack;
 								bool		clipCreated;
@@ -7127,7 +7127,7 @@ BOOLEAN CreateGun( UINT16 usItem, INT16 bStatus, OBJECTTYPE * pObj )
 	return( TRUE );
 }
 
-BOOLEAN CreateAmmo( UINT16 usItem, OBJECTTYPE * pObj, INT16 ubShotsLeft )
+BOOLEAN CreateAmmo( UINT16 usItem, OBJECTTYPE * pObj, UINT16 ubShotsLeft )
 {
 	if (pObj == NULL)
 	{
@@ -7137,11 +7137,11 @@ BOOLEAN CreateAmmo( UINT16 usItem, OBJECTTYPE * pObj, INT16 ubShotsLeft )
 	pObj->usItem = usItem;
 	pObj->ubNumberOfObjects = 1;
 	//pObj->objectStack.resize(1);//not necessary due to init, here for code commenting
-	if (ubShotsLeft < 0) {
+	if (ubShotsLeft == 0) {
 		(*pObj)[0]->data.ubShotsLeft = Magazine[ Item[usItem].ubClassIndex ].ubMagSize;
 	}
 	else {
-		(*pObj)[0]->data.ubShotsLeft = (UINT8)ubShotsLeft;
+		(*pObj)[0]->data.ubShotsLeft = ubShotsLeft;
 	}
 	//WarmSteel - Init attachment slots.
 	if(UsingNewAttachmentSystem()==true)
@@ -9049,6 +9049,8 @@ INT16 GetRangeBonus( OBJECTTYPE * pObj )
 {
 	INT16 bonus = 0;
 	if (pObj->exists() == true) {
+		if(Item[pObj->usItem].usItemClass == IC_AMMO)
+			return( Item[pObj->usItem].rangebonus );
 		bonus = BonusReduce( Item[pObj->usItem].rangebonus, (*pObj)[0]->data.objectStatus );
 
 		if ( (*pObj)[0]->data.gun.ubGunShotsLeft > 0 )
@@ -10998,13 +11000,16 @@ void ApplyEquipmentBonuses(SOLDIERTYPE * pSoldier)
 	//if ( pSoldier->bInSector)
 	//	pSoldier->CreateSoldierPalettes( );
 
-	// WANNE: We should only delete the face, if there was a camo we applied.
+	
+	// WANNE: I disabled the call, because it leeds to endless loop when examining doors with explosives!
+	/*
 	// This should fix the bug and crashes with missing faces
 	if (SetCamoFace( pSoldier ))
 	{
 		DeleteSoldierFace( pSoldier );// remove face
 		pSoldier->iFaceIndex = InitSoldierFace( pSoldier );// create new face
 	}
+	*/
 
 	fInterfacePanelDirty = DIRTYLEVEL2;
 }
@@ -11627,7 +11632,7 @@ UINT8 GetAllowedAimingLevelsForItem( SOLDIERTYPE *pSoldier, OBJECTTYPE *pObj, UI
 		return 1;
 	}
 
-	UINT8 aimLevels = 4;
+	INT8 aimLevels = 4;
 
 	// HEADROCK HAM B2.6: Dynamic aiming level restrictions based on gun type and attachments.
 	// HEADROCK HAM 3.5: Revamped this - it was illogically constructed.

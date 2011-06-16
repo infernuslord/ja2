@@ -89,6 +89,7 @@
 
 #ifdef JA2UB
 #include "Ja25 Strategic Ai.h"
+#include "Ja25Update.h"
 #endif
 
 #include "legion cfg.h" //legion2
@@ -613,7 +614,7 @@ void LoadGameLegionOptions()
 	gGameLegionOptions.ZAIKONA5 = iniReader.ReadBoolean("Unfinished Business","BORDER_AIRSPACE", TRUE);
 	gGameLegionOptions.ZAIKONA6 = iniReader.ReadBoolean("Unfinished Business","BORDER_ITEM", TRUE);
 	
-	gGameLegionOptions.SF_UB = iniReader.ReadBoolean("Unfinished Business","SF", FALSE);
+	//gGameLegionOptions.SF_UB = iniReader.ReadBoolean("Unfinished Business","SF", FALSE);
 	
 	gGameLegionOptions.EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE_UB = iniReader.ReadBoolean("Unfinished Business","EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE", TRUE);
 	
@@ -624,6 +625,13 @@ void LoadGameLegionOptions()
 
 	gGameExternalOptions.ubDefaultArrivalSectorX	= gGameLegionOptions.ubDefaultArrivalSectorX;
 	gGameExternalOptions.ubDefaultArrivalSectorY	= gGameLegionOptions.ubDefaultArrivalSectorY;
+	
+	JA2_5_START_SECTOR_X = gGameLegionOptions.ubDefaultArrivalSectorX;
+	JA2_5_START_SECTOR_Y = gGameLegionOptions.ubDefaultArrivalSectorY;
+	
+	gGameLegionOptions.ubEndDefaultSectorX	= iniReader.ReadInteger("Unfinished Business","DEFAULT_END_SECTOR_X", 16, 1, 16);
+	gGameLegionOptions.ubEndDefaultSectorY	= iniReader.ReadInteger("Unfinished Business","DEFAULT_END_SECTOR_Y", 11, 1, 16);
+	gGameLegionOptions.ubEndDefaultSectorZ	= iniReader.ReadInteger("Unfinished Business","DEFAULT_END_SECTOR_Z", 0, 0, 16);
 
 	gGameLegionOptions.iStartingCashNovice		= iniReader.ReadInteger("Unfinished Business", "STARTING_CASH_NOVICE",40000, 2000, 0x0FFFFFFF);
 	gGameLegionOptions.iStartingCashExperienced	= iniReader.ReadInteger("Unfinished Business", "STARTING_CASH_EXPERIENCED",35000, 2000, 0x0FFFFFFF);
@@ -664,8 +672,21 @@ void LoadGameLegionOptions()
 	gGameLegionOptions.InGameHeliCrash = iniReader.ReadBoolean("Unfinished Business","InGameHeliCrash", TRUE);
 	gGameLegionOptions.JerryQuotes = iniReader.ReadBoolean("Unfinished Business","JerryQuotes", TRUE);
 	gGameLegionOptions.InJerry = iniReader.ReadBoolean("Unfinished Business","Jerry", TRUE);	
-	gGameLegionOptions.JerryGridNo = iniReader.ReadInteger("Unfinished Business","JerryGridNo", 15109);		
-		
+	gGameLegionOptions.JerryGridNo = iniReader.ReadInteger("Unfinished Business","JerryGridNo", 15109);	
+	gGameLegionOptions.InGameHeli = iniReader.ReadBoolean("Unfinished Business","InGameHeli", FALSE);	
+	
+	if ( gGameLegionOptions.InGameHeli == TRUE ) 
+		gGameLegionOptions.InGameHeliCrash = FALSE;
+	
+	if ( gGameLegionOptions.InGameHeliCrash == TRUE )
+		gGameLegionOptions.InGameHeli = FALSE;
+	
+	if ( gGameLegionOptions.InGameHeli == TRUE && gGameLegionOptions.InGameHeliCrash == TRUE ) 
+		{
+			gGameLegionOptions.InGameHeliCrash = TRUE;
+			gGameLegionOptions.InGameHeli = FALSE;
+		}
+
 	//Campaign Section
 	
 	gGameLegionOptions.EnemyXML = TRUE; //iniReader.ReadBoolean("Campaign","USE_ENEMY_XML", TRUE);
@@ -675,12 +696,24 @@ void LoadGameLegionOptions()
 	
 	gGameLegionOptions.LaptopQuestEnabled = iniReader.ReadBoolean("Campaign","Laptop_Quest", TRUE);
 	
+	gGameLegionOptions.pJA2UB = iniReader.ReadBoolean("Campaign","JA2UB", TRUE);
+	
+	gGameLegionOptions.fDeadMerc = iniReader.ReadBoolean("Campaign","AIM_SYSTEM", FALSE);
+	
+	
 	gGameLegionOptions.MercStartingGear25XML = TRUE;//iniReader.ReadBoolean("UB","USE_MERC_STARTING_GEAR_XML", FALSE);
 	gGameLegionOptions.MercStartingGear25XML = TRUE;//iniReader.ReadBoolean("UB","USE_MERC_STARTING_GEAR_XML", FALSE);
 	
 	gGameLegionOptions.LAPTOP_IMP_PASS_JA2  = iniReader.ReadBoolean("Laptop","IMP_PASS_JA2",  FALSE);
 	
 	gGameLegionOptions.LAPTOP_IMP_PASS_UB  = iniReader.ReadBoolean("Laptop","IMP_PASS_UB",  TRUE);
+	
+	gGameLegionOptions.LaptopLinkInsurance  = iniReader.ReadBoolean("Laptop","LINK_INSURANCE",  FALSE);
+	gGameLegionOptions.LaptopLinkFuneral  = iniReader.ReadBoolean("Laptop","LINK_FUNERAL",  TRUE);
+	gGameLegionOptions.LaptopLinkBobby  = iniReader.ReadBoolean("Laptop","LINK_BOBBY",  FALSE);
+	gGameLegionOptions.fBobbyRSite  = iniReader.ReadBoolean("Laptop","BOBBY_SITE_ACCESSED",  FALSE);
+	
+	//LaptopSaveInfo.fBobbyRSiteCanBeAccessed = gGameLegionOptions.fBobbyRSite;
 
 	//gGameLegionOptions.RISRAPORT  = iniReader.ReadBoolean("Laptop","RIS_RAPORT",  TRUE);
 	
@@ -698,8 +731,18 @@ void LoadGameLegionOptions()
 	gGameLegionOptions.POWERGENFANSOUND_GRIDNO1a = iniReader.ReadInteger("Unfinished Business","POWERGEN_FAN_SOUND_GRIDNO1", 10979);	
 	gGameLegionOptions.POWERGENFANSOUND_GRIDNO2a = iniReader.ReadInteger("Unfinished Business","POWERGEN_FAN_SOUND_GRIDNO2", 19749);	
 	gGameLegionOptions.STARTFANBACKUPAGAIN_GRIDNOa = iniReader.ReadInteger("Unfinished Business","START_FANBACKUP_AGAIN_GRIDNO", 10980);	
-	gGameLegionOptions.STOPPOWERGENFAN_GRIDNOa = iniReader.ReadInteger("Unfinished Business","STOP_POWERGEN_FAN_GRIDNO", 10980);	
+	gGameLegionOptions.STOPPOWERGENFAN_GRIDNOa = iniReader.ReadInteger("Unfinished Business","STOP_POWERGEN_FAN_GRIDNO", 10980);
 
+	//sec J13
+	gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[0] = iniReader.ReadInteger("Unfinished Business","ISFANGRAPHICINSECTORATTHISGRIDNO1", 10978);
+	gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[1] = iniReader.ReadInteger("Unfinished Business","ISFANGRAPHICINSECTORATTHISGRIDNO2", 10979);
+	gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[2] = iniReader.ReadInteger("Unfinished Business","ISFANGRAPHICINSECTORATTHISGRIDNO3", 10980);
+	gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[3] = iniReader.ReadInteger("Unfinished Business","ISFANGRAPHICINSECTORATTHISGRIDNO4", 10818);
+	gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[4] = iniReader.ReadInteger("Unfinished Business","ISFANGRAPHICINSECTORATTHISGRIDNO5", 10819);
+	gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[5] = iniReader.ReadInteger("Unfinished Business","ISFANGRAPHICINSECTORATTHISGRIDNO6", 10820);
+	gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[6] = iniReader.ReadInteger("Unfinished Business","ISFANGRAPHICINSECTORATTHISGRIDNO7", 10658);
+	gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[7] = iniReader.ReadInteger("Unfinished Business","ISFANGRAPHICINSECTORATTHISGRIDNO8", 10659);
+	gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[8] = iniReader.ReadInteger("Unfinished Business","ISFANGRAPHICINSECTORATTHISGRIDNO9", 10660);
 
 //	gGameLegionOptions.BobbyRayInventory_UB = iniReader.ReadBoolean("Unfinished Business","INIT_BOBBYRAY_INVENTORY", FALSE);
 //	gGameLegionOptions.InitTownLoyalty_UB = iniReader.ReadBoolean("Unfinished Business","INIT_TOWN_LOYALTY", FALSE);

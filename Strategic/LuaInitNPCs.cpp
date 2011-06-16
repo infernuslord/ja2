@@ -49,6 +49,8 @@
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
 #include "Ja25Update.h"
+#include "legion cfg.h"
+#include "Ja25Update.h"
 #endif
 
 #include "Intro.h"
@@ -75,7 +77,42 @@ void FatigueCharacter( SOLDIERTYPE *pSoldier );
 
 static int l_AddCustomEmail (lua_State *L);
 
+static int l_SetDefaultArrivalSector (lua_State *L);
+static int l_GetDefaultArrivalSector (lua_State *L);
+static int l_SetMercArrivalLocation(lua_State *L);
+static int l_GetDefaultArrivalSectorX (lua_State *L);
+static int l_GetDefaultArrivalSectorY (lua_State *L);
+
+static int l_InitProfile(lua_State *L);
+
 #ifdef JA2UB
+
+static int l_InitMercgridNo0 (lua_State *L);
+static int l_InitMercgridNo1 (lua_State *L);
+static int l_InitMercgridNo2 (lua_State *L);
+static int l_InitMercgridNo3 (lua_State *L);
+static int l_InitMercgridNo4 (lua_State *L);
+static int l_InitMercgridNo5 (lua_State *L);
+static int l_InitMercgridNo6 (lua_State *L);
+static int l_InitJerryGridNo (lua_State *L);
+
+static int l_SetInternalLocateGridNo(lua_State *L);
+
+static int l_setInGameHeliCrash (lua_State *L);
+static int l_setJerryQuotes (lua_State *L);
+static int l_setInJerry (lua_State *L);
+static int l_setLaptopQuest (lua_State *L);
+static int l_setInGameHeli (lua_State *L);
+
+
+//static int l_getMercgridNo0 (lua_State *L);
+//static int l_getMercgridNo1 (lua_State *L);
+//static int l_getMercgridNo2 (lua_State *L);
+//static int l_getMercgridNo3 (lua_State *L);
+//static int l_getMercgridNo4 (lua_State *L);
+//static int l_getMercgridNo5 (lua_State *L);
+//static int l_getMercgridNo6 (lua_State *L);
+
 static int l_Ja25SaveStructJohnKulbaIsInGame(lua_State *L);
 static int l_Ja25SaveCheckStructJohnKulbaIsInGame(lua_State *L);
 
@@ -1325,6 +1362,43 @@ void IniFunction(lua_State *L)
 	lua_register(L, "StartVideo", l_StartVideo);	
 
 	lua_register(L, "SetGlobalLoyaltyEvent", l_SetHandleGlobalLoyaltyEvent);	
+	
+	lua_register(L, "SetDefaultArrivalSector", l_SetDefaultArrivalSector);	
+	lua_register(L, "GetDefaultArrivalSector", l_GetDefaultArrivalSector);
+	lua_register(L, "SetDefaultArrivalGridNo", l_SetMercArrivalLocation);
+	lua_register(L, "GetDefaultArrivalSectorX", l_GetDefaultArrivalSectorX);
+	lua_register(L, "GetDefaultArrivalSectorY", l_GetDefaultArrivalSectorY);
+	
+	lua_register(L, "InitialProfile", l_InitProfile);
+	
+	#ifdef JA2UB
+	lua_register(L, "InitialHeliGridNo1", l_InitMercgridNo0);
+	lua_register(L, "InitialHeliGridNo2", l_InitMercgridNo1);
+	lua_register(L, "InitialHeliGridNo3", l_InitMercgridNo2);
+	lua_register(L, "InitialHeliGridNo4", l_InitMercgridNo3);
+	lua_register(L, "InitialHeliGridNo5", l_InitMercgridNo4);
+	lua_register(L, "InitialHeliGridNo6", l_InitMercgridNo5);
+	lua_register(L, "InitialHeliGridNo7", l_InitMercgridNo6);
+	
+	lua_register(L, "InitialJerryGridNo", l_InitJerryGridNo);
+	
+	lua_register(L, "InitialLaptopQuest", l_setLaptopQuest);
+	
+	lua_register(L, "InitialHeliCrash", l_setInGameHeliCrash );
+	lua_register(L, "InitialJerryQuotes", l_setJerryQuotes );
+	lua_register(L, "InitialJerry", l_setInJerry );
+	lua_register(L, "InitialHeli", l_setInGameHeli );
+	
+	lua_register(L, "InternalLocateGridNo", l_SetInternalLocateGridNo );
+	#endif
+	
+	//lua_register(L, "GetINITIALHELIGRIDNO1", l_getMercgridNo0);
+	//lua_register(L, "GetINITIALHELIGRIDNO2", l_getMercgridNo1);
+	//lua_register(L, "GetINITIALHELIGRIDNO3", l_getMercgridNo2);
+	//lua_register(L, "GetINITIALHELIGRIDNO4", l_getMercgridNo3);
+	//lua_register(L, "GetINITIALHELIGRIDNO5", l_getMercgridNo4);
+	//lua_register(L, "GetINITIALHELIGRIDNO6", l_getMercgridNo5);
+	//lua_register(L, "GetINITIALHELIGRIDNO7", l_getMercgridNo6);
 
 }
 
@@ -1614,7 +1688,7 @@ int i;
 INT32 iMessageOffset;
 INT32 iMessageLength;
 UINT8 ubSender;
-INT32 iCurrentIMPPosition;
+//INT32 iCurrentIMPPosition;
 INT16 iCurrentShipmentDestinationID = -1;
 
 	for (i= 1; i<=n; i++ )
@@ -2442,6 +2516,12 @@ BOOLEAN LetLuaGameInit(UINT8 Init)
 		lua_call(L,0,0); 
 	}
 	
+	if ( Init == 2 )
+	{
+		lua_getglobal(L , "InitStrategicLayer");
+		lua_call(L,0,0); 
+	}	
+	
 	lua_close(L);
 
 	delete[] buffer;
@@ -2914,6 +2994,350 @@ BOOLEAN LetLuaHourlyQuestUpdate(UINT8 Init)
 //object
 
 //---------------
+#ifdef JA2UB
+static int l_InitMercgridNo0 (lua_State *L)
+{
+UINT32 GridNo;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) GridNo = lua_tointeger(L,i);
+		}	
+		
+		gGameLegionOptions.INITIALHELIGRIDNO[ 0 ] = GridNo;
+		
+	return 0;
+}
+
+static int l_InitMercgridNo1 (lua_State *L)
+{
+UINT32 GridNo;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) GridNo = lua_tointeger(L,i);
+		}	
+		
+		gGameLegionOptions.INITIALHELIGRIDNO[ 1 ] = GridNo;
+		
+	return 0;
+}
+
+static int l_InitMercgridNo2 (lua_State *L)
+{
+UINT32 GridNo;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) GridNo = lua_tointeger(L,i);
+		}	
+		
+		gGameLegionOptions.INITIALHELIGRIDNO[ 2 ] = GridNo;
+		
+	return 0;
+}
+
+static int l_InitMercgridNo3 (lua_State *L)
+{
+UINT32 GridNo;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) GridNo = lua_tointeger(L,i);
+		}	
+		
+		gGameLegionOptions.INITIALHELIGRIDNO[ 3 ] = GridNo;
+		
+	return 0;
+}
+
+static int l_InitMercgridNo4 (lua_State *L)
+{
+UINT32 GridNo;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) GridNo = lua_tointeger(L,i);
+		}	
+		
+		gGameLegionOptions.INITIALHELIGRIDNO[ 4 ] = GridNo;
+		
+	return 0;
+}
+
+static int l_InitMercgridNo5 (lua_State *L)
+{
+UINT32 GridNo;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) GridNo = lua_tointeger(L,i);
+		}	
+		
+		gGameLegionOptions.INITIALHELIGRIDNO[ 5 ] = GridNo;
+		
+	return 0;
+}
+
+static int l_InitMercgridNo6 (lua_State *L)
+{
+UINT32 GridNo;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) GridNo = lua_tointeger(L,i);
+		}	
+		
+		gGameLegionOptions.INITIALHELIGRIDNO[ 6 ] = GridNo;
+		
+	return 0;
+}
+
+static int l_InitJerryGridNo (lua_State *L)
+{
+UINT32 GridNo;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) GridNo = lua_tointeger(L,i);
+		}	
+		
+		gGameLegionOptions.JerryGridNo = GridNo;
+		
+	return 0;
+}
+
+static int l_setLaptopQuest (lua_State *L)
+{
+BOOLEAN set = TRUE;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) set = lua_toboolean(L,i);
+		}	
+		
+		
+		gGameLegionOptions.LaptopQuestEnabled = set;
+
+		
+	return 0;
+}
+
+static int l_setInJerry (lua_State *L)
+{
+BOOLEAN set = TRUE;
+UINT8  n = lua_gettop(L);
+UINT32 GridNo = 0;
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) set = lua_toboolean(L,i);
+			if (i == 2 ) GridNo = lua_tointeger(L,i);
+		}	
+		
+		gGameLegionOptions.InJerry = set;
+		
+		if ( GridNo > 0 )
+		gGameLegionOptions.JerryGridNo = GridNo;
+		else if ( GridNo < -1 )
+		gGameLegionOptions.JerryGridNo = 15943;
+
+	return 0;
+}
+
+static int l_setJerryQuotes (lua_State *L)
+{
+BOOLEAN set = TRUE;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) set = lua_toboolean(L,i);
+		}	
+		
+		
+		gGameLegionOptions.JerryQuotes = set;
+
+		
+	return 0;
+}
+
+static int l_setInGameHeliCrash (lua_State *L)
+{
+BOOLEAN set = TRUE;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) set = lua_toboolean(L,i);
+		}	
+		
+		
+		gGameLegionOptions.InGameHeliCrash = set;
+
+		
+	return 0;
+}
+
+static int l_setInGameHeli (lua_State *L)
+{
+BOOLEAN set = TRUE;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) set = lua_toboolean(L,i);
+		}	
+		
+		
+		gGameLegionOptions.InGameHeli= set;
+
+		
+	return 0;
+}
+
+static int l_SetInternalLocateGridNo(lua_State *L)
+{
+UINT32 GridNo;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) GridNo = lua_tointeger(L,i);
+		}	
+		
+		gGameLegionOptions.LOCATEGRIDNO = GridNo;
+		
+	return 0;
+}
+#endif
+
+static int l_SetMercArrivalLocation(lua_State *L)
+{
+UINT32 GridNo;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) GridNo = lua_tointeger(L,i);
+		}	
+	
+		gGameExternalOptions.iInitialMercArrivalLocation = GridNo;
+		
+	return 0;
+}
+
+static int l_GetDefaultArrivalSectorY (lua_State *L)
+{
+INT16 sSectorY = 1;
+
+		sSectorY = gsMercArriveSectorY;
+		
+		lua_pushinteger(L, sSectorY);
+		
+	return 1;
+}
+
+static int l_GetDefaultArrivalSectorX (lua_State *L)
+{
+INT16 sSectorX = 9;
+
+		sSectorX = gsMercArriveSectorX;
+		
+		lua_pushinteger(L, sSectorX);
+		
+	return 1;
+}
+
+static int l_GetDefaultArrivalSector (lua_State *L)
+{
+INT16 sSectorX = 9;
+INT16 sSectorY = 1;
+
+		sSectorX = gsMercArriveSectorX;
+		sSectorY = gsMercArriveSectorY;
+		
+		lua_pushinteger(L, sSectorX);
+		lua_pushinteger(L, sSectorY);
+		
+	return 2;
+}
+
+static int l_SetDefaultArrivalSector(lua_State *L)
+{
+UINT8 sSectorX;
+UINT8 sSectorY;
+UINT8  n = lua_gettop(L);
+int i;
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) sSectorX = lua_tointeger(L,i);
+			if (i == 2 ) sSectorY = lua_tointeger(L,i);
+		}	
+		
+	if ( ( sSectorX >= 1 || sSectorX <= 16 ) && ( sSectorY >= 1 || sSectorY <= 16 ) )
+		{
+			gsMercArriveSectorX	= sSectorX;
+			gsMercArriveSectorY	= sSectorY;
+			
+			#ifdef JA2UB
+			JA2_5_START_SECTOR_X = sSectorX;
+			JA2_5_START_SECTOR_Y = sSectorY;
+			#endif
+			gGameExternalOptions.ubDefaultArrivalSectorX = sSectorX;
+			gGameExternalOptions.ubDefaultArrivalSectorY = sSectorY;
+		}
+		else
+		{
+		
+			#ifdef JA2UB
+			JA2_5_START_SECTOR_X = 7;
+			JA2_5_START_SECTOR_Y = 8;
+			
+			gsMercArriveSectorX	= 7;
+			gsMercArriveSectorY	= 8;
+			
+			gGameExternalOptions.ubDefaultArrivalSectorX = 7;
+			gGameExternalOptions.ubDefaultArrivalSectorY = 8;
+			
+			#else
+			
+			gsMercArriveSectorX	= 9;
+			gsMercArriveSectorY	= 1;
+			
+
+			gGameExternalOptions.ubDefaultArrivalSectorX = 9;
+			gGameExternalOptions.ubDefaultArrivalSectorY = 1;
+			#endif
+		}
+		
+	return 0;
+}
 
 static int l_BoxerExists(lua_State *L)
 {
@@ -2983,6 +3407,37 @@ UINT32 Town;
 	}
 	
 	gMercProfiles[ ubProfileID ].bTown = Town;
+	
+return 0;
+}
+
+static int l_InitProfile(lua_State *L)
+{
+UINT8  n = lua_gettop(L);
+int i;
+UINT8 ubProfileID;
+//UINT32 Town;
+UINT16 x = 0;
+UINT16 y = 0;
+UINT8 z = 0;
+UINT32 sGridNo;
+	
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) ubProfileID = lua_tointeger(L,i);
+		if (i == 2 ) x = lua_tointeger(L,i);
+		if (i == 3 ) y = lua_tointeger(L,i);
+		if (i == 4 ) z = lua_tointeger(L,i);
+		if (i == 5 ) sGridNo = lua_tointeger(L,i);
+	}
+	
+	gMercProfiles[ ubProfileID ].sSectorX = x;
+	gMercProfiles[ ubProfileID ].sSectorY = y;
+	gMercProfiles[ ubProfileID ].bSectorZ = z;
+	gMercProfiles[ ubProfileID ].sGridNo = sGridNo; 
+	gMercProfiles[ ubProfileID ].fUseProfileInsertionInfo = TRUE;
+	gMercProfiles[ ubProfileID ].ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
+	gMercProfiles[ ubProfileID ].usStrategicInsertionData = sGridNo;
 	
 return 0;
 }

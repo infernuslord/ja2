@@ -182,8 +182,6 @@ enum
 };
 
 
-
-
 BOOLEAN	AreAnyPlayerMercsStillInSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ );
 
 BOOLEAN ShouldEnemiesBeAddedToInitialSector();
@@ -258,7 +256,7 @@ typedef struct
 
 	UINT8		ubInsertionDirection;								// For custom maps, used to describe which direction enemies are from
 
-	INT16		sInsertionGridNo;										// For custom maps, the insertion gridno
+	UINT32		sInsertionGridNo;										// For custom maps, the insertion gridno
 
 	BOOLEAN	fCustomSector;											// Ah, a flag so the AI doesn't need to lookup sector info
 
@@ -270,6 +268,9 @@ typedef struct
 
 } JA25_SECTOR_AI;
 
+#define CUSTOMSECTOR 1020
+
+extern	JA25_SECTOR_AI	gJa25AiSectorStruct[CUSTOMSECTOR];
 
 enum
 {

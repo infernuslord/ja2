@@ -1334,7 +1334,7 @@ void MercLooksForCorpses( SOLDIERTYPE *pSoldier )
 	if ( Random( 400 ) <= 2 )
 	{
 		INT32					cnt;
-		INT16										sGridNo;
+		INT32										sGridNo;
 		ROTTING_CORPSE					*pCorpse;
 
 		// Loop through all corpses....

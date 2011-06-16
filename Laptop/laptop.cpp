@@ -790,6 +790,11 @@ UINT32 LaptopScreenInit()
 	GameInitCharProfile();
 	GameInitFlorist();
 #ifdef JA2UB
+	if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+	{
+	GameInitInsurance();
+	GameInitInsuranceContract();
+	}
 //JA25:	
 #else
 	GameInitInsurance();
@@ -823,6 +828,11 @@ BOOLEAN InitLaptopAndLaptopScreens()
 	LaptopSaveInfo.fIMPCompletedFlag = FALSE;
 
 	//Reset the flag so that BOBBYR's isnt available at the begining of the game
+	#ifdef JA2UB
+	if ( gGameLegionOptions.fBobbyRSite == TRUE )
+	LaptopSaveInfo.fBobbyRSiteCanBeAccessed = TRUE;
+	else
+	#endif
 	LaptopSaveInfo.fBobbyRSiteCanBeAccessed = FALSE;
 
 	return( TRUE );
@@ -851,6 +861,8 @@ DrawLapTopText()
 UINT32 LaptopScreenShutdown()
 {
 #ifdef JA2UB
+	if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+		InsuranceContractEndGameShutDown();
 //JA25:	
 #else
 	InsuranceContractEndGameShutDown();
@@ -1307,6 +1319,8 @@ void RenderLaptop()
 
 		case LAPTOP_MODE_INSURANCE:
 #ifdef JA2UB
+	if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+		RenderInsurance();
 //JA25:		//	Assert( 0 );
 #else
 			RenderInsurance();
@@ -1315,6 +1329,8 @@ void RenderLaptop()
 
 		case LAPTOP_MODE_INSURANCE_INFO:
 #ifdef JA2UB
+	if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+		RenderInsuranceInfo();
 //JA25:			//	Assert( 0 );
 #else
 			RenderInsuranceInfo();
@@ -1323,6 +1339,8 @@ void RenderLaptop()
 
 		case LAPTOP_MODE_INSURANCE_CONTRACT:
 #ifdef JA2UB
+	if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+		RenderInsuranceContract();
 //JA25:
 #else
 			RenderInsuranceContract();
@@ -1331,6 +1349,8 @@ void RenderLaptop()
 
 		case LAPTOP_MODE_INSURANCE_COMMENTS:
 #ifdef JA2UB
+	if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+		RenderInsuranceComments();
 //JA25:			//	Assert( 0 );
 #else
 			RenderInsuranceComments();
@@ -1686,19 +1706,20 @@ void EnterNewLaptopMode()
 			break;
 #ifdef JA2UB
 		case LAPTOP_MODE_INSURANCE:
-	//		Assert( 0 );
-//JA25:			EnterInsurance();
+			if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+				EnterInsurance();
 			break;
 		case LAPTOP_MODE_INSURANCE_INFO:
-		//	Assert( 0 );
-//JA25:			EnterInsuranceInfo();
+			if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+				EnterInsuranceInfo();
 			break;
 		case LAPTOP_MODE_INSURANCE_CONTRACT:
-//JA25:			EnterInsuranceContract();
+			if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+				EnterInsuranceContract();
 			break;
 		case LAPTOP_MODE_INSURANCE_COMMENTS:
-		//	Assert( 0 );
-//JA25:			EnterInsuranceComments();
+			if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+				EnterInsuranceComments();
 			break;
 #else
 		case LAPTOP_MODE_INSURANCE:
@@ -1871,20 +1892,25 @@ void HandleLapTopHandles()
 #ifdef JA2UB
 		case LAPTOP_MODE_INSURANCE:
 		//	Assert( 0 );
-//JA25:			HandleInsurance();
+		if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+			HandleInsurance();
 			break;
 
 		case LAPTOP_MODE_INSURANCE_INFO:
 		//	Assert( 0 );
-//JA25:			HandleInsuranceInfo();
+		if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+			HandleInsuranceInfo();
 			break;
 
 		case LAPTOP_MODE_INSURANCE_CONTRACT:
-//JA25:			HandleInsuranceContract();
+		if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+			HandleInsuranceContract();
 			break;
+			
 		case LAPTOP_MODE_INSURANCE_COMMENTS:
 		//	Assert( 0 );
-//JA25:			HandleInsuranceComments();
+		if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+			HandleInsuranceComments();
 			break;
 #else
 		case LAPTOP_MODE_INSURANCE:
@@ -2385,20 +2411,25 @@ UINT32 ExitLaptopMode(UINT32 uiMode)
 #ifdef JA2UB			
 		case LAPTOP_MODE_INSURANCE:
 		//	Assert( 0 );
-//JA25:			ExitInsurance();
+			if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+				ExitInsurance();
 			break;
 
 		case LAPTOP_MODE_INSURANCE_INFO:
 		//	Assert( 0 );
-//JA25:			ExitInsuranceInfo();
+			if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+				ExitInsuranceInfo();
 			break;
 
 		case LAPTOP_MODE_INSURANCE_CONTRACT:
-//JA25:			ExitInsuranceContract();
+			if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+				ExitInsuranceContract();
 			break;
+			
 		case LAPTOP_MODE_INSURANCE_COMMENTS:
 		//	Assert( 0 );
-//JA25:			ExitInsuranceComments();
+			if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+				ExitInsuranceComments();
 			break;
 #else
 		case LAPTOP_MODE_INSURANCE:
@@ -4343,7 +4374,8 @@ void EnterLaptopInitLaptopPages()
 	EnterInitAimHistory();
 	EnterInitFloristGallery();
 #ifdef JA2UB
-//JA25:	EnterInitInsuranceInfo();
+	if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+		EnterInitInsuranceInfo();
 #else
 	EnterInitInsuranceInfo();
 #endif
@@ -5723,7 +5755,8 @@ void HandleKeyBoardShortCutsForLapTop( UINT16 usEvent, UINT32 usParam, UINT16 us
 				SetBookMark( FUNERAL_BOOKMARK );
 				SetBookMark( FLORIST_BOOKMARK );
 #ifdef JA2UB
-			//	SetBookMark( INSURANCE_BOOKMARK );
+				if (gGameLegionOptions.LaptopLinkInsurance == TRUE )
+				SetBookMark( INSURANCE_BOOKMARK );
 #else
 				SetBookMark( INSURANCE_BOOKMARK );
 #endif

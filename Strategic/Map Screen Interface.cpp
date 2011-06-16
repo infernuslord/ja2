@@ -5781,8 +5781,8 @@ BOOLEAN HandleTimeCompressWithTeamJackedInAndGearedToGo( void )
 			return( FALSE );
 		}
 
-		gubPBSectorX = gGameExternalOptions.ubDefaultArrivalSectorX;
-		gubPBSectorY = gGameExternalOptions.ubDefaultArrivalSectorY;
+		gubPBSectorX = (UINT8)gGameExternalOptions.ubDefaultArrivalSectorX;
+		gubPBSectorY = (UINT8)gGameExternalOptions.ubDefaultArrivalSectorY;
 	}
 	gubPBSectorZ = 0;	
 

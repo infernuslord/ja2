@@ -754,108 +754,6 @@ BOOLEAN ReadInWeaponStats(STR fileName)
 
 	MemFree(lpcBuffer);
 
-#ifdef JA2TESTVERSION
-	//Debug code; make sure that what we got from the file is the same as what's there
-	// Open a new file
-	hFile = FileOpen( "TABLEDATA\\~Weapons out.xml", FILE_ACCESS_WRITE | FILE_CREATE_ALWAYS, FALSE );
-	SGP_THROW_IFFALSE(hFile, _BS(L"Couls not open/create file : ") << L"TABLEDATA\\~Weapons out.xml" << _BS::wget);
-	//if ( !hFile )
-	//	return( FALSE );
-
-	{
-		UINT32 cnt;
-
-		FilePrintf(hFile,"<WEAPONLIST>\r\n");
-		for(cnt = 0;cnt < MAXITEMS;cnt++)
-		{
-			STR8 szRemainder = Weapon[cnt].szWeaponName; //the remaining string to be output (for making valid XML)
-
-			FilePrintf(hFile,"\t<WEAPON>\r\n");
-			FilePrintf(hFile,"\t\t<uiIndex>%d</uiIndex>\r\n",									Weapon[cnt].uiIndex);
-
-			FilePrintf(hFile,"\t\t<szWeaponName>");
-			while(szRemainder[0] != '\0')
-			{
-				UINT32 uiCharLoc = strcspn(szRemainder,"&<>\'\"\0");
-				CHAR8 invChar = szRemainder[uiCharLoc];
-
-				if(uiCharLoc)
-				{
-					szRemainder[uiCharLoc] = '\0';
-					FilePrintf(hFile,"%s",szRemainder);
-					szRemainder[uiCharLoc] = invChar;
-				}
-
-				szRemainder += uiCharLoc;
-
-				switch(invChar)
-				{
-					case '&':
-						FilePrintf(hFile,"&amp;");
-						szRemainder++;
-					break;
-
-					case '<':
-						FilePrintf(hFile,"&lt;");
-						szRemainder++;
-					break;
-
-					case '>':
-						FilePrintf(hFile,"&gt;");
-						szRemainder++;
-					break;
-
-					case '\'':
-						FilePrintf(hFile,"&apos;");
-						szRemainder++;
-					break;
-
-					case '\"':
-						FilePrintf(hFile,"&quot;");
-						szRemainder++;
-					break;
-				}
-			}
-			FilePrintf(hFile,"</szWeaponName>\r\n");
-
-			FilePrintf(hFile,"\t\t<ubWeaponClass>%d</ubWeaponClass>\r\n",						Weapon[cnt].ubWeaponClass);
-			FilePrintf(hFile,"\t\t<ubWeaponType>%d</ubWeaponType>\r\n",							Weapon[cnt].ubWeaponType);
-			FilePrintf(hFile,"\t\t<ubCalibre>%d</ubCalibre>\r\n",								Weapon[cnt].ubCalibre);
-			FilePrintf(hFile,"\t\t<ubReadyTime>%d</ubReadyTime>\r\n",							Weapon[cnt].ubReadyTime);
-			FilePrintf(hFile,"\t\t<ubShotsPer4Turns>%d</ubShotsPer4Turns>\r\n",					Weapon[cnt].ubShotsPer4Turns);
-			FilePrintf(hFile,"\t\t<ubShotsPerBurst>%d</ubShotsPerBurst>\r\n",					Weapon[cnt].ubShotsPerBurst);
-			FilePrintf(hFile,"\t\t<ubBurstPenalty>%d</ubBurstPenalty>\r\n",						Weapon[cnt].ubBurstPenalty);
-			FilePrintf(hFile,"\t\t<ubBulletSpeed>%d</ubBulletSpeed>\r\n",						Weapon[cnt].ubBulletSpeed);
-			FilePrintf(hFile,"\t\t<ubImpact>%d</ubImpact>\r\n",									Weapon[cnt].ubImpact);
-			FilePrintf(hFile,"\t\t<ubDeadliness>%d</ubDeadliness>\r\n",							Weapon[cnt].ubDeadliness);
-			FilePrintf(hFile,"\t\t<bAccuracy>%d</bAccuracy>\r\n",								Weapon[cnt].bAccuracy);
-			FilePrintf(hFile,"\t\t<nAccuracy>%d</nAccuracy>\r\n",								Weapon[cnt].nAccuracy);
-			FilePrintf(hFile,"\t\t<ubMagSize>%d</ubMagSize>\r\n",								Weapon[cnt].ubMagSize);
-			FilePrintf(hFile,"\t\t<usRange>%d</usRange>\r\n",									Weapon[cnt].usRange);
-			FilePrintf(hFile,"\t\t<usReloadDelay>%d</usReloadDelay>\r\n",						Weapon[cnt].usReloadDelay);
-			FilePrintf(hFile,"\t\t<ubAttackVolume>%d</ubAttackVolume>\r\n",						Weapon[cnt].ubAttackVolume);
-			FilePrintf(hFile,"\t\t<ubHitVolume>%d</ubHitVolume>\r\n",							Weapon[cnt].ubHitVolume);
-			FilePrintf(hFile,"\t\t<sSound>%d</sSound>\r\n",										Weapon[cnt].sSound);
-			FilePrintf(hFile,"\t\t<sBurstSound>%d</sBurstSound>\r\n",							Weapon[cnt].sBurstSound);
-			FilePrintf(hFile,"\t\t<sSilencedBurstSound>%d</sSilencedBurstSound>\r\n",			Weapon[cnt].sSilencedBurstSound);
-			FilePrintf(hFile,"\t\t<sReloadSound>%d</sReloadSound>\r\n",							Weapon[cnt].sReloadSound);
-			FilePrintf(hFile,"\t\t<sLocknLoadSound>%d</sLocknLoadSound>\r\n",					Weapon[cnt].sLocknLoadSound);
-			FilePrintf(hFile,"\t\t<bBurstAP>%d</bBurstAP>\r\n",									Weapon[cnt].bBurstAP);
-			FilePrintf(hFile,"\t\t<bAutofireShotsPerFiveAP>%d</bAutofireShotsPerFiveAP>\r\n",	Weapon[cnt].bAutofireShotsPerFiveAP);
-			FilePrintf(hFile,"\t\t<APsToReloadManually>%d</APsToReloadManually>\r\n",			Weapon[cnt].APsToReloadManually);
-			FilePrintf(hFile,"\t\t<ManualReloadSound>%d</ManualReloadSound>\r\n",				Weapon[cnt].ManualReloadSound);
-			FilePrintf(hFile,"\t\t<ubAimLevels>%d</ubAimLevels>\r\n",							Weapon[cnt].ubAimLevels);
-			FilePrintf(hFile,"\t\t<bRecoilX>%d</bRecoilX>\r\n",									Weapon[cnt].bRecoilX);
-			FilePrintf(hFile,"\t\t<bRecoilY>%d</bRecoilY>\r\n",									Weapon[cnt].bRecoilY);
-			FilePrintf(hFile,"\t\t<ubRecoilDelay>%d</ubRecoilDelay>\r\n",						Weapon[cnt].ubRecoilDelay);
-			FilePrintf(hFile,"\t\t<Handling>%d</Handling>\r\n",									Weapon[cnt].ubHandling);
-			FilePrintf(hFile,"\t</WEAPON>\r\n");
-		}
-		FilePrintf(hFile,"</WEAPONLIST>\r\n");
-	}
-	FileClose( hFile );
-#endif
-
 	XML_ParserFree(parser);
 
 	return( TRUE );
@@ -3202,7 +3100,7 @@ BOOLEAN UseHandToHand( SOLDIERTYPE *pSoldier, INT32 sTargetGridNo, BOOLEAN fStea
 						// if second hand item was removed place it now somewhere
 						if (oTempObjectSecondHand.usItem != 0 )
 						{
-							if (!PlaceInAnyPocket( pSoldier, &pSoldier->inv[HANDPOS], FALSE, 5))
+							if (!PlaceInAnyPocket( pSoldier, &oTempObjectSecondHand, FALSE, 5))
 							{
 								if (!AutoPlaceObject( pSoldier, &oTempObjectSecondHand, FALSE ))
 								{
@@ -4683,7 +4581,11 @@ UINT32 CalcNewChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTi
 	scopeRangeMod = (float)sDistVis / (float)sDistVisNoScope;	// percentage DistVis has been enhanced due to an attached scope
 	iSightRange = (INT32)(iSightRange / scopeRangeMod);
 	if(iSightRange > 0){
-		iSightRange -= GetGearAimBonus ( pSoldier, iSightRange, ubAimTime ) * iSightRange / 100;
+		//CHRISL: The LOS system, which determines whether to display an enemy unit, does not factor in the AimBonus tag during it's calculations.  So having
+		//	the CTH system use that tag to adjust iSightRange for AimBonus applied from armor might not be the best option.  Especially as it can sometimes
+		//	result in 0% CTH when everything looks like you could actually hit the target.  Let's try applying this penalty to CTH at the same point we would
+		//	apply the "invisible target" penalty.
+		//iSightRange -= GetGearAimBonus ( pSoldier, iSightRange, ubAimTime ) * iSightRange / 100;
 		if ( gGameOptions.fNewTraitSystem ) {
 			if ( HAS_SKILL_TRAIT( pSoldier, SNIPER_NT ) ) {
 				iSightRange -= ((gSkillTraitValues.ubSNEffRangeToTargetReduction * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT )) * iSightRange) /100;
@@ -5132,6 +5034,9 @@ UINT32 CalcNewChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTi
 	{
 		iBaseModifier += gGameCTHConstants.BASE_TARGET_INVISIBLE;
 	}
+	//CHRISL: Applying the Gear AimBonus (penalty) here, and directly to iBaseModifier as a flat penalty, instead of altering iSightRange above.  For now
+	//	I'm just applying this to the BaseModifier which means that aiming can overcome the Gear AimBonus (penalty).
+	iBaseModifier += GetGearAimBonus ( pSoldier, iSightRange, ubAimTime );
 
 	// GAME DIFFICULTY
 	if ( !(pSoldier->flags.uiStatusFlags & SOLDIER_PC ) && (pSoldier->bSide != gbPlayerNum) )
@@ -6001,7 +5906,11 @@ UINT32 CalcChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTime,
 	// Modify Sight and Physical Range
 	iSightRange = (INT32)(iSightRange / scopeRangeMod);
 	if(iSightRange > 0){
-		iSightRange -= GetGearAimBonus ( pSoldier, iSightRange, ubAimTime ) * iSightRange / 100;
+		//CHRISL: The LOS system, which determines whether to display an enemy unit, does not factor in the AimBonus tag during it's calculations.  So having
+		//	the CTH system use that tag to adjust iSightRange for AimBonus applied from armor might not be the best option.  Especially as it can sometimes
+		//	result in 0% CTH when everything looks like you could actually hit the target.  Let's try applying this penalty to CTH at the same point we would
+		//	apply the "invisible target" penalty.
+		//iSightRange -= GetGearAimBonus ( pSoldier, iSightRange, ubAimTime ) * iSightRange / 100;
 		if ( gGameOptions.fNewTraitSystem ) {
 			if ( HAS_SKILL_TRAIT( pSoldier, SNIPER_NT ) ) {
 				iSightRange -= ((gSkillTraitValues.ubSNEffRangeToTargetReduction * NUM_SKILL_TRAITS( pSoldier, SNIPER_NT )) * iSightRange) /100;
@@ -6084,6 +5993,9 @@ UINT32 CalcChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTime,
 		iPenalty = min(iPenalty, -gGameExternalOptions.iPenaltyShootUnSeen);
 	}
 	iChance += iPenalty;
+	//CHRISL: Applying the Gear AimBonus (penalty) here, and directly to iChance as a flat penalty, instead of altering iSightRange above.
+	iChance += GetGearAimBonus ( pSoldier, iSightRange, ubAimTime );
+
 	//CHRISL: We should probably include these target size penalties even if we can't see the target so that shooting a "hidden" head is harder then a "hidden" body
 	// if aiming at the head, reduce chance to hit
 	if (ubAimPos == AIM_SHOT_HEAD)

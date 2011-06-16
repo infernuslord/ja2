@@ -1430,9 +1430,9 @@ BOOLEAN AllowedToTimeCompress( void )
 	{
 		return FALSE;
 	}
-#ifdef JA2UB
+#ifdef JA2UB  
 		//if the player hasnt been to the initial sector yet
-	if( !GetSectorFlagStatus( 7, 8, 0, SF_HAS_ENTERED_TACTICAL ) )
+	if( !GetSectorFlagStatus( gGameExternalOptions.ubDefaultArrivalSectorX, gGameExternalOptions.ubDefaultArrivalSectorY, 0, SF_HAS_ENTERED_TACTICAL ) ) //7, 8
 	{
 		//if there is something that jerry wants to say
 		if( !WillJerryMiloAllowThePlayerToCompressTimeAtBeginingOfGame() )

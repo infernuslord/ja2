@@ -394,7 +394,7 @@ void CheckForValidQuotesWhenLeavingDealer( UINT8 ubProfile );
 void HaveBiggensDetonatingExplosivesByTheMine();
 
 // This function checks if we should replace the mine entrance graphic
-BOOLEAN IsMineEntranceInSectorI13AtThisGridNo( INT16 sGridNo );
+BOOLEAN IsMineEntranceInSectorI13AtThisGridNo( UINT32 sGridNo );
 
 void ReplaceMineEntranceGraphicWithCollapsedEntrance();
 #endif

@@ -7,7 +7,7 @@
 
 #define		PGF__FAN_EXIT_GRID_GRIDNO																	10979
 
-#define		NUM_MERCS_WITH_NEW_QUOTES												7
+#define		NUM_MERCS_WITH_NEW_QUOTES												20//7
 
 
 #define		DQ__NORMAL_DELAYED_QUOTE														0xff00

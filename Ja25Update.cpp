@@ -103,7 +103,8 @@
 #include "Ja25_Tactical.h"
 #include "Ja25 Strategic Ai.h"
 
-
+INT16 JA2_5_START_SECTOR_X;
+INT16 JA2_5_START_SECTOR_Y;
 
 //** Defines *******************************************************************
 

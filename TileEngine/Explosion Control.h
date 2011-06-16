@@ -150,6 +150,6 @@ extern BOOLEAN IsFanGraphicInSectorAtThisGridNo( UINT32 sGridNo );
 extern void HandleExplosionsInTunnelSector( UINT32 sGridNo );
 extern void HandleSwitchToOpenFortifiedDoor( UINT32 sGridNo );
 extern void HandleSeeingPowerGenFan( UINT32 sGridNo );
-extern void HandleSeeingFortifiedDoor( INT32 sGridNo );//Ja25 UB
+extern void HandleSeeingFortifiedDoor( UINT32 sGridNo );//Ja25 UB
 #endif
 #endif

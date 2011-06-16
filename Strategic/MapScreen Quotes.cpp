@@ -62,6 +62,7 @@
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
 #include "Legion cfg.h"
+#include "Ja25Update.h"
 
 
 #include "MapScreen Quotes.h"
@@ -431,7 +432,9 @@ BOOLEAN DidPlayerInitiallyHaveLessThen6MercsAndNowHaveExactly6AndHasntSaidFullLo
 	UINT8	ubNumMercsOnTeam = NumberOfMercsOnPlayerTeam();
 
 	//If we have been to the sector, make sure we dont say it
-	if( SectorInfo[ SEC_H7].uiFlags & SF_HAS_ENTERED_TACTICAL )
+	
+	//if( SectorInfo[ SEC_H7].uiFlags & SF_HAS_ENTERED_TACTICAL )
+	if( SectorInfo[ (UINT8)SECTOR(  gGameExternalOptions.ubDefaultArrivalSectorX,  gGameExternalOptions.ubDefaultArrivalSectorY ) ].uiFlags & SF_HAS_ENTERED_TACTICAL )
 	{
 		return( FALSE );
 	}

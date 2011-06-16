@@ -278,7 +278,7 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 #ifdef JA2UB
 		//ja25ub
 		//set a flag so we know we are doing the heli crash
-		if ( gGameLegionOptions.InGameHeliCrash == TRUE )
+		if ( gGameLegionOptions.InGameHeliCrash == TRUE || gGameLegionOptions.InGameHeli == FALSE)
 			gfFirstTimeInGameHeliCrash = TRUE; //AA FALSE ??
 		else
 			gfFirstTimeInGameHeliCrash = FALSE;
@@ -287,6 +287,9 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 #endif
 		pHireMerc->uiTimeTillMercArrives = ( gGameExternalOptions.iGameStartingTime + gGameExternalOptions.iFirstArrivalDelay ) / NUM_SEC_IN_MIN;
 #ifdef JA2UB
+
+	if ( gGameLegionOptions.InGameHeli == FALSE )
+	{
 		// Set the gridno for the soldier
 		pSoldier->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
 		pSoldier->usStrategicInsertionData = GetInitialHeliGridNo( );
@@ -304,6 +307,11 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 		pSoldier->fIgnoreGetupFromCollapseCheck = TRUE;
 
 		RESETTIMECOUNTER( pSoldier->GetupFromJA25StartCounter, GetInitialHeliRandomTime() );
+		}
+		else
+		{
+		pHireMerc->ubInsertionCode				= INSERTION_CODE_CHOPPER;
+		}
 #else
 		// Set insertion for first time in chopper
 		pHireMerc->ubInsertionCode				= INSERTION_CODE_CHOPPER;
@@ -468,7 +476,11 @@ void MercArrivesCallback(	UINT8	ubSoldierID )
 		// OK, If this sector is currently loaded, and guy does not have CHOPPER insertion code....
 		// ( which means we are at beginning of game if so )
 		// Setup chopper....
-		if ( pSoldier->ubStrategicInsertionCode != INSERTION_CODE_CHOPPER && pSoldier->sSectorX == 9 && pSoldier->sSectorY == 1 )
+		#ifdef JA2UB
+		if ( pSoldier->ubStrategicInsertionCode != INSERTION_CODE_CHOPPER && pSoldier->sSectorX == gGameExternalOptions.ubDefaultArrivalSectorX && pSoldier->sSectorY == gGameExternalOptions.ubDefaultArrivalSectorY && gGameLegionOptions.InGameHeli == TRUE )
+		#else
+		if ( pSoldier->ubStrategicInsertionCode != INSERTION_CODE_CHOPPER && pSoldier->sSectorX == gGameExternalOptions.ubDefaultArrivalSectorX && pSoldier->sSectorY == gGameExternalOptions.ubDefaultArrivalSectorY )
+		#endif
 		{
 			gfTacticalDoHeliRun = TRUE;
 
@@ -490,7 +502,9 @@ void MercArrivesCallback(	UINT8	ubSoldierID )
 	{
 		// OK, otherwise, set them in north area, so once we load again, they are here.
 #ifdef JA2UB
-		pSoldier->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
+		//pSoldier->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
+		pSoldier->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
+		pSoldier->usStrategicInsertionData = gGameLegionOptions.LOCATEGRIDNO;
 #else
 		//pSoldier->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
 		pSoldier->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
@@ -779,8 +793,8 @@ void CheckForValidArrivalSector( )
 	INT16	sLeft, sRight;
 	INT16	cnt1, cnt2, sGoodX, sGoodY;
 	UINT8	ubRadius = 4;
-	INT32	leftmost;
-	INT32	 sSectorGridNo, sSectorGridNo2;
+	UINT32	leftmost;
+	UINT32	 sSectorGridNo, sSectorGridNo2;
 	INT32	uiRange, uiLowestRange = 999999;
 	BOOLEAN	fFound = FALSE;
 	CHAR16 sString[ 1024 ];
@@ -950,11 +964,14 @@ void UpdateJerryMiloInInitialSector()
 	SOLDIERTYPE	*pSoldier = NULL;
 	SOLDIERTYPE	*pJerrySoldier=NULL;
 
-    SectorInfo[ SEC_H7 ].fSurfaceWasEverPlayerControlled = TRUE;
+	
+    //SectorInfo[ SEC_H7 ].fSurfaceWasEverPlayerControlled = TRUE;
+	  SectorInfo[ (UINT8)SECTOR( gGameExternalOptions.ubDefaultArrivalSectorX, gGameExternalOptions.ubDefaultArrivalSectorY ) ].fSurfaceWasEverPlayerControlled = TRUE;
     //SectorInfo[ SEC_H7 ].ubNumAdmins = 2;
+	StrategicMap[ (UINT8)SECTOR( gGameExternalOptions.ubDefaultArrivalSectorX, gGameExternalOptions.ubDefaultArrivalSectorY ) ].fEnemyControlled = FALSE;
     
-
-//	return; //AA
+if ( gGameLegionOptions.InGameHeli == TRUE )
+	return; //AA
 
 if ( gGameLegionOptions.InGameHeliCrash == TRUE )
    { 
@@ -977,8 +994,11 @@ if ( gGameLegionOptions.InGameHeliCrash == TRUE )
 	StartQuest( QUEST_FIX_LAPTOP, -1, -1 );
 
 	//Record the initial sector as ours
-	SectorInfo[ SEC_H7 ].fSurfaceWasEverPlayerControlled = TRUE;
-	if ( gGameLegionOptions.InJerry == TRUE ) 
+	//SectorInfo[ SEC_H7 ].fSurfaceWasEverPlayerControlled = TRUE;
+	  SectorInfo[ (UINT8)SECTOR( gGameExternalOptions.ubDefaultArrivalSectorX, gGameExternalOptions.ubDefaultArrivalSectorY ) ].fSurfaceWasEverPlayerControlled = TRUE;
+	  StrategicMap[ (UINT8)SECTOR( gGameExternalOptions.ubDefaultArrivalSectorX, gGameExternalOptions.ubDefaultArrivalSectorY ) ].fEnemyControlled = FALSE;
+ 
+	  if ( gGameLegionOptions.InJerry == TRUE ) 
 	{
 	//Set some variable so Jerry will be on the ground
 	pSoldier->fWaitingToGetupFromJA25Start = TRUE;

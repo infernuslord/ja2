@@ -26,6 +26,7 @@
 #ifdef JA2UB
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
+#include "legion cfg.h"
 #endif
 
 #include "GameSettings.h"	// ary-05/05/2009 : add forced turn mode
@@ -1580,7 +1581,7 @@ void AddSoldierToSectorGridNo( SOLDIERTYPE *pSoldier, INT32 sGridNo, UINT8 ubDir
 				{
 #ifdef JA2UB				
 					// DAVE!!!!
-					if ( gfFirstTimeInGameHeliCrash )
+					if ( gfFirstTimeInGameHeliCrash && gGameLegionOptions.InGameHeli == FALSE )
 					{
 						//should we be on our back or tummy
 						if( Random( 100 ) < 50 )

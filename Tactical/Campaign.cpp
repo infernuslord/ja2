@@ -1339,13 +1339,19 @@ void HandleUnhiredMercDeaths( INT32 iProfileID )
 
 		//send an email as long as the merc is from aim
 #ifdef JA2UB
-		//ja25 ub
+		//ja25 ub	
+	if( gubQuest[ QUEST_FIX_LAPTOP ] == QUESTDONE || gGameLegionOptions.LaptopQuestEnabled == FALSE )
+	{
+		if ( gProfilesAIM[ iProfileID ].ProfilId == iProfileID && gGameLegionOptions.fDeadMerc == TRUE )  //new profiles by Jazz
+			//send an email to the player telling the player that a merc died
+			AddEmailWithSpecialData(206, MERC_DIED_ON_OTHER_ASSIGNMENT_LENGTH, AIM_SITE, GetWorldTotalMin(), 0, iProfileID, TYPE_EMAIL_DEAD_MERC_AIM_SITE_EMAIL_JA2_EDT, TYPE_E_AIM_L1 );
+	}
 #else
 	//	if( iProfileID < BIFF )
 		if ( gProfilesAIM[ iProfileID ].ProfilId == iProfileID )  //new profiles by Jazz
 		{
 			//send an email to the player telling the player that a merc died
-			AddEmailWithSpecialData(MERC_DIED_ON_OTHER_ASSIGNMENT, MERC_DIED_ON_OTHER_ASSIGNMENT_LENGTH, AIM_SITE, GetWorldTotalMin(), 0, iProfileID, TYPE_EMAIL_EMAIL_EDT );
+			AddEmailWithSpecialData(MERC_DIED_ON_OTHER_ASSIGNMENT, MERC_DIED_ON_OTHER_ASSIGNMENT_LENGTH, AIM_SITE, GetWorldTotalMin(), 0, iProfileID, TYPE_EMAIL_EMAIL_EDT, TYPE_E_NONE );
 		}
 #endif
 	}

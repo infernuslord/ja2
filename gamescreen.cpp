@@ -619,24 +619,24 @@ UINT32	MainGameScreenHandle(void)
 
 #ifdef JA2UB		
 		//if it is the first time in the game, and we are doing the heli crash code, locate to a different spot
-		if( gfFirstTimeInGameHeliCrash )
+		if( gfFirstTimeInGameHeliCrash && gGameLegionOptions.InGameHeli == FALSE )
 		{
 			InternalLocateGridNo( gGameLegionOptions.LOCATEGRIDNO, TRUE ); // 15427
         }
         else
         {
-                     if ( gGameLegionOptions.InGameHeliCrash == TRUE )
-						InternalLocateGridNo( gMapInformation.sNorthGridNo, TRUE );
-                     else
-						InternalLocateGridNo( gGameLegionOptions.LOCATEGRIDNO, TRUE );
-			
+            if ( gGameLegionOptions.InGameHeliCrash == TRUE )
+				//InternalLocateGridNo( gMapInformation.sNorthGridNo, TRUE );
+				  InternalLocateGridNo( gGameLegionOptions.LOCATEGRIDNO, TRUE );
+            else
+				InternalLocateGridNo( gGameLegionOptions.LOCATEGRIDNO, TRUE );
         }
 #else
-			InternalLocateGridNo( gMapInformation.sNorthGridNo, TRUE );
+			InternalLocateGridNo( gGameExternalOptions.iInitialMercArrivalLocation, TRUE );
 #endif			
 		// Start heli Run...
 #ifdef JA2UB
-		StartHelicopterRun( gMapInformation.sNorthGridNo );
+		StartHelicopterRun( gGameLegionOptions.LOCATEGRIDNO ); //gMapInformation.sNorthGridNo );
 #else
 		//StartHelicopterRun( gMapInformation.sNorthGridNo );
 		StartHelicopterRun( gGameExternalOptions.iInitialMercArrivalLocation );
@@ -1207,7 +1207,8 @@ void InitHelicopterEntranceByMercs( void )
 		//if ( gGameOptions.fAirStrikes )
 		//	ScheduleAirRaid( &AirRaidDef );
 #ifdef JA2UB		
-		HandleInitialEventsInHeliCrash(); //JA25 UB
+		if ( gGameLegionOptions.InGameHeli == FALSE )
+			HandleInitialEventsInHeliCrash(); //JA25 UB
 #endif
 		gfTacticalDoHeliRun = TRUE;
 		gfFirstHeliRun			= TRUE;

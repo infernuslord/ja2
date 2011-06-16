@@ -375,7 +375,7 @@ public:
 	INT8		bEvolution;
 	UINT8		ubMiscFlags;
 	UINT8		bSexist;
-	INT8		bLearnToHate;
+	UINT8		bLearnToHate;
 
 	// skills
 	INT8		bStealRate;
@@ -505,7 +505,7 @@ public:
 	INT8 bBaseMorale;
 	UINT16 sMedicalDepositAmount;
 	
-	INT8 bLearnToLike;
+	UINT8 bLearnToLike;
 	UINT8 ubApproachVal[4];
 	UINT8 ubApproachMod[3][4];
 	INT8 bTown;
@@ -618,7 +618,7 @@ public:
 	INT8		bEvolution;
 	UINT8		ubMiscFlags;
 	UINT8		bSexist;
-	INT8		bLearnToHate;
+	UINT8		bLearnToHate;
 
 	// skills
 	INT8		bStealRate;
@@ -699,8 +699,8 @@ public:
 	//INT8	bSkillTrait3; // added by SANDRO
 	INT8	bLeadership;
 
-	INT8	bBuddy[5];
-	INT8	bHated[5];
+	UINT8	bBuddy[5];
+	UINT8	bHated[5];
 	INT8	bExpLevel;		// general experience level
 
 	INT8	bMarksmanship;
@@ -750,7 +750,7 @@ public:
 	INT8 bBaseMorale;
 	UINT16 sMedicalDepositAmount;
 	
-	INT8 bLearnToLike;
+	UINT8 bLearnToLike;
 	UINT8 ubApproachVal[4];
 	UINT8 ubApproachMod[3][4];
 	INT8 bTown;

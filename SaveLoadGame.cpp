@@ -152,6 +152,7 @@
 #include "Strategic Movement.h"
 #include "LuaInitNPCs.h"
 #include "Legion cfg.h"
+#include "Ja25Update.h"
 #endif
 
 #include "LuaInitNPCs.h"
@@ -431,11 +432,47 @@ typedef struct
 
 	// HEADROCK HAM 3.6: Global variable keeping track of Militia Upkeep Costs at last midnight.
 	UINT32 uiTotalUpkeepForMilitia;
+	
+	UINT32 	sMercArrivalGridNo;
 
 //JA25 UB
 #ifdef JA2UB
 	INT8		fMorrisShouldSayHi;
 	BOOLEAN		fFirstTimeInGameHeliCrash;
+	UINT32	sINITIALHELIGRIDNO[ 7 ];
+	UINT32	sLOCATEGRIDNO;
+	UINT32  sLOCATEGRIDNO2;
+	UINT32  sJerryGridNo;
+	
+	BOOLEAN sJerryQuotes;
+	BOOLEAN sInJerry;
+	BOOLEAN sInGameHeliCrash;
+	BOOLEAN sLaptopQuestEnabled;
+	BOOLEAN sTEX_AND_JOHN;
+	BOOLEAN sRandom_Manuel_Text;
+	
+	BOOLEAN sEVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE_UB;
+	BOOLEAN sHandleAddingEnemiesToTunnelMaps_UB;
+	
+	BOOLEAN sInGameHeli;
+	BOOLEAN spJA2UB;
+	
+	BOOLEAN sfDeadMerc;
+	
+	UINT8 subEndDefaultSectorX;
+	UINT8 subEndDefaultSectorY;
+	UINT8 subEndDefaultSectorZ;
+	
+	BOOLEAN sTestUB;
+	
+	BOOLEAN sLaptopLinkInsurance;
+	BOOLEAN sLaptopLinkFuneral;
+	BOOLEAN sLaptopLinkBobby;
+	
+	BOOLEAN ubFiller2[255];
+	UINT32 ubFiller3[255];
+	INT8 ubFiller4[255];
+	
 #endif
 
 	// HEADROCK HAM 4: Added manual restrictions
@@ -1229,7 +1266,7 @@ BOOLEAN MERCPROFILESTRUCT::Load(HWFILE hFile, bool forceLoadOldVersion, bool for
 		numBytesRead = ReadFieldByField( hFile, &this->bEvolution, sizeof(this->bEvolution), sizeof(INT8), numBytesRead);
 		numBytesRead = ReadFieldByField( hFile, &this->ubMiscFlags, sizeof(this->ubMiscFlags), sizeof(UINT8), numBytesRead);
 		numBytesRead = ReadFieldByField( hFile, &this->bSexist, sizeof(this->bSexist), sizeof(UINT8), numBytesRead);
-		numBytesRead = ReadFieldByField( hFile, &this->bLearnToHate, sizeof(this->bLearnToHate), sizeof(INT8), numBytesRead);
+		numBytesRead = ReadFieldByField( hFile, &this->bLearnToHate, sizeof(this->bLearnToHate), sizeof(UINT8), numBytesRead);
 		numBytesRead = ReadFieldByField( hFile, &this->bStealRate, sizeof(this->bStealRate), sizeof(INT8), numBytesRead);
 		numBytesRead = ReadFieldByField( hFile, &this->bVocalVolume, sizeof(this->bVocalVolume), sizeof(INT8), numBytesRead);
 		numBytesRead = ReadFieldByField( hFile, &this->ubQuoteRecord, sizeof(this->ubQuoteRecord), sizeof(UINT8), numBytesRead);
@@ -1307,8 +1344,8 @@ BOOLEAN MERCPROFILESTRUCT::Load(HWFILE hFile, bool forceLoadOldVersion, bool for
 			numBytesRead += 28;
 		}
 		numBytesRead = ReadFieldByField( hFile, &this->bLeadership, sizeof(this->bLeadership), sizeof(INT8), numBytesRead);
-		numBytesRead = ReadFieldByField( hFile, this->bBuddy, sizeof(this->bBuddy), sizeof(INT8), numBytesRead);
-		numBytesRead = ReadFieldByField( hFile, this->bHated, sizeof(this->bHated), sizeof(INT8), numBytesRead);
+		numBytesRead = ReadFieldByField( hFile, this->bBuddy, sizeof(this->bBuddy), sizeof(UINT8), numBytesRead);
+		numBytesRead = ReadFieldByField( hFile, this->bHated, sizeof(this->bHated), sizeof(UINT8), numBytesRead);
 		numBytesRead = ReadFieldByField( hFile, &this->bExpLevel, sizeof(this->bExpLevel), sizeof(INT8), numBytesRead);
 		numBytesRead = ReadFieldByField( hFile, &this->bMarksmanship, sizeof(this->bMarksmanship), sizeof(INT8), numBytesRead);
 		numBytesRead = ReadFieldByField( hFile, &this->bMinService, sizeof(this->bMinService), sizeof(UINT8), numBytesRead);
@@ -1351,7 +1388,7 @@ BOOLEAN MERCPROFILESTRUCT::Load(HWFILE hFile, bool forceLoadOldVersion, bool for
 		if(guiCurrentSaveGameVersion < STOMP12_SAVEGAME_DATATYPE_CHANGE)
 			ReadFieldByField( hFile, &filler, sizeof(UINT8), sizeof(UINT8), numBytesRead);
 		numBytesRead = ReadFieldByField( hFile, &this->sMedicalDepositAmount, sizeof(this->sMedicalDepositAmount), sizeof(UINT16), numBytesRead);
-		numBytesRead = ReadFieldByField( hFile, &this->bLearnToLike, sizeof(this->bLearnToLike), sizeof(INT8), numBytesRead);
+		numBytesRead = ReadFieldByField( hFile, &this->bLearnToLike, sizeof(this->bLearnToLike), sizeof(UINT8), numBytesRead);
 		numBytesRead = ReadFieldByField( hFile, this->ubApproachVal, sizeof(this->ubApproachVal), sizeof(UINT8), numBytesRead);
 		numBytesRead = ReadFieldByField( hFile, this->ubApproachMod, sizeof(this->ubApproachMod), sizeof(UINT8), numBytesRead);
 		numBytesRead = ReadFieldByField( hFile, &this->bTown, sizeof(this->bTown), sizeof(INT8), numBytesRead);
@@ -5107,6 +5144,9 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 #endif
 	}
 
+	// WANNE: I disabled that for now, because I am not sure if this works like intended
+	// We got some problems with the merc portraits, so if disabled we are on the safe side.
+	/*
 	// CHRISL: To set camo faces correctly from the start
 	for( UINT16 cnt=0; cnt< CODE_MAXIMUM_NUMBER_OF_PLAYER_MERCS; cnt++)
 	{
@@ -5121,6 +5161,7 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 			}
 		}
 	}
+	*/
 
 	// ATE: Patch? Patch up groups.....( will only do for old saves.. )
 	UpdatePersistantGroupsFromOldSave( guiCurrentSaveGameVersion );
@@ -5134,6 +5175,25 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 		CancelAllPendingBRPurchaseOrders();
 	}
 
+	// WANNE: THis should fix the bug with initializing problem in GameInit.lua on startup, in which we could meet crepitus in Tixa underground map
+	if(guiCurrentSaveGameVersion < FIXED_CREPITUS_IN_REALISTIC_GAME_MODE)
+ 	{
+		if ( gGameOptions.ubGameStyle == STYLE_SCIFI && gGameExternalOptions.fEnableCrepitus )
+		{
+			// Nothing to do here
+		}
+		else
+		{ //not scifi, so use alternate map in Tixa's b1 level that doesn't have the stairs going down to the caves.
+			UNDERGROUND_SECTORINFO *pSector;
+			pSector = FindUnderGroundSector( 9, 10, 1 ); //j9_b1
+			if( pSector )
+			{
+				pSector->uiFlags |= SF_USE_ALTERNATE_MAP;
+			}
+		}
+	}
+
+	// ---------------------------------------------------------------------------
 
 	//if the world is loaded, apply the temp files to the loaded map
 	if( SaveGameHeader.fWorldLoaded || guiCurrentSaveGameVersion < 50 )
@@ -5424,11 +5484,6 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 
 	return( TRUE );
 }
-
-
-
-
-
 
 
 BOOLEAN SaveMercProfiles( HWFILE hFile )
@@ -6046,8 +6101,18 @@ BOOLEAN SaveEmailToSavedGame( HWFILE hFile )
 	//loop through all the email to find out the total number
 	while(pEmail)
 	{
+		gEmailT[ uiNumOfEmails ].EmailType = 0; //reset
+		gEmailT[ uiNumOfEmails ].EmailType = pEmail->EmailType;
+	
 		pEmail=pEmail->Next;
+		
 		uiNumOfEmails++;
+	}
+	
+	FileWrite( hFile, &gEmailT, sizeof( gEmailT ) , &uiNumBytesWritten ); 
+	if( uiNumBytesWritten != sizeof( gEmailT ) )
+	{
+		return( FALSE );
 	}
 
 	uiSizeOfEmails = sizeof( Email ) * uiNumOfEmails;
@@ -6102,6 +6167,11 @@ BOOLEAN SaveEmailToSavedGame( HWFILE hFile )
 		SavedEmail.iCurrentShipmentDestinationID = pEmail->iCurrentShipmentDestinationID;
 		
 		SavedEmail.EmailVersion = pEmail->EmailVersion;
+		//SavedEmail.EmailType = pEmail->EmailType;
+		
+	//	gEmailT[ cnt].EmailType = 0; //reset
+	//	gEmailT[ cnt ].EmailType = pEmail->EmailType;
+		
 		
 		// write the email header to the saved game file
 		FileWrite( hFile, &SavedEmail, sizeof( SavedEmailStruct ), &uiNumBytesWritten );
@@ -6131,6 +6201,12 @@ BOOLEAN LoadEmailFromSavedGame( HWFILE hFile )
 
 	//Delete the existing list of emails
 	ShutDownEmailList();
+	
+	FileRead( hFile, &gEmailT, sizeof( gEmailT ) , &uiNumBytesRead ); 
+	if( uiNumBytesRead != sizeof( gEmailT )   )  
+	{
+		return( FALSE );
+	}
 
 	pEmailList = NULL;
 	//Allocate memory for the header node
@@ -6173,7 +6249,7 @@ BOOLEAN LoadEmailFromSavedGame( HWFILE hFile )
 
 		//CHRISL: Adjust this so we can change the SavedEmailStruct without hurting savegame compatability
  		//get the rest of the data from the email
-		INT32	numBytesRead = 0, temp, temp2;
+		INT32	numBytesRead = 0;//, temp, temp2;
 		numBytesRead = ReadFieldByField(hFile, &SavedEmail.usOffset, sizeof(SavedEmail.usOffset), sizeof(UINT16), numBytesRead);
 		numBytesRead = ReadFieldByField(hFile, &SavedEmail.usLength, sizeof(SavedEmail.usLength), sizeof(UINT16), numBytesRead);
 		numBytesRead = ReadFieldByField(hFile, &SavedEmail.ubSender, sizeof(SavedEmail.ubSender), sizeof(UINT8), numBytesRead);
@@ -6189,6 +6265,8 @@ BOOLEAN LoadEmailFromSavedGame( HWFILE hFile )
 		numBytesRead = ReadFieldByField(hFile, &SavedEmail.fNew, sizeof(SavedEmail.fNew), sizeof(BOOLEAN), numBytesRead);
 		numBytesRead = ReadFieldByField(hFile, &SavedEmail.iCurrentIMPPosition, sizeof(SavedEmail.iCurrentIMPPosition), sizeof(INT32), numBytesRead);
 		numBytesRead = ReadFieldByField(hFile, &SavedEmail.EmailVersion, sizeof(SavedEmail.EmailVersion), sizeof(UINT8), numBytesRead);	
+	//	numBytesRead = ReadFieldByField(hFile, &SavedEmail.EmailType, sizeof(SavedEmail.EmailType), sizeof(UINT32), numBytesRead);	
+	
 	//	if(guiCurrentSaveGameVersion >= BR_EMAIL_DATA_CHANGE){
 			numBytesRead = ReadFieldByField(hFile, &SavedEmail.iCurrentShipmentDestinationID, sizeof(SavedEmail.iCurrentShipmentDestinationID), sizeof(INT16), numBytesRead);
 			//We need these extra 2 bytes so that the structure's total size is evenly divisible by 4
@@ -6235,6 +6313,8 @@ BOOLEAN LoadEmailFromSavedGame( HWFILE hFile )
 		pTempEmail->iCurrentShipmentDestinationID = SavedEmail.iCurrentShipmentDestinationID;
 		
 		pTempEmail->EmailVersion = SavedEmail.EmailVersion;
+		
+		pTempEmail->EmailType = gEmailT[ cnt ].EmailType; //SavedEmail.EmailType;
 
 		//add the current email in
 		pEmail->Next = pTempEmail;
@@ -6261,7 +6341,7 @@ BOOLEAN LoadEmailFromSavedGame( HWFILE hFile )
 		MemFree( pEmailList );
 		pEmailList = NULL;
 	}
-
+	
 	return( TRUE );
 }
 
@@ -7317,6 +7397,45 @@ BOOLEAN SaveGeneralInfo( HWFILE hFile )
 	{
 		sGeneralInfo.HiddenNames[i] = !zHiddenNames[i].Hidden; //legion2
 	}
+	
+	sGeneralInfo.sMercArrivalGridNo	= gGameExternalOptions.iInitialMercArrivalLocation;
+	
+#ifdef JA2UB		
+	sGeneralInfo.sINITIALHELIGRIDNO[ 0 ] = gGameLegionOptions.INITIALHELIGRIDNO[ 0 ];//14947;
+	sGeneralInfo.sINITIALHELIGRIDNO[ 1 ] = gGameLegionOptions.INITIALHELIGRIDNO[ 1 ];//15584;//16067;
+	sGeneralInfo.sINITIALHELIGRIDNO[ 2 ] = gGameLegionOptions.INITIALHELIGRIDNO[ 2 ];//15754;
+	sGeneralInfo.sINITIALHELIGRIDNO[ 3 ] = gGameLegionOptions.INITIALHELIGRIDNO[ 3 ];//16232;
+	sGeneralInfo.sINITIALHELIGRIDNO[ 4 ] = gGameLegionOptions.INITIALHELIGRIDNO[ 4 ];//16067;
+	sGeneralInfo.sINITIALHELIGRIDNO[ 5 ] = gGameLegionOptions.INITIALHELIGRIDNO[ 5 ];//16230;
+	sGeneralInfo.sINITIALHELIGRIDNO[ 6 ] = gGameLegionOptions.INITIALHELIGRIDNO[ 6 ];//15272;
+	
+	sGeneralInfo.sLOCATEGRIDNO				= gGameLegionOptions.LOCATEGRIDNO;
+	sGeneralInfo.sLOCATEGRIDNO2				= gGameLegionOptions.LOCATEGRIDNO2;
+	sGeneralInfo.sInGameHeliCrash			= gGameLegionOptions.InGameHeliCrash;
+	sGeneralInfo.sJerryGridNo				= gGameLegionOptions.JerryGridNo;
+	sGeneralInfo.sJerryQuotes				= gGameLegionOptions.JerryQuotes;
+	sGeneralInfo.sInJerry					= gGameLegionOptions.InJerry;
+	sGeneralInfo.sLaptopQuestEnabled		= gGameLegionOptions.LaptopQuestEnabled;
+	sGeneralInfo.sTEX_AND_JOHN				= gGameLegionOptions.TEX_AND_JOHN;
+	sGeneralInfo.sRandom_Manuel_Text		= gGameLegionOptions.Random_Manuel_Text;
+	sGeneralInfo.sEVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE_UB		= gGameLegionOptions.EVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE_UB;
+	sGeneralInfo.sHandleAddingEnemiesToTunnelMaps_UB						= gGameLegionOptions.HandleAddingEnemiesToTunnelMaps_UB;
+	sGeneralInfo.sInGameHeli				= gGameLegionOptions.InGameHeli;
+	sGeneralInfo.spJA2UB					= gGameLegionOptions.pJA2UB;
+	
+	sGeneralInfo.sfDeadMerc					= gGameLegionOptions.fDeadMerc;
+	
+	sGeneralInfo.subEndDefaultSectorX		= gGameLegionOptions.ubEndDefaultSectorX;
+	sGeneralInfo.subEndDefaultSectorY		= gGameLegionOptions.ubEndDefaultSectorY;
+	sGeneralInfo.subEndDefaultSectorZ		= gGameLegionOptions.ubEndDefaultSectorZ;
+	
+	sGeneralInfo.sTestUB					= gGameLegionOptions.TestUB;
+	
+	sGeneralInfo.sLaptopLinkInsurance		= gGameLegionOptions.LaptopLinkInsurance;
+	sGeneralInfo.sLaptopLinkFuneral			= gGameLegionOptions.LaptopLinkFuneral;
+	sGeneralInfo.sLaptopLinkBobby			= gGameLegionOptions.LaptopLinkBobby;
+	
+#endif
 
 	//Setup the 
 	//Save the current music mode
@@ -7458,13 +7577,47 @@ BOOLEAN LoadGeneralInfo( HWFILE hFile )
 	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sSkyriderCostModifier, sizeof(sGeneralInfo.sSkyriderCostModifier), sizeof(INT16), numBytesRead);
 	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.fOutstandingFacilityDebt, sizeof(sGeneralInfo.fOutstandingFacilityDebt), sizeof(BOOLEAN), numBytesRead);
 	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.uiTotalUpkeepForMilitia, sizeof(sGeneralInfo.uiTotalUpkeepForMilitia), sizeof(UINT32), numBytesRead);
-
+	
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sMercArrivalGridNo, sizeof(sGeneralInfo.sMercArrivalGridNo), sizeof(UINT32), numBytesRead);
 #ifdef JA2UB
 	//ja25 UB
 	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.fMorrisShouldSayHi, sizeof(sGeneralInfo.fMorrisShouldSayHi), sizeof(INT8), numBytesRead);
 	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.fFirstTimeInGameHeliCrash, sizeof(sGeneralInfo.fFirstTimeInGameHeliCrash), sizeof(BOOLEAN), numBytesRead);
-#endif
 
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sINITIALHELIGRIDNO, sizeof(sGeneralInfo.sINITIALHELIGRIDNO), sizeof(UINT32), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sLOCATEGRIDNO, sizeof(sGeneralInfo.sLOCATEGRIDNO), sizeof(UINT32), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sLOCATEGRIDNO2, sizeof(sGeneralInfo.sLOCATEGRIDNO2), sizeof(UINT32), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sJerryGridNo, sizeof(sGeneralInfo.sJerryGridNo), sizeof(UINT32), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sJerryQuotes, sizeof(sGeneralInfo.sJerryQuotes), sizeof(BOOLEAN), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sInJerry, sizeof(sGeneralInfo.sInJerry), sizeof(BOOLEAN), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sInGameHeliCrash, sizeof(sGeneralInfo.sInGameHeliCrash), sizeof(BOOLEAN), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sLaptopQuestEnabled, sizeof(sGeneralInfo.sLaptopQuestEnabled), sizeof(BOOLEAN), numBytesRead);
+
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sTEX_AND_JOHN, sizeof(sGeneralInfo.sTEX_AND_JOHN), sizeof(BOOLEAN), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sRandom_Manuel_Text, sizeof(sGeneralInfo.sRandom_Manuel_Text), sizeof(BOOLEAN), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sEVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE_UB, sizeof(sGeneralInfo.sEVENT_ATTACK_INITIAL_SECTOR_IF_PLAYER_STILL_THERE_UB), sizeof(BOOLEAN), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sHandleAddingEnemiesToTunnelMaps_UB, sizeof(sGeneralInfo.sHandleAddingEnemiesToTunnelMaps_UB), sizeof(BOOLEAN), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sInGameHeli, sizeof(sGeneralInfo.sInGameHeli), sizeof(BOOLEAN), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.spJA2UB, sizeof(sGeneralInfo.spJA2UB), sizeof(BOOLEAN), numBytesRead);
+	
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sfDeadMerc, sizeof(sGeneralInfo.sfDeadMerc), sizeof(BOOLEAN), numBytesRead);
+	
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.subEndDefaultSectorX, sizeof(sGeneralInfo.subEndDefaultSectorX), sizeof(UINT8), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.subEndDefaultSectorY, sizeof(sGeneralInfo.subEndDefaultSectorY), sizeof(UINT8), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.subEndDefaultSectorZ, sizeof(sGeneralInfo.subEndDefaultSectorZ), sizeof(UINT8), numBytesRead);
+
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sTestUB, sizeof(sGeneralInfo.sTestUB), sizeof(BOOLEAN), numBytesRead);
+
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sLaptopLinkInsurance, sizeof(sGeneralInfo.sLaptopLinkInsurance), sizeof(BOOLEAN), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sLaptopLinkFuneral, sizeof(sGeneralInfo.sLaptopLinkFuneral), sizeof(BOOLEAN), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.sLaptopLinkBobby, sizeof(sGeneralInfo.sLaptopLinkBobby), sizeof(BOOLEAN), numBytesRead);
+	
+
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.ubFiller2, sizeof(sGeneralInfo.ubFiller2), sizeof(BOOLEAN), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.ubFiller3, sizeof(sGeneralInfo.ubFiller3), sizeof(UINT32), numBytesRead);
+	numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.ubFiller4, sizeof(sGeneralInfo.ubFiller4), sizeof(INT8), numBytesRead);
+
+#endif	
 	if ( guiCurrentSaveGameVersion >= NEW_GENERAL_SAVE_INFO_DATA ){
 		numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.ubManualRestrictMilitia, sizeof(sGeneralInfo.ubManualRestrictMilitia), sizeof(UINT8), numBytesRead);
 		numBytesRead = ReadFieldByField(hFile, &sGeneralInfo.HiddenNames, sizeof(sGeneralInfo.HiddenNames), sizeof(BOOLEAN), numBytesRead);
@@ -7703,6 +7856,12 @@ BOOLEAN LoadGeneralInfo( HWFILE hFile )
 
 	gsMercArriveSectorX = sGeneralInfo.sMercArriveSectorX;
 	gsMercArriveSectorY = sGeneralInfo.sMercArriveSectorY;
+	
+	gGameExternalOptions.ubDefaultArrivalSectorX = gsMercArriveSectorX;
+	gGameExternalOptions.ubDefaultArrivalSectorY = gsMercArriveSectorY;
+	
+	JA2_5_START_SECTOR_X = gGameLegionOptions.ubDefaultArrivalSectorX;
+	JA2_5_START_SECTOR_Y = gGameLegionOptions.ubDefaultArrivalSectorY;
 
 	gfCreatureMeanwhileScenePlayed = sGeneralInfo.fCreatureMeanwhileScenePlayed;
 
@@ -7753,6 +7912,37 @@ BOOLEAN LoadGeneralInfo( HWFILE hFile )
 	{
 		zHiddenNames[i].Hidden = !sGeneralInfo.HiddenNames[i];
 	}
+	
+	gGameExternalOptions.iInitialMercArrivalLocation = sGeneralInfo.sMercArrivalGridNo;
+	
+	gGameLegionOptions.INITIALHELIGRIDNO[ 0 ] = sGeneralInfo.sINITIALHELIGRIDNO[ 0 ];//14947;
+	gGameLegionOptions.INITIALHELIGRIDNO[ 1 ] = sGeneralInfo.sINITIALHELIGRIDNO[ 1 ];//15584;//16067;
+	gGameLegionOptions.INITIALHELIGRIDNO[ 2 ] = sGeneralInfo.sINITIALHELIGRIDNO[ 2 ];//15754;
+	gGameLegionOptions.INITIALHELIGRIDNO[ 3 ] = sGeneralInfo.sINITIALHELIGRIDNO[ 3 ];//16232;
+	gGameLegionOptions.INITIALHELIGRIDNO[ 4 ] = sGeneralInfo.sINITIALHELIGRIDNO[ 4 ];//16067;
+	gGameLegionOptions.INITIALHELIGRIDNO[ 5 ] = sGeneralInfo.sINITIALHELIGRIDNO[ 5 ];//16230;
+	gGameLegionOptions.INITIALHELIGRIDNO[ 6 ] = sGeneralInfo.sINITIALHELIGRIDNO[ 6 ];//15272;
+	
+	gGameLegionOptions.LOCATEGRIDNO				= sGeneralInfo.sLOCATEGRIDNO;
+	gGameLegionOptions.LOCATEGRIDNO2			= sGeneralInfo.sLOCATEGRIDNO2;
+	gGameLegionOptions.InGameHeliCrash			= sGeneralInfo.sInGameHeliCrash;
+	gGameLegionOptions.JerryGridNo				= sGeneralInfo.sJerryGridNo;
+	gGameLegionOptions.JerryQuotes				= sGeneralInfo.sJerryQuotes;
+	gGameLegionOptions.InJerry					= sGeneralInfo.sInJerry;
+	gGameLegionOptions.InGameHeli				= sGeneralInfo.sInGameHeli;
+	gGameLegionOptions.pJA2UB					= sGeneralInfo.spJA2UB;
+	
+	gGameLegionOptions.fDeadMerc 				= sGeneralInfo.sfDeadMerc;
+	
+	gGameLegionOptions.ubEndDefaultSectorX 		= sGeneralInfo.subEndDefaultSectorX;
+	gGameLegionOptions.ubEndDefaultSectorY 		= sGeneralInfo.subEndDefaultSectorY;
+	gGameLegionOptions.ubEndDefaultSectorZ 		= sGeneralInfo.subEndDefaultSectorZ;
+	
+	gGameLegionOptions.TestUB 					= sGeneralInfo.sTestUB;
+	
+	gGameLegionOptions.LaptopLinkInsurance 		= sGeneralInfo.sLaptopLinkInsurance;
+	gGameLegionOptions.LaptopLinkFuneral 		= sGeneralInfo.sLaptopLinkFuneral;
+	gGameLegionOptions.LaptopLinkBobby 			= sGeneralInfo.sLaptopLinkBobby;
 	
 	if ( gGameExternalOptions.fShowCamouflageFaces == TRUE ) 
 	{

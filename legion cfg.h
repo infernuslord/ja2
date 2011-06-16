@@ -92,7 +92,7 @@ typedef struct
 	BOOLEAN MercStartingGear25XML;
 	UINT32	INITIALHELIGRIDNO[ 7 ];
 	INT16	INITIALHELIRANDOMTIMES[ 7 ];
-	INT32	LOCATEGRIDNO;
+	UINT32	LOCATEGRIDNO;
 	BOOLEAN LAPTOP_IMP_PASS_JA2;
 	BOOLEAN LAPTOP_IMP_PASS_UB;
 	
@@ -114,7 +114,9 @@ typedef struct
 	
 	BOOLEAN InGameHeliCrash;
 	
-	INT32 LOCATEGRIDNO2;
+	BOOLEAN InGameHeli;
+	
+	UINT32 LOCATEGRIDNO2;
 	
 	BOOLEAN JerryQuotes;
 	
@@ -138,6 +140,21 @@ typedef struct
 	UINT32  STOPPOWERGENFAN_GRIDNOa;
 	
 	BOOLEAN TestUB;
+	
+	BOOLEAN LaptopLinkInsurance;
+	BOOLEAN LaptopLinkFuneral;
+	BOOLEAN LaptopLinkBobby;
+	
+	UINT32 IsFanGraphicInSectorAtThisGridNoA[9];
+	
+	UINT8 ubEndDefaultSectorX;
+	UINT8 ubEndDefaultSectorY;
+	UINT8 ubEndDefaultSectorZ;
+	
+	BOOLEAN pJA2UB;
+	
+	BOOLEAN fBobbyRSite;
+	BOOLEAN fDeadMerc;
        
 } GAME_LEGION_OPTIONS;
 

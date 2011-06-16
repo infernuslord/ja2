@@ -45,6 +45,10 @@
 	#include "Overhead.h"
 #endif
 
+#ifdef JA2UB
+#include "legion cfg.h"
+#endif
+
 
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
@@ -480,7 +484,9 @@ void HandleHeliDrop( )
 			{
 				// Add merc to sector
 				#ifdef JA2UB
-				MercPtrs[ gusHeliSeats[ cnt ] ]->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
+				//MercPtrs[ gusHeliSeats[ cnt ] ]->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
+				MercPtrs[ gusHeliSeats[ cnt ] ]->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
+				MercPtrs[ gusHeliSeats[ cnt ] ]->usStrategicInsertionData = gGameLegionOptions.LOCATEGRIDNO;
 				#else
 				//MercPtrs[ gusHeliSeats[ cnt ] ]->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
 				MercPtrs[ gusHeliSeats[ cnt ] ]->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
@@ -622,7 +628,9 @@ void HandleHeliDrop( )
 
 						// Change insertion code
 #ifdef JA2UB
-						MercPtrs[ gusHeliSeats[ gbCurDrop ] ]->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
+						//MercPtrs[ gusHeliSeats[ gbCurDrop ] ]->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
+						MercPtrs[ gusHeliSeats[ gbCurDrop ] ]->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
+						MercPtrs[ gusHeliSeats[ gbCurDrop ] ]->usStrategicInsertionData = gGameLegionOptions.LOCATEGRIDNO;
 #else
 						//MercPtrs[ gusHeliSeats[ gbCurDrop ] ]->ubStrategicInsertionCode = INSERTION_CODE_NORTH;
 						MercPtrs[ gusHeliSeats[ gbCurDrop ] ]->ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
@@ -835,7 +843,7 @@ void HandleFirstHeliDropOfGame( )
 
 		// Move to header file...
 		// HEADROCK HAM 3.5: Externalized!
-		AddExtraItems( gGameExternalOptions.ubDefaultArrivalSectorX, gGameExternalOptions.ubDefaultArrivalSectorY, startingZ, true );
+		AddExtraItems( (UINT8)gGameExternalOptions.ubDefaultArrivalSectorX, (UINT8)gGameExternalOptions.ubDefaultArrivalSectorY, startingZ, true );
 
 		// HEADROCK HAM 3.5: Starting sector externalized - might not contain enemies at all!
 		if (NumEnemyInSector( ) > 0)

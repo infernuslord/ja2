@@ -1568,27 +1568,27 @@ BOOLEAN DisplayMercsInventory(UINT8 ubMercID)
 	CHAR16			gzItemName[ SIZE_ITEM_NAME ];
 	UINT8			ubItemCount=0;
 	UINT8			ubColumnCount=0;
-//	UINT16			gzTempItemName[ SIZE_ITEM_INFO ];
-	
 
 	//if the mercs inventory has already been purchased, dont display the inventory
 	if( gMercProfiles[ ubMercID ].ubMiscFlags & PROFILE_MISC_FLAG_ALREADY_USED_ITEMS )
 		return( TRUE );
 
 	if(gGameExternalOptions.gfUseNewStartingGearInterface)
-	{
+	{		
 		UINT16 wnameY = AIM_MEMBER_WEAPON_NAME_Y;
 		PosX = WEAPONBOX_X_NSGI+3;		// + 3 ( 1 to take care of the shadow, +2 to get past the weapon box border )
 		PosY = WEAPONBOX_Y_NSGI;
 		if(is_networked && guiCurrentLaptopMode == LAPTOP_MODE_MERC_FILES)
 		{
-			PosY-=30;
-			wnameY-=30;
+			PosX+=0;
+			PosY+=24;
+			wnameY-=26;
 		}
 
 		//tais: disable Weaponbox Mouseregions to stop crashing when changing kit selection and hovering over item
 		//tooltips for weaponbox
-		for(i=0;i<WEAPONBOX_TOTAL_ITEMS;i++) {
+		for(i=0;i<WEAPONBOX_TOTAL_ITEMS;i++) 
+		{
 			MSYS_DisableRegion(&gWeaponboxFasthelpRegion[i]);
 		}
 
@@ -1606,6 +1606,7 @@ BOOLEAN DisplayMercsInventory(UINT8 ubMercID)
 				pItem = &Item[ usItem ];
 				GetVideoObject( &hVObject, GetInterfaceGraphicForItem( pItem ) );
 				UINT16 usGraphicNum = g_bUsePngItemImages ? 0 : pItem->ubGraphicNum;
+				
 				if(usGraphicNum < hVObject->usNumberOfObjects)
 				{
 					pTrav = &(hVObject->pETRLEObject[ usGraphicNum ] );
@@ -1623,36 +1624,45 @@ BOOLEAN DisplayMercsInventory(UINT8 ubMercID)
 				sCenY = PosY + ( abs( WEAPONBOX_SIZE_Y_NSGI - (int)usHeight ) / 2 ) - pTrav->sOffsetY;
 
 				//blt the shadow of the item
-				if(gGameSettings.fOptions[ TOPTION_SHOW_ITEM_SHADOW ]) BltVideoObjectOutlineShadowFromIndex( FRAME_BUFFER, GetInterfaceGraphicForItem( pItem ), usGraphicNum, sCenX-2, sCenY+2);
+				if(gGameSettings.fOptions[ TOPTION_SHOW_ITEM_SHADOW ]) 
+					BltVideoObjectOutlineShadowFromIndex( FRAME_BUFFER, GetInterfaceGraphicForItem( pItem ), usGraphicNum, sCenX-2, sCenY+2);
+				
 				//blt the item
 				BltVideoObjectOutlineFromIndex( FRAME_BUFFER, GetInterfaceGraphicForItem( pItem ), usGraphicNum, sCenX, sCenY, 0, FALSE );
-
 
 				//if there are more then 1 piece of equipment in the current slot, display how many there are
 				if( gMercProfiles[ubMercID].bInvNumber[ i ] > 1 )
 				{
 					CHAR16 zTempStr[ 32 ];
-	//				UINT16	usWidthOfNumber;
 
 					swprintf( zTempStr, L"x%d", gMercProfiles[ ubMercID ].bInvNumber[ i ] );
 
 					DrawTextToScreen( zTempStr, (UINT16)(PosX-1), (UINT16)(PosY+20), AIM_MEMBER_WEAPON_NAME_WIDTH, AIM_M_FONT_DYNAMIC_TEXT, AIM_M_WEAPON_TEXT_COLOR, FONT_MCOLOR_BLACK, FALSE, RIGHT_JUSTIFIED );
 				}
-				else
-				{
-				}
-
 
 				wcscpy( gzItemName, ShortItemNames[ usItem ] );
 				SetRegionFastHelpText( &(gWeaponboxFasthelpRegion[ubItemCount-1]), gzItemName );
 				SetRegionHelpEndCallback( &(gWeaponboxFasthelpRegion[ubItemCount-1]), HelpTextDoneCallback );
 				MSYS_EnableRegion( &gWeaponboxFasthelpRegion[ubItemCount-1] );
 
-				if(ubColumnCount == WEAPONBOX_COLUMNS) {
+				// WANNE: In a multiplayer game also display the items name on the MERC website
+				if (is_networked && guiCurrentLaptopMode == LAPTOP_MODE_MERC_FILES)
+				{
+					//if this will only be a single line, center it in the box
+					if( ( DisplayWrappedString( (UINT16)(PosX-1), wnameY, AIM_MEMBER_WEAPON_NAME_WIDTH, 2, AIM_M_WEAPON_TEXT_FONT, AIM_M_WEAPON_TEXT_COLOR,	gzItemName, FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED | DONT_DISPLAY_TEXT ) / GetFontHeight( AIM_M_WEAPON_TEXT_FONT ) ) == 1 )
+						DisplayWrappedString( (UINT16)(PosX-1), (UINT16)(wnameY+GetFontHeight( AIM_M_WEAPON_TEXT_FONT )/2), AIM_MEMBER_WEAPON_NAME_WIDTH, 2, AIM_M_WEAPON_TEXT_FONT, AIM_M_WEAPON_TEXT_COLOR,	gzItemName, FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED );
+					else
+						DisplayWrappedString( (UINT16)(PosX-1), wnameY, AIM_MEMBER_WEAPON_NAME_WIDTH, 2, AIM_M_WEAPON_TEXT_FONT, AIM_M_WEAPON_TEXT_COLOR,	gzItemName, FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED );
+				}
+
+				if(ubColumnCount == WEAPONBOX_COLUMNS) 
+				{
 					PosX = WEAPONBOX_X_NSGI+3;
 					PosY += WEAPONBOX_SIZE_Y_NSGI;
 					ubColumnCount = 0;
-				} else {
+				} 
+				else 
+				{
 					PosX += WEAPONBOX_SIZE_X_NSGI;
 				}
 			}
@@ -1665,8 +1675,9 @@ BOOLEAN DisplayMercsInventory(UINT8 ubMercID)
 		PosY = WEAPONBOX_Y;
 		if(is_networked && guiCurrentLaptopMode == LAPTOP_MODE_MERC_FILES)
 		{
-			PosY-=30;
-			wnameY-=30;
+			PosX+=20;
+			PosY-=28;
+			wnameY-=28;
 		}
 
 		for(i=0; i<gMercProfiles[ubMercID].inv.size(); i++)
@@ -1701,23 +1712,20 @@ BOOLEAN DisplayMercsInventory(UINT8 ubMercID)
 				sCenY = PosY + ( abs( WEAPONBOX_SIZE_Y - (int)usHeight ) / 2 ) - pTrav->sOffsetY;
 
 				//blt the shadow of the item
-				if(gGameSettings.fOptions[ TOPTION_SHOW_ITEM_SHADOW ]) BltVideoObjectOutlineShadowFromIndex( FRAME_BUFFER, GetInterfaceGraphicForItem( pItem ), usGraphicNum, sCenX-2, sCenY+2);
+				if(gGameSettings.fOptions[ TOPTION_SHOW_ITEM_SHADOW ]) 
+					BltVideoObjectOutlineShadowFromIndex( FRAME_BUFFER, GetInterfaceGraphicForItem( pItem ), usGraphicNum, sCenX-2, sCenY+2);
+
 				//blt the item
 				BltVideoObjectOutlineFromIndex( FRAME_BUFFER, GetInterfaceGraphicForItem( pItem ), usGraphicNum, sCenX, sCenY, 0, FALSE );
-
 
 				//if there are more then 1 piece of equipment in the current slot, display how many there are
 				if( gMercProfiles[ubMercID].bInvNumber[ i ] > 1 )
 				{
 					CHAR16 zTempStr[ 32 ];
-	//				UINT16	usWidthOfNumber;
 
 					swprintf( zTempStr, L"x%d", gMercProfiles[ ubMercID ].bInvNumber[ i ] );
 
 					DrawTextToScreen( zTempStr, (UINT16)(PosX-1), (UINT16)(PosY+20), AIM_MEMBER_WEAPON_NAME_WIDTH, AIM_M_FONT_DYNAMIC_TEXT, AIM_M_WEAPON_TEXT_COLOR, FONT_MCOLOR_BLACK, FALSE, RIGHT_JUSTIFIED );
-				}
-				else
-				{
 				}
 
 				wcscpy( gzItemName, ShortItemNames[ usItem ] );
@@ -3298,7 +3306,7 @@ UINT8 WillMercAcceptCall()
 BOOLEAN CanMercBeHired()
 {
 	UINT8	i,j;
-	INT8	bMercID;
+	UINT8	bMercID;
 	BOOLEAN fRetVal = FALSE;
 	BOOLEAN	fBuddyOnTeam=FALSE;
 
@@ -4105,7 +4113,7 @@ BOOLEAN InitDeleteVideoConferencePopUp( )
 		if( gMercProfiles[gbCurrentSoldier].usOptionalGearCost == 0 )
 			DisableButton( giBuyEquipmentButton[1] );
 
-		if(!ALLOW_EQUIP && is_networked)
+		if(!cAllowMercEquipment && is_networked)
 		{
 			gfBuyEquipment = FALSE;
 			DisableButton( giBuyEquipmentButton[0] );

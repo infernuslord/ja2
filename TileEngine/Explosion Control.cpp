@@ -108,7 +108,7 @@ extern void RecompileLocalMovementCostsForWall( INT32 sGridNo, UINT8 ubOrientati
 void FatigueCharacter( SOLDIERTYPE *pSoldier );
 
 #ifdef JA2UB
-void HandleSeeingFortifiedDoor( INT32 sGridNo );//Ja25 UB
+void HandleSeeingFortifiedDoor( UINT32 sGridNo );//Ja25 UB
 #endif
 
 #define NO_ALT_SOUND -1
@@ -4394,7 +4394,7 @@ BOOLEAN IsFanGraphicInSectorAtThisGridNo( UINT32 sGridNo )
 	if( gWorldSectorX == 13 && gWorldSectorY == MAP_ROW_J && gbWorldSectorZ == 0 )
 	{
 		//if this is the right gridno
-		if( sGridNo == 10978 || 
+		/*if( sGridNo == 10978 || 
 				sGridNo == 10979 || 
 				sGridNo == 10980 || 
 				sGridNo == 10818 || 
@@ -4403,6 +4403,16 @@ BOOLEAN IsFanGraphicInSectorAtThisGridNo( UINT32 sGridNo )
 				sGridNo == 10658 || 
 				sGridNo == 10659 || 
 				sGridNo == 10660 )
+				*/
+		if( sGridNo == gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[0] || 
+				sGridNo == gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[1] || 
+				sGridNo == gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[2] || 
+				sGridNo == gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[3] || 
+				sGridNo == gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[4] || 
+				sGridNo == gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[5] || 
+				sGridNo == gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[6] || 
+				sGridNo == gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[7] || 
+				sGridNo == gGameLegionOptions.IsFanGraphicInSectorAtThisGridNoA[8] )
 		{
 			return( TRUE );
 		}
@@ -4481,7 +4491,7 @@ void HandleExplosionsInTunnelSector( UINT32 sGridNo )
 }
 
 
-void HandleSeeingFortifiedDoor( INT32 sGridNo )
+void HandleSeeingFortifiedDoor( UINT32 sGridNo )
 {
 	INT32 sID=0;
 

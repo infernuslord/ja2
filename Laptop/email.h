@@ -10,6 +10,23 @@
 
 //---ja25 ub
 #ifdef JA2UB
+
+#define EMAIL_INSURANCE_L1 170
+#define EMAIL_INSURANCE_L2 211
+#define EMAIL_INSURANCE_L3 170
+#define EMAIL_INSURANCE_L4 173
+#define EMAIL_INSURANCE_L5 179
+#define EMAIL_INSURANCE_L6 176
+
+#define EMAIL_BOBBY_R_L1 198
+
+#define EMAIL_AIM_L1 206
+#define EMAIL_AIM_L2 27
+#define EMAIL_AIM_L3 217
+#define EMAIL_AIM_L4 214
+
+
+
 //JA25:  New emails
 // email # 1
 #define EMAIL_STARTGAME												0
@@ -152,6 +169,62 @@
 #define MERC_INVALID_LENGTH2				2							
 #define	NEW_MERCS_AT_MERC					( MERC_INVALID2 + MERC_INVALID_LENGTH2 )
 #define	NEW_MERCS_AT_MERC_LENGTH	2
+
+//Jagged Alliance 2
+
+// insurance company emails
+#define INSUR_PAYMENT					200
+#define INSUR_PAYMENT_LENGTH	3
+#define INSUR_SUSPIC					201
+#define INSUR_SUSPIC_LENGTH		3
+#define INSUR_INVEST_OVER			202
+#define INSUR_INVEST_OVER_LENGTH	3
+#define INSUR_SUSPIC_2				203
+#define INSUR_SUSPIC_2_LENGTH		3
+
+#define	BOBBYR_NOW_OPEN					204
+#define BOBBYR_NOW_OPEN_LENGTH	3
+
+#define KING_PIN_LETTER					205
+#define KING_PIN_LETTER_LENGTH 4
+
+#define	LACK_PLAYER_PROGRESS_1	206
+#define	LACK_PLAYER_PROGRESS_1_LENGTH	3
+
+#define	LACK_PLAYER_PROGRESS_2	207
+#define	LACK_PLAYER_PROGRESS_2_LENGTH	3
+
+#define	LACK_PLAYER_PROGRESS_3	208
+#define	LACK_PLAYER_PROGRESS_3_LENGTH	3
+
+//A package from bobby r has arrived in Drassen
+#define	BOBBYR_SHIPMENT_ARRIVED	199
+#define	BOBBYR_SHIPMENT_ARRIVED_LENGTH	4
+
+// John Kulba has left the gifts for theplayers in drassen
+#define	JOHN_KULBA_GIFT_IN_DRASSEN	209
+#define	JOHN_KULBA_GIFT_IN_DRASSEN_LENGTH	4
+
+//when a merc dies on ANOTHER assignment ( ie not with the player )
+#define	MERC_DIED_ON_OTHER_ASSIGNMENT	210
+#define	MERC_DIED_ON_OTHER_ASSIGNMENT_LENGTH	5
+
+#define INSUR_1HOUR_FRAUD 211
+#define INSUR_1HOUR_FRAUD_LENGTH 3
+
+//when a merc is fired, and is injured
+#define AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND 212
+#define AIM_MEDICAL_DEPOSIT_PARTIAL_REFUND_LENGTH 3
+
+//when a merc is fired, and is dead
+#define AIM_MEDICAL_DEPOSIT_NO_REFUND 213
+#define AIM_MEDICAL_DEPOSIT_NO_REFUND_LENGTH 3
+
+#define	BOBBY_R_MEDUNA_SHIPMENT				214
+#define	BOBBY_R_MEDUNA_SHIPMENT_LENGTH				4
+
+#define AIM_MEDICAL_DEPOSIT_REFUND 215
+#define AIM_MEDICAL_DEPOSIT_REFUND_LENGTH 3
 
 #else
 #define IMP_EMAIL_INTRO					0
@@ -329,6 +402,8 @@ struct email
 	INT32		iCurrentIMPPosition;
 	
 	UINT8 EmailVersion;
+	
+	UINT32 EmailType;
 
 	// WANNE.MAIL: Fix
 	INT16		iCurrentShipmentDestinationID;
@@ -363,6 +438,8 @@ typedef struct
 	INT32		iCurrentIMPPosition;
 	
 	UINT8 EmailVersion;
+	
+//	UINT32 EmailType;
 	
 	// WANNE.MAIL: Fix
 	INT16		iCurrentShipmentDestinationID;
@@ -453,7 +530,7 @@ void RenderEmail();
 
 
 // message manipulation
-void AddEmailMessage(INT32 iMessageOffset, INT32 iMessageLength,STR16 pSubject, INT32 iDate, UINT8 ubSender, BOOLEAN fAlreadyRead, INT32 uiFirstData, UINT32 uiSecondData, INT32 iCurrentIMPPosition, INT16 iCurrentShipmentDestinationID, UINT8 EmailType );
+void AddEmailMessage(INT32 iMessageOffset, INT32 iMessageLength,STR16 pSubject, INT32 iDate, UINT8 ubSender, BOOLEAN fAlreadyRead, INT32 uiFirstData, UINT32 uiSecondData, INT32 iCurrentIMPPosition, INT16 iCurrentShipmentDestinationID, UINT8 EmailType, UINT32 EmailAIM );
 void RemoveEmailMessage(INT32 iId);
 EmailPtr GetEmailMessage(INT32 iId);
 void LookForUnread();
@@ -472,7 +549,7 @@ void ReDrawNewMailBox( void );
 void ReDisplayBoxes( void );
 void ShutDownEmailList();
 void AddMessageToPages(INT32 iMessageId);
-void AddEmailWithSpecialData(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iFirstData, UINT32 uiSecondData, UINT8 EmailType);
+void AddEmailWithSpecialData(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iFirstData, UINT32 uiSecondData, UINT8 EmailType, UINT32 EmailAIM );
 
 void AddCustomEmail(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition, INT16 iCurrentShipmentDestinationID, UINT8 EmailType);
 
@@ -521,19 +598,57 @@ enum {
 	TYPE_EMAIL_MERC_LEVEL_UP,
 	
 	//Read from others *.XMLs
-/*	TYPE_EMAIL_ENRICO,
+	TYPE_EMAIL_BOBBY_R,
+	
+	//Read from JA2 Email.edt
+	TYPE_EMAIL_BOBBY_R_EMAIL_JA2_EDT,
+	TYPE_EMAIL_INSURANCE_COMPANY_EMAIL_JA2_EDT,
+	TYPE_EMAIL_DEAD_MERC_AIM_SITE_EMAIL_JA2_EDT,
+	
+	//Read from others *.XMLs
+	TYPE_EMAIL_ENRICO,
 	TYPE_EMAIL_CHAR_PROFILE_SITE,
 	TYPE_EMAIL_GAME_HELP,
 	TYPE_EMAIL_IMP_PROFILE_RESULTS,
 	TYPE_EMAIL_SPECK_FROM_MERC,
 	TYPE_EMAIL_RIS_EMAIL,
 	TYPE_EMAIL_INSURANCE_COMPANY,
-	TYPE_EMAIL_BOBBY_R,
 	TYPE_EMAIL_KING_PIN,
 	TYPE_EMAIL_JOHN_KULBA,
-	TYPE_EMAIL_AIM_SITE, */
+	TYPE_EMAIL_AIM_SITE, 
+	
 	TYPE_EMAIL_OTHER,
 };
+
+enum {
+
+	TYPE_E_NONE   = 0,
+	
+	TYPE_E_AIM_L1 = 1, //206
+	TYPE_E_AIM_L2 = 2, //27
+	TYPE_E_AIM_L3 = 3, //217
+	TYPE_E_AIM_L4 = 4, //214
+	
+	TYPE_E_INSURANCE_L1 = 5, //170
+	TYPE_E_INSURANCE_L2 = 6, //211
+	TYPE_E_INSURANCE_L3 = 7, //170
+	TYPE_E_INSURANCE_L4 = 8, //173
+	TYPE_E_INSURANCE_L5 = 9, //179
+	TYPE_E_INSURANCE_L6 = 10, //176
+
+	TYPE_EMAIL_BOBBY_R_L1 = 11,
+};
+
+typedef struct
+{
+	UINT8 uiIndex;
+	UINT32	EmailType;
+
+} EMAIL_TYPE;
+
+#define EMAIL_VAL 4000
+
+extern EMAIL_TYPE gEmailT[EMAIL_VAL];
 
 extern EMAIL_MERC_AVAILABLE_VALUES EmailMercAvailableText[NUM_PROFILES];
 extern EMAIL_MERC_LEVEL_UP_VALUES EmailMercLevelUpText[NUM_PROFILES];
@@ -541,6 +656,11 @@ extern EMAIL_OTHER_VALUES EmailOtherText[EMAIL_INDEX];
 extern BOOLEAN ReadXMLEmail;
 extern void AddEmailTypeXML( INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition, UINT8 EmailType );
 extern void AddPreReadEmailTypeXML( INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, UINT8 EmailType );
+
+#ifdef JA2UB
+extern void AddBobbyREmailJA2(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition, INT16 iCurrentShipmentDestinationID, UINT8 EmailType );
+#endif
+
 #endif
 
 

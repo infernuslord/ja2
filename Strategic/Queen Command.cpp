@@ -87,6 +87,10 @@ extern BOOLEAN gfOverrideSector;
 INT32 gsInterrogationGridNo[3] = { 7756, 7757, 7758 };
 
 #ifdef JA2UB
+INT32		gsGridNoForMapEdgePointInfo=-1;
+#endif
+
+#ifdef JA2UB
 void HandleBloodCatDeaths( SECTORINFO *pSector );
 #endif
 
@@ -1353,6 +1357,10 @@ void AddPossiblePendingEnemiesToBattle()
 	if(!(gWorldSectorX > 0 && gWorldSectorY > 0 && gbWorldSectorZ == 0))//dnl ch57 161009
 		return;
 
+#ifdef JA2UB
+	BOOLEAN fMagicallyAppeared=FALSE;
+#endif
+
 	UINT8 ubSlots, ubNumAvailable;
 	UINT8 ubNumElites, ubNumTroops, ubNumAdmins;
 	UINT8 ubNumGroupsInSector;
@@ -1460,6 +1468,14 @@ void AddPossiblePendingEnemiesToBattle()
 					ubStrategicInsertionCode = INSERTION_CODE_SOUTH;
 				else if( NumEnemiesInSector( gWorldSectorX, gWorldSectorY - 1 ) )
 					ubStrategicInsertionCode = INSERTION_CODE_NORTH;
+			#ifdef JA2UB
+				else if( gsGridNoForMapEdgePointInfo != -1 )
+					{
+						//Ja25: it doesnt matter the entry point at this point, it will become GRIDNO at a later point
+						ubStrategicInsertionCode = INSERTION_CODE_NORTH;
+						fMagicallyAppeared = FALSE;
+					}
+			#endif
 			}
 
 			if( ubStrategicInsertionCode == 255 )
@@ -1654,6 +1670,11 @@ void AddEnemiesToBattle( GROUP *pGroup, UINT8 ubStrategicInsertionCode, UINT8 ub
 	UINT8 ubCurrSlot;
 	UINT8 ubTotalSoldiers;
 	UINT8 bDesiredDirection=0;
+
+#ifdef JA2UB
+	UINT8	ubCnt;
+#endif
+
 	switch( ubStrategicInsertionCode )
 	{
 		case INSERTION_CODE_NORTH:	bDesiredDirection = SOUTHEAST;										break;
@@ -1696,8 +1717,40 @@ void AddEnemiesToBattle( GROUP *pGroup, UINT8 ubStrategicInsertionCode, UINT8 ub
 	}
 
 	ubTotalSoldiers = ubNumAdmins + ubNumTroops + ubNumElites;
+	
+	#ifdef JA2UB
+	if( gsGridNoForMapEdgePointInfo != -1 )
+	{
+		ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
+	}
+	#endif
+	
+	#ifdef JA2UB
+	if( ubStrategicInsertionCode == INSERTION_CODE_GRIDNO )
+	{
+		if( gsGridNoForMapEdgePointInfo == -1 )
+		{
+			Assert( 0 );
+			gsGridNoForMapEdgePointInfo=0;
+		}
 
-	ChooseMapEdgepoints( &MapEdgepointInfo, ubStrategicInsertionCode, (UINT8)(ubNumAdmins+ubNumElites+ubNumTroops) );
+		for( ubCnt=0; ubCnt<32;ubCnt++)
+		{
+			MapEdgepointInfo.sGridNo[ ubCnt ] = gsGridNoForMapEdgePointInfo;
+		}
+
+		MapEdgepointInfo.ubNumPoints = 32;
+		MapEdgepointInfo.ubStrategicInsertionCode = INSERTION_CODE_GRIDNO;
+	}
+	else
+	{
+		ChooseMapEdgepoints( &MapEdgepointInfo, ubStrategicInsertionCode, (UINT8)(ubNumAdmins+ubNumElites+ubNumTroops) );
+	}
+	#else
+	    ChooseMapEdgepoints( &MapEdgepointInfo, ubStrategicInsertionCode, (UINT8)(ubNumAdmins+ubNumElites+ubNumTroops) );
+	#endif
+	
+	
 	ubCurrSlot = 0;
 	while( ubTotalSoldiers )
 	{
@@ -1776,6 +1829,10 @@ void AddEnemiesToBattle( GROUP *pGroup, UINT8 ubStrategicInsertionCode, UINT8 ub
 			pSoldier->bActionPoints = 0;
 		}
 	}
+	
+	#ifdef JA2UB
+		gsGridNoForMapEdgePointInfo = -1;
+	#endif
 }
 
 

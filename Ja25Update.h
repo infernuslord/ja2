@@ -11,8 +11,10 @@
 
 
 //The starting sector of the Expanion pack
-#define JA2_5_START_SECTOR_X			7
-#define JA2_5_START_SECTOR_Y			8
+extern INT16 JA2_5_START_SECTOR_X;
+extern INT16 JA2_5_START_SECTOR_Y;
+//#define JA2_5_START_SECTOR_X			7
+//#define JA2_5_START_SECTOR_Y			8
 
 #define 	JA25_PROF_DAT "BINARYDATA\\Ja25Prof.dat"
 
