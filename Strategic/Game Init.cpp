@@ -686,14 +686,14 @@ fFirstTimeInMapScreen = TRUE;
 		// this is for the "mercs climbing down from a rope" animation, NOT Skyrider!!
 		ResetHeliSeats( );
 
-#ifdef LUA_GAME_INIT_NEW_GAME
-			LetLuaGameInit(0);
+//#ifdef LUA_GAME_INIT_NEW_GAME
+		
+		LetLuaGameInit(0);
 
 		#ifdef JA2UB
 		InitCustomStrategicLayer ( );
 		#endif
-
-#else
+/*#else
 		#ifdef JA2UB
 
 		#else
@@ -747,6 +747,7 @@ fFirstTimeInMapScreen = TRUE;
  		AddTransactionToPlayersBook( ANONYMOUS_DEPOSIT, 0, GetWorldTotalMin(), iStartingCash );
 		#endif
 #endif
+*/
 	
 		UINT32	uiDaysTimeMercSiteAvailable = Random( 2 ) + 1;
 
