@@ -1351,7 +1351,7 @@ void HandleDeathInPowerGenSector( SOLDIERTYPE *pSoldier )
 			}
 		}
 
-
+/*
 		//
 		// Chooose a random slot ID for the enemy
 		//
@@ -1377,13 +1377,15 @@ void HandleDeathInPowerGenSector( SOLDIERTYPE *pSoldier )
 				break;
 			}
 		}
-
+*/	
 		// if we found an enemy, or this is the 2nd last enemy in the sector
 		if( fFoundValidEnemy || ubNumFlagedEnemiesInSector <= 2 )
 		{
 			StopPowerGenFan();
 		}
-	}		
+
+	}	
+
 }
 
 
