@@ -159,7 +159,7 @@
 
 
 #ifdef JA2UB
-void ConvertWeapons( SOLDIERTYPE *pSoldier );
+//void ConvertWeapons( SOLDIERTYPE *pSoldier );
 extern void MakeBadSectorListFromMapsOnHardDrive( BOOLEAN fDisplayMessages ); // ja25 UB
 #endif
 
@@ -5770,10 +5770,10 @@ BOOLEAN LoadSoldierStructure( HWFILE hFile )
 				}
 			}
 #endif
-			#ifdef JA2UB
+			//#ifdef JA2UB
 			//if the soldier has the NON weapon version of the merc knofe or merc umbrella
-			ConvertWeapons( &Menptr[ cnt ] );
-			#endif
+			//ConvertWeapons( &Menptr[ cnt ] );
+			//#endif
 			
 			// JA2Gold: fix next-to-previous attacker value
 			if ( guiCurrentSaveGameVersion < 99 )
@@ -8613,7 +8613,8 @@ void ConvertWeapons( SOLDIERTYPE *pSoldier )
 				pSoldier->inv[ iCnt ].usItem = 71; 				
 		}	
 
-		*/
+		
 	}
 }
 #endif
+*/
