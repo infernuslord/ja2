@@ -184,7 +184,7 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 	if ( gProfilesMERC[ubCurrentSoldier].ProfilId == ubCurrentSoldier )
 //	if( ( ubCurrentSoldier >= 40 && ubCurrentSoldier <= 50 ) || ubCurrentSoldier == 58 /*GASTON*/ || ubCurrentSoldier == 59 /*STOGIE*/ )
 	{
-		AddItemToMerc( iNewIndex, MERC_UMBRELLA ); //4507
+		AddItemToMerc( iNewIndex, MERC_UMBRELLA ); //1361
 	}
 
 	//if this is an AIM or MERC merc
@@ -195,7 +195,7 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 		if ( gProfilesAIM[ubCurrentSoldier].ProfilId == ubCurrentSoldier )
 		{
 			//give the mercs one of the promo items
-			AddItemToMerc( iNewIndex, SAM_GARVER_COMBAT_KNIFE ); //4506
+			AddItemToMerc( iNewIndex, SAM_GARVER_COMBAT_KNIFE ); //1353
 		}
 
 		// if its a merc merc
@@ -203,9 +203,9 @@ INT8 HireMerc( MERC_HIRE_STRUCT *pHireMerc)
 		//else if( ubCurrentSoldier <= 50 || ubCurrentSoldier == 58 /*GASTON*/ || ubCurrentSoldier == 59 /*STOGIE*/ )
 		{
 			//give the mercs one of the promo items
-			AddItemToMerc( iNewIndex, CHE_GUEVARA_CANTEEN ); //4504
-			AddItemToMerc( iNewIndex, MERC_WRISTWATCH ); //4505
-			AddItemToMerc( iNewIndex, SAM_GARVER_COMBAT_KNIFE ); //4506
+			AddItemToMerc( iNewIndex, CHE_GUEVARA_CANTEEN ); //1359
+			AddItemToMerc( iNewIndex, MERC_WRISTWATCH ); //1360
+			AddItemToMerc( iNewIndex, SAM_GARVER_COMBAT_KNIFE ); //1353
 		}
 	}
 #else //ja25: No enrico, therefore, no email

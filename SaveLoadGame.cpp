@@ -8592,6 +8592,8 @@ UINT32 CalcJA2EncryptionSet( SAVED_GAME_HEADER * pSaveGameHeader )
 	return( uiEncryptionSet );
 }
 
+//inshy: Now we dont need this convertation, all items chenged in the maps
+/*
 #ifdef JA2UB
 void ConvertWeapons( SOLDIERTYPE *pSoldier )
 {
@@ -8610,63 +8612,7 @@ void ConvertWeapons( SOLDIERTYPE *pSoldier )
 			if( pSoldier->inv[ iCnt ].usItem == 117 || pSoldier->inv[ iCnt ].usItem ==  349 || pSoldier->inv[ iCnt ].usItem == 1263 )
 				pSoldier->inv[ iCnt ].usItem = 71; 				
 		}	
-		
-		
-/*	
-		if( pSoldier->inv[ iCnt ].usItem == 4499 )
-		{
-			pSoldier->inv[ iCnt ].usItem = 115;
-		}
-	
-		if( pSoldier->inv[ iCnt ].usItem == 4498 )
-		{
-			pSoldier->inv[ iCnt ].usItem = 63;
-		}
-	
-		if( pSoldier->inv[ iCnt ].usItem == 4501 )
-		{
-			pSoldier->inv[ iCnt ].usItem = 328;
-		}
-		
-		if( pSoldier->inv[ iCnt ].usItem == 4502 )
-		{
-			pSoldier->inv[ iCnt ].usItem = 329;
-		}
 
-		if( pSoldier->inv[ iCnt ].usItem == 4503 )
-		{
-			pSoldier->inv[ iCnt ].usItem = 330;
-		}
-		
-		if( pSoldier->inv[ iCnt ].usItem == 4500 )
-		{
-			pSoldier->inv[ iCnt ].usItem = 331;
-		}
-		
-		if( pSoldier->inv[ iCnt ].usItem == 4504 )
-		{
-			pSoldier->inv[ iCnt ].usItem = 332;
-		}		
-		
-		if( pSoldier->inv[ iCnt ].usItem == 4505 )
-		{
-			pSoldier->inv[ iCnt ].usItem = 333;
-		}
-		
-		if( pSoldier->inv[ iCnt ].usItem == 4506 )
-		{
-			pSoldier->inv[ iCnt ].usItem = 334;
-		}
-		
-		if( pSoldier->inv[ iCnt ].usItem == 4508 )
-		{
-			pSoldier->inv[ iCnt ].usItem = 336;
-		}
-
-		if( pSoldier->inv[ iCnt ].usItem == 4507 )
-		{
-			pSoldier->inv[ iCnt ].usItem = 70;
-		}
 		*/
 	}
 }

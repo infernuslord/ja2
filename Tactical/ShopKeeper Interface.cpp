@@ -3416,7 +3416,7 @@ UINT8		ubItemsNotCounted = 0; //ja25 UB
 	{
 		//if the item is the antique musket
 		if( usItemID == TEX_MOVIE_ATTACK_CLYDESDALES || usItemID == TEX_MOVIE_WILD_EAST || usItemID == TEX_MOVIE_HAVE_HONDA )
-	//	if( usItemID == 4501 || usItemID == 4502 || usItemID == 4503 )
+	//	if( usItemID == 1356 || usItemID == 1357 || usItemID == 1358 )
 		{
 			//Make the item price top be what is listed in the item table ( 20 )
 			uiTotalPrice = Item[ usItemID ].usPrice;
@@ -4230,9 +4230,9 @@ void MoveAllArmsDealersItemsInOfferAreaToPlayersOfferArea( )
 				}
 
 				//if the item is Tex's videos
-				if( ArmsDealerOfferArea[ uiCnt ].sItemIndex == TEX_MOVIE_ATTACK_CLYDESDALES ||//4501  ||
-						ArmsDealerOfferArea[ uiCnt ].sItemIndex == TEX_MOVIE_WILD_EAST ||//4502 	||
-						ArmsDealerOfferArea[ uiCnt ].sItemIndex == TEX_MOVIE_HAVE_HONDA )//4503  )
+				if( ArmsDealerOfferArea[ uiCnt ].sItemIndex == TEX_MOVIE_ATTACK_CLYDESDALES ||//1356  ||
+						ArmsDealerOfferArea[ uiCnt ].sItemIndex == TEX_MOVIE_WILD_EAST ||//1357 	||
+						ArmsDealerOfferArea[ uiCnt ].sItemIndex == TEX_MOVIE_HAVE_HONDA )//1358  )
 				{
 					SetFactTrue( FACT_PLAYER_BOUGHT_A_TEX_VIDEO_FROM_BETTY );
 				}

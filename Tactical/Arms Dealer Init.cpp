@@ -2416,10 +2416,10 @@ BOOLEAN CanThisItemBeSoldToSimulatedCustomer( UINT8 ubArmsDealerID, UINT16 usIte
 		case ARMS_DEALER_BETTY:
 			//if the item is..
 
-			if( usItemIndex == TEX_MOVIE_ATTACK_CLYDESDALES ||  //4501  ||
-					usItemIndex == TEX_MOVIE_WILD_EAST || //4502  ||
-					usItemIndex == TEX_MOVIE_HAVE_HONDA || //4503  ||
-					usItemIndex == LAPTOP_TRANSMITTER )//4500  )
+			if( usItemIndex == TEX_MOVIE_ATTACK_CLYDESDALES ||  //1356  ||
+					usItemIndex == TEX_MOVIE_WILD_EAST || //1357  ||
+					usItemIndex == TEX_MOVIE_HAVE_HONDA || //1358  ||
+					usItemIndex == LAPTOP_TRANSMITTER )//1355  )
 			{
 				return( FALSE );
 			}
