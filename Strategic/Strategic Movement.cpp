@@ -2001,7 +2001,8 @@ void GroupArrivedAtSector( UINT8 ubGroupID, BOOLEAN fCheckForBattle, BOOLEAN fNe
 				if ( GroupAtFinalDestination( pGroup ) && ( pGroup->ubSectorZ == 0 ) && !fNeverLeft )
 				{
 					// HEADROCK HAM 3.6: Messages are no longer yellow by default.
-					ScreenMsg( FONT_MCOLOR_LTGREEN, MSG_INTERFACE, pMessageStrings[ MSG_ARRIVE ], pVehicleStrings[ pVehicleList[ iVehId ].ubVehicleType ], pMapVertIndex[ pGroup->ubSectorY ], pMapHortIndex[ pGroup->ubSectorX ] );
+				//	ScreenMsg( FONT_MCOLOR_LTGREEN, MSG_INTERFACE, pMessageStrings[ MSG_ARRIVE ], pVehicleStrings[ pVehicleList[ iVehId ].ubVehicleType ], pMapVertIndex[ pGroup->ubSectorY ], pMapHortIndex[ pGroup->ubSectorX ] );
+					ScreenMsg( FONT_MCOLOR_LTGREEN, MSG_INTERFACE, pMessageStrings[ MSG_ARRIVE ], gNewVehicle[ pVehicleList[ iVehId ].ubVehicleType ].NewVehicleStrings, pMapVertIndex[ pGroup->ubSectorY ], pMapHortIndex[ pGroup->ubSectorX ] );
 				}
 			}
 		}

@@ -1549,59 +1549,77 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 		}
 #endif
 
-		/// Allow to load everywhere
-		if ((InputEvent.usEvent == KEY_DOWN )&& ( InputEvent.usParam == 'l') )
+		// ROMAN.MP
+		// It is not allowed in a network game to go to the load screen, because if you cancel the load screen it is always your turn!
+		if (!is_networked)
 		{
-			if( InputEvent.usKeyState & ALT_DOWN )
+			/// Allow to load everywhere
+			if ((InputEvent.usEvent == KEY_DOWN )&& ( InputEvent.usParam == 'l') )
 			{
-				if ( !( gTacticalStatus.uiFlags & ENGAGED_IN_CONV ) )
+				if( InputEvent.usKeyState & ALT_DOWN )
 				{
-					gfSaveGame = FALSE;
-					gfCameDirectlyFromGame = TRUE;
+					if ( !( gTacticalStatus.uiFlags & ENGAGED_IN_CONV ) )
+					{
+						gfSaveGame = FALSE;
+						gfCameDirectlyFromGame = TRUE;
 
-					guiPreviousOptionScreen = GAME_SCREEN;
-					//Heinz: 28.02.09 BUGFIX: player doesn't need to see save/load screen
-					//LeaveTacticalScreen( SAVE_LOAD_SCREEN );
-					DoQuickLoad();
+						guiPreviousOptionScreen = GAME_SCREEN;
+						
+						// cancel, the player can move when it is not its turn!
+						//Heinz: 28.02.09 BUGFIX: player doesn't need to see save/load screen
+						//LeaveTacticalScreen( SAVE_LOAD_SCREEN );
+						DoQuickLoad();
+					}
 				}
-			}
-			else if( InputEvent.usKeyState & CTRL_DOWN )
-			{
-				if ( !( gTacticalStatus.uiFlags & ENGAGED_IN_CONV ) )
+				else if( InputEvent.usKeyState & CTRL_DOWN )
 				{
-					gfSaveGame = FALSE;
-					gfCameDirectlyFromGame = TRUE;
+					// WANNE: Do not allow saving via the save screen when it is not our turn,
+					// because there is an explit when you close the save window without saving, you can move your merc even it is not your turn
+					// IF UI HAS LOCKED, ONLY ALLOW EXIT!
+					if ( gfDisableRegionActive || gfUserTurnRegionActive )
+					{
+						continue;
+					}
 
-					guiPreviousOptionScreen = GAME_SCREEN;
-					LeaveTacticalScreen( SAVE_LOAD_SCREEN );
+					if ( !( gTacticalStatus.uiFlags & ENGAGED_IN_CONV ) )
+					{
+						gfSaveGame = FALSE;
+						gfCameDirectlyFromGame = TRUE;
+
+						guiPreviousOptionScreen = GAME_SCREEN;
+						LeaveTacticalScreen( SAVE_LOAD_SCREEN );
+					}
 				}
 			}
 		}
+
 		if (is_networked)
 		{
-
-		if ((InputEvent.usEvent == KEY_DOWN )&& ( InputEvent.usParam == 's') )//allow saving 'always'//hayden
-		{
-			if( InputEvent.usKeyState & ALT_DOWN )
+			// WANNE: Disabled the quick saving in a multiplayer game, because if you quit out of the save dialog,
+			// you can move your merc even if it is not your turn.
+			/*
+			if ((InputEvent.usEvent == KEY_DOWN )&& ( InputEvent.usParam == 's') )//allow saving 'always'//hayden
 			{
-						if( !fDisableMapInterfaceDueToBattle && !( gTacticalStatus.uiFlags & ENGAGED_IN_CONV ) )
+				if( InputEvent.usKeyState & ALT_DOWN )
+				{
+					if( !fDisableMapInterfaceDueToBattle && !( gTacticalStatus.uiFlags & ENGAGED_IN_CONV ) )
+					{
+						//if the game CAN be saved
+						if( CanGameBeSaved() )
 						{
-							//if the game CAN be saved
-							if( CanGameBeSaved() )
-							{
-								guiPreviousOptionScreen = GAME_SCREEN;
-								//guiPreviousOptionScreen = guiCurrentScreen;
-								DoQuickSave();
-							}
-							else
-							{
-								//Display a message saying the player cant save now
-								DoMessageBox( MSG_BOX_BASIC_STYLE, zNewTacticalMessages[ TCTL_MSG__IRON_MAN_CANT_SAVE_NOW ], GAME_SCREEN, ( UINT8 )MSG_BOX_FLAG_OK, NULL, NULL );
-							}
+							guiPreviousOptionScreen = GAME_SCREEN;
+							//guiPreviousOptionScreen = guiCurrentScreen;
+							DoQuickSave();
 						}
-			}
-			else if( InputEvent.usKeyState & CTRL_DOWN )
-			{
+						else
+						{
+							//Display a message saying the player cant save now
+							DoMessageBox( MSG_BOX_BASIC_STYLE, zNewTacticalMessages[ TCTL_MSG__IRON_MAN_CANT_SAVE_NOW ], GAME_SCREEN, ( UINT8 )MSG_BOX_FLAG_OK, NULL, NULL );
+						}
+					}
+				}
+				else if( InputEvent.usKeyState & CTRL_DOWN )
+				{
 					if( !fDisableMapInterfaceDueToBattle && !( gTacticalStatus.uiFlags & ENGAGED_IN_CONV ) )
 					{
 						//if the game CAN be saved
@@ -1618,11 +1636,11 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 							//Display a message saying the player cant save now
 							DoMessageBox( MSG_BOX_BASIC_STYLE, zNewTacticalMessages[ TCTL_MSG__IRON_MAN_CANT_SAVE_NOW ], GAME_SCREEN, ( UINT8 )MSG_BOX_FLAG_OK, NULL, NULL);
 						}
+					}
+				}
 			}
-			}
-		}
-			
-
+			*/
+		
 			if ((InputEvent.usEvent == KEY_DOWN )&& ( InputEvent.usParam == 'e') )
 			{
 				if( InputEvent.usKeyState & ALT_DOWN )
@@ -3811,6 +3829,14 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 
 					else if( !fDisableMapInterfaceDueToBattle && !( gTacticalStatus.uiFlags & ENGAGED_IN_CONV ) && !is_networked)
 					{
+						// WANNE: Do not allow saving via the save screen when it is not our turn,
+						// because there is an explit when you close the save window without saving, you can move your merc even it is not your turn
+						// IF UI HAS LOCKED, ONLY ALLOW EXIT!
+						if ( gfDisableRegionActive || gfUserTurnRegionActive )
+						{
+							continue;
+						}
+
 						//if the game CAN be saved
 						if( CanGameBeSaved() )
 						{

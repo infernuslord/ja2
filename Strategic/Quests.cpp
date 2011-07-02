@@ -807,7 +807,7 @@ BOOLEAN CheckFact( UINT16 usFact, UINT8 ubProfileID )
 			break;
 			/*
 		case FACT_SKYRIDER_CLOSE_TO_CHOPPER:
-			SetUpHelicopterForPlayer( 13, MAP_ROW_B , SKYRIDER );
+			SetUpHelicopterForPlayer( 13, MAP_ROW_B, gNewVehicle[ HELICOPTER ].NewPilot, HELICOPTER );
 			break;
 			*/
 		case FACT_SPIKE_AT_DOOR:

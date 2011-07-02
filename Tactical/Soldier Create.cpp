@@ -571,7 +571,8 @@ SOLDIERTYPE* TacticalCreateSoldier( SOLDIERCREATE_STRUCT *pCreateStruct, UINT8 *
 	BOOLEAN					fGuyAvail = FALSE;
 	UINT8						bLastTeamID;
 	UINT8						ubVehicleID = 0;
-
+	UINT32 iCounter2;
+	
 	*pubID = NOBODY;
 	DebugMsg(TOPIC_JA2,DBG_LEVEL_3,String("TacticalCreateSoldier"));
 
@@ -1009,36 +1010,48 @@ SOLDIERTYPE* TacticalCreateSoldier( SOLDIERCREATE_STRUCT *pCreateStruct, UINT8 *
 			case ELDORADO:
 			case ICECREAMTRUCK:
 			case JEEP:
-				case TANK_NW:
-				case TANK_NE:
+			case TANK_NW:
+			case TANK_NE:
 
 				Soldier.flags.uiStatusFlags |= SOLDIER_VEHICLE;
 
 				switch( Soldier.ubBodyType )
 				{
 					case HUMVEE:
+					case ELDORADO:
+					case ICECREAMTRUCK:
+					case JEEP:
+						if ( Soldier.ubProfile != HELICOPTER || Soldier.ubProfile != 0 || Soldier.ubProfile != NO_PROFILE || Soldier.ubProfile != TANK_CAR ) 
+						{
+							ubVehicleID = Soldier.ubProfile;
+							Soldier.aiData.bNeutral = gNewVehicle[Soldier.ubProfile].bNewNeutral;
+						}
+					break;
+				
+				/*	case HUMVEE:
 
 						ubVehicleID = HUMMER;
-			Soldier.aiData.bNeutral = TRUE;
+						Soldier.aiData.bNeutral = TRUE;
 						break;
 
 					case ELDORADO:
 
 						ubVehicleID = ELDORADO_CAR;
-			Soldier.aiData.bNeutral = TRUE;
+						Soldier.aiData.bNeutral = TRUE;
 						break;
 
 					case ICECREAMTRUCK:
 
 						ubVehicleID = ICE_CREAM_TRUCK;
-			Soldier.aiData.bNeutral = TRUE;
+						Soldier.aiData.bNeutral = TRUE;
 						break;
-
+					
 					case JEEP:
 
 						ubVehicleID = JEEP_CAR;
 						break;
-
+		
+					*/	
 					case TANK_NW:
 					case TANK_NE:
 
@@ -3221,7 +3234,8 @@ void TrashAllSoldiers( )
 
 UINT8 GetLocationModifier( UINT8 ubSoldierClass )
 {
-	UINT8 ubLocationModifier;	
+	UINT8 ubLocationModifier;
+	UINT8 ubPalaceDistance;
 	INT16 sSectorX, sSectorY, sSectorZ;
 	#ifdef JA2UB
 	#else

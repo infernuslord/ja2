@@ -67,6 +67,8 @@
 #include <vector>
 #include <queue>
 
+#include "Vehicles.h"
+
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -6068,7 +6070,8 @@ BOOLEAN DisplayRepairMenu( SOLDIERTYPE *pSoldier )
 				{
 					if ( IsThisVehicleAccessibleToSoldier( pSoldier, iVehicleIndex ) )
 					{
-						AddMonoString( (UINT32 *)&hStringHandle,pVehicleStrings[ pVehicleList[ iVehicleIndex ].ubVehicleType ] );
+						//AddMonoString( (UINT32 *)&hStringHandle,pVehicleStrings[ pVehicleList[ iVehicleIndex ].ubVehicleType ] );
+						AddMonoString( (UINT32 *)&hStringHandle,gNewVehicle[ pVehicleList[ iVehicleIndex ].ubVehicleType ].NewVehicleStrings );
 					}
 				}
 			}
@@ -9535,7 +9538,8 @@ BOOLEAN DisplayVehicleMenu( SOLDIERTYPE *pSoldier )
 		{
 			if ( IsThisVehicleAccessibleToSoldier( pSoldier, iCounter ) )
 			{
-				AddMonoString((UINT32 *)&hStringHandle, pVehicleStrings[ pVehicleList[ iCounter ].ubVehicleType ]);
+				//AddMonoString((UINT32 *)&hStringHandle, pVehicleStrings[ pVehicleList[ iCounter ].ubVehicleType ]);
+					AddMonoString((UINT32 *)&hStringHandle, gNewVehicle[ pVehicleList[ iCounter ].ubVehicleType ].NewVehicleStrings);
 				fVehiclePresent = TRUE;
 			}
 		}
@@ -14459,7 +14463,8 @@ BOOLEAN DisplayFacilityAssignmentMenu( SOLDIERTYPE *pSoldier, UINT8 ubFacilityTy
 						if ( IsThisVehicleAccessibleToSoldier( pSoldier, iCounterB ) )
 						{
 							// Create line that says "Repair X" where X is the vehicle.
-							swprintf( sTempString, gzFacilityAssignmentStrings[ FAC_REPAIR_VEHICLE ], pVehicleStrings[ pVehicleList[ iCounterB ].ubVehicleType ]);
+						//	swprintf( sTempString, gzFacilityAssignmentStrings[ FAC_REPAIR_VEHICLE ], pVehicleStrings[ pVehicleList[ iCounterB ].ubVehicleType ]);
+							swprintf( sTempString, gzFacilityAssignmentStrings[ FAC_REPAIR_VEHICLE ], gNewVehicle[ pVehicleList[ iCounterB ].ubVehicleType ].NewVehicleStrings);
 							AddMonoString((UINT32 *)&hStringHandle, sTempString );
 							fFoundVehicle = TRUE;
 						}

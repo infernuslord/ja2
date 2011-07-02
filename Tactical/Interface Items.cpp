@@ -1211,15 +1211,15 @@ BOOLEAN InitInvSlotInterface( INV_REGION_DESC *pRegionDesc , INV_REGION_DESC *pC
 	// Kaiden: Vehicle Inventory change - Added two new STI's for Vehicle Inventory
 	// Feel free to change them to more appropriate pictures, I just blanked out
 	// the body image for now, I'm no graphics artist.
-	VObjectDesc.fCreateFlags = VOBJECT_CREATE_FROMFILE;
-	FilenameForBPP("INTERFACE\\inventory_figure_Vehicle.sti",
-VObjectDesc.ImageFile);
-	CHECKF( AddVideoObject( &VObjectDesc, &(guiBodyInvVO[ 4 ][ 0 ] ) ) );
+	//VObjectDesc.fCreateFlags = VOBJECT_CREATE_FROMFILE;
+	//FilenameForBPP("INTERFACE\\inventory_figure_Vehicle.sti",
+	//VObjectDesc.ImageFile);
+	//CHECKF( AddVideoObject( &VObjectDesc, &(guiBodyInvVO[ 4 ][ 0 ] ) ) );
 
-	VObjectDesc.fCreateFlags = VOBJECT_CREATE_FROMFILE;
-	FilenameForBPP("INTERFACE\\inventory_figure_Vehicle_h.sti",
-VObjectDesc.ImageFile);
-	CHECKF( AddVideoObject( &VObjectDesc, &(guiBodyInvVO[ 4 ][ 1 ] ) ) );
+	//VObjectDesc.fCreateFlags = VOBJECT_CREATE_FROMFILE;
+	//FilenameForBPP("INTERFACE\\inventory_figure_Vehicle_h.sti",
+	//VObjectDesc.ImageFile);
+	//CHECKF( AddVideoObject( &VObjectDesc, &(guiBodyInvVO[ 4 ][ 1 ] ) ) );
 
 	// add gold key graphic
 	VObjectDesc.fCreateFlags = VOBJECT_CREATE_FROMFILE;
@@ -1343,12 +1343,12 @@ void ShutdownInvSlotInterface( )
 	DeleteVideoObjectFromIndex( guiBodyInvVO[ 2 ][ 0 ] );
 	DeleteVideoObjectFromIndex( guiBodyInvVO[ 1 ][ 0 ] );
 	DeleteVideoObjectFromIndex( guiBodyInvVO[ 3 ][ 0 ] );
-	DeleteVideoObjectFromIndex( guiBodyInvVO[ 4 ][ 0 ] );
+	//DeleteVideoObjectFromIndex( guiBodyInvVO[ 4 ][ 0 ] );
 	DeleteVideoObjectFromIndex( guiBodyInvVO[ 0 ][ 1 ] );
 	DeleteVideoObjectFromIndex( guiBodyInvVO[ 2 ][ 1 ] );
 	DeleteVideoObjectFromIndex( guiBodyInvVO[ 1 ][ 1 ] );
 	DeleteVideoObjectFromIndex( guiBodyInvVO[ 3 ][ 1 ] );
-	DeleteVideoObjectFromIndex( guiBodyInvVO[ 4 ][ 1 ] );
+	//DeleteVideoObjectFromIndex( guiBodyInvVO[ 4 ][ 1 ] );
 
 	DeleteVideoObjectFromIndex( guiGoldKeyVO );
 
@@ -1374,7 +1374,7 @@ void RenderInvBodyPanel( SOLDIERTYPE *pSoldier, INT16 sX, INT16 sY )
 	// the original statement
 	if ( (gGameExternalOptions.fVehicleInventory) && (pSoldier->flags.uiStatusFlags & SOLDIER_VEHICLE) )
 	{
-		BltVideoObjectFromIndex( guiSAVEBUFFER, guiBodyInvVO[4][0], 0, sX, sY, VO_BLT_SRCTRANSPARENCY, NULL );
+		//BltVideoObjectFromIndex( guiSAVEBUFFER, guiBodyInvVO[4][0], 0, sX, sY, VO_BLT_SRCTRANSPARENCY, NULL );
 	}
 	else
 	{
@@ -6358,15 +6358,16 @@ BOOLEAN HandleItemPointerClick( INT32 usMapPos )
 			sAPCost = GetAPsToGiveItem( gpItemPointerSoldier, usMapPos );
 		}
 
+		//CHRISL: This doesn't make sense to me.  If we take an item out of a stack and then click on something, why would we first attempt to put the item
+		//	back in the stack we took it from.  The item in the cursor should be recognized as a seperate stack at this point.
 		// Place it back in our hands!
-
 		gTempObject = *gpItemPointer;
 
-		if ( gbItemPointerSrcSlot != NO_SLOT )
-		{
-			PlaceObject( gpItemPointerSoldier, gbItemPointerSrcSlot, gpItemPointer );
-			fInterfacePanelDirty = DIRTYLEVEL2;
-		}
+//		if ( gbItemPointerSrcSlot != NO_SLOT )
+//		{
+//			PlaceObject( gpItemPointerSoldier, gbItemPointerSrcSlot, gpItemPointer );
+//			fInterfacePanelDirty = DIRTYLEVEL2;
+//		}
 /*
 		//if the user just clicked on an arms dealer
 		if( IsMercADealer( MercPtrs[ ubSoldierID ]->ubProfile ) )
@@ -9271,9 +9272,13 @@ void GetHelpTextForItem( STR16 pzStr, OBJECTTYPE *pObject, SOLDIERTYPE *pSoldier
 		//CHRISL: Also, determine weight differently if we're looking at a single item in a stack
 		if(subObject == -1){
 			// Find the minimum status value - not just the first one
+			if(Item[pObject->usItem].usItemClass != IC_AMMO)
+				(*pObject)[0]->data.objectStatus = __min((*pObject)[0]->data.objectStatus, 100);
 			sValue = (*pObject)[0]->data.objectStatus;
 
 			for(INT16 i = 1; i < pObject->ubNumberOfObjects; i++){
+				if(Item[pObject->usItem].usItemClass != IC_AMMO)
+					(*pObject)[ i ]->data.objectStatus = __min((*pObject)[ i ]->data.objectStatus, 100);
 				if((*pObject)[ i ]->data.objectStatus < sValue)
 				{
 					sValue = (*pObject)[ i ]->data.objectStatus;
@@ -9284,6 +9289,8 @@ void GetHelpTextForItem( STR16 pzStr, OBJECTTYPE *pObject, SOLDIERTYPE *pSoldier
 			subObject = 0;
 		}
 		else {
+			if(Item[pObject->usItem].usItemClass != IC_AMMO)
+				(*pObject)[subObject]->data.objectStatus = __min((*pObject)[subObject]->data.objectStatus, 100);
 			sValue = (*pObject)[subObject]->data.objectStatus;
 			fWeight = (float)(pObject->GetWeightOfObjectInStack(subObject)) / 10;
 		}

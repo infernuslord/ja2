@@ -3932,11 +3932,13 @@ void AddStringsToMoveBox( void )
 		// add this vehicle
 		if( fVehicleIsMoving[ iCount ] )
 		{
-			swprintf( sString, L"*%s*", pVehicleStrings[ pVehicleList[ iVehicleMovingList[ iCount ] ].ubVehicleType ] );
+		//	swprintf( sString, L"*%s*", pVehicleStrings[ pVehicleList[ iVehicleMovingList[ iCount ] ].ubVehicleType ] );
+			swprintf( sString, L"*%s*", gNewVehicle[ pVehicleList[ iVehicleMovingList[ iCount ] ].ubVehicleType ].NewVehicleStrings );
 		}
 		else
 		{
-			swprintf( sString, L"%s", pVehicleStrings[ pVehicleList[ iVehicleMovingList[ iCount ]	].ubVehicleType ] );
+		//	swprintf( sString, L"%s", pVehicleStrings[ pVehicleList[ iVehicleMovingList[ iCount ]	].ubVehicleType ] );
+			swprintf( sString, L"%s", gNewVehicle[ pVehicleList[ iVehicleMovingList[ iCount ]	].ubVehicleType ].NewVehicleStrings);
 		}
 		AddMonoString(&hStringHandle, sString );
 

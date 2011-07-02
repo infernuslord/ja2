@@ -119,6 +119,7 @@
 #include "Luaglobal.h"
 #include "LuaInitNPCs.h"
 #include "Interface.h"
+#include "Vehicles.h"
 #ifdef JA2UB
 #include "Ja25 Strategic Ai.h"
 #include "Ja25_Tactical.h"
@@ -2329,21 +2330,11 @@ BOOLEAN HandleGotoNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving, BOOLE
 				INT8				bPosOfMask;
 
 				bPosOfMask = FindGasMask (pSoldier);
+
 				if(!DoesSoldierWearGasMask(pSoldier))//dnl ch40 200909
 					bPosOfMask = NO_SLOT;
-				//if ( pSoldier->inv[ HEAD1POS ].usItem == GASMASK && pSoldier->inv[ HEAD1POS ][0]->data.objectStatus >= GASMASK_MIN_STATUS )
-				//{
-				//	bPosOfMask = HEAD1POS;
-				//}
-				//else if ( pSoldier->inv[ HEAD2POS ].usItem == GASMASK && pSoldier->inv[ HEAD2POS ][0]->data.objectStatus >= GASMASK_MIN_STATUS )
-				//{
-				//	bPosOfMask = HEAD2POS;
-				//}
-				//else
-				//{
-				//	bPosOfMask = NO_SLOT;
-				//}
 
+				// WANNE: Only apply the following code for soldiers and not the ROBOT!!
 				// TODO: Madd: This next section is pretty lame because it can't figure out which explosive was used to actually cause a gas effect
 				// so for now, the first explosive to use a gas effect decides the health and breath damage for all of the gasses of that type
 				// (this was hard coded before by the developers - i guess they figured they didn't need to look for the actual explosion item,
@@ -2378,39 +2369,39 @@ BOOLEAN HandleGotoNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving, BOOLE
 							pExplosive = &(Explosive[ Item[ GetFirstExplosiveOfType(EXPLOSV_MUSTGAS) ].ubClassIndex ]);
 						}
 					}
-				}
-
-				//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"Overhead pExplosive: %d", pExplosive->ubType );
-				if ( gpWorldLevelData[ pSoldier->sGridNo ].ubExtFlags[pSoldier->pathing.bLevel] & MAPELEMENT_EXT_CREATUREGAS )
-				{
-					if ( !(pSoldier->flags.fHitByGasFlags & HIT_BY_CREATUREGAS) ) // gas mask doesn't help vs creaturegas
+		
+					//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"Overhead pExplosive: %d", pExplosive->ubType );
+					if ( gpWorldLevelData[ pSoldier->sGridNo ].ubExtFlags[pSoldier->pathing.bLevel] & MAPELEMENT_EXT_CREATUREGAS )
 					{
-						pExplosive = &(Explosive[ Item[ GetFirstExplosiveOfType(EXPLOSV_CREATUREGAS) ].ubClassIndex ]);
+						if ( !(pSoldier->flags.fHitByGasFlags & HIT_BY_CREATUREGAS) ) // gas mask doesn't help vs creaturegas
+						{
+							pExplosive = &(Explosive[ Item[ GetFirstExplosiveOfType(EXPLOSV_CREATUREGAS) ].ubClassIndex ]);
+						}
 					}
-				}
 
-				//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"Overhead pExplosive: %d", pExplosive->ubType );
-				if ( gpWorldLevelData[ pSoldier->sGridNo ].ubExtFlags[pSoldier->pathing.bLevel] & MAPELEMENT_EXT_BURNABLEGAS )
-				{
-					if ( !(pSoldier->flags.fHitByGasFlags & HIT_BY_BURNABLEGAS) )
+					//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"Overhead pExplosive: %d", pExplosive->ubType );
+					if ( gpWorldLevelData[ pSoldier->sGridNo ].ubExtFlags[pSoldier->pathing.bLevel] & MAPELEMENT_EXT_BURNABLEGAS )
 					{
-						pExplosive = &(Explosive[ Item[ GetFirstExplosiveOfType(EXPLOSV_BURNABLEGAS) ].ubClassIndex ]);
+						if ( !(pSoldier->flags.fHitByGasFlags & HIT_BY_BURNABLEGAS) )
+						{
+							pExplosive = &(Explosive[ Item[ GetFirstExplosiveOfType(EXPLOSV_BURNABLEGAS) ].ubClassIndex ]);
+						}
 					}
-				}
 
-				//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"Overhead pSoldier->flags.fHitByGasFlags: %d", pSoldier->flags.fHitByGasFlags );
-				//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"Overhead pExplosive: %d", pExplosive->ubType );
+					//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"Overhead pSoldier->flags.fHitByGasFlags: %d", pSoldier->flags.fHitByGasFlags );
+					//ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"Overhead pExplosive: %d", pExplosive->ubType );
 
-				if ( !(gpWorldLevelData[ pSoldier->sGridNo ].ubExtFlags[pSoldier->pathing.bLevel] & MAPELEMENT_EXT_SMOKE ))
-				{
-					if ( pExplosive )
+					if ( !(gpWorldLevelData[ pSoldier->sGridNo ].ubExtFlags[pSoldier->pathing.bLevel] & MAPELEMENT_EXT_SMOKE ))
 					{
-						pSoldier->EVENT_StopMerc( pSoldier->sGridNo, pSoldier->ubDirection );
-						fDontContinue = TRUE;
+						if ( pExplosive )
+						{
+							pSoldier->EVENT_StopMerc( pSoldier->sGridNo, pSoldier->ubDirection );
+							fDontContinue = TRUE;
 
-						DishOutGasDamage( pSoldier, pExplosive, TRUE, FALSE,
-							(INT16) (pExplosive->ubDamage + (UINT8)PreRandom( pExplosive->ubDamage ) ),
-							(INT16) (100 * ( pExplosive->ubStunDamage + (INT16)PreRandom( ( pExplosive->ubStunDamage / 2 ) ) ) ), NOBODY );
+							DishOutGasDamage( pSoldier, pExplosive, TRUE, FALSE,
+								(INT16) (pExplosive->ubDamage + (UINT8)PreRandom( pExplosive->ubDamage ) ),
+								(INT16) (100 * ( pExplosive->ubStunDamage + (INT16)PreRandom( ( pExplosive->ubStunDamage / 2 ) ) ) ), NOBODY );
+						}
 					}
 				}
 			}
@@ -2922,7 +2913,7 @@ BOOLEAN HandleAtNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving )
 						pSoldier->EVENT_StopMerc( pSoldier->sGridNo, pSoldier->ubDirection );
 						SetFactTrue( FACT_SKYRIDER_CLOSE_TO_CHOPPER );
 						TriggerNPCRecord( SKYRIDER, 15 );
-						SetUpHelicopterForPlayer( 13, MAP_ROW_B, SKYRIDER );
+						SetUpHelicopterForPlayer( 13, MAP_ROW_B, gNewVehicle[ HELICOPTER ].NewPilot, HELICOPTER );
 					}
 					break;
 
@@ -3454,7 +3445,7 @@ void HandlePlayerTeamMemberDeath( SOLDIERTYPE *pSoldier )
 			}
 			break;
 		}
-		
+
 	}
 
 	//Make a call to handle the strategic things, such as Life Insurance, record it in history file etc.

@@ -218,6 +218,8 @@ typedef PARSE_STAGE;
 #define EMAILMERCLEVELUP					"Email\\EmailMercLevelUp.xml"
 #define EMAILOTHER							"Email\\EmailOther.xml"
 
+#define VEHICLESFILENAME					"Vehicles.xml"
+
 extern BOOLEAN ReadInItemStats(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteItemStats();
 
@@ -429,4 +431,9 @@ extern BOOLEAN WriteInActionItems( STR fileName);
 extern BOOLEAN ReadInEmailMercAvailable(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN ReadInEmailMercLevelUp(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN ReadInEmailOther(STR fileName, BOOLEAN localizedVersion);
+
+extern BOOLEAN ReadInNewCar(STR fileName, BOOLEAN localizedVersion);
+extern BOOLEAN WriteNewCar(STR fileName);
+extern void InitNewVehicles ();
+
 #endif

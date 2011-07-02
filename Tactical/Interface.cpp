@@ -1874,7 +1874,8 @@ void DrawSelectedUIAboveGuy( UINT16 usSoldierID )
 		//Legion	
 		if (pSoldier->ubBodyType == TANK_NE || pSoldier->ubBodyType == TANK_NW)
 		{
-		swprintf( NameStr, pVehicleStrings[4] );
+		  swprintf( NameStr, gNewVehicle[164].NewVehicleStrings );
+		//swprintf( NameStr, pVehicleStrings[4] );
 		}
 		else if (zHiddenNames[pSoldier->ubProfile].Hidden == TRUE) 
 		{
@@ -1911,7 +1912,8 @@ void DrawSelectedUIAboveGuy( UINT16 usSoldierID )
 			//Legion	
 			if (pSoldier->ubBodyType == TANK_NE || pSoldier->ubBodyType == TANK_NW)
 			{
-			swprintf( NameStr, pVehicleStrings[4] );
+			//swprintf( NameStr, pVehicleStrings[4] );
+			swprintf( NameStr, gNewVehicle[164].NewVehicleStrings );
 			}
 			else if (zHiddenNames[pSoldier->ubProfile].Hidden == TRUE) 
 			{

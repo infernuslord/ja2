@@ -1865,7 +1865,7 @@ STR16 pPersonnelRecordsHelpTexts[] =
 	L"Пропущенных ударов: %d\n",
 	L"Подорвался: %d\n",
 	L"Ухудшений параметров: %d\n",
-	L"Перенёс мед. вмешательств: %d\n",	//Surgeries Undergoed
+	L"Перенёс мед. вмешательств: %d\n",	//Surgeries undergone
 	L"Травм на производстве: %d\n",	//Facility Accidents
 
 	L"Характер:",
@@ -4049,6 +4049,7 @@ STR16			MercHomePageText[] =
 	L"Просмотр файлов",
 	// The version number on the video conferencing system that pops up when Speck is talking
 	L"Speck Com v3.2",
+	L"Денежный перевод не состоялся. Недостаточно средств на счету.",	// TODO.Translate
 };
 
 // For use at MiGillicutty's Web Page.

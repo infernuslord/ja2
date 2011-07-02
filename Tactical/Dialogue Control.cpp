@@ -1978,7 +1978,7 @@ CHAR8 *GetDialogueDataFilename( UINT8 ubCharacterNum, UINT16 usQuoteNum, BOOLEAN
 	}
 	//else if ( ubCharacterNum >= FIRST_RPC && ubCharacterNum < GASTON &&
 	//new profiles by Jazz
-	else if ( ( gProfilesRPC[ubCharacterNum].ProfilId == ubCharacterNum || gProfilesNPC[ubCharacterNum].ProfilId == ubCharacterNum || gProfilesVehicle[ubCharacterNum].ProfilId == ubCharacterNum ) &&	
+	else if ( ( gProfilesRPC[ubCharacterNum].ProfilId == ubCharacterNum || gProfilesNPC[ubCharacterNum].ProfilId == ubCharacterNum ) && //|| gProfilesVehicle[ubCharacterNum].ProfilId == ubCharacterNum ) &&	
 			( !( gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_RECRUITED )
 			|| ProfileCurrentlyTalkingInDialoguePanel( ubCharacterNum )
 			|| (gMercProfiles[ ubCharacterNum ].ubMiscFlags & PROFILE_MISC_FLAG_FORCENPCQUOTE) )

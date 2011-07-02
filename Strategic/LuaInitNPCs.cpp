@@ -6485,15 +6485,17 @@ UINT16 SextorX;
 UINT16 SextorY;
 
 UINT8 SkyDrive;
+UINT8 vehicle = 163;	// Default: Helicopter
 
 	for (i= 1; i<=n; i++ )
 	{
 		if (i == 1 ) SextorX = lua_tointeger(L,i);
 		if (i == 2 ) SextorY = lua_tointeger(L,i);
 		if (i == 3 ) SkyDrive = lua_tointeger(L,i);
+		if (i == 4 ) vehicle = lua_tointeger(L,i);
 	}
 
-	SetUpHelicopterForPlayer( SextorX, SextorY, SkyDrive );
+	SetUpHelicopterForPlayer( SextorX, SextorY, SkyDrive, vehicle );
 	
 return 0;
 }

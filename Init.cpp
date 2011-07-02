@@ -798,7 +798,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
 	mpTeams.ReadInMPTeams(fileName);
 
-	//legion by jazz (load small faces from rpcs)
+	//legion by jazz (load small faces from rpcs)	
 	strcpy(fileName, directoryName);
 	strcat(fileName, RPCFACESSMALLFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
@@ -1038,6 +1038,26 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	//	New_UB_Inventory ();
 #endif
 	
+
+	//new vehicles by Jazz	
+	
+	InitNewVehicles ();
+	
+	strcpy(fileName, directoryName);
+	strcat(fileName, VEHICLESFILENAME);
+	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+	SGP_THROW_IFFALSE(ReadInNewCar(fileName,FALSE), VEHICLESFILENAME);
+	
+#ifndef ENGLISH
+		AddLanguagePrefix(fileName);
+		if ( FileExists(fileName) )
+		{
+			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+			if(!ReadInNewCar(fileName,TRUE))
+				return FALSE;
+		}
+#endif
+
 	LuaState::INIT(lua::LUA_STATE_STRATEGIC_MINES_AND_UNDERGROUND, true);
 	g_luaUnderground.LoadScript(GetLanguagePrefix());
 	// load Lua for Strategic Mines initialization
