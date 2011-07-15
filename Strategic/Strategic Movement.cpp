@@ -1818,14 +1818,25 @@ void GroupArrivedAtSector( UINT8 ubGroupID, BOOLEAN fCheckForBattle, BOOLEAN fNe
 		{
 			// check for discovering secret locations
 			INT8 bTownId = GetTownIdForSector( pGroup->ubSectorX, pGroup->ubSectorY );
+			
+			if ( gfHiddenTown[ bTownId ] == FALSE )
+				{
+					gfHiddenTown[ bTownId ] = TRUE;
+					
+					if ( gfIconTown[ bTownId ] == TRUE )
+						gfDrawHiddenTown[ bTownId ] = TRUE;
+				}
 		#ifdef JA2UB
 		//Ja25:	No tixa, orta or sam site
 		#else
+			/*
 			if( bTownId == TIXA )
 				SetTixaAsFound();
 			else if( bTownId == ORTA )
 				SetOrtaAsFound();
-			else if( IsThisSectorASAMSector( pGroup->ubSectorX, pGroup->ubSectorY, 0 ) )
+			else 
+			*/
+			if( IsThisSectorASAMSector( pGroup->ubSectorX, pGroup->ubSectorY, 0 ) )
 				SetSAMSiteAsFound( GetSAMIdFromSector( pGroup->ubSectorX, pGroup->ubSectorY, 0 ) );
 		#endif
 		}

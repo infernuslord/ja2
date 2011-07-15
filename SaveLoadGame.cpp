@@ -133,6 +133,7 @@
 #endif
 
 #include "LuaInitNPCs.h"
+#include "Vehicles.h"
 
 #include <vfs/Core/vfs.h>
 //rain
@@ -2462,13 +2463,25 @@ BOOLEAN OBJECTTYPE::Load( HWFILE hFile )
 		{
 			return(FALSE);
 		}
-		int size;
+		
+		int size = 0;
 		if ( !FileRead( hFile, &size, sizeof(int), &uiNumBytesRead ) )
 		{
 			return(FALSE);
 		}
+		
+		// WANNE: This is a safety check.
+		// The size can get any huge value, if we are using wrong items.xml on the savegame
+		// In that case, the "objectStack.resize(size) consumes ALL the memory on the system and then the game crashes because of not enough free memory!!!!
+		// When returning FALSE well tell there is something wrong and we can't load the savegame
+		if (size < 0 || size > 1000)
+		{
+			return(FALSE);
+		}
 
+		// WANNE.MEMORY: This call takes all the pc memory if we pass an invalid huge size as a parameter. See previous safety check.
 		objectStack.resize(size);
+		
 		int x = 0;
 		for (StackedObjects::iterator iter = objectStack.begin(); iter != objectStack.end(); ++iter, ++x) {
 			if (! iter->Load(hFile)) {
@@ -3637,9 +3650,31 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing lua global");
 		goto FAILED_TO_SAVE;
 	}
+	
 	#ifdef JA2BETAVERSION
 		SaveGameFilePosition( FileGetPos( hFile ), "Lua global" );
 	#endif
+		
+	//New vehicles by Jazz
+	if( !SaveNewVehiclesToSaveGameFile( hFile ) )
+	{
+		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing new vehicles");
+		goto FAILED_TO_SAVE;
+	}
+	
+	#ifdef JA2BETAVERSION
+		SaveGameFilePosition( FileGetPos( hFile ), "New Vehicles" );
+	#endif	
+	
+	if( !SaveHiddenTownToSaveGameFile( hFile ) )
+	{
+		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing hidden town");
+		goto FAILED_TO_SAVE;
+	}
+	
+	#ifdef JA2BETAVERSION
+		SaveGameFilePosition( FileGetPos( hFile ), "New Vehicles" );
+	#endif	
 
 	//Close the saved game file
 	FileClose( hFile );
@@ -5080,15 +5115,9 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 	#endif
 
 	uiRelEndPerc += 1;
-	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Final Checks..." );
-	RenderProgressBar( 0, 100 );
-	uiRelStartPerc = uiRelEndPerc;
-	uiRelEndPerc += 1;
 	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Lua Global System..." );
 	RenderProgressBar( 0, 100 );
 	uiRelStartPerc = uiRelEndPerc;
-
-
 
 	if( guiCurrentSaveGameVersion >= 114 )
 	{
@@ -5099,9 +5128,45 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 			return FALSE;
 		}
 	}
+	
 	#ifdef JA2BETAVERSION
 		LoadGameFilePosition( FileGetPos( hFile ), "Lua Global System" );
 	#endif
+
+	if( guiCurrentSaveGameVersion >= VEHICLES_DATATYPE_CHANGE)
+	{
+		uiRelEndPerc += 1;
+		SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Load New Vehicles..." );
+		RenderProgressBar( 0, 100 );
+		uiRelStartPerc = uiRelEndPerc;
+
+		if( !LoadNewVehiclesToSaveGameFile( hFile ) )
+		{
+			DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("LoadNewVehiclesToSaveGameFile failed" ) );
+			FileClose( hFile );
+			return( FALSE );
+		}
+	}
+	
+	if( guiCurrentSaveGameVersion >= HIDDENTOWN_DATATYPE_CHANGE)
+	{
+		uiRelEndPerc += 1;
+		SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Load Hidden Towns..." );
+		RenderProgressBar( 0, 100 );
+		uiRelStartPerc = uiRelEndPerc;
+
+		if( !LoadHiddenTownFromLoadGameFile( hFile ) )
+		{
+			DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("LoadHiddenTownFromLoadGameFile failed" ) );
+			FileClose( hFile );
+			return( FALSE );
+		}
+	}
+	
+	uiRelEndPerc += 1;
+	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Final Checks..." );
+	RenderProgressBar( 0, 100 );
+	uiRelStartPerc = uiRelEndPerc;
 
 #ifdef JA2UB	
 	//	New_UB_Inventory ();
@@ -6105,7 +6170,6 @@ BOOLEAN SaveEmailToSavedGame( HWFILE hFile )
 		gEmailT[ uiNumOfEmails ].EmailType = pEmail->EmailType;
 	
 		pEmail=pEmail->Next;
-		
 		uiNumOfEmails++;
 	}
 	
@@ -6341,7 +6405,7 @@ BOOLEAN LoadEmailFromSavedGame( HWFILE hFile )
 		MemFree( pEmailList );
 		pEmailList = NULL;
 	}
-	
+
 	return( TRUE );
 }
 

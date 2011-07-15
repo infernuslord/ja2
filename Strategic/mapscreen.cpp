@@ -4474,7 +4474,8 @@ UINT32 MapScreenHandle(void)
 	VOBJECT_DESC VObjectDesc;
 //	static BOOLEAN fSecondFrame = FALSE;
 	INT32 iCounter = 0;
-
+	INT32 iCounter2 = 0;
+	char fileName[500];
 
 
 	//DO NOT MOVE THIS FUNCTION CALL!!!
@@ -4688,14 +4689,14 @@ UINT32 MapScreenHandle(void)
 				MAP_VIEW_WIDTH = 688;			
 				MAP_VIEW_HEIGHT = 560 + 10 + 17;
 
-				MAP_FONT = BLOCKFONT2;
+				MAP_FONT = FONT12ARIAL;
 
 				MAP_HORT_INDEX_X = (MAP_BORDER_X + MAP_BORDER_X_OFFSET + 53);
 				MAP_HORT_INDEX_Y = (MAP_BORDER_Y + MAP_BORDER_Y_OFFSET + 19);
 				MAP_HORT_HEIGHT = GetFontHeight(MAP_FONT);
 
-				MAP_VERT_INDEX_X = (MAP_BORDER_X + MAP_BORDER_X_OFFSET + 25);
-				MAP_VERT_INDEX_Y = (MAP_BORDER_Y + MAP_BORDER_Y_OFFSET + 47);
+				MAP_VERT_INDEX_X = (MAP_BORDER_X + MAP_BORDER_X_OFFSET + 24);
+				MAP_VERT_INDEX_Y = (MAP_BORDER_Y + MAP_BORDER_Y_OFFSET + 44);
 				MAP_VERT_WIDTH = GetFontHeight(MAP_FONT);
 
 				// Helicopter ETA box
@@ -4859,6 +4860,47 @@ UINT32 MapScreenHandle(void)
 		VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
 		FilenameForBPP("INTERFACE\\prison.sti", VObjectDesc.ImageFile);
 		CHECKF(AddVideoObject(&VObjectDesc, &guiTIXAICON));
+		
+       //----------- legion 2
+		for( iCounter2 = 1; iCounter2 < NUM_TOWNS; iCounter2++ )
+		{
+		//	if ( gfIconTown[iCounter2] != -1 && gfDrawHiddenTown[iCounter2] == TRUE )
+		//	{
+				VObjectDesc.fCreateFlags = VOBJECT_CREATE_FROMFILE;
+				//FilenameForBPP("INTERFACE\\PRISON.sti", VObjectDesc.ImageFile);
+				
+				/*
+				if (iResolution == 0)
+				{
+					strcpy(fileName, gHiddenIcon[iCounter2].IconSti);
+					strcat(fileName,".sti");
+				}
+				if (iResolution == 1)
+				{
+					strcpy(fileName, gHiddenIcon[iCounter2].IconSti);
+					strcat(fileName,"_800x600.sti");
+				}
+				if (iResolution == 2)
+				{
+					strcpy(fileName, gHiddenIcon[iCounter2].IconSti);
+					strcat(fileName,"_1024x768.sti");
+				}
+				
+				if ( gfIconTown[iCounter2] == TRUE )
+					strcpy(VObjectDesc.ImageFile, fileName);
+				else
+					FilenameForBPP("INTERFACE\\PRISON.sti", VObjectDesc.ImageFile);
+				*/
+
+				if ( gfIconTown[iCounter2] == TRUE )
+					strcpy(VObjectDesc.ImageFile, gHiddenIcon[iCounter2].IconSti);
+				else
+					FilenameForBPP("INTERFACE\\PRISON.sti", VObjectDesc.ImageFile);
+					
+				CHECKF(AddVideoObject(&VObjectDesc, &guiIcon2[iCounter2]));
+		//	}
+		 }
+        //-------
 
 		VObjectDesc.fCreateFlags=VOBJECT_CREATE_FROMFILE;
 		FilenameForBPP("INTERFACE\\merc_between_sector_icons.sti", VObjectDesc.ImageFile);
@@ -6725,6 +6767,8 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 	BOOLEAN fCtrl, fAlt;
 
 	INT16 sMapX, sMapY;
+	
+	INT32 iCounter2 = 0;
 
 	fCtrl = _KeyDown( CTRL );
 	fAlt = _KeyDown( ALT );
@@ -7718,6 +7762,15 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 						#ifdef JA2TESTVERSION
 							fFoundOrta = !fFoundOrta;
 							fFoundTixa = !fFoundTixa;
+							
+							//gfHiddenTown[ TIXA ] = TRUE;
+							//gfHiddenTown[ ORTA ] = TRUE;
+							
+							for( iCounter2 = 1; iCounter2 < NUM_TOWNS; iCounter2++ )
+								{
+									gfHiddenTown [ iCounter2 ] = TRUE; 
+								}
+	
 							fMapPanelDirty = TRUE;
 						#endif
 					}
@@ -8126,6 +8179,9 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 
 void EndMapScreen( BOOLEAN fDuringFade )
 {
+
+INT32 iCounter2 = 0;
+
 	if ( fInMapMode == FALSE )
 	{
 		// shouldn't be here
@@ -8303,6 +8359,14 @@ void EndMapScreen( BOOLEAN fDuringFade )
 		DeleteVideoObjectFromIndex( guiHelicopterIcon );
 		DeleteVideoObjectFromIndex( guiMINEICON );
 		DeleteVideoObjectFromIndex( guiSectorLocatorGraphicID );
+		
+        //----------- Legion 2
+		for( iCounter2 = 1; iCounter2 < NUM_TOWNS; iCounter2++ )
+		{
+			//if ( gfIconTown[iCounter2] != -1 && gfDrawHiddenTown[iCounter2] == TRUE )
+                DeleteVideoObjectFromIndex(guiIcon2[iCounter2]);
+		}
+        //-------
 
 		DeleteVideoObjectFromIndex( guiBULLSEYE );
 
@@ -12935,6 +12999,8 @@ BOOLEAN AnyMercsLeavingRealSoon()
 void HandleRemovalOfPreLoadedMapGraphics( void )
 {
 
+INT32 iCounter2 = 0;
+
 	if( fPreLoadedMapGraphics == TRUE )
 	{
 		DeleteMapBottomGraphics( );
@@ -12976,6 +13042,14 @@ void HandleRemovalOfPreLoadedMapGraphics( void )
 		DeleteVideoObjectFromIndex( guiNewMailIcons );
 
 		DeleteVideoObjectFromIndex( guiBULLSEYE );
+		
+        //----------- Legion 2
+		for( iCounter2 = 1; iCounter2 < NUM_TOWNS; iCounter2++ )
+		{
+			//if ( gfIconTown[iCounter2] != -1 && gfDrawHiddenTown[iCounter2] == TRUE )
+				DeleteVideoObjectFromIndex(guiIcon2[iCounter2]);
+		}
+        //-------
 
 
 		// remove the graphic for the militia pop up box
@@ -15004,7 +15078,7 @@ void DestinationPlottingCompleted( void )
 void HandleMilitiaRedistributionClick( void )
 {
 	INT8 bTownId;
-	BOOLEAN fTownStillHidden;
+	//BOOLEAN fTownStillHidden;
 	CHAR16 sString[ 128 ];
 
 
@@ -15012,9 +15086,11 @@ void HandleMilitiaRedistributionClick( void )
 	if ( iCurrentMapSectorZ == 0 )
 	{
 		bTownId = GetTownIdForSector( sSelMapX, sSelMapY );
-		fTownStillHidden = ( ( bTownId == TIXA ) && !fFoundTixa ) || ( ( bTownId == ORTA ) && !fFoundOrta );
-
-		if( ( bTownId != BLANK_SECTOR ) && !fTownStillHidden )
+		//fTownStillHidden = ( ( bTownId == TIXA ) && !fFoundTixa ) || ( ( bTownId == ORTA ) && !fFoundOrta );
+		
+	//	fTownStillHidden = ( ( bTownId == TIXA ) && !gfHiddenTown[ TIXA ] ) || ( ( bTownId == ORTA ) && !gfHiddenTown[ ORTA ] );
+		
+		if( ( bTownId != BLANK_SECTOR ) && !gfHiddenTown[ bTownId ] ) //&& !fTownStillHidden )
 		{
 			if ( MilitiaTrainingAllowedInSector( sSelMapX, sSelMapY, ( INT8 )iCurrentMapSectorZ ) )
 			{

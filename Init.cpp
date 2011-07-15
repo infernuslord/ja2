@@ -557,6 +557,11 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	}
 #endif
 
+	//strcpy(fileName, directoryName);
+	//strcat(fileName, CITYTABLEFILENAME);
+	//SGP_THROW_IFFALSE(WriteInStrategicMapSectorTownNames(fileName),CITYTABLEFILENAME);
+
+
 	// Lesh: Strategic movement costs will be read in Strategic\Strategic Movement Costs.cpp,
 	//		function BOOLEAN InitStrategicMovementCosts();
 	//		It is called several times from various places and acts after clearing SectorInfo array
