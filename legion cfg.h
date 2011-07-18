@@ -155,6 +155,8 @@ typedef struct
 	
 	BOOLEAN fBobbyRSite;
 	BOOLEAN fDeadMerc;
+	
+	BOOLEAN OLDUBInventory;
        
 } GAME_LEGION_OPTIONS;
 

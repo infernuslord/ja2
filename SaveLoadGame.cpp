@@ -2752,6 +2752,8 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 	INT32		iSaveLoadGameMessageBoxID = -1;
 	UINT16	usPosX, usActualWidth, usActualHeight;
 	BOOLEAN fWePausedIt = FALSE;
+	
+	CHAR16	zString[128];
 
 
 	//sprintf(	saveDir, "%S", pMessageStrings[ MSG_SAVEDIRECTORY ] );
@@ -2763,7 +2765,7 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 #endif
 #endif
 
-	if( ubSaveGameID > NUM_SLOT && ubSaveGameID < EARLIST_SPECIAL_SAVE )
+	if( ubSaveGameID > NUM_SAVE_GAMES /*NUM_SLOT*/ || ubSaveGameID == EARLIST_SPECIAL_SAVE )
 		return( FALSE );		//ddd
 	alreadySaving = true;
 
@@ -2783,7 +2785,20 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 
 
 	//Place a message on the screen telling the user that we are saving the game
-	iSaveLoadGameMessageBoxID = PrepareMercPopupBox( iSaveLoadGameMessageBoxID, BASIC_MERC_POPUP_BACKGROUND, BASIC_MERC_POPUP_BORDER, zSaveLoadText[ SLG_SAVING_GAME_MESSAGE ], 300, 0, 0, 0, &usActualWidth, &usActualHeight);
+	if ( ubSaveGameID >= SAVE__TIMED_AUTOSAVE_SLOT1 && ubSaveGameID < SAVE__TIMED_AUTOSAVE_SLOT5 + 1 )
+	{
+		swprintf( zString, L"%s%d",pMessageStrings[ MSG_SAVE_AUTOSAVE_SAVING_TEXT ],ubSaveGameID );
+		iSaveLoadGameMessageBoxID = PrepareMercPopupBox( iSaveLoadGameMessageBoxID, BASIC_MERC_POPUP_BACKGROUND, BASIC_MERC_POPUP_BORDER, zString, 300, 0, 0, 0, &usActualWidth, &usActualHeight);
+	}
+	else if ( ubSaveGameID == SAVE__END_TURN_NUM ) //SAVE__END_TURN_NUM_1 || ubSaveGameID == SAVE__END_TURN_NUM_2 )
+	{
+		//swprintf( zString, L"%s%d",pMessageStrings[ MSG_SAVE_AUTOSAVE_SAVING_TEXT ],ubSaveGameID );
+		swprintf( zString, L"%s",pMessageStrings[ MSG_SAVE_AUTOSAVE_SAVING_TEXT ] );
+		iSaveLoadGameMessageBoxID = PrepareMercPopupBox( iSaveLoadGameMessageBoxID, BASIC_MERC_POPUP_BACKGROUND, BASIC_MERC_POPUP_BORDER, zString, 300, 0, 0, 0, &usActualWidth, &usActualHeight);
+	}
+	else	
+		iSaveLoadGameMessageBoxID = PrepareMercPopupBox( iSaveLoadGameMessageBoxID, BASIC_MERC_POPUP_BACKGROUND, BASIC_MERC_POPUP_BORDER, zSaveLoadText[ SLG_SAVING_GAME_MESSAGE ], 300, 0, 0, 0, &usActualWidth, &usActualHeight);
+	
 	usPosX = ( SCREEN_WIDTH - usActualWidth ) / 2 ;
 
 	RenderMercPopUpBoxFromIndex( iSaveLoadGameMessageBoxID, usPosX, iScreenHeightOffset + 160, FRAME_BUFFER );
@@ -3654,17 +3669,17 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 	#ifdef JA2BETAVERSION
 		SaveGameFilePosition( FileGetPos( hFile ), "Lua global" );
 	#endif
-		
+	
 	//New vehicles by Jazz
 	if( !SaveNewVehiclesToSaveGameFile( hFile ) )
 	{
 		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing new vehicles");
 		goto FAILED_TO_SAVE;
-	}
-	
+
 	#ifdef JA2BETAVERSION
 		SaveGameFilePosition( FileGetPos( hFile ), "New Vehicles" );
-	#endif	
+	#endif
+	}
 	
 	if( !SaveHiddenTownToSaveGameFile( hFile ) )
 	{
@@ -3676,15 +3691,33 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 		SaveGameFilePosition( FileGetPos( hFile ), "New Vehicles" );
 	#endif	
 
+
+	
+	if( !SaveDataSaveToSaveGameFile( hFile ) )
+	{
+		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing save data");
+		goto FAILED_TO_SAVE;
+
+	#ifdef JA2BETAVERSION
+		SaveGameFilePosition( FileGetPos( hFile ), "Save Data" );
+	#endif	
+
+	}
+	
+
+	
 	//Close the saved game file
 	FileClose( hFile );
 
 
 	//if we succesfully saved the game, mark this entry as the last saved game file
-	if( ubSaveGameID < EARLIST_SPECIAL_SAVE && ubSaveGameID != SAVE__TIMED_AUTOSAVE )
-	{
-		gGameSettings.bLastSavedGameSlot = ubSaveGameID;
-	}
+	//if( ubSaveGameID < EARLIST_SPECIAL_SAVE && ubSaveGameID != SAVE__TIMED_AUTOSAVE_SLOT1 )
+	//{
+		if ( ubSaveGameID == 0 || ubSaveGameID < SAVE__ASSERTION_FAILURE )
+			gGameSettings.bLastSavedGameSlot = ubSaveGameID;
+		else
+			gGameSettings.bLastSavedGameSlot = -1;
+	//}
 
 	//Save the save game settings
 	SaveGameSettings();
@@ -3699,7 +3732,7 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 		ScreenMsg( FONT_MCOLOR_WHITE, MSG_INTERFACE, pMessageStrings[ MSG_SAVESUCCESS ] );
 	}
 //#ifdef JA2BETAVERSION
-	else if( ubSaveGameID == SAVE__END_TURN_NUM )
+	else if( ubSaveGameID == SAVE__END_TURN_NUM ) //SAVE__END_TURN_NUM_1 || ubSaveGameID == SAVE__END_TURN_NUM_2 )
 	{
 //		ScreenMsg( FONT_MCOLOR_WHITE, MSG_INTERFACE, pMessageStrings[ MSG_END_TURN_AUTO_SAVE ] );
 	}
@@ -3828,7 +3861,7 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 #endif
 
 	//is it a valid save number
-	if( ubSavedGameID >= NUM_SLOT )
+	if( ubSavedGameID >=  SAVE__END_TURN_NUM ) //NUM_SLOT )
 	{
 		if( ubSavedGameID != SAVE__END_TURN_NUM )
 			return( FALSE );
@@ -4337,18 +4370,30 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 	RenderProgressBar( 0, 100 );
 	uiRelStartPerc = uiRelEndPerc;
 
-
-
-	if( !LoadQuestInfoFromSavedGameFile( hFile ) )
+	if( guiCurrentSaveGameVersion < QUESTS_DATATYPE_CHANGE )
 	{
-		DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("LoadQuestInfoFromSavedGameFile failed" ) );
-		FileClose( hFile );
-		return( FALSE );
+		if( !LoadQuestInfoFromSavedGameFile( hFile, MAX_OLD_QUESTS ) )
+		{
+			DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("LoadQuestInfoFromSavedGameFile failed" ) );
+			FileClose( hFile );
+			return( FALSE );
+		}
+		#ifdef JA2BETAVERSION
+			LoadGameFilePosition( FileGetPos( hFile ), "Quest Info" );
+		#endif
 	}
-	#ifdef JA2BETAVERSION
-		LoadGameFilePosition( FileGetPos( hFile ), "Quest Info" );
-	#endif
-
+	else
+	{
+		if( !LoadQuestInfoFromSavedGameFile( hFile, MAX_QUESTS ) )
+		{
+			DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("LoadQuestInfoFromSavedGameFile failed" ) );
+			FileClose( hFile );
+			return( FALSE );
+		}
+		#ifdef JA2BETAVERSION
+			LoadGameFilePosition( FileGetPos( hFile ), "Quest Info" );
+		#endif
+	}
 
 	uiRelEndPerc += 1;
 	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"OppList Info..." );
@@ -5114,13 +5159,13 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 		LoadGameFilePosition( FileGetPos( hFile ), "Load New Sytem Mercs Prfiles" );
 	#endif
 
+
+	if( guiCurrentSaveGameVersion >= 114 )
+	{
 	uiRelEndPerc += 1;
 	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Lua Global System..." );
 	RenderProgressBar( 0, 100 );
 	uiRelStartPerc = uiRelEndPerc;
-
-	if( guiCurrentSaveGameVersion >= 114 )
-	{
 		if( !LoadLuaGlobalFromLoadGameFile( hFile ) )
 		{
 			DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("LoadLuaGlobalFromLoadGameFile failed" ) );
@@ -5128,11 +5173,11 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 			return FALSE;
 		}
 	}
-	
+
 	#ifdef JA2BETAVERSION
 		LoadGameFilePosition( FileGetPos( hFile ), "Lua Global System" );
 	#endif
-
+	
 	if( guiCurrentSaveGameVersion >= VEHICLES_DATATYPE_CHANGE)
 	{
 		uiRelEndPerc += 1;
@@ -5147,6 +5192,11 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 			return( FALSE );
 		}
 	}
+
+
+	#ifdef JA2BETAVERSION
+		LoadGameFilePosition( FileGetPos( hFile ), "New Vehicles" );
+	#endif
 	
 	if( guiCurrentSaveGameVersion >= HIDDENTOWN_DATATYPE_CHANGE)
 	{
@@ -5161,6 +5211,31 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 			FileClose( hFile );
 			return( FALSE );
 		}
+	}
+
+	#ifdef JA2BETAVERSION
+		LoadGameFilePosition( FileGetPos( hFile ), "Load Hidden Towns" );
+	#endif
+
+
+	if( guiCurrentSaveGameVersion >= NEW_SAVE_GAME_GENERAL_SAVE_INFO_DATA)
+	{
+		uiRelEndPerc += 1;
+		SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Load Save Data..." );
+		RenderProgressBar( 0, 100 );
+		uiRelStartPerc = uiRelEndPerc;
+
+		if( !LoadDataSaveFromLoadGameFile( hFile ) )
+		{
+			DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("LoadDataSaveFromLoadGameFile failed" ) );
+			FileClose( hFile );
+			return( FALSE );
+		}
+		
+	#ifdef JA2BETAVERSION
+		LoadGameFilePosition( FileGetPos( hFile ), "Load Save Data" );
+	#endif		
+		
 	}
 	
 	uiRelEndPerc += 1;
@@ -6976,25 +7051,33 @@ void CreateSavedGameFileNameFromNumber( UINT8 ubSaveGameID, STR pzNewFileName )
 #endif
 			sprintf( pzNewFileName , "%s\\%S.%S", gSaveDir, pMessageStrings[ MSG_QUICKSAVE_NAME ], pMessageStrings[ MSG_SAVEEXTENSION ] );
 	}
-//#ifdef JA2BETAVERSION
-	else if( ubSaveGameID == SAVE__END_TURN_NUM )
+	else if( ubSaveGameID>= SAVE__TIMED_AUTOSAVE_SLOT1 && ubSaveGameID < SAVE__TIMED_AUTOSAVE_SLOT5 + 1 )
 	{
-		//The name of the file
-		sprintf( pzNewFileName , "%s\\Auto%02d.%S", gSaveDir, guiLastSaveGameNum, pMessageStrings[ MSG_SAVEEXTENSION ] );
-
-		//increment end turn number
-		guiLastSaveGameNum++;
-
-		//just have 2 saves
-		if( guiLastSaveGameNum == 2 )
-		{
-			guiLastSaveGameNum = 0;
-		}
+		sprintf( pzNewFileName , "%s\\%S%02d.%S", gSaveDir, pMessageStrings[ MSG_SAVE_AUTOSAVE_FILENAME ], ubSaveGameID, pMessageStrings[ MSG_SAVEEXTENSION ] );
 	}
-//#endif
+	else if( ubSaveGameID == SAVE__END_TURN_NUM_1 || ubSaveGameID == SAVE__END_TURN_NUM_2 )
+	{
+		if ( ubSaveGameID == SAVE__END_TURN_NUM_1 ) 
+			sprintf( pzNewFileName , "%s\\Auto%02d.%S", gSaveDir, 0, pMessageStrings[ MSG_SAVEEXTENSION ] );
+		else if ( ubSaveGameID == SAVE__END_TURN_NUM_2 ) 
+			sprintf( pzNewFileName , "%s\\Auto%02d.%S", gSaveDir, 1, pMessageStrings[ MSG_SAVEEXTENSION ] );
+	}
+	else if( ubSaveGameID == SAVE__END_TURN_NUM  )
+	{
+			//The name of the file
+			sprintf( pzNewFileName , "%s\\Auto%02d.%S", gSaveDir, guiLastSaveGameNum, pMessageStrings[ MSG_SAVEEXTENSION ] );
 
+			//increment end turn number
+			guiLastSaveGameNum++;
+
+			//just have 2 saves
+			if( guiLastSaveGameNum == 2 )
+			{
+				guiLastSaveGameNum = 0;
+			}
+	}
 	else
-		sprintf( pzNewFileName , "%s\\%S%02d.%S", gSaveDir, pMessageStrings[ MSG_SAVE_NAME ], ubSaveGameID, pMessageStrings[ MSG_SAVEEXTENSION ] );
+		sprintf( pzNewFileName , "%s\\%S%02d.%S", gSaveDir, pMessageStrings[ MSG_SAVE_NAME ], ubSaveGameID - SAVE__END_TURN_NUM_2, pMessageStrings[ MSG_SAVEEXTENSION ] );
 }
 
 

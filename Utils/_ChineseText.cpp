@@ -4786,7 +4786,7 @@ STR16			zSaveLoadText[] =
 	//the second is the recommended amount of free space.
 	L"你的硬盘空间不够。你现在只有 %dM 可用空间，JA2需要至少 %dM 可用空间。",
 
-	L"保存...",	//"Saving...",			//When saving a game, a message box with this string appears on the screen
+	L"保存",	//"Saving",			//When saving a game, a message box with this string appears on the screen
 
 	L"普通武器",		//"Normal Guns",
 	L"包括前华约武器",	//"Tons of Guns",
@@ -5423,12 +5423,25 @@ STR16 pMessageStrings[] =
 	L"正常回合制模式",
 	L"离开战斗",
 	L"强制回合制模式启动，进入战斗",
-#ifdef JA2BETAVERSION
 	L"自动储存成功。",
-#endif
 	L"..\\SavedGames\\MP_SavedGames", //The name of the directory where games are saved.//84
 	L"客户端", //"Client",
 	L"旧携行系统不能与新附件系统同时使用.",
+
+	// TODO.Translate
+	L"AutoSave #", //91		// Text des Auto Saves im Load Screen mit ID
+	L"This slot is reserved for Auto Saves.", //92	// The text, when the user clicks on the save screen on an auto save
+	L"Empty Auto Save Slot #", //93	// The text, when the auto save slot (1 - 5) is empty (not saved yet)
+	L"AutoSaveGame",		// 94	// The filename of the auto save, such as AutoSaveGame01 - AutoSaveGame05
+	L"End Turn Auto Save",	// 95	// The text for the tactical end turn auto save
+	L"Saving AutoSave #",	// 96	// The message box, when doing auto save
+	L"Empty Auto Save End Turn Slot #",	// 97	// The message box, when doing auto save
+	L"This slot is reserved for end turn Auto Saves .", //98	// The text, when the user clicks on the save screen on an auto save
+	L"End Turn AutoSave #", //99
+	L"Quick Slot#%d",
+	L"Strategic Map AutoSave Slot#%d",
+	L"End Turn Auto Save#%d",
+	L"Save Slot#%d", //103
 };
 
 
@@ -6880,12 +6893,12 @@ STR16 szUDBAdvStatsExplanationsTooltipText[]=
 	L"\n \n当该物品戴在身上或附在穿戴品上时，增加在\n沙漠环境中的伪装值。\n \n该伪装需靠近沙砾或沙漠植被才能发挥最大功\n效。\n \n该伪装数值越高越好。",
 	L"\n \n当该物品戴在身上或附在穿戴品上时，增加在\n雪地环境中的伪装值。\n \n该伪装需靠近雪地才能发挥最大功效。\n \n该伪装数值越高越好。",
 	L"\n \n当该物品戴在身上或附在穿戴品上时，修正潜\n行的能力，使潜行者更难被听到。\n \n注意该修正值并不能使其他人看不见潜行者，\n而只能改变潜行中的动静大小。\n \n该数值越高越好。",
-	L"\n \n当该物品戴在身上或附在穿戴品上时，修正听\n觉距离（以格数计算）。\n \n正数修正值让使用者听得更远。\n \n反之，负数修正值阻碍使用者的听力。\n \n该数值越高越好。",
-	L"\n \n当该物品戴在身上或附在穿戴品上时，修正视\n距（以格数计算）。\n \n这项修正作用于任何情况下。\n \n该数值越高越好。",
-	L"\n \n当该物品戴在身上或附在穿戴品上时，修正视\n距（以格数计算）。\n \n这项修正仅作用于夜晚的低光环境中。\n \n该数值越高越好。",
-	L"\n \n当该物品戴在身上或附在穿戴品上时，修正视\n距（以格数计算）。\n \n这项修正仅作用于白天光量适中或稍强的环境\n中。\n \n该数值越高越好。",
-	L"\n \n当该物品戴在身上或附在穿戴品上时，修正视\n距（以格数计算）。\n \n这项修正仅作用于高光环境中，如正午时或者\n查看被发光棒照亮的格子时。\n \n该数值越高越好。",
-	L"\n \n当该物品戴在身上或附在穿戴品上时，修正视\n距（以格数计算）。\n \n这项修正仅作用于低光的洞穴中。\n \n该数值越高越好。",
+	L"\n \nWhen this item is worn, or attached to a worn\nitem, it modifies the wearer's Hearing Range by the\nlisted percent.\n \nA positive bonus makes it possible to hear noises\nfrom a greater distance.\n \nConversely, a negative modifier impairs the wearer's hearing.\n \nHigher is better.",
+	L"\n \nWhen this item is worn, or attached to a worn\nitem, it modifies the wearer's Vision Range by the\nlisted percent.\n \nThis General modifier works in all conditions.\n \nHigher is better.",
+	L"\n \nWhen this item is worn, or attached to a worn\nitem, it modifies the wearer's Vision Range by the\nlisted percent.\n \nThis Night-Vision modifier works only when light\nlevels are sufficiently low.\n \nHigher is better.",
+	L"\n \nWhen this item is worn, or attached to a worn\nitem, it modifies the wearer's Vision Range by the\nlisted percent.\n \nThis Day-Vision modifier works only when light\nlevels are average or higher.\n \nHigher is better.",
+	L"\n \nWhen this item is worn, or attached to a worn\nitem, it modifies the wearer's Vision Range by the\nlisted percent.\n \nThis Bright-Vision modifier works only when light\nlevels are very high, for example when looking\ninto tiles lit by Break-Lights or at high noon.\n \nHigher is better.",
+	L"\n \nWhen this item is worn, or attached to a worn\nitem, it modifies the wearer's Vision Range by the\nlisted percent.\n \nThis Cave-Vision modifier works only in the dark\nand only underground.\n \nHigher is better.",
 	L"\n \n当该物品戴在身上或附在穿戴品上时，改变视\n野范围，使可视角度变窄。\n \n该数值越低越好。",
 	L"\n \n这是射手在点射或者连发时，制退后坐力的能力。\n \n该数值越高越好。",
 	L"\n \n这是射手在点射或者连发时，频繁估量制退力\n大小的能力。\n \n低修正值能够提高子弹的总体精度，在射手能\n正确制退后坐力的前提下，远距离的连发也更\n能加准确。\n \n该数值越低越好。",
@@ -6932,12 +6945,12 @@ STR16 szUDBAdvStatsExplanationsTooltipTextForWeapons[]=
 	L"\n \n当装备这件武器时，增加在沙漠环境中的伪装值。\n \n该伪装需靠近沙砾或沙漠植被才能发挥最大功\n效。\n \n该伪装数值越高越好。",
 	L"\n \n当装备这件武器时，增加在雪地环境中的伪装值。\n \n该伪装需靠近雪地才能发挥最大功效。\n \n该伪装数值越高越好。",
 	L"\n \n当装备这件武器时，修正潜行的能力，使潜行\n者更难或更容易被听到。\n \n注意该修正值并不能使其他人看不见潜行者，\n而只能改变潜行中的动静大小。\n \n该数值越高越好。",
-	L"\n \n当装备这件武器时，修正听觉距离（以格数计\n算）。\n \n正数修正值让使用者听得更远。\n \n反之，负数修正值阻碍使用者的听力。\n \n该数值越高越好。",
-	L"\n \n由于所装附件或其固有特性，当装备这件武器\n时，修正视距（以格数计算）。\n \n这项修正作用于任何情况下。\n \n该数值越高越好。",
-	L"\n \n由于所装附件或其固有特性，当装备这件武器\n时，修正视距（以格数计算）。\n \n这项修正仅作用于夜晚的低光环境中。\n \n该数值越高越好。",
-	L"\n \n由于所装附件或其固有特性，当装备这件武器\n时，修正视距（以格数计算）。\n \n这项修正仅作用于白天光量适中或稍强的环境\n中。\n \n该数值越高越好。",
-	L"\n \n由于所装附件或其固有特性，当装备这件武器\n时，修正视距（以格数计算）。\n \n这项修正仅作用于高光环境中，如正午时或者\n查看被发光棒照亮的格子时。\n \n该数值越高越好。",
-	L"\n \n由于所装附件或其固有特性，当装备这件武器\n时，修正视距（以格数计算）。\n \n这项修正仅作用于低光的洞穴中。\n \n该数值越高越好。",
+	L"\n \nWhen this weapon is held in hand, it modifies the\nsoldier's Hearing Range by the listed percent.\n \nA positive bonus makes it possible to hear noises\nfrom a greater distance.\n \nConversely, a negative modifier impairs the wearer's hearing.\n \nHigher is better.",
+	L"\n \nWhen this weapon is raised to the shooting position,\nit modifies the wearer's Vision Range by the\nlisted percent, thanks to attachments or\ninherent properties of the weapon.\n \nThis General modifier works in all conditions.\n \nHigher is better.",
+	L"\n \nWhen this weapon is raised to the shooting position,\nit modifies the wearer's Vision Range by the\nlisted percent, thanks to attachments or\ninherent properties of the weapon.\n \nThis Night-Vision modifier works only when light\nlevels are sufficiently low.\n \nHigher is better.",
+	L"\n \nWhen this weapon is raised to the shooting position,\nit modifies the wearer's Vision Range by the\nlisted percent, thanks to attachments or\ninherent properties of the weapon.\n \nThis Day-Vision modifier works only when light\nlevels are average or higher.\n \nHigher is better.",
+	L"\n \nWhen this weapon is raised to the shooting position,\nit modifies the wearer's Vision Range by the\nlisted percent, thanks to attachments or\ninherent properties of the weapon.\n \nThis Bright-Vision modifier works only when light\nlevels are very high, for example when looking\ninto tiles lit by Break-Lights or at high noon.\n \nHigher is better.",
+	L"\n \nWhen this weapon is raised to the shooting position,\nit modifies the wearer's Vision Range by the\nlisted percent, thanks to attachments or\ninherent properties of the weapon.\n \nThis Cave-Vision modifier works only in the dark\nand only underground.\n \nHigher is better.",
 	L"\n \n当装备这件武器时，改变视野范围，使可视角\n度变窄。\n \n该数值越低越好。",
 	L"\n \n这是射手在点射和连发时，制退后坐力的能力。\n \n该数值越高越好。",
 	L"\n \n这是射手频繁估量制退力大小的能力。\n \n如果武器点射和连发功能都没有，则此能力无\n效。\n \n低修正值能够提高子弹的总体精度，在射手能\n正确制退后坐力的前提下，远距离的连发也更\n能加准确。\n \n该数值越低越好。",

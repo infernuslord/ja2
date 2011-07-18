@@ -571,7 +571,6 @@ SOLDIERTYPE* TacticalCreateSoldier( SOLDIERCREATE_STRUCT *pCreateStruct, UINT8 *
 	BOOLEAN					fGuyAvail = FALSE;
 	UINT8						bLastTeamID;
 	UINT8						ubVehicleID = 0;
-	UINT32 iCounter2;
 	
 	*pubID = NOBODY;
 	DebugMsg(TOPIC_JA2,DBG_LEVEL_3,String("TacticalCreateSoldier"));

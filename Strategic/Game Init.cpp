@@ -83,6 +83,7 @@
 
 #include "LuaInitNPCs.h"
 #include "Luaglobal.h"
+#include "SaveLoadScreen.h"
 
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -535,6 +536,14 @@ BOOLEAN InitNewGame( BOOLEAN fReset )
 		gubScreenCount = 0;
 		return( TRUE );
 	}
+	
+	//reset autosave
+	AutoSaveToSlot[0] = FALSE;
+	AutoSaveToSlot[1] = FALSE;
+	AutoSaveToSlot[2] = FALSE;
+	AutoSaveToSlot[3] = FALSE;
+	AutoSaveToSlot[4] = FALSE;
+	
 
 #ifdef JA2UB
 //Ja25 no meanwhiles

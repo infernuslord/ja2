@@ -1569,13 +1569,15 @@ BOOLEAN SaveQuestInfoToSavedGameFile( HWFILE hFile )
 }
 
 
-BOOLEAN LoadQuestInfoFromSavedGameFile( HWFILE hFile )
+BOOLEAN LoadQuestInfoFromSavedGameFile( HWFILE hFile, UINT8 MaxQuest )
 {
 	UINT32	uiNumBytesRead;
 
 	//Save all the states if the Quests
-	FileRead( hFile, gubQuest, MAX_QUESTS, &uiNumBytesRead );
-	if( uiNumBytesRead != MAX_QUESTS )
+	//FileRead( hFile, gubQuest, MAX_QUESTS, &uiNumBytesRead );
+	//if( uiNumBytesRead != MAX_QUESTS )
+	FileRead( hFile, gubQuest, MaxQuest, &uiNumBytesRead );
+	if( uiNumBytesRead != MaxQuest )
 	{
 		return(FALSE);
 	}

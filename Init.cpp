@@ -1037,10 +1037,10 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 */
 
 #ifdef JA2UB	
-	//if ( OldNew == TRUE )
-	//	Old_UB_Inventory ();
-	//else
-	//	New_UB_Inventory ();
+	if ( gGameLegionOptions.OLDUBInventory == TRUE )
+		Old_UB_Inventory ();
+	else
+		New_UB_Inventory ();
 #endif
 	
 

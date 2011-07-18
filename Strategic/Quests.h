@@ -9,7 +9,8 @@
 #define	QUESTINPROGRESS					1
 #define QUESTDONE								2
 
-#define MAX_QUESTS							30
+#define MAX_QUESTS								255
+#define MAX_OLD_QUESTS							30
 #define MAX_FACTS								65536
 #define	NUM_FACTS								500			//If you increase this number, add entries to the fact text list in QuestText.c
 
@@ -598,7 +599,7 @@ extern void CheckForQuests( UINT32 uiDay );
 
 void InitQuestEngine();
 
-BOOLEAN LoadQuestInfoFromSavedGameFile( HWFILE hFile );
+BOOLEAN LoadQuestInfoFromSavedGameFile( HWFILE hFile, UINT8 MaxQuest );
 BOOLEAN SaveQuestInfoToSavedGameFile( HWFILE hFile );
 
 // added by SANDRO

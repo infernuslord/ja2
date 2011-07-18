@@ -1437,6 +1437,8 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 	static BOOLEAN	fAltDown = FALSE;
 	INT32 usMapPos;
 	BOOLEAN						fGoodCheatLevelKey = FALSE;
+	
+	CHAR16	zString[128]; 
 
 	GetCursorPos(&MousePos);
 	ScreenToClient(ghWindow, &MousePos); // In window coords!
@@ -3908,7 +3910,9 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 				}
 				else if ( fCtrl && fShift )
 				{
-					SaveGame( SAVE__TIMED_AUTOSAVE, L"Auto Save" );
+					//SaveGame( SAVE__TIMED_AUTOSAVE_SLOT1, L"Auto Save 1" );
+					swprintf( zString, L"%s %d",pMessageStrings[ 90 ],SAVE__TIMED_AUTOSAVE_SLOT1);
+					DoAutoSave(SAVE__TIMED_AUTOSAVE_SLOT1,zString);
 				}
 				else
 				{	

@@ -4625,7 +4625,7 @@ STR16 zSaveLoadText[] =
 	L"Sie haben zu wenig Festplattenspeicher. Sie haben nur %d MB frei und JA2 benötigt mindestens %d MB.",
 	
 										
-	L"Speichere...",	//While the game is saving this message appears.
+	L"Speichere",	//While the game is saving this message appears.
 	
 	L"Normale Waffen",
 	L"Zusatzwaffen",
@@ -5241,7 +5241,7 @@ STR16 pMessageStrings[] =
 	L"Sie können %ss Tagessold von %s nicht zahlen",	//first %s is the mercs name, the second is a string containing the salary
 	L"Abbruch",			// 70
 	L"%s kann alleine nicht gehen.",
-	L"Spielstand namens Spielstand99.sav kreiert. Wenn nötig, in Spielstand01 - Spielstand10 umbennen und über die Option 'Laden' aufrufen.",
+	L"Spielstand namens Spielstand249.sav kreiert. Wenn nötig, in Spielstand01 - Spielstand10 umbennen und über die Option 'Laden' aufrufen.",
 	L"%s hat %s getrunken.",
 	L"Paket in Drassen angekommen.",
 	L"%s kommt am %d. um ca. %s am Zielort an (Sektor %s).", //first %s is mercs name(OK), next is the sector location and name where they will be arriving in, lastely is the day an the time of arrival       !!!7 It should be like this: first one is merc (OK), next is day of arrival (OK) , next is time of the day for ex. 07:00 (not OK, now it is still sector), next should be sector (not OK, now it is still time of the day)	//LOOTF - is this still valid? I assume it's not.
@@ -5257,13 +5257,25 @@ STR16 pMessageStrings[] =
 	L"Normaler Rundenmodus",
 	L"Verlasse Kampfmodus",
 	L"Erzwungener Rundenmodus ist aktiv, gehe in Kampfmodus",
-#ifdef JA2BETAVERSION
 	L"Spiel erfolgreich in Position End Turn Auto Save gespeichert.",	// 83
-#endif
 	L"..\\Spielstände\\MP_Spielstände",			//The name of the directory where games are saved.
 	L"Client",
 	
 	L"Sie können nicht altes Inventar und neues Attachment System gleichzeitig verwenden.",
+	
+	L"Automatischer Spielstandspeicherung #", //91		// Text des Auto Saves im Load Screen mit ID
+	L"Dieser Platz ist reserviert für Spielstände die automatisch gespeichert werden.", //92	// The text, when the user clicks on the save screen on an auto save
+	L"Leerer Platz für automatische Spielstandspeicherung #", //93	// The text, when the auto save slot (1 - 5) is empty (not saved yet)
+	L"AutoSpielstand",		// 94	// The filename of the auto save, such as AutoSaveGame01 - AutoSaveGame05
+	L"Zugende - Automatische Spielstandspeicherung",	// 95	// The text for the tactical end turn auto save
+	L"Speichere AutoSpielstand #",	// 96	// The message box, when doing auto save
+	L"Empty Auto Save End Turn Slot #",	// 97	// The message box, when doing auto save
+	L"This slot is reserved for end turn Auto Saves .", //98	// The text, when the user clicks on the save screen on an auto save
+	L"End Turn AutoSave #", //99
+	L"Quick Slot#%d",
+	L"Strategic Map AutoSave Slot#%d",
+	L"End Turn Auto Save#%d",
+	L"Save Slot#%d", //103
 };
 
 CHAR16 ItemPickupHelpPopup[][40] =
@@ -6697,12 +6709,12 @@ STR16 szUDBAdvStatsExplanationsTooltipText[]=
 	L"\n \nDieser Gegenstand beeinflusst die Tarnung\nin Wüstenebieten, wenn er getragen oder an einen\ngetragenen Gegenstand angebracht wird.\n \nHöher ist besser.",
 	L"\n \nDieser Gegenstand beeinflusst die Tarnung\nin Schneegebieten, wenn er getragen oder an einen\ngetragenen Gegenstand angebracht wird.\n \nHöher ist besser.",
 	L"\n \nDieser Gegenstand beeinflusst das Schleichen\n, wenn er getragen oder an einen\ngetragenen Gegenstand angebracht wird.\n \nHöher ist besser.",
-	L"\n \nDieser Gegenstand beeinflusst die Hörweite\n, wenn er getragen oder an einen\ngetragenen Gegenstand angebracht wird.\n \nHöher ist besser.",
-	L"\n \nDieser Gegenstand beeinflusst die allgemeine\nSichtweite, wenn er getragen oder an einen\ngetragenen Gegenstand angebracht wird.\n \nHöher ist besser.",
-	L"\n \nDieser Gegenstand beeinflusst die Sichtweite\nbei Nacht, wenn er getragen oder\nan einen getragenen Gegenstand angebracht wird.\n \nHöher ist besser.",
-	L"\n \nDieser Gegenstand beeinflusst die Sichtweite\nbei Tag, wenn er getragen oder\nan einen getragenen Gegenstand angebracht wird.\n \nHöher ist besser.",
-	L"\n \nDieser Gegenstand beeinflusst die Sichtweite\nbei hellem Licht (Knick-Licht),\nwenn er getragen oder an einen getragenen Gegenstand angebracht wird.\n \nHöher ist besser.",
-	L"\n \nDieser Gegenstand beeinflusst die Sichtweite\nunter Tage, wenn er getragen oder\nan einen getragenen Gegenstand angebracht wird.\n \nHöher ist besser.",
+	L"\n \nWenn dieser Gegenstand getragen, oder an einem getragenen\nGegenstand angebracht, verändert dies die Hörweite\num die angegebenen Prozent.\n \nEin positiver Bonus ermöglicht das Hören von Geräuschen\nauf größere Distanzen.\n \nHöher ist besser.", // TODO.Translate
+	L"\n \nWhen this item is worn, or attached to a worn\nitem, it modifies the wearer's Vision Range by the\nlisted percent.\n \nThis General modifier works in all conditions.\n \nHigher is better.",
+	L"\n \nWhen this item is worn, or attached to a worn\nitem, it modifies the wearer's Vision Range by the\nlisted percent.\n \nThis Night-Vision modifier works only when light\nlevels are sufficiently low.\n \nHigher is better.",
+	L"\n \nWhen this item is worn, or attached to a worn\nitem, it modifies the wearer's Vision Range by the\nlisted percent.\n \nThis Day-Vision modifier works only when light\nlevels are average or higher.\n \nHigher is better.",
+	L"\n \nWhen this item is worn, or attached to a worn\nitem, it modifies the wearer's Vision Range by the\nlisted percent.\n \nThis Bright-Vision modifier works only when light\nlevels are very high, for example when looking\ninto tiles lit by Break-Lights or at high noon.\n \nHigher is better.",
+	L"\n \nWhen this item is worn, or attached to a worn\nitem, it modifies the wearer's Vision Range by the\nlisted percent.\n \nThis Cave-Vision modifier works only in the dark\nand only underground.\n \nHigher is better.",
 	L"\n \nDieser Gegenstand beeinflusst die Sichtbreite,\nwenn er getragen oder\nan einen getragenen Gegenstand angebracht wird.\n \nHöher ist besser.",
 	L"\n \nDie Fähigkeit des Schützen Rückstoß\nwährend Feuerstoß-/Autofeuersalven zu bewältigen.\n \nHöher ist besser.",
 	L"\n \nDie Fähigkeit des Schützen einzuschätzen\nwieviel Kraft er während Feuerstoß-/Autofeuersalven\nbenötigt um den Rückstoß auszugleichen.\n \nNiedriger ist besser.",
@@ -6750,12 +6762,12 @@ STR16 szUDBAdvStatsExplanationsTooltipTextForWeapons[]=
 	L"\n \nWenn in der Hand gehalten, verändert sich\ndie Tarnung des Soldaten in Schneegebieten.\n \nHöher ist besser.",
 	L"\n \nWenn in der Hand gehalten, verändert sich\ndie Fähigkeit des Soldaten sich leise zu bewegen.\n \nHöher ist besser.",
 	L"\n \nWenn in der Hand gehalten, verändert sich\ndie Hörfähigkeit (in Felder) des Soldaten.\n \nHöher ist besser.",
-	L"\n \nWenn angelegt, verändert sich\ndie Sichtweite des Benutzers\nin der angegebenen Anzahl der Felder.\n \nFunktioniert unter allen Bedingungen.\n \nHöher ist besser.",
-	L"\n \nWenn angelegt, verändert sich die Sichtweite des Benutzers\nin der angegebenen Anzahl der Felder,\ndank der Erweiterungen oder inhärenter Fähigkeiten.\nFunktioniert nur bei ausreichend geringen Lichtlevel.\n \nHöher ist besser.",
-	L"\n \nWenn angelegt, verändert sich die Sichtweite des Benutzers\nin der angegebenen Anzahl der Felder,\ndank der Erweiterungen oder inhärenter Fähigkeiten.\nFunktioniert nur bei Durch-/Überdurchschnittlich Lichtlevel.\n \nHöher ist besser.",
-	L"\n \nWenn angelegt, verändert sich die Sichtweite des Benutzers\nin der angegebenen Anzahl der Felder,\ndank der Erweiterungen oder inhärenter Fähigkeiten.\nFunktioniert nur bei sehr hellem Lichtlevel.\n \nHöher ist besser.",
-	L"\n \nWenn angelegt, verändert sich die Sichtweite des Benutzers\nin der angegebenen Anzahl der Felder,\ndank der Erweiterungen oder inhärenter Fähigkeiten.\nFunktioniert nur bei dunkelheit oder unter Tage.\n \nHöher ist besser.",
-	L"\n \nWenn angelegt, verändert sich das Sichtfeld\ndes Benutzers.\n \nEin verengtes Sichtfeld verringert\ndie Sichtweite horizontal.\n \nNiedriger ist besser.",
+	L"\n \nWhen this weapon is held in hand, it modifies the\nsoldier's Hearing Range by the listed percent.\n \nA positive bonus makes it possible to hear noises\nfrom a greater distance.\n \nConversely, a negative modifier impairs the wearer's hearing.\n \nHigher is better.",
+	L"\n \nWhen this weapon is raised to the shooting position,\nit modifies the wearer's Vision Range by the\nlisted percent, thanks to attachments or\ninherent properties of the weapon.\n \nThis General modifier works in all conditions.\n \nHigher is better.",
+	L"\n \nWhen this weapon is raised to the shooting position,\nit modifies the wearer's Vision Range by the\nlisted percent, thanks to attachments or\ninherent properties of the weapon.\n \nThis Night-Vision modifier works only when light\nlevels are sufficiently low.\n \nHigher is better.",
+	L"\n \nWhen this weapon is raised to the shooting position,\nit modifies the wearer's Vision Range by the\nlisted percent, thanks to attachments or\ninherent properties of the weapon.\n \nThis Day-Vision modifier works only when light\nlevels are average or higher.\n \nHigher is better.",
+	L"\n \nWhen this weapon is raised to the shooting position,\nit modifies the wearer's Vision Range by the\nlisted percent, thanks to attachments or\ninherent properties of the weapon.\n \nThis Bright-Vision modifier works only when light\nlevels are very high, for example when looking\ninto tiles lit by Break-Lights or at high noon.\n \nHigher is better.",
+	L"\n \nWhen this weapon is raised to the shooting position,\nit modifies the wearer's Vision Range by the\nlisted percent, thanks to attachments or\ninherent properties of the weapon.\n \nThis Cave-Vision modifier works only in the dark\nand only underground.\n \nHigher is better.",
 	L"\n \nDas ist die Fähigkeit des Schützen Rückstoß\nwährend der Feuerstoß-/Autofeuersalven zu bewältigen.\n \nHöher ist besser.",
 	L"\n \nDas ist die Fähigkeit des Schützen Rückstöße\ngenauer auszugleichen.\n \nDies hat keine Wirkung bei Einzelschüssen!\n \nEin hoher Wert hilft dem Schützen die Mündung der Waffe\nbei Salven genauer auf das Ziel zu richten.\n \nNiedriger ist besser.",
 	L"\n \nDer Treffer Modifikator wird verändert durch\nMunition, Erweiterungen oder eingebauter Attribute.\n \nEin erhöhter Treffer Modifikator erlaubt es entfernte Ziele\n öfter zu treffen sofern\nanständig gezielt wird.\n \nHöher ist besser.",

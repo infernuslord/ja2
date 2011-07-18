@@ -20,12 +20,18 @@ extern	CHAR16		zTrackingNumber[16];
 //
 //		Keeps track of the saved game version.	Increment the saved game version whenever 
 //	you will invalidate the saved game file
-#define			SAVE_GAME_VERSION								124	//123		//114	//113	//112	//111	//110	//109	//108	//107	//106	//105	//104	//103	//102	//101	//100 // 99
+#define			SAVE_GAME_VERSION								126	//123		//114	//113	//112	//111	//110	//109	//108	//107	//106	//105	//104	//103	//102	//101	//100 // 99
 
-#define			CURRENT_SAVEGAME_DATATYPE_VERSION				124
-
-
+#define			CURRENT_SAVEGAME_DATATYPE_VERSION				126
+#ifdef JA2UB
+#define			NEW_SAVE_GAME_GENERAL_SAVE_INFO_DATA			126
+#define			QUESTS_DATATYPE_CHANGE							125	// Before this, we had a maximum number of 30 quests (JA2 default) (by Jazz)
 #define			HIDDENTOWN_DATATYPE_CHANGE						124
+#else
+#define			NEW_SAVE_GAME_GENERAL_SAVE_INFO_DATA			125
+#define			QUESTS_DATATYPE_CHANGE							124	// Before this, we had a maximum number of 30 quests (JA2 default) (by Jazz)
+#endif
+
 #define			VEHICLES_DATATYPE_CHANGE						123	// Before this, vehicles were not externalized (by Jazz)
 #define			FIXED_CREPITUS_IN_REALISTIC_GAME_MODE			122	// Before this, there was an initializing problem in GameInit.lua on startup, in which we could meet crepitus in Tixa underground map
 #define			FIXED_NPC_QUOTE_BUG								121	// Before this, we need to reload all npc quote information because it was not being saved and loaded correctly.

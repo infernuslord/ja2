@@ -97,6 +97,8 @@
 #endif
 
 #include "teamturns.h"
+#include "Options Screen.h"
+#include "SaveLoadScreen.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // SANDRO - In this file, all APBPConstants[AP_CROUCH] and APBPConstants[AP_PRONE] were changed to GetAPsCrouch() and GetAPsProne()
@@ -1222,6 +1224,8 @@ UINT32 UIHandleEnterPalEditMode( UI_EVENT *pUIEvent )
 
 UINT32 UIHandleEndTurn( UI_EVENT *pUIEvent )
 {
+//CHAR16	zString[128]; 
+
 	// CANCEL FROM PLANNING MODE!
 	if ( InUIPlanMode( ) )
 	{
@@ -1246,8 +1250,11 @@ UINT32 UIHandleEndTurn( UI_EVENT *pUIEvent )
 		if (gGameSettings.fOptions[TOPTION_USE_AUTO_SAVE] == TRUE && CanGameBeSaved() )
 		{
 			//Save the game
+			//swprintf( zString, L"%s",pMessageStrings[ MSG_SAVE_END_TURN_SAVE_TEXT ]);
+			//DoAutoSave(SAVE__END_TURN_NUM,zString);
+			
 			guiPreviousOptionScreen = guiCurrentScreen;
-			SaveGame( SAVE__END_TURN_NUM, L"End Turn Auto Save" );
+			SaveGame(SAVE__END_TURN_NUM, pMessageStrings[ MSG_SAVE_END_TURN_SAVE_TEXT ] ); 
 		}
 
 	////ddd оптимизация для хода драников
