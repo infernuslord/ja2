@@ -1024,7 +1024,7 @@ UINT32 DrawMap( void )
 					pSectorY = SECTORY( sBaseSectorValue );
 					
 					INT8 bTownId = GetTownIdForSector( pSectorX, pSectorY );
-					if ( bTownId != 0 && bTownId < NUM_TOWNS )
+					if ( /*bTownId != 0 && */ bTownId < NUM_TOWNS )
 					{
 						DrawIconL(gHiddenIcon[bTownId].IconX, gHiddenIcon[bTownId].IconY, bTownId, pSectorX, pSectorY);
 					}

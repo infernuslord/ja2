@@ -5633,6 +5633,12 @@ void DisplayJerryBreakingLaptopTransmitterPopup()
 {
 	CHAR16	zString[512];
 	INT8		bID=-1;
+	UINT32	uiStartLoc=0;  
+	wchar_t	sText[400];
+	
+	#define			LANGMESSAGEFILE		"BinaryData\\TacticalMessages.EDT"
+	#define 		EDT_SIZE 400 * 2
+
 
 	if( gJa25SaveStruct.fJerryBreakingLaptopOccuring )
 	{
@@ -5647,9 +5653,13 @@ void DisplayJerryBreakingLaptopTransmitterPopup()
 		//Assert( 0 );
 		return;
 	}
+	
+	uiStartLoc = EDT_SIZE * 10;
+	LoadEncryptedDataFromFile(LANGMESSAGEFILE, sText, uiStartLoc, EDT_SIZE);
 
 	//Create the string
-	swprintf( zString, zNewTacticalMessages[ TCTL_MSG__JERRY_BREAKIN_LAPTOP_ANTENA ], Menptr[ bID ].name );
+	//swprintf( zString, zNewTacticalMessages[ TCTL_MSG__JERRY_BREAKIN_LAPTOP_ANTENA ], Menptr[ bID ].name );
+	  swprintf( zString, sText, Menptr[ bID ].name );
 
 	//Display it
 	ExecuteTacticalTextBox( 110, zString );

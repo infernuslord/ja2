@@ -3685,12 +3685,12 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 	{
 		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing hidden town");
 		goto FAILED_TO_SAVE;
-	}
-	
+
 	#ifdef JA2BETAVERSION
-		SaveGameFilePosition( FileGetPos( hFile ), "New Vehicles" );
+		SaveGameFilePosition( FileGetPos( hFile ), "Hidden Town" );
 	#endif	
 
+	}
 
 	
 	if( !SaveDataSaveToSaveGameFile( hFile ) )
