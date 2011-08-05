@@ -221,7 +221,7 @@ typedef PARSE_STAGE;
 
 #define VEHICLESFILENAME					"Vehicles.xml"
 
-#define TEXTFILENAME					"Text\\NewTacticalMessages.xml"
+#define TEXTFILENAME					"Text\\TacticalMessages.xml"
 
 extern BOOLEAN ReadInItemStats(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteItemStats();
