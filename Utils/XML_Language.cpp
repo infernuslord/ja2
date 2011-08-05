@@ -113,7 +113,7 @@ languageLocationEndElementHandle(void *userData, const XML_Char *name)
 
 	if(pData->currentDepth <= pData->maxReadDepth) 
 	{
-		if(strcmp(name, "LANGUAGE") == 0)
+		if(strcmp(name, "MESSAGES") == 0)
 		{
 			pData->curElement = LANGUAGE_ELEMENT_NONE;
 		}

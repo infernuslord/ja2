@@ -3274,12 +3274,14 @@ int i;
 		swprintf( zString, L"Empty Text" );
 	}
 	*/
-	
-		swprintf( zString, XMLTacticalMessages[idText] );
+		if ( idText >= 0 && idText <= 1000 )
+		{
+			swprintf( zString, XMLTacticalMessages[idText] );
 
-		if ( sLeftPosition <= 0 ) sLeftPosition = 110;
+			if ( sLeftPosition <= 0 ) sLeftPosition = 110;
 	
-		ExecuteTacticalTextBox( sLeftPosition, zString );
+			ExecuteTacticalTextBox( sLeftPosition, zString );
+		}
 		
 	return 0;
 }

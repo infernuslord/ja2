@@ -45,7 +45,7 @@ enum
 	LPTP_MSG__PREVIEW_TEXT,
 };
 
-extern	CHAR16	XMLTacticalMessages[][MAX_MESSAGE_NAMES_CHARS];
+extern	CHAR16	XMLTacticalMessages[1000][MAX_MESSAGE_NAMES_CHARS];
 
 //Editor
 //Editor Taskbar Creation.cpp

@@ -139,7 +139,7 @@ Remove any LOOTF comment that has been checked, except maybe for "alt." (alterna
 07/2010 LootFragg
 */
 
-CHAR16	XMLTacticalMessages[][MAX_MESSAGE_NAMES_CHARS] = 
+CHAR16	XMLTacticalMessages[1000][MAX_MESSAGE_NAMES_CHARS] = 
 {
 	L"",
 };
