@@ -9,6 +9,10 @@
 //Unfinished Business - Titles (ja2set.dat)
 #define JA2UBMAPS
 
+
+//MOD configuration
+//#define UBMODSHADYJOB
+
 //#define WFconvertUB
 
 // Map Editor version - you should use the MapEditor configuration instead of messing with these defines (ChrisL)

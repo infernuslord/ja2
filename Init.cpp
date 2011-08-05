@@ -1063,6 +1063,21 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		}
 #endif
 
+		strcpy(fileName, directoryName);
+		strcat(fileName, TEXTFILENAME);
+		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+		SGP_THROW_IFFALSE(ReadInLanguageLocation(fileName,FALSE,zlanguageText,0), TEXTFILENAME);
+
+#ifndef ENGLISH
+		AddLanguagePrefix(fileName);
+		if ( FileExists(fileName) )
+		{
+			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+			if(!ReadInLanguageLocation(fileName,TRUE,zlanguageText,0))
+				return FALSE;
+		}
+#endif
+
 	LuaState::INIT(lua::LUA_STATE_STRATEGIC_MINES_AND_UNDERGROUND, true);
 	g_luaUnderground.LoadScript(GetLanguagePrefix());
 	// load Lua for Strategic Mines initialization

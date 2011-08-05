@@ -12,6 +12,7 @@
 #include "legion cfg.h"
 #include "Strategic Town Loyalty.h"
 #include "qarray.h"
+#include "XML_Language.h"
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -219,6 +220,8 @@ typedef PARSE_STAGE;
 #define EMAILOTHER							"Email\\EmailOther.xml"
 
 #define VEHICLESFILENAME					"Vehicles.xml"
+
+#define TEXTFILENAME					"Text\\NewTacticalMessages.xml"
 
 extern BOOLEAN ReadInItemStats(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteItemStats();
@@ -435,5 +438,7 @@ extern BOOLEAN ReadInEmailOther(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN ReadInNewCar(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteNewCar(STR fileName);
 extern void InitNewVehicles ();
+
+extern BOOLEAN ReadInLanguageLocation(STR fileName, BOOLEAN localizedVersion, LANGUAGE_LOCATION *Lang, UINT32 FileType2 );
 
 #endif

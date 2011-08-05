@@ -115,6 +115,11 @@ FAST HELP TEXT -- Explains how the syntax of fast help text works.
 
 */
 
+CHAR16	XMLTacticalMessages[][MAX_MESSAGE_NAMES_CHARS] = 
+{
+	L"",
+};
+
 // Editor
 //Editor Taskbar Creation.cpp
 STR16 iEditorItemStatsButtonsText[] =

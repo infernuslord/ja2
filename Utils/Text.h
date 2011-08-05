@@ -4,6 +4,7 @@
 #include "items.h"
 #include "types.h"
 #include "mapscreen.h"
+#include "XML_Language.h"
 
 #define STRING_LENGTH 255
 
@@ -43,6 +44,8 @@ enum
 	LPTP_MSG__TEMP_UNAVAILABLE,
 	LPTP_MSG__PREVIEW_TEXT,
 };
+
+extern	CHAR16	XMLTacticalMessages[][MAX_MESSAGE_NAMES_CHARS];
 
 //Editor
 //Editor Taskbar Creation.cpp

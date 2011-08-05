@@ -68,6 +68,8 @@ extern "C" {
 #include "lua_state.h"
 #include "lua_function.h"
 #include <vfs/Core/vfs_string.h>
+
+#include "Encrypted File.h"
 //-------------------------- UB ------------------------------
 extern	BOOLEAN	gfDoneWithSplashScreen;
 extern UINT32 iStringToUseLua;
@@ -691,6 +693,8 @@ static int l_InitFace(lua_State *L);
 static int l_WhoIs(lua_State *L);
 
 static int l_SetHandleGlobalLoyaltyEvent (lua_State *L);
+
+static int l_ExecuteTacticalTextBox(lua_State *L);
 
 
 using namespace std;
@@ -1399,6 +1403,8 @@ void IniFunction(lua_State *L)
 	//lua_register(L, "GetINITIALHELIGRIDNO5", l_getMercgridNo4);
 	//lua_register(L, "GetINITIALHELIGRIDNO6", l_getMercgridNo5);
 	//lua_register(L, "GetINITIALHELIGRIDNO7", l_getMercgridNo6);
+	
+	lua_register(L, "ExecuteTacticalTextBox", l_ExecuteTacticalTextBox);
 
 }
 
@@ -3234,6 +3240,49 @@ int i;
 	return 0;
 }
 #endif
+
+
+static int l_ExecuteTacticalTextBox(lua_State *L)
+{
+INT16 sLeftPosition = 110;
+UINT32 idText = 0;
+UINT8  n = lua_gettop(L);
+wchar_t	sText[400];
+UINT32	uiStartLoc=0;  
+CHAR16	zString[512];
+int i;
+
+//#define			LANGMESSAGEFILE		"BinaryData\\TacticalMessages.EDT"
+//#define 		EDT_SIZE 400 * 2
+
+	for (i= 1; i<=n; i++ )
+		{
+			if (i == 1 ) sLeftPosition = lua_tointeger(L,i);
+			if (i == 2 ) idText = lua_tointeger(L,i);
+			
+		}	
+	/*	
+	if ( FileExists(LANGMESSAGEFILE) )
+	{
+		uiStartLoc = EDT_SIZE * idText;
+		LoadEncryptedDataFromFile(LANGMESSAGEFILE, sText, uiStartLoc, EDT_SIZE);	
+		swprintf( zString, sText );
+	}
+	else
+	{
+		//Create the string
+		swprintf( zString, L"Empty Text" );
+	}
+	*/
+	
+		swprintf( zString, XMLTacticalMessages[idText] );
+
+		if ( sLeftPosition <= 0 ) sLeftPosition = 110;
+	
+		ExecuteTacticalTextBox( sLeftPosition, zString );
+		
+	return 0;
+}
 
 static int l_SetMercArrivalLocation(lua_State *L)
 {

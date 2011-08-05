@@ -82,6 +82,7 @@
 #endif
 
 #include "LuaInitNPCs.h"
+#include "Text.h"
 
 #ifdef JA2UB
 #include "Explosion Control.h"
@@ -5653,13 +5654,27 @@ void DisplayJerryBreakingLaptopTransmitterPopup()
 		//Assert( 0 );
 		return;
 	}
+/*	
+	if ( FileExists(LANGMESSAGEFILE) )
+	{
 	
-	uiStartLoc = EDT_SIZE * 10;
-	LoadEncryptedDataFromFile(LANGMESSAGEFILE, sText, uiStartLoc, EDT_SIZE);
-
-	//Create the string
-	//swprintf( zString, zNewTacticalMessages[ TCTL_MSG__JERRY_BREAKIN_LAPTOP_ANTENA ], Menptr[ bID ].name );
-	  swprintf( zString, sText, Menptr[ bID ].name );
+		uiStartLoc = EDT_SIZE * 10;
+		LoadEncryptedDataFromFile(LANGMESSAGEFILE, sText, uiStartLoc, EDT_SIZE);	
+	
+		swprintf( zString, sText, Menptr[ bID ].name );
+	}
+	else
+	{
+		//Create the string
+		swprintf( zString, zNewTacticalMessages[ TCTL_MSG__JERRY_BREAKIN_LAPTOP_ANTENA ], Menptr[ bID ].name );
+	}
+*/
+	#ifdef UBMODSHADYJOB   //See file builddefines.h
+		swprintf( zString, XMLTacticalMessages[0] ); //Shady Job
+	#else
+		swprintf( zString, XMLTacticalMessages[0], Menptr[ bID ].name ); //UB
+	#endif
+	
 
 	//Display it
 	ExecuteTacticalTextBox( 110, zString );
