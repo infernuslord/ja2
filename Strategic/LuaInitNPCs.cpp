@@ -7289,7 +7289,8 @@ static int l_SetGlobalLuaVal (lua_State *L)
 {
 UINT8  n = lua_gettop(L);
 int i;
-UINT32 val,set;
+UINT32 val;
+INT32 set;
 
 	for (i= 1; i<=n; i++ )
 	{
@@ -7307,7 +7308,8 @@ static int l_GetGlobalLuaVal (lua_State *L)
 {
 UINT8  n = lua_gettop(L);
 int i;
-UINT32 val,set;
+UINT32 val;
+INT32 set;
 
 	for (i= 1; i<=n; i++ )
 	{
@@ -7345,7 +7347,8 @@ static int l_CheckGlobalLuaVal (lua_State *L)
 {
 UINT8  n = lua_gettop(L);
 int i;
-UINT32 val,set;
+UINT32 val;
+INT32 set;
 
 	for (i= 1; i<=n; i++ )
 	{
