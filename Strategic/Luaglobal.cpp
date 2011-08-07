@@ -35,6 +35,8 @@ extern "C" {
 #include "lualib.h"
 }
 
+#include "Ja25_Tactical.h"
+
 using namespace std;
 
 extern	BOOLEAN	gfDoneWithSplashScreen;
@@ -299,5 +301,73 @@ void IniGlobalGameSetting(lua_State *L)
 	
 	lua_pushboolean(L, gGameLegionOptions.Random_Manuel_Text);
 	lua_setglobal(L, "RandomManuelText");	
+	
+	
+	//Items
+	lua_pushboolean(L, BARRETT_UB);
+	lua_setglobal(L, "itemBARRETT_UB");	
+
+	lua_pushboolean(L, CALICO_960_UB);
+	lua_setglobal(L, "itemCALICO_960_UB");	
+	
+	lua_pushboolean(L, PSG1_UB);
+	lua_setglobal(L, "itemPSG1_UB");	
+	
+	lua_pushboolean(L, L85_UB);
+	lua_setglobal(L, "itemL85_UB");
+	
+	lua_pushboolean(L, TAR21_UB);
+	lua_setglobal(L, "itemTAR21_UB");
+
+	lua_pushboolean(L, VAL_SILENT_UB);
+	lua_setglobal(L, "itemVAL_SILENT_UB");
+
+	lua_pushboolean(L, MICRO_UZI_UB);
+	lua_setglobal(L, "itemMICRO_UZI_UB");
+	
+	lua_pushboolean(L, CALICO_950_UB);
+	lua_setglobal(L, "itemCALICO_950_UB");
+	
+	lua_pushboolean(L, CALICO_900_UB);
+	lua_setglobal(L, "itemCALICO_900_UB");
+	
+	lua_pushboolean(L, CLIP_CANNON_BALL);
+	lua_setglobal(L, "itemCLIP_CANNON_BALL");
+	
+	lua_pushboolean(L, MERC_UMBRELLA);
+	lua_setglobal(L, "itemMERC_UMBRELLA");
+	
+	lua_pushboolean(L, HAND_CANNON);
+	lua_setglobal(L, "itemHAND_CANNON");
+	
+	lua_pushboolean(L, HARTFORD_6_SHOOTER);
+	lua_setglobal(L, "itemHARTFORD_6_SHOOTER");
+	
+	lua_pushboolean(L, TEX_MOVIE_ATTACK_CLYDESDALES);
+	lua_setglobal(L, "itemTEX_MOVIE_ATTACK_CLYDESDALES");
+	
+	lua_pushboolean(L, TEX_MOVIE_WILD_EAST);
+	lua_setglobal(L, "itemTEX_MOVIE_WILD_EAST");
+	
+	lua_pushboolean(L, TEX_MOVIE_HAVE_HONDA);
+	lua_setglobal(L, "itemTEX_MOVIE_HAVE_HONDA");
+	
+	lua_pushboolean(L, LAPTOP_TRANSMITTER);
+	lua_setglobal(L, "itemLAPTOP_TRANSMITTER");
+	
+	lua_pushboolean(L, CHE_GUEVARA_CANTEEN);
+	lua_setglobal(L, "itemCHE_GUEVARA_CANTEEN");
+	
+	lua_pushboolean(L, MERC_WRISTWATCH);
+	lua_setglobal(L, "itemMERC_WRISTWATCH");
+	
+	lua_pushboolean(L, SAM_GARVER_COMBAT_KNIFE);
+	lua_setglobal(L, "itemSAM_GARVER_COMBAT_KNIFE");
+	
+	lua_pushboolean(L, MERC_UMBRELLA_OLD);
+	lua_setglobal(L, "itemMERC_UMBRELLA_OLD");
+	
+	lua_pushboolean(L, MORRIS_INSTRUCTION_NOTE);
+	lua_setglobal(L, "itemMORRIS_INSTRUCTION_NOTE");
 	
 }
