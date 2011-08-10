@@ -1035,15 +1035,6 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		}
 #endif
 */
-
-#ifdef JA2UB	
-	if ( gGameLegionOptions.OLDUBInventory == TRUE )
-		Old_UB_Inventory ();
-	else
-		New_UB_Inventory ();
-#endif
-	
-
 	//new vehicles by Jazz	
 	
 	InitNewVehicles ();
@@ -1097,6 +1088,8 @@ UINT32 InitializeJA2(void)
 	HandleJA2CDCheck( );
 
 	gfWorldLoaded = FALSE;
+	
+	OldNew = FALSE;
 
 	//Load external game mechanic data
 	//if ( !LoadExternalGameplayData(TABLEDATA_DIRECTORY))
@@ -1230,10 +1223,10 @@ UINT32 InitializeJA2(void)
 
 #ifdef JA2UB
 		// run old UB inventory Data-UB\Addons\Data-Old-UB-Inventory
-	//	if( !strcmp( gzCommandLine, "-OLDUBINVENTORY" ) )
-	//	{
-	//		OldNew = TRUE; 
-	//	}
+		if( !strcmp( gzCommandLine, "-OLDUBINVENTORY" ) )
+		{
+			OldNew = TRUE; 
+		}
 #endif
 
 #ifdef JA2BETAVERSION
@@ -1252,6 +1245,8 @@ UINT32 InitializeJA2(void)
 			gfIntendOnEnteringEditor = TRUE;
 			gGameOptions.fGunNut = TRUE;
 			gGameOptions.fAirStrikes = FALSE;
+			
+			OldNew = TRUE; 
 			return( GAME_SCREEN );
 		}
 		#endif
@@ -1307,6 +1302,13 @@ UINT32 InitializeJA2(void)
 
 #ifdef JA2UB
 	InitGridNoUB();
+#endif
+
+#ifdef JA2UB	
+	if ( gGameLegionOptions.OLDUBInventory == TRUE || OldNew == TRUE )
+		Old_UB_Inventory ();
+	else
+		New_UB_Inventory ();
 #endif
 
 //Lua
