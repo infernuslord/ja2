@@ -2077,6 +2077,19 @@ void SetAttributes( void )
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	else // ORIGINAL 
 	{
+		// default
+		iStrengthMinimum = gGameExternalOptions.iMinAttribute;
+		iAgilityMinimum	 = gGameExternalOptions.iMinAttribute;
+		iDexterityMinimum	= gGameExternalOptions.iMinAttribute;
+		iHealthMinimum		= gGameExternalOptions.iMinAttribute;
+		iLeaderShipMinimum	= gGameExternalOptions.iMinAttribute;
+		iWisdomMinimum		= gGameExternalOptions.iMinAttribute;
+		
+		iMarkmanshipMinimum = gGameExternalOptions.iMinAttribute;
+		iMechanicalMinimum	= gGameExternalOptions.iMinAttribute;
+		iMedicalMinimum	 = gGameExternalOptions.iMinAttribute;
+		iExplosivesMinimum	= gGameExternalOptions.iMinAttribute;
+
 		iCurrentBonusPoints = gGameExternalOptions.iImpAttributePoints;
 
 		//Determine if the player has any extra points

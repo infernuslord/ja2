@@ -64,6 +64,7 @@ UINT16	MAP_VIEW_START_Y;
 UINT16	MAP_VIEW_WIDTH;
 UINT16	MAP_VIEW_HEIGHT;
 
+INT32 ETA_FONT;
 
 INT32	MAP_FONT;
 // x start of hort index
@@ -627,6 +628,11 @@ void DrawIconL(INT32 MAP_GRID_X2, INT32 MAP_GRID_Y2, INT32 i, INT32 Sector_X , I
 	else
 	{
 		GetScreenXYFromMapXY( Sector_X, Sector_Y, &sX, &sY );
+		
+		sX = (UINT16) (MAP_VIEW_START_X + MAP_GRID_X +  (MAP_GRID_X2 * MAP_GRID_X) / 10);
+		sY = (UINT16) (MAP_VIEW_START_Y + MAP_GRID_Y + ((MAP_GRID_Y2 * MAP_GRID_Y) / 10) + 1);
+		
+		/*
 		if (iResolution == 0)
 		{
 			sY += MAP_GRID_Y2;
@@ -642,6 +648,7 @@ void DrawIconL(INT32 MAP_GRID_X2, INT32 MAP_GRID_Y2, INT32 i, INT32 Sector_X , I
 			sY += + 10 + MAP_GRID_Y2;
 			sX += - MAP_GRID_X2 + 10;
 		}
+		*/
 		ubVidObjIndex = 1;
 	}
 
@@ -994,40 +1001,21 @@ UINT32 DrawMap( void )
 		// DOESN'T MERELY SHADE THE EXISTING MAP SURFACE, BUT INSTEAD GRABS THE ORIGINAL GRAPHICS FROM BIGMAP, AND CHANGES
 		// THEIR PALETTE.  BLITTING ICONS PRIOR TO SHADING WOULD MEAN THEY DON'T SHOW UP IN AIRSPACE VIEW AT ALL.
 		
-	//	for( iCounter2 = 0; iCounter2 < 256; iCounter2++ )
-	//	{
-		
-		//	if( SectorInfo[ iCounter2 ].uiTimeCurrentSectorWasLastLoaded != 0 && gfHiddenTown[ iCounter2 ] != TRUE )
-		//	if ( GetSectorFlagStatus( (INT16)pTownPoints[iCounter2].x, (INT16)pTownPoints[iCounter2].y, 0, SF_ALREADY_VISITED ) == FALSE && gfHiddenTown[ iCounter2 ] == FALSE )
-		//	if ( GetSectorFlagStatus( gWorldSectorX, gWorldSectorY, 0, SF_ALREADY_VISITED ) == FALSE && gfHiddenTown[ iCounter2 ] == FALSE )
-		//	if (  gfHiddenTown[ iCounter2 ] == TRUE )
-		//	{
-		//		gfHiddenTown[ iCounter2 ] = TRUE; 
-		//	}
-			
-		//	if ( gfHiddenTown[ iCounter2 ] == TRUE )  
-		//	{
-			//	if ( gfIconTown[iCounter2] != -1 )
-			//	DrawIconL(gfIconTown[iCounter2], /* MAP_GRID_X2a */3, /* MAP_GRID_Y2a */6, iCounter2, pTownPoints[iCounter2].x, pTownPoints[iCounter2].y);
-		//	}
-		
-		//}	
-		
 		for (cnt = 1; cnt < NUM_TOWNS; cnt++)
 		{
-			if ( gfHiddenTown[ cnt ] == TRUE  )
+			if ( gfHiddenTown[ cnt ] == TRUE )
 			{
 				if ( gfIconTown[ cnt ] == TRUE && gfDrawHiddenTown[ cnt ] == TRUE )
 				{
-					sBaseSectorValue = sBaseSectorList[ cnt - 1 ];
+					sBaseSectorValue = sBaseSectorList[ cnt-1 ];
 					pSectorX = SECTORX( sBaseSectorValue );
 					pSectorY = SECTORY( sBaseSectorValue );
 					
 					INT8 bTownId = GetTownIdForSector( pSectorX, pSectorY );
-					if ( /*bTownId != 0 && */ bTownId < NUM_TOWNS )
+					if ( /*bTownId != 0 &&*/ bTownId < NUM_TOWNS )
 					{
-						DrawIconL(gHiddenIcon[bTownId].IconX, gHiddenIcon[bTownId].IconY, bTownId, pSectorX, pSectorY);
-					}
+						DrawIconL(gHiddenIcon[cnt].IconX, gHiddenIcon[cnt].IconY, cnt, pSectorX, pSectorY);
+					}		
 				}
 			}
 		}
@@ -4328,7 +4316,7 @@ BOOLEAN IsTheCursorAllowedToHighLightThisSector( INT16 sSectorX, INT16 sSectorY 
 */	
 	// check to see if this sector is a blocked out sector?
 
-	if( sBadSectorsList[ sSectorX ][ sSectorY ] )//|| SectorInfo[ ( SECTOR( sSectorX, sSectorY ) ) ].fValidSector )
+	if( sBadSectorsList[ sSectorX ][ sSectorY ] )
 	{
 		return  ( FALSE );
 	}
@@ -4768,7 +4756,7 @@ void DisplayDistancesForHelicopter( void )
 
 	// blit in background
 	GetVideoObject( &hHandle, guiMapBorderHeliSectors );
-	BltVideoObject( FRAME_BUFFER, hHandle, 0, MAP_HELICOPTER_ETA_POPUP_X, sYPosition, VO_BLT_SRCTRANSPARENCY, NULL );
+	BltVideoObject( FRAME_BUFFER, hHandle, iResolution, MAP_HELICOPTER_ETA_POPUP_X, sYPosition, VO_BLT_SRCTRANSPARENCY, NULL );
 
 
 //	sTotalCanTravel = ( INT16 )GetTotalDistanceHelicopterCanTravel( );

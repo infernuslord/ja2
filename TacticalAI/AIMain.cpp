@@ -2594,19 +2594,21 @@ INT8 ExecuteAction(SOLDIERTYPE *pSoldier)
 
 		SendNetData(ALL_NODES);
 		*/
-		DeductPoints(pSoldier,APBPConstants[AP_RADIO],APBPConstants[BP_RADIO]);// pay for it!
+		DeductPoints(pSoldier,APBPConstants[AP_RADIO],APBPConstants[BP_RADIO], AFTERACTION_INTERRUPT); // pay for it!
+		
 		RadioSightings(pSoldier,EVERYBODY,pSoldier->bTeam);      // about everybody
 		// action completed immediately, cancel it right away
 
 		// ATE: Change to an animation!
 		AIDecideRadioAnimation( pSoldier );
-		//return(FALSE);           // no longer in progress
+
 		break;
 
 	case AI_ACTION_CREATURE_CALL:									// creature calling to others
-		DeductPoints(pSoldier,APBPConstants[AP_RADIO],APBPConstants[BP_RADIO]);// pay for it!
+
+		DeductPoints(pSoldier,APBPConstants[AP_RADIO],APBPConstants[BP_RADIO], AFTERACTION_INTERRUPT); // pay for it!
 		CreatureCall( pSoldier );
-		//return( FALSE ); // no longer in progress
+
 		break;
 
 	case AI_ACTION_CHANGE_STANCE:                // crouch

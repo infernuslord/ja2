@@ -85,6 +85,11 @@
 #endif
 
 #include "connect.h"
+#include "Encyclopedia_Data.h"
+#include "Encyclopedia.h"
+#include "BriefingRoom.h"
+#include "BriefingRoomM.h"
+
 
 #ifdef JA2UB
 #include "Ja25_Tactical.h"
@@ -804,6 +809,12 @@ UINT32 LaptopScreenInit()
 	GameInitSirTech();
 	GameInitFiles();
 	GameInitPersonnel();
+	
+	//legion
+	GameInitEncyclopedia();
+	GameInitEncyclopediaLocation();
+	GameInitBriefingRoom();
+	GameInitBriefingRoomEnter();
 
 	// init program states
 	memset( &gLaptopProgramStates, LAPTOP_PROGRAM_MINIMIZED, sizeof( gLaptopProgramStates ) );
@@ -1032,10 +1043,8 @@ INT32 EnterLaptop()
 	fMaximizingProgram = FALSE;
 	fMinizingProgram = FALSE;
 
-
 	// initialize open queue
 	InitLaptopOpenQueue( );
-
 
 	gfShowBookmarks=FALSE;
 	LoadBookmark( );
@@ -1047,6 +1056,12 @@ INT32 EnterLaptop()
 	//JA25 UB
 	 SetBookMark(MERC_BOOKMARK);
 #endif	
+	if ( gGameExternalOptions.gEncyclopedia == TRUE && !is_networked )
+		SetBookMark(ENCYCLOPEDIA_BOOKMARK); 
+		
+	if ( gGameExternalOptions.gBriefingRoom == TRUE && !is_networked )
+		SetBookMark(BRIEFING_ROOM_BOOKMARK); 
+	
 	LoadLoadPending( );
 
 	DrawDeskTopBackground( );
@@ -1234,6 +1249,27 @@ void RenderLaptop()
 		case( LAPTOP_MODE_NONE ):
 		DrawDeskTopBackground( );
 		break;
+		
+		case LAPTOP_MODE_ENCYCLOPEDIA: //LEGION
+			RenderEncyclopedia();
+			break;
+			
+		case LAPTOP_MODE_ENCYCLOPEDIA_LOCATION:
+			RenderEncyclopediaLocation(FALSE);
+			break;
+			
+		case LAPTOP_MODE_BRIEFING_ROOM_PAGE:
+			RenderBriefingRoom();
+			break;
+			
+		case LAPTOP_MODE_BRIEFING_ROOM_ENTER:
+			RenderBriefingRoomEnter();
+			 break;
+		
+		case LAPTOP_MODE_BRIEFING_ROOM:
+			RenderEncyclopediaLocation(FALSE);
+			break;
+			
 		case LAPTOP_MODE_AIM:
 		RenderAIM();
 			break;
@@ -1533,6 +1569,16 @@ void EnterNewLaptopMode()
 		default:
 		if( gLaptopProgramStates[ LAPTOP_PROGRAM_WEB_BROWSER ] == LAPTOP_PROGRAM_MINIMIZED )
 		{
+		
+			if ( guiCurrentLaptopMode == LAPTOP_MODE_ENCYCLOPEDIA_LOCATION || guiCurrentLaptopMode == LAPTOP_MODE_ENCYCLOPEDIA )
+			{
+				guiCurrentLaptopMode = LAPTOP_MODE_ENCYCLOPEDIA;
+			}
+			else if ( guiCurrentLaptopMode == LAPTOP_MODE_BRIEFING_ROOM_PAGE || guiCurrentLaptopMode == LAPTOP_MODE_BRIEFING_ROOM || guiCurrentLaptopMode == LAPTOP_MODE_BRIEFING_ROOM_ENTER )
+			{
+				guiCurrentLaptopMode = LAPTOP_MODE_BRIEFING_ROOM_ENTER;
+			}
+			
 			// minized, maximized
 			if(	fMaximizingProgram == FALSE )
 			{
@@ -1619,6 +1665,26 @@ void EnterNewLaptopMode()
 	//Initialize the new mode.
 	switch( guiCurrentLaptopMode )
 	{
+		//legion
+		case LAPTOP_MODE_ENCYCLOPEDIA:
+			EnterEncyclopedia();
+			break;
+			
+		case LAPTOP_MODE_ENCYCLOPEDIA_LOCATION:
+			EnterEncyclopediaLocation();
+			break;
+			
+		case LAPTOP_MODE_BRIEFING_ROOM_PAGE:
+			EnterBriefingRoom();
+			break;
+			
+		case LAPTOP_MODE_BRIEFING_ROOM_ENTER:
+			EnterBriefingRoomEnter();
+			break;
+		
+		case LAPTOP_MODE_BRIEFING_ROOM:
+			EnterEncyclopediaLocation();
+			break;
 
 		case LAPTOP_MODE_AIM:
 			EnterAIM();
@@ -1802,6 +1868,26 @@ void HandleLapTopHandles()
 
  	switch( guiCurrentLaptopMode )
 	{
+		//legion
+		case LAPTOP_MODE_ENCYCLOPEDIA:
+			HandleEncyclopedia();
+			break; 
+			
+		case LAPTOP_MODE_ENCYCLOPEDIA_LOCATION:
+			HandleEncyclopediaLocation();
+			break; 				
+
+		case LAPTOP_MODE_BRIEFING_ROOM_PAGE:
+			HandleBriefingRoom();
+			break;
+			
+		case LAPTOP_MODE_BRIEFING_ROOM_ENTER:
+			HandleBriefingRoomEnter();
+			break;
+		
+		case LAPTOP_MODE_BRIEFING_ROOM:
+			HandleEncyclopediaLocation();
+			break; 				
 
 		case LAPTOP_MODE_AIM:
 
@@ -2323,6 +2409,29 @@ UINT32 ExitLaptopMode(UINT32 uiMode)
 
 	switch( uiMode )
 	{
+	
+		case LAPTOP_MODE_ENCYCLOPEDIA:
+			ExitEncyclopedia();
+			//InitEncyklopediaBool();
+			break;			
+			
+		case LAPTOP_MODE_ENCYCLOPEDIA_LOCATION:
+			ExitEncyclopediaLocation();
+			break;
+		
+		case LAPTOP_MODE_BRIEFING_ROOM_PAGE:
+			ExitBriefingRoom();
+			break;
+			
+		case LAPTOP_MODE_BRIEFING_ROOM_ENTER:
+			ExitBriefingRoomEnter();
+			break;
+		
+		case LAPTOP_MODE_BRIEFING_ROOM:
+			ExitEncyclopediaLocation();
+			//InitEncyklopediaBool();
+			break;	
+			
 		case LAPTOP_MODE_AIM:
 			ExitAIM();
 			break;
@@ -3020,7 +3129,8 @@ void WWWRegionButtonCallback(GUI_BUTTON *btn,INT32 reason )
 	{
 	if (btn->uiFlags & BUTTON_CLICKED_ON)
 		{
-		btn->uiFlags&=~(BUTTON_CLICKED_ON);
+		btn->uiFlags&=~(BUTTON_CLICKED_ON);	
+			
 			if(giCurrentRegion!=WWW_REGION)
 				giOldRegion=giCurrentRegion;
 			if(!fNewWWW)
@@ -3065,7 +3175,27 @@ void WWWRegionButtonCallback(GUI_BUTTON *btn,INT32 reason )
 				}
 			}
 			giCurrentRegion=WWW_REGION;
-			RestoreOldRegion(giOldRegion);
+			RestoreOldRegion(giOldRegion);	
+			
+			if ( guiCurrentWWWMode >= LAPTOP_MODE_FINANCES && guiCurrentWWWMode  <= LAPTOP_MODE_BOBBYR_SHIPMENTS )
+			{ 
+			    IDPageEncyData = PAGENONE;
+				UnLoadMenuButtons ();
+				bEncyclopediaLocation = FALSE;
+				bEncyclopediaCharacter = FALSE;
+				bEncyclopediaInventory = FALSE;
+				bEncyclopediaQuests  = FALSE;
+				bBriefingRoom  = FALSE;
+				bBriefingRoomSpecialMission = FALSE;	
+			}
+	
+			if ( IDPageEncyData == PAGEENCYCLOPEDIALOCATION )  guiCurrentWWWMode = LAPTOP_MODE_ENCYCLOPEDIA;//{ bEncyclopediaLocation = TRUE; InitData (); } 
+			else if ( IDPageEncyData == PAGEENCYCLOPEDIACHARACTER )  guiCurrentWWWMode = LAPTOP_MODE_ENCYCLOPEDIA;//{ bEncyclopediaCharacter = TRUE; InitData (); } 
+			else if ( IDPageEncyData == PAGEENCYCLOPEDIAINVENTORY )  guiCurrentWWWMode = LAPTOP_MODE_ENCYCLOPEDIA;//{ bEncyclopediaInventory = TRUE; InitData (); } 
+			else if ( IDPageEncyData == PAGEENCYCLOPEDIAQUESTS )  guiCurrentWWWMode = LAPTOP_MODE_ENCYCLOPEDIA;//{ bEncyclopediaQuests = TRUE; InitData (); } 
+			else if ( IDPageEncyData == PAGEBRIEFINGROOM )  guiCurrentWWWMode = LAPTOP_MODE_BRIEFING_ROOM_ENTER;//{ bBriefingRoom = TRUE; InitData (); }
+			else if ( IDPageEncyData == PAGEBRIEFINGROOMSPECIALMISSION )  guiCurrentWWWMode = LAPTOP_MODE_BRIEFING_ROOM_ENTER;//{ bBriefingRoomSpecialMission = TRUE; InitData (); } 
+			
 			if(guiCurrentWWWMode!=LAPTOP_MODE_NONE)
 			guiCurrentLaptopMode = guiCurrentWWWMode;
 			else
@@ -3081,7 +3211,6 @@ void WWWRegionButtonCallback(GUI_BUTTON *btn,INT32 reason )
 		{
 			btn->uiFlags&=~(BUTTON_CLICKED_ON);
 			// nothing yet
-
 
 			if(giCurrentRegion!=WWW_REGION)
 			giOldRegion=giCurrentRegion;
@@ -3863,6 +3992,46 @@ if( (gubQuest[ QUEST_FIX_LAPTOP ] != QUESTINPROGRESS) || (gGameLegionOptions.Lap
 				fFastLoadFlag =	TRUE;
 			}
 		break;
+		
+		//LEGION
+		case ENCYCLOPEDIA_BOOKMARK:
+		  guiCurrentWWWMode=LAPTOP_MODE_ENCYCLOPEDIA;
+		  guiCurrentLaptopMode=LAPTOP_MODE_ENCYCLOPEDIA;
+
+			// do we have to have a World Wide Wait
+			if( LaptopSaveInfo.fVisitedBookmarkAlready[ ENCYCLOPEDIA_BOOKMARK ] == FALSE )
+			{
+        // reset flag and set load pending flag
+				LaptopSaveInfo.fVisitedBookmarkAlready[ ENCYCLOPEDIA_BOOKMARK ] = TRUE;
+				fLoadPendingFlag = TRUE;
+			}
+			else
+			{
+				// fast reload
+				fLoadPendingFlag = TRUE;
+				fFastLoadFlag =  TRUE;
+			}
+		break;
+		
+		case BRIEFING_ROOM_BOOKMARK:
+		  guiCurrentWWWMode=LAPTOP_MODE_BRIEFING_ROOM_PAGE;
+		  guiCurrentLaptopMode=LAPTOP_MODE_BRIEFING_ROOM_PAGE;
+
+			// do we have to have a World Wide Wait
+			if( LaptopSaveInfo.fVisitedBookmarkAlready[ BRIEFING_ROOM_BOOKMARK ] == FALSE )
+			{
+        // reset flag and set load pending flag
+				LaptopSaveInfo.fVisitedBookmarkAlready[ BRIEFING_ROOM_BOOKMARK ] = TRUE;
+				fLoadPendingFlag = TRUE;
+			}
+			else
+			{
+				// fast reload
+				fLoadPendingFlag = TRUE;
+				fFastLoadFlag =  TRUE;
+			}
+		break;
+		
 		case BOBBYR_BOOKMARK:
 			guiCurrentWWWMode=LAPTOP_MODE_BOBBY_R;
 		guiCurrentLaptopMode=LAPTOP_MODE_BOBBY_R;
@@ -4487,13 +4656,13 @@ void CheckIfNewWWWW( void )
 {
 	// if no www mode, set new www flag..until new www mode that is not 0
 
-	if( guiCurrentWWWMode == LAPTOP_MODE_NONE )
+    if( guiCurrentWWWMode == LAPTOP_MODE_NONE )
 	{
-	fNewWWW = TRUE;
+		fNewWWW = TRUE;
 	}
 	else
 	{
-	fNewWWW = FALSE;
+		fNewWWW = FALSE;
 	}
 
 	return;
@@ -5441,14 +5610,26 @@ void SetCurrentToLastProgramOpened( void )
 		break;
 		case( LAPTOP_PROGRAM_WEB_BROWSER ):
 		// last www mode
-			if( guiCurrentWWWMode != 0 )
+			if ( guiCurrentLaptopMode == LAPTOP_MODE_ENCYCLOPEDIA_LOCATION || guiCurrentLaptopMode == LAPTOP_MODE_ENCYCLOPEDIA )
 			{
-			guiCurrentLaptopMode = guiCurrentWWWMode;
+				guiCurrentLaptopMode = LAPTOP_MODE_ENCYCLOPEDIA;
+			}
+			else if ( guiCurrentLaptopMode == LAPTOP_MODE_BRIEFING_ROOM_PAGE || guiCurrentLaptopMode == LAPTOP_MODE_BRIEFING_ROOM || guiCurrentLaptopMode == LAPTOP_MODE_BRIEFING_ROOM_ENTER )
+			{
+				guiCurrentLaptopMode = LAPTOP_MODE_BRIEFING_ROOM_ENTER;
+			}
+			//else if( guiCurrentWWWMode != 0 && ( guiCurrentWWWMode == LAPTOP_MODE_ENCYCLOPEDIA_LOCATION || guiCurrentWWWMode == LAPTOP_MODE_ENCYCLOPEDIA || guiCurrentWWWMode == LAPTOP_MODE_BRIEFING_ROOM_PAGE || guiCurrentWWWMode == LAPTOP_MODE_BRIEFING_ROOM || guiCurrentWWWMode == LAPTOP_MODE_BRIEFING_ROOM_ENTER ) )
+
+			else if( guiCurrentWWWMode >= LAPTOP_MODE_FINANCES && guiCurrentWWWMode  <= LAPTOP_MODE_BOBBYR_SHIPMENTS  )
+			{
+				guiCurrentLaptopMode = guiCurrentWWWMode;
 			}
 			else
 			{
 				guiCurrentLaptopMode = LAPTOP_MODE_WWW;
 			}
+			
+				guiCurrentLaptopMode = LAPTOP_MODE_WWW;
 			//gfShowBookmarks = TRUE;
 			fShowBookmarkInfo = TRUE;
 		break;
@@ -5798,6 +5979,16 @@ void HandleKeyBoardShortCutsForLapTop( UINT16 usEvent, UINT32 usParam, UINT16 us
 	{
 		if( CHEATER_CHEAT_LEVEL( ) )
 		{
+			AddTransactionToPlayersBook( ANONYMOUS_DEPOSIT, 0, GetWorldTotalMin(), 10000 );
+			MarkButtonsDirty( );
+		}
+	}
+
+	//adding lots of money
+	else if ((usEvent == KEY_DOWN )&& ( usParam == '+' ))
+	{
+		if( CHEATER_CHEAT_LEVEL( ) )
+		{
 			AddTransactionToPlayersBook( ANONYMOUS_DEPOSIT, 0, GetWorldTotalMin(), 100000 );
 			MarkButtonsDirty( );
 		}
@@ -5809,6 +6000,16 @@ void HandleKeyBoardShortCutsForLapTop( UINT16 usEvent, UINT32 usParam, UINT16 us
 		if( CHEATER_CHEAT_LEVEL( ) )
 		{
 			AddTransactionToPlayersBook( ANONYMOUS_DEPOSIT, 0, GetWorldTotalMin(), -10000 );
+			MarkButtonsDirty( );
+		}
+	}
+	
+	//subtracting lots of money
+	else if( (usEvent == KEY_DOWN ) && ( usParam == '_' ) )
+	{
+		if( CHEATER_CHEAT_LEVEL( ) )
+		{
+			AddTransactionToPlayersBook( ANONYMOUS_DEPOSIT, 0, GetWorldTotalMin(), -100000 );
 			MarkButtonsDirty( );
 		}
 	}

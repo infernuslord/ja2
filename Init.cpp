@@ -72,6 +72,7 @@
 #include "Soldier Profile.h"
 #include "aim.h"
 #include "mainmenuscreen.h"
+#include "email.h"
 
 #ifdef JA2UB
 #include "Ja25_Tactical.h"
@@ -83,6 +84,8 @@
 #include "Civ Quotes.h"
 #include "Sector Summary.h"
 #include "LuaInitNPCs.h"
+#include "Encyclopedia_Data.h"
+#include "Encyclopedia.h"
 
 extern INT16 APBPConstants[TOTAL_APBP_VALUES] = {0};
 extern INT16 gubMaxActionPoints[28];//MAXBODYTYPES = 28... JUST GETTING IT TO WORK NOW.  GOTTHARD 7/2/08
@@ -542,7 +545,8 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, FREDOINVENTORYFILENAME);
 	SGP_THROW_IFFALSE(ReadInInventoryStats(gFredoInventory,fileName),FREDOINVENTORYFILENAME);
-	
+
+
 	strcpy(fileName, directoryName);
 	strcat(fileName, CITYTABLEFILENAME);
 	SGP_THROW_IFFALSE(ReadInMapStructure(fileName, FALSE),CITYTABLEFILENAME);
@@ -860,9 +864,9 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	
 		// Sender Name List by Jazz
 		strcpy(fileName, directoryName);
-		strcat(fileName, SENDERNAMELISTFILENAME);
+		strcat(fileName, EMAILSENDERNAMELIST);
 		DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-		SGP_THROW_IFFALSE(ReadInSenderNameList(fileName,FALSE), SENDERNAMELISTFILENAME);
+		SGP_THROW_IFFALSE(ReadInSenderNameList(fileName,FALSE), EMAILSENDERNAMELIST);
 
 #ifndef ENGLISH
 		AddLanguagePrefix(fileName);
@@ -987,6 +991,8 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		}
 #endif
 
+if ( ReadXMLEmail == TRUE )
+{
 		// EMAIL MERC AVAILABLE by Jazz
 		strcpy(fileName, directoryName);
 		strcat(fileName, EMAILMERCAVAILABLE);
@@ -1018,6 +1024,7 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 				return FALSE;
 		}
 #endif
+}
 /*
 		// EMAIL OTHER by Jazz
 		strcpy(fileName, directoryName);
@@ -1042,14 +1049,14 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 	strcpy(fileName, directoryName);
 	strcat(fileName, VEHICLESFILENAME);
 	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-	SGP_THROW_IFFALSE(ReadInNewCar(fileName,FALSE), VEHICLESFILENAME);
+	SGP_THROW_IFFALSE(ReadInNewVehicles(fileName,FALSE), VEHICLESFILENAME);
 	
 #ifndef ENGLISH
 		AddLanguagePrefix(fileName);
 		if ( FileExists(fileName) )
 		{
 			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
-			if(!ReadInNewCar(fileName,TRUE))
+			if(!ReadInNewVehicles(fileName,TRUE))
 				return FALSE;
 		}
 #endif
@@ -1065,6 +1072,82 @@ BOOLEAN LoadExternalGameplayData(STR directoryName)
 		{
 			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
 			if(!ReadInLanguageLocation(fileName,TRUE,zlanguageText,0))
+				return FALSE;
+		}
+#endif
+
+//encyklopedia
+	strcpy(fileName, directoryName);
+	strcat(fileName, ENCYCLOPEDIALOCATIONFILENAME);
+	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+	SGP_THROW_IFFALSE(ReadInEncyclopediaLocation(fileName,FALSE,gEncyclopediaLocationData, 0), ENCYCLOPEDIALOCATIONFILENAME);
+	
+#ifndef ENGLISH
+		AddLanguagePrefix(fileName);
+		if ( FileExists(fileName) )
+		{
+			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+			if(!ReadInEncyclopediaLocation(fileName,TRUE,gEncyclopediaLocationData,0 ))
+				return FALSE;
+		}
+#endif
+
+	strcpy(fileName, directoryName);
+	strcat(fileName, ENCYCLOPEDIAPROFILEFILENAME);
+	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+	SGP_THROW_IFFALSE(ReadInEncyclopediaLocation(fileName,FALSE,gEncyclopediaProfilesData, 1), ENCYCLOPEDIAPROFILEFILENAME);
+	
+#ifndef ENGLISH
+		AddLanguagePrefix(fileName);
+		if ( FileExists(fileName) )
+		{
+			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+			if(!ReadInEncyclopediaLocation(fileName,TRUE,gEncyclopediaProfilesData, 1))
+				return FALSE;
+		}
+#endif
+
+	strcpy(fileName, directoryName);
+	strcat(fileName, ENCYCLOPEDIAINVENTORYFILENAME);
+	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+	SGP_THROW_IFFALSE(ReadInEncyclopediaLocation(fileName,FALSE,gEncyclopediaInventoryData, 2), ENCYCLOPEDIAINVENTORYFILENAME);
+	
+#ifndef ENGLISH
+		AddLanguagePrefix(fileName);
+		if ( FileExists(fileName) )
+		{
+			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+			if(!ReadInEncyclopediaLocation(fileName,TRUE,gEncyclopediaInventoryData, 2))
+				return FALSE;
+		}
+#endif
+
+	strcpy(fileName, directoryName);
+	strcat(fileName, ENCYCLOPEDIAQUESTSFILENAME);
+	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+	SGP_THROW_IFFALSE(ReadInEncyclopediaLocation(fileName,FALSE,gEncyclopediaQuestsData, 3), ENCYCLOPEDIAQUESTSFILENAME);
+	
+#ifndef ENGLISH
+		AddLanguagePrefix(fileName);
+		if ( FileExists(fileName) )
+		{
+			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+			if(!ReadInEncyclopediaLocation(fileName,TRUE,gEncyclopediaQuestsData, 3))
+				return FALSE;
+		}
+#endif
+
+	strcpy(fileName, directoryName);
+	strcat(fileName, BRIEFINGROOMFILENAME);
+	DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+	SGP_THROW_IFFALSE(ReadInEncyclopediaLocation(fileName,FALSE,gBriefingRoomData, 4), BRIEFINGROOMFILENAME);
+	
+#ifndef ENGLISH
+		AddLanguagePrefix(fileName);
+		if ( FileExists(fileName) )
+		{
+			DebugMsg (TOPIC_JA2,DBG_LEVEL_3,String("LoadExternalGameplayData, fileName = %s", fileName));
+			if(!ReadInEncyclopediaLocation(fileName,TRUE,gBriefingRoomData, 4))
 				return FALSE;
 		}
 #endif

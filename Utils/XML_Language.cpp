@@ -54,10 +54,7 @@ BOOLEAN LanguageLocation_TextOnly;
 
 LANGUAGE_LOCATION *pLang;
 
-UINT32 FileType = 0;
-UINT32 MaxPage = 0;
-UINT8 mID = 0;
-UINT8			gMercArray[ NUM_PROFILES ];
+UINT32 FileTypeXml = 0;
 
 static void XMLCALL
 languageLocationStartElementHandle(void *userData, const XML_Char *name, const XML_Char **atts)
@@ -125,12 +122,12 @@ languageLocationEndElementHandle(void *userData, const XML_Char *name)
 				{
 					pLang[pData->curLanguageData.uiIndex].uiIndex = pData->curLanguageData.uiIndex;
 					
-					if ( FileType == 0 )
+					if ( FileTypeXml == 0 )
 						wcscpy(XMLTacticalMessages[pData->curLanguageData.uiIndex], pData->curLanguageData.Message);	
 				}
 				else
 				{
-					if ( FileType == 0 )
+					if ( FileTypeXml == 0 )
 						wcscpy(XMLTacticalMessages[pData->curLanguageData.uiIndex], pData->curLanguageData.Message);
 				}		
 		}
@@ -194,7 +191,7 @@ BOOLEAN ReadInLanguageLocation(STR fileName, BOOLEAN localizedVersion, LANGUAGE_
 	XML_SetUserData(parser, &pData);
 	
 	pLang = Lang;
-	FileType = FileType2;
+	FileTypeXml = FileType2;
 
 
 	if(!XML_Parse(parser, lpcBuffer, uiFSize, TRUE))

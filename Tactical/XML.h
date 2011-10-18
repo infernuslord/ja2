@@ -13,6 +13,8 @@
 #include "Strategic Town Loyalty.h"
 #include "qarray.h"
 #include "XML_Language.h"
+#include "Encyclopedia_Data.h"
+#include "Encyclopedia.h"
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -215,13 +217,24 @@ typedef PARSE_STAGE;
 
 #define FACEGEARFILENAME					"FaceGear.xml"
 
+//Sender Name List
+#define EMAILSENDERNAMELIST					"Email\\EmailSenderNameList.xml"
 #define EMAILMERCAVAILABLE					"Email\\EmailMercAvailable.xml"
 #define EMAILMERCLEVELUP					"Email\\EmailMercLevelUp.xml"
 #define EMAILOTHER							"Email\\EmailOther.xml"
+#define EMAILINSURANCE 						"Email\\EmailInsurance.xml"
+
 
 #define VEHICLESFILENAME					"Vehicles.xml"
 
 #define TEXTFILENAME					"Text\\TacticalMessages.xml"
+
+#define ENCYCLOPEDIALOCATIONFILENAME				"Encyclopedia\\EncyclopediaLocations.xml"
+#define ENCYCLOPEDIAPROFILEFILENAME					"Encyclopedia\\EncyclopediaProfiles.xml"
+#define ENCYCLOPEDIAINVENTORYFILENAME				"Encyclopedia\\EncyclopediaInventory.xml"
+#define ENCYCLOPEDIAOTHERFILENAME					"Encyclopedia\\EncyclopediaOthers.xml"
+#define ENCYCLOPEDIAQUESTSFILENAME					"Encyclopedia\\EncyclopediaQuests.xml"
+#define BRIEFINGROOMFILENAME						"BriefingRoom\\BriefingRoom.xml"
 
 extern BOOLEAN ReadInItemStats(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN WriteItemStats();
@@ -434,9 +447,12 @@ extern BOOLEAN WriteInActionItems( STR fileName);
 extern BOOLEAN ReadInEmailMercAvailable(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN ReadInEmailMercLevelUp(STR fileName, BOOLEAN localizedVersion);
 extern BOOLEAN ReadInEmailOther(STR fileName, BOOLEAN localizedVersion);
+//extern BOOLEAN ReadInInsurance(STR fileName, BOOLEAN localizedVersion);
 
-extern BOOLEAN ReadInNewCar(STR fileName, BOOLEAN localizedVersion);
-extern BOOLEAN WriteNewCar(STR fileName);
+extern BOOLEAN ReadInEncyclopediaLocation(STR fileName, BOOLEAN localizedVersion, ENCYCLOPEDIA_LOCATION *Ency, UINT32 FileType2 );
+
+extern BOOLEAN ReadInNewVehicles(STR fileName, BOOLEAN localizedVersion);
+extern BOOLEAN WriteNewVehicles(STR fileName);
 extern void InitNewVehicles ();
 
 extern BOOLEAN ReadInLanguageLocation(STR fileName, BOOLEAN localizedVersion, LANGUAGE_LOCATION *Lang, UINT32 FileType2 );

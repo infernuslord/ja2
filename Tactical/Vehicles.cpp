@@ -352,23 +352,20 @@ INT32 AddVehicleToList( INT16 sMapX, INT16 sMapY, INT32 sGridNo, UINT8 ubType )
 		pGroup->ubTransportationMask = TRUCK;
 	}
 	else
-	{
-	//	pGroup->ubTransportationMask = (UINT8)iMvtTypes[ ubType ];
-	
-		if ( gNewVehicle[ ubType ].iNewMvtTypes = 0 )
+	{	
+		// WANNE: This FIXES the bug (== instead of =), that the heli could only fly on roads!!
+		if ( gNewVehicle[ ubType ].iNewMvtTypes == 0 )
 			pGroup->ubTransportationMask = FOOT;
-		else if ( gNewVehicle[ ubType ].iNewMvtTypes = 1 )
+		else if ( gNewVehicle[ ubType ].iNewMvtTypes == 1 )
 			pGroup->ubTransportationMask = CAR;	
-		else if ( gNewVehicle[ ubType ].iNewMvtTypes = 2 )
+		else if ( gNewVehicle[ ubType ].iNewMvtTypes == 2 )
 			pGroup->ubTransportationMask = TRUCK;	
-		else if ( gNewVehicle[ ubType ].iNewMvtTypes = 3 )
+		else if ( gNewVehicle[ ubType ].iNewMvtTypes == 3 )
 			pGroup->ubTransportationMask = TRACKED;			
-		else if ( gNewVehicle[ ubType ].iNewMvtTypes = 4 )
+		else if ( gNewVehicle[ ubType ].iNewMvtTypes == 4 )
 			pGroup->ubTransportationMask = AIR;				
 		else 
 			pGroup->ubTransportationMask = CAR;
-			
-		//pGroup->ubTransportationMask = (UINT8) gNewVehicle[ ubType ].iNewMvtTypes;
 	}
 
 	// ARM: setup group movement defaults

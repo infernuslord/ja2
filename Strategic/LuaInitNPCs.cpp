@@ -75,6 +75,11 @@ extern	BOOLEAN	gfDoneWithSplashScreen;
 extern UINT32 iStringToUseLua;
 extern INT8 Test;
 
+//Briefing room
+static int l_SetEndMission(lua_State *L);
+static int l_SetStartMission(lua_State *L);
+static int l_CheckMission (lua_State *L);
+
 void FatigueCharacter( SOLDIERTYPE *pSoldier );
 
 static int l_AddCustomEmail (lua_State *L);
@@ -179,8 +184,8 @@ BOOLEAN LetLuaInterfaceDialogue( UINT8 ubNPC, UINT8 InitFunction);
 BOOLEAN LuaHandlePlayerTeamMemberDeath(UINT8 ProfileId, UINT8 Init);
 BOOLEAN LuaHandleNPCTeamMemberDeath(UINT8 ProfileId, UINT8 Init);
 BOOLEAN LuaCheckForKingpinsMoneyMissing( BOOLEAN fFirstCheck, UINT8 Init);
-BOOLEAN LuaHandleQuestCodeOnSectorExit( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 Init);
-BOOLEAN LuaHandleQuestCodeOnSectorEntry( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 Init);
+BOOLEAN LuaHandleQuestCodeOnSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 Init);
+//BOOLEAN LuaHandleQuestCodeOnSectorEntry( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 Init);
 BOOLEAN LuaHandleDelayedItemsArrival( UINT32 uiReason, UINT8 Init);
 BOOLEAN LetLuaHandleNPCSystemEvent( UINT32 uiEvent, UINT8 Init);
 
@@ -694,8 +699,19 @@ static int l_WhoIs(lua_State *L);
 
 static int l_SetHandleGlobalLoyaltyEvent (lua_State *L);
 
+//----05-08-2011---
+
+// tactical tex box function
 static int l_ExecuteTacticalTextBox(lua_State *L);
 
+//Town function
+static int l_VisibleTown (lua_State *L);
+static int l_HiddenTown (lua_State *L);
+//static int l_EraseTown (lua_State *L);
+//static int l_ResizeTown (lua_State *L);
+
+static int l_gubBoxerID(lua_State *L);
+static int l_RemoveGraphicFromTempFile (lua_State *L);
 
 using namespace std;
 
@@ -787,6 +803,11 @@ void IniGlobal_1(lua_State *L)
 }		
 void IniFunction(lua_State *L)
 {
+
+	//Briefing room
+	lua_register(L, "SetEndMission", l_SetEndMission);
+	lua_register(L, "SetStartMission", l_SetStartMission);
+	lua_register(L, "CheckMission", l_CheckMission);
 
 	//Sector
 	lua_register(L, "AddAlternateSector", l_AddAlternateSector);
@@ -1405,6 +1426,17 @@ void IniFunction(lua_State *L)
 	//lua_register(L, "GetINITIALHELIGRIDNO7", l_getMercgridNo6);
 	
 	lua_register(L, "ExecuteTacticalTextBox", l_ExecuteTacticalTextBox);
+
+	//Town function
+	lua_register(L, "VisibleTown", l_VisibleTown);
+	lua_register(L, "HiddenTown", l_HiddenTown);
+	//lua_register(L, "EraseTown", l_EraseTown);
+	//lua_register(L, "ResizeTown", l_ResizeTown);
+	
+	lua_register(L, "gubBoxerID", l_gubBoxerID);
+	
+	lua_register(L, "RemoveGraphicFromTempFile", l_RemoveGraphicFromTempFile);
+	
 
 }
 
@@ -2420,7 +2452,7 @@ BOOLEAN LuaHandleQuestCodeOnSectorEntry( INT16 sSectorX, INT16 sSectorY, INT8 bS
 
 }
 */
-BOOLEAN LuaHandleQuestCodeOnSectorExit( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 Init)
+BOOLEAN LuaHandleQuestCodeOnSector( INT16 sSectorX, INT16 sSectorY, INT8 bSectorZ, UINT8 Init)
 {
 	char * filename = "scripts\\strategicmap.lua";
 	UINT32 size, bytesRead;     
@@ -2457,6 +2489,15 @@ BOOLEAN LuaHandleQuestCodeOnSectorExit( INT16 sSectorX, INT16 sSectorY, INT8 bSe
 	if ( Init == 0 )
 	{
 		lua_getglobal(L , "HandleQuestCodeOnSectorExit");
+		lua_pushnumber (L, sSectorX );
+		lua_pushnumber (L, sSectorY );
+		lua_pushnumber (L, bSectorZ );
+		lua_call(L,3,0); 
+	}
+	
+	if ( Init == 1 )
+	{
+		lua_getglobal(L , "HandleQuestCodeOnSectorEntry");
 		lua_pushnumber (L, sSectorX );
 		lua_pushnumber (L, sSectorY );
 		lua_pushnumber (L, bSectorZ );
@@ -3399,6 +3440,24 @@ BOOLEAN Bool;
 	lua_pushboolean(L, Bool);
 	
 return 1;
+}
+
+static int l_gubBoxerID(lua_State *L)
+{
+UINT8  n = lua_gettop(L);
+int i;
+UINT8 val,val2;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) val = lua_tointeger(L,i);
+		if (i == 2 ) val2 = lua_tointeger(L,i);
+	}
+	
+	if ( val >= 0 && val <= 2 )
+		gubBoxerID[ val ] = val2;
+	
+return 0;
 }
 
 static int l_CheckTalkerUnpropositionedFemale(lua_State *L)
@@ -11544,6 +11603,186 @@ static int l_AddAltUnderGroundSector(lua_State *L)
 	
 	return 0;	
 }
+
+//--------------Briefing room-----------------------30-06-2011
+
+static int l_SetEndMission(lua_State *L)
+{
+	UINT32 idMission, nextMission;
+	UINT8 n = lua_gettop(L);
+	int i = 0;
+	
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) idMission = lua_tointeger(L,i);
+	}
+	
+	if ( gBriefingRoomData[idMission].CheckMission == MISSIONSTART ) 
+	{
+		gBriefingRoomData[idMission].CheckMission = MISSIONEND; //set end mission 
+		nextMission = gBriefingRoomData[idMission].NextMission;
+		if ( nextMission != -1 )
+		gBriefingRoomData[nextMission].Hidden = TRUE; // set next mission
+	}
+	 
+	return 0;
+}
+
+static int l_SetStartMission(lua_State *L)
+{
+	UINT32 idMission;
+	UINT8 n = lua_gettop(L);
+	int i = 0;
+	
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) idMission = lua_tointeger(L,i);
+	}
+	
+	if ( gBriefingRoomData[idMission].CheckMission != MISSIONSTART || gBriefingRoomData[idMission].CheckMission != MISSIONEND || gBriefingRoomData[idMission].CheckMission == MISSIONNOSTARTED ) 
+	{
+		gBriefingRoomData[idMission].CheckMission = MISSIONSTART; //set start mission 
+		gBriefingRoomData[idMission].Hidden = TRUE; // set next mission
+	}
+	 
+	return 0;
+}
+
+static int l_CheckMission (lua_State *L)
+{
+	UINT8  n = lua_gettop(L);
+	int i = 0;
+	UINT32 idMission = 0;
+	UINT32 Bool = 0;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) idMission = lua_tointeger(L,i);
+	}
+
+	if ( gBriefingRoomData[idMission].CheckMission == MISSIONNOSTARTED)
+		Bool = 0;
+	else if ( gBriefingRoomData[idMission].CheckMission == MISSIONSTART)
+		Bool = 1;
+	else if (gBriefingRoomData[idMission].CheckMission == MISSIONEND)	
+		Bool = 2;
+		
+	lua_pushinteger(L, Bool);
+		
+		
+	return 1;
+}
+
+//--------------------------------------------------------------
+
+static int l_RemoveGraphicFromTempFile (lua_State *L)
+{
+	UINT8  n = lua_gettop(L);
+	int i = 0;
+	INT32 uiMapIndex;
+	UINT16 usIndex;
+	INT16 sSectorX;
+	INT16 sSectorY;
+	UINT8 ubSectorZ; 
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) uiMapIndex = lua_tointeger(L,i);
+		if (i == 2 ) usIndex = lua_tointeger(L,i);
+		if (i == 3 ) sSectorX = lua_tointeger(L,i);
+		if (i == 4 ) sSectorY = lua_tointeger(L,i);
+		if (i == 5 ) ubSectorZ = lua_tointeger(L,i);
+	}
+	
+	RemoveGraphicFromTempFile( uiMapIndex, usIndex, sSectorX, sSectorY, ubSectorZ );
+
+
+	return 0;
+}
+
+//------------ Towns function
+/*
+static int l_ResizeTown (lua_State *L)
+{
+	UINT8 n = lua_gettop(L);
+
+	UINT16 x = 0;
+	UINT16 y = 0;
+	UINT8 TownID;
+	
+	int i = 0;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) x = lua_tointeger(L,i);
+		if (i == 2 ) y = lua_tointeger(L,i);
+		if (i == 3 ) TownID = lua_tointeger(L,i);		
+	}
+	
+	if ( TownID > 0 && TownID <= NUM_TOWNS ) //MAX_TOWNS
+		StrategicMap[SECTOR( x, y )].bNameId = TownID;
+
+	return 0;
+}
+
+static int l_EraseTown (lua_State *L)
+{
+	UINT8 n = lua_gettop(L);
+
+	UINT8 TownID,cnt;
+	
+	int i = 0;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) TownID = lua_tointeger(L,i);		
+	}
+		
+	for (cnt = 0; cnt < 256; cnt++)
+	{
+		if ( StrategicMap[cnt].bNameId == TownID && TownID < NUM_TOWNS ) StrategicMap[cnt].bNameId = 0;
+	}
+
+	return 0;
+}
+*/
+static int l_HiddenTown (lua_State *L)
+{
+	UINT8 n = lua_gettop(L);
+	UINT8 TownID;
+	
+	int i = 0;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) TownID = lua_tointeger(L,i);
+	}
+	
+	if ( TownID > 0 && TownID <= NUM_TOWNS )
+		gfHiddenTown[TownID] = FALSE;
+
+	return 0;
+}
+
+static int l_VisibleTown (lua_State *L)
+{
+	UINT8 n = lua_gettop(L);
+	UINT8 TownID;
+	
+	int i = 0;
+
+	for (i= 1; i<=n; i++ )
+	{
+		if (i == 1 ) TownID = lua_tointeger(L,i);
+	}
+	
+	if ( TownID > 0 && TownID <= NUM_TOWNS )
+		gfHiddenTown[TownID] = TRUE;
+
+	return 0;
+}
+
+//---------------
 
 static int lh_getBooleanFromTable(lua_State *L, const char * fieldname)
 {

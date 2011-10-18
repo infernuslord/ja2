@@ -602,5 +602,8 @@
     <ClCompile Include="XML_NewFaceGear.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="XML_Vehicles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

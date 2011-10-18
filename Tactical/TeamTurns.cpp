@@ -262,6 +262,8 @@ void StartPlayerTeamTurn( BOOLEAN fDoBattleSnd, BOOLEAN fEnteringCombatMode )
 	// ATE: Reset killed on attack variable.. this is because sometimes timing is such
 	/// that a baddie can die and still maintain it's attacker ID
 	gTacticalStatus.fKilledEnemyOnAttack = FALSE;
+	
+	gTacticalStatus.ubInterruptPending	= DISABLED_INTERRUPT;
 
 	HandleTacticalUI( );
 }
@@ -347,9 +349,14 @@ void EndTurn( UINT8 ubNextTeam )
 		}
 
 		gTacticalStatus.ubCurrentTeam	= ubNextTeam;
+		
+		gTacticalStatus.ubInterruptPending	= DISABLED_INTERRUPT;
 
 		if(is_server || !is_client) BeginTeamTurn( gTacticalStatus.ubCurrentTeam );
+
+		// WANNE: Disabled Headrocks Experimental fix, because it causes assertion in AddPossiblePendingMilitiaToBattle();
 		// HEADROCK HAM 3.2: Experimental fix to force reinforcements enter battle with 0 APs.
+		/*
 		if (gGameExternalOptions.ubReinforcementsFirstTurnFreeze == 1 || gGameExternalOptions.ubReinforcementsFirstTurnFreeze == 2)
 		{
 			AddPossiblePendingEnemiesToBattle();
@@ -358,6 +365,7 @@ void EndTurn( UINT8 ubNextTeam )
 		{
 			AddPossiblePendingMilitiaToBattle();
 		}
+		*/
 
 		BetweenTurnsVisibilityAdjustments();
 	}
@@ -430,6 +438,8 @@ void EndAllAITurns( void )
 
 		gTacticalStatus.ubCurrentTeam = gbPlayerNum;
 		//BeginTeamTurn( gTacticalStatus.ubCurrentTeam );
+		
+		gTacticalStatus.ubInterruptPending	= DISABLED_INTERRUPT;
 	}
 }
 
@@ -803,7 +813,8 @@ void StartInterrupt( void )
 		INT32		iSquad, iCounter;
 
 		// build string for display of who gets interrupt
-		while( 1 )
+		//while( 1 )
+		for( iCounter = 0; iCounter <= MAX_NUM_SOLDIERS; iCounter++ )
 		{
 			MercPtrs[ubInterrupter]->aiData.bMoved = FALSE;
 			DebugMsg( TOPIC_JA2INTERRUPT, DBG_LEVEL_3, String("INTERRUPT: popping %d off of the interrupt queue", ubInterrupter ) );
@@ -921,9 +932,10 @@ void StartInterrupt( void )
 		}
 		*/
 
-		while( 1 )
+		//while( 1 )
+		UINT16 usCounter;
+		for( usCounter = 0; usCounter <= MAX_NUM_SOLDIERS; usCounter++ )
 		{
-
 			MercPtrs[ubInterrupter]->aiData.bMoved = FALSE;
 
 			DebugMsg( TOPIC_JA2INTERRUPT, DBG_LEVEL_3, String("INTERRUPT: popping %d off of the interrupt queue", ubInterrupter ) );
@@ -944,7 +956,6 @@ void StartInterrupt( void )
 				ubFirstInterrupter = ubInterrupter;
 			}
 		}
-		{
 
 		// here we have to rebuilt the AI list!
 		BuildAIListForTeam( bTeam );
@@ -952,11 +963,15 @@ void StartInterrupt( void )
 		// set to the new first interrupter
 		cnt = RemoveFirstAIListEntry();
 
-		pSoldier = MercPtrs[ cnt ];
+		pTempSoldier = MercPtrs[ cnt ];
 //		pSoldier = MercPtrs[ubFirstInterrupter];
 
 		//if ( gTacticalStatus.ubCurrentTeam == OUR_TEAM )//hayden
-		if (!is_networked && gTacticalStatus.ubCurrentTeam == OUR_TEAM ) // if ( pSoldier->bTeam > OUR_TEAM && pSoldier->bTeam < 6) // cheap disable
+		// if ( pSoldier->bTeam > OUR_TEAM && pSoldier->bTeam < 6) // cheap disable
+		// SANDRO - if we just saw the guy, don't flag it as hidden interrupt
+		if (!is_networked && gTacticalStatus.ubCurrentTeam == OUR_TEAM 
+			&& MercPtrs[ LATEST_INTERRUPT_GUY ]->aiData.bOppList[pTempSoldier->ubID] != SEEN_CURRENTLY 
+			&& MercPtrs[ LATEST_INTERRUPT_GUY ]->aiData.bOppList[pTempSoldier->ubID] != SEEN_THIS_TURN ) 
 		{
 			// we're being interrupted by the computer!
 			// we delay displaying any interrupt message until the computer
@@ -966,8 +981,8 @@ void StartInterrupt( void )
 		}
 		// otherwise it's the AI interrupting another AI team
 
-		if (pSoldier != NULL)
-			gTacticalStatus.ubCurrentTeam	= pSoldier->bTeam;
+		if (pTempSoldier != NULL)
+			gTacticalStatus.ubCurrentTeam	= pTempSoldier->bTeam;
 		
 		if (is_networked)
 		{
@@ -976,10 +991,8 @@ void StartInterrupt( void )
 			#endif
 		}
 
-		if (pSoldier != NULL)
-			StartNPCAI( pSoldier );
-		
-		}
+		if (pTempSoldier != NULL)
+			StartNPCAI( pTempSoldier );
 	}
 
 	if ( !gfHiddenInterrupt )
@@ -1053,7 +1066,10 @@ void EndInterrupt( BOOLEAN fMarkInterruptOccurred )
 			nubFirstInterrupter = LATEST_INTERRUPT_GUY;
 			npSoldier = MercPtrs[nubFirstInterrupter];
 			nbTeam = npSoldier->bTeam;
+
+#ifdef BETAVERSION
 			ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"unchecked interrupt call area:(resume interrupted interrupt)...");
+#endif
 		
 			if ((nbTeam > 0) && (nbTeam <6 ) && is_server) //is AI and are server
 			{
@@ -1116,6 +1132,7 @@ void EndInterrupt( BOOLEAN fMarkInterruptOccurred )
 
 		// change team
 		gTacticalStatus.ubCurrentTeam	= pSoldier->bTeam;
+
 		// switch appropriate messages & flags
 		if ( pSoldier->bTeam == OUR_TEAM)
 		{
@@ -1208,6 +1225,9 @@ void EndInterrupt( BOOLEAN fMarkInterruptOccurred )
 				// normal player's turn without readjusting time left in turn (for
 				// timed turns)
 				InitPlayerUIBar( 2 );
+				
+				// SANDRO - shouldn't we unset ui here too?
+				UnSetUIBusy( pSoldier->ubID );
 			}
 
 		}
@@ -2141,29 +2161,21 @@ void DoneAddingToIntList( SOLDIERTYPE * pSoldier, BOOLEAN fChange, UINT8 ubInter
 				}
 				// INTERRUPT is calculated on the pure client
 				else if(gTacticalStatus.ubCurrentTeam == 0)//its our turn (we are moving)
-				{					
-					//// WANNE: Skip the interrupt (against enemy AI) on the pure client, when we are in a coop game!
-					//if (cGameType == MP_TYPE_COOP)
-					//{
-					//	#ifdef BETAVERSION
-					//		ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"interrupt for another team - pure client - skipping problematic interrupt");
-					//	#endif			
-					//}
-					//else
-					//{
-						send_interrupt( npSoldier );
-						ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, L"interrupt for another team - PROBLEMATIC");
+				{																	
+					ScreenMsg( FONT_MCOLOR_LTRED, MSG_INTERFACE, MPClientMessage[79]);
 
-						SOLDIERTYPE* pMerc = MercPtrs[ gusSelectedSoldier ];
-						//AdjustNoAPToFinishMove( pMerc, TRUE );	
-						pMerc->HaultSoldierFromSighting(TRUE);
-						//pMerc->fTurningFromPronePosition = FALSE;// hmmm ??
-						FreezeInterfaceForEnemyTurn();
-						InitEnemyUIBar( 0, 0 );
-						fInterfacePanelDirty = DIRTYLEVEL2;
-						AddTopMessage( COMPUTER_INTERRUPT_MESSAGE, TeamTurnString[ nbTeam ] );
-						gTacticalStatus.fInterruptOccurred = TRUE;
-					//}
+					send_interrupt( npSoldier );
+
+
+					SOLDIERTYPE* pMerc = MercPtrs[ gusSelectedSoldier ];
+					//AdjustNoAPToFinishMove( pMerc, TRUE );	
+					pMerc->HaultSoldierFromSighting(TRUE);
+					//pMerc->fTurningFromPronePosition = FALSE;// hmmm ??
+					FreezeInterfaceForEnemyTurn();
+					InitEnemyUIBar( 0, 0 );
+					fInterfacePanelDirty = DIRTYLEVEL2;
+					AddTopMessage( COMPUTER_INTERRUPT_MESSAGE, TeamTurnString[ nbTeam ] );
+					gTacticalStatus.fInterruptOccurred = TRUE;						
 				}
 				else
 				{
@@ -2352,6 +2364,12 @@ void ResolveInterruptsVs( SOLDIERTYPE * pSoldier, UINT8 ubInterruptType)
 				{
 					// add this guy to everyone's interrupt queue
 					AddToIntList(ubIntList[ubSmallestSlot],TRUE,TRUE);
+					// SANDRO - for IIS, reset counter if we got here
+					if ( gGameExternalOptions.fImprovedInterruptSystem )
+					{
+						// reset the counter
+						MercPtrs[ ubIntList[ubSmallestSlot] ]->aiData.ubInterruptCounter[pSoldier->ubID] = 0;						
+					}
 					if (INTERRUPTS_OVER)
 					{
 						// a loop was created which removed all the people in the interrupt queue!

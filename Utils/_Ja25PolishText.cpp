@@ -1,4 +1,4 @@
-// WANNE: Yes we need this here exclusivly in Polish version, because we do not have a codepage in the code like for other versions.
+ï»¿// WANNE: Yes we need this here exclusivly in Polish version, because we do not have a codepage in the code like for other versions.
 #pragma setlocale("POLISH")
 
 #ifdef PRECOMPILEDHEADERS
@@ -24,23 +24,23 @@ void this_is_the_Ja25PolishText_public_symbol(void){;}
 //these strings match up with the defines in IMP Skill trait.cpp
 STR16 gzIMPSkillTraitsText[]=
 {
-	L"Otwieranie zamków",
-	L"Walka wrêcz",
+	L"Otwieranie zamkÃ³w",
+	L"Walka wrÄ™cz",
 	L"Elektronika",
 	L"Operacje nocne",
 	L"Rzucanie",
 	L"Szkolenie",
-	L"Broñ ciê¿ka",
-	L"Broñ automatyczna",
-	L"Skradanie siê",
-	L"Oburêcznoœæ",
-	L"Broñ bia³a",
+	L"BroÅ„ ciÄ™Å¼ka",
+	L"BroÅ„ automatyczna",
+	L"Skradanie siÄ™",
+	L"OburÄ™cznoÅ›Ä‡",
+	L"BroÅ„ biaÅ‚a",
 	L"Snajper",
-	L"Kamufla¿",
+	L"KamuflaÅ¼",
 	L"Sztuki walki",
 
 	L"Brak",
-	L"Umiejêtnoœci",
+	L"UmiejÄ™tnoÅ›ci",
 	L"(Ekspert)",
 
 };
@@ -48,41 +48,41 @@ STR16 gzIMPSkillTraitsText[]=
 //added another set of skill texts for new major traits
 STR16 gzIMPSkillTraitsTextNewMajor[]=
 {
-	L"Broñ automatyczna",
-	L"Broñ ciê¿ka",
+	L"BroÅ„ automatyczna",
+	L"BroÅ„ ciÄ™Å¼ka",
 	L"Strzelec wyborowy",
-	L"£owca",
+	L"Åowca",
 	L"Rewolwerowiec",
-	L"Walka wrêcz",
-	L"Zastêpca szeryfa",
+	L"Walka wrÄ™cz",
+	L"ZastÄ™pca szeryfa",
 	L"Technik",
 	L"Paramedyk",
 
 	L"None",
-	L"G³ówne cechy I.M.P",
+	L"GÅ‚Ã³wne cechy I.M.P",
 	// second names
 	L"Strzelec CKM",
 	L"Bombardier",
 	L"Snajper",
-	L"Leœniczy",
+	L"LeÅ›niczy",
 	L"Rewolwerowiec",
-	L"Walka wrêcz",
-	L"Dowódca dru¿yny",
-	L"In¿ynier",
+	L"Walka wrÄ™cz",
+	L"DowÃ³dca druÅ¼yny",
+	L"InÅ¼ynier",
 	L"Doktor",
 };
 
 //added another set of skill texts for new minor traits
 STR16 gzIMPSkillTraitsTextNewMinor[]=
 {
-	L"Oburêcznoœæ",
-	L"Walka wrêcz",
+	L"OburÄ™cznoÅ›Ä‡",
+	L"Walka wrÄ™cz",
 	L"Rzucanie",
 	L"Operacje nocne",
 	L"Cichy",
 	L"Atletyka",
 	L"Bodybuilding",
-	L"£adunki wybuchowe",
+	L"Åadunki wybuchowe",
 	L"Nauczanie",
 	L"Zwiad",
 
@@ -96,19 +96,19 @@ STR16 gzIMPMajorTraitsHelpTextsAutoWeapons[]=
 	L"+%d%s do szansy trafienia karabinem szturmowym\n",
 	L"+%d%s do szansy trafienia pistoletem maszynowym\n",
 	L"+%d%s do szansy trafienia erkaemem\n",
-	L"-%d%s do liczby PA potrzebnych do strza³u erkaemem w trybie automatycznym lub seri¹\n",
+	L"-%d%s do liczby PA potrzebnych do strzaÅ‚u erkaemem w trybie automatycznym lub seriÄ…\n",
 	L"-%d%s do liczby PA potrzebnych do przygotowania erkaemu\n",
-	L"Kara do szansy trafienia ogniem automatycznym/seri¹ jest zmniejszona o %d%s\n",
-	L"Zmniejszona szansa na wystrzelenie przez przypadek wiêkszej liczby pocisków w ogniu automatycznym o -%d%s\n",
+	L"Kara do szansy trafienia ogniem automatycznym/seriÄ… jest zmniejszona o %d%s\n",
+	L"Zmniejszona szansa na wystrzelenie przez przypadek wiÄ™kszej liczby pociskÃ³w w ogniu automatycznym o -%d%s\n",
 
 };
 STR16 gzIMPMajorTraitsHelpTextsHeavyWeapons[]=
 {
-	L"-%d%s do liczby PA potrzebnych do strza³u z granatnika\n",
-	L"-%d%s do liczby PA potrzebnych do strza³u z wyrzutni rakiet\n",
+	L"-%d%s do liczby PA potrzebnych do strzaÅ‚u z granatnika\n",
+	L"-%d%s do liczby PA potrzebnych do strzaÅ‚u z wyrzutni rakiet\n",
 	L"+%d%s do szansy trafienia grantnikiem\n",
-	L"+%d%s do szansy trafienia wyrzutni¹ rakiet\n",
-	L"-%d%s do liczby PA potrzebnych do strza³u z moŸdzierza\n",
+	L"+%d%s do szansy trafienia wyrzutniÄ™ rakiet\n",
+	L"-%d%s do liczby PA potrzebnych do strzaÅ‚u z moÅºdzierza\n",
 	L"Reduce penalty for mortar CtH by %d%s\n",
 	L"+%d%s damage to tanks with heavy weapons, grenades and explosives\n",
 	L"+%d%s damage to other targets with heavy weapons\n",

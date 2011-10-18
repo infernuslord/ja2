@@ -107,6 +107,7 @@
 #endif
 
 #include "LuaInitNPCs.h"
+#include "Luaglobal.h"
 
 #ifdef JA2UB
 #include "SaveLoadGame.h"
@@ -120,6 +121,7 @@
 #include "Map Screen Interface Bottom.h"
 #include "Strategic AI.h"
 #include "legion cfg.h"
+#include "Luaglobal.h"
 #endif
 
 #include "connect.h" //hayden added alot ""'s to get around client spawing random/different placed AI
@@ -127,6 +129,9 @@
 #include "Strategic Mines.h"
 #include "Strategic Mines LUA.h"
 #include "UndergroundInit.h"
+
+#include "LuaInitNPCs.h"
+#include "Luaglobal.h"
 
 #include "sgp_logger.h"
 
@@ -819,7 +824,7 @@ INT8 NUM_TOWNS;
 extern UINT8	gubTownRebelSentiment	[ MAX_TOWNS ];
 extern BOOLEAN	gfTownUsesLoyalty		[ MAX_TOWNS ];
 extern BOOLEAN	gfMilitiaAllowedInTown	[ MAX_TOWNS ];
-BOOLEAN	gfHiddenTown			[ MAX_TOWNS ];
+BOOLEAN	gfHiddenTown			[ MAX_TOWNS ];				// Info: Visible town are TRUE, hidden towns are FALSE
 BOOLEAN	gfDrawHiddenTown		[ MAX_TOWNS ];
 BOOLEAN	gfDrawHiddenTownTemp	[ MAX_TOWNS ];
 BOOLEAN	gfHiddenTownTemp		[ MAX_TOWNS ];
@@ -2623,17 +2628,6 @@ void HandleQuestCodeOnSectorEntry( INT16 sNewSectorX, INT16 sNewSectorY, INT8 bN
 	UINT8		cnt;
 	SOLDIERTYPE * pSoldier;
 
-	if ( CheckFact( FACT_ALL_TERRORISTS_KILLED, 0 ) )
-	{
-		// end terrorist quest
-		// SANDRO - removed ending quest from here, placed to Interface Dialogue
-		//EndQuest( QUEST_KILL_TERRORISTS, gMercProfiles[ CARMEN ].sSectorX, gMercProfiles[ CARMEN ].sSectorY );
-		// remove Carmen
-		gMercProfiles[ CARMEN ].sSectorX = 0;
-		gMercProfiles[ CARMEN ].sSectorY = 0;
-		gMercProfiles[ CARMEN ].bSectorZ = 0;
-	}
-
 	// are we in a mine sector, on the surface?
 	if ( IsThereAMineInThisSector( sNewSectorX, sNewSectorY ) && ( bNewSectorZ == 0 ))
 	{
@@ -2702,18 +2696,16 @@ void HandleQuestCodeOnSectorEntry( INT16 sNewSectorX, INT16 sNewSectorY, INT8 bN
 #endif
 		}
 	}
-
-	if ( CheckFact( FACT_ROBOT_RECRUITED_AND_MOVED, 0 ) == FALSE )
+	
+	if ( CheckFact( FACT_ALL_TERRORISTS_KILLED, 0 ) )
 	{
-		SOLDIERTYPE * pRobot;
-		pRobot = FindSoldierByProfileID( ROBOT, TRUE );
-		if (pRobot)
-		{
-			// robot is on our team and we have changed sectors, so we can
-			// replace the robot-under-construction in Madlab's sector
-			RemoveGraphicFromTempFile( gsRobotGridNo, SEVENTHISTRUCT1, gMercProfiles[MADLAB].sSectorX, gMercProfiles[MADLAB].sSectorY, gMercProfiles[MADLAB].bSectorZ );
-			SetFactTrue( FACT_ROBOT_RECRUITED_AND_MOVED );
-		}
+		// end terrorist quest
+		// SANDRO - removed ending quest from here, placed to Interface Dialogue
+		//EndQuest( QUEST_KILL_TERRORISTS, gMercProfiles[ CARMEN ].sSectorX, gMercProfiles[ CARMEN ].sSectorY );
+		// remove Carmen
+		gMercProfiles[ CARMEN ].sSectorX = 0;
+		gMercProfiles[ CARMEN ].sSectorY = 0;
+		gMercProfiles[ CARMEN ].bSectorZ = 0;
 	}
 
 	// Check to see if any player merc has the Chalice; if so,
@@ -2730,11 +2722,30 @@ void HandleQuestCodeOnSectorEntry( INT16 sNewSectorX, INT16 sNewSectorY, INT8 bN
 			}
 		}
 	}
-
+	
 	if ( (gubQuest[ QUEST_KINGPIN_MONEY ] == QUESTINPROGRESS) && CheckFact( FACT_KINGPIN_CAN_SEND_ASSASSINS, 0 ) && (GetTownIdForSector( sNewSectorX, sNewSectorY ) != BLANK_SECTOR) && Random( 10 + GetNumberOfMilitiaInSector( sNewSectorX, sNewSectorY, bNewSectorZ ) ) < 3 )
 	{
 		DecideOnAssassin();
 	}
+	
+	if ( CheckFact( FACT_ROBOT_RECRUITED_AND_MOVED, 0 ) == FALSE )
+	{
+		SOLDIERTYPE * pRobot;
+		pRobot = FindSoldierByProfileID( ROBOT, TRUE );
+		if (pRobot)
+		{
+			// robot is on our team and we have changed sectors, so we can
+			// replace the robot-under-construction in Madlab's sector
+			RemoveGraphicFromTempFile( gsRobotGridNo, SEVENTHISTRUCT1, gMercProfiles[MADLAB].sSectorX, gMercProfiles[MADLAB].sSectorY, gMercProfiles[MADLAB].bSectorZ );
+			SetFactTrue( FACT_ROBOT_RECRUITED_AND_MOVED );
+		}
+	}
+	
+	#ifdef LUA_HANDLE_QUEST_CODE_ON_SECTOR
+		
+	LuaHandleQuestCodeOnSector( sNewSectorX, sNewSectorY, bNewSectorZ, 1);
+
+	#else
 
 /*
 	if ( sNewSectorX == 5 && sNewSectorY == MAP_ROW_C )
@@ -2769,20 +2780,25 @@ void HandleQuestCodeOnSectorEntry( INT16 sNewSectorX, INT16 sNewSectorY, INT8 bN
 			gMercProfiles[ ELLIOT ].bLife = gMercProfiles[ ELLIOT ].bLifeMax;
 		}
 	}
-
+	
+	#endif
+	
 	ResetOncePerConvoRecordsForAllNPCsInLoadedSector();
 }
 
 void HandleQuestCodeOnSectorExit( INT16 sOldSectorX, INT16 sOldSectorY, INT8 bOldSectorZ )
 {
-	LuaHandleQuestCodeOnSectorExit( sOldSectorX, sOldSectorY, bOldSectorZ, 0);
-	
-#if 0
 
 #ifdef JA2UB
 SOLDIERTYPE *pSoldier=NULL;
 #endif
 
+	#ifdef LUA_HANDLE_QUEST_CODE_ON_SECTOR
+	
+	LuaHandleQuestCodeOnSector( sOldSectorX, sOldSectorY, bOldSectorZ, 0);
+
+	#else
+	
 	if ( sOldSectorX == KINGPIN_MONEY_SECTOR_X && sOldSectorY == KINGPIN_MONEY_SECTOR_Y && bOldSectorZ == KINGPIN_MONEY_SECTOR_Z )
 	{
 		CheckForKingpinsMoneyMissing( TRUE );
@@ -2853,7 +2869,7 @@ SOLDIERTYPE *pSoldier=NULL;
 	// reset the state of the museum alarm for Eldin's quotes
 	SetFactFalse( FACT_MUSEUM_ALARM_WENT_OFF );
 	
-#endif
+	#endif
 }
 
 BOOLEAN EnterSector( INT16 sSectorX, INT16 sSectorY , INT8 bSectorZ )

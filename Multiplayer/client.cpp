@@ -2413,6 +2413,9 @@ void recieveSETTINGS (RPCParameters *rpcParameters) //recive settings from serve
 		gGameExternalOptions.gfAllowReinforcements				= false;
 		gGameExternalOptions.gfAllowReinforcementsOnlyInCity	= false;
 
+		// WANNE: The new improved interrupt system (IIS) does not work with multiplayer, so disable it
+		gGameExternalOptions.fImprovedInterruptSystem			= false;
+
 		// Disable Real-Time Mode
 		// SANDRO - huh? real-time sneak is in preferences
 		//gGameExternalOptions.fAllowRealTimeSneak = false;
@@ -2527,6 +2530,9 @@ void reapplySETTINGS()
 	// Set fast loading of WWW sites
 	gfTemporaryDisablingOfLoadPendingFlag = TRUE;
 
+	// WANNE: This should fix the bug playing a "tilt" sound and showing the mini laptop graphic on the screen, when opening the laptop / option screen from map screen
+	gfDontStartTransitionFromLaptop = TRUE;
+
 	gMercProfiles[ 57 ].sSalary = 2000;
 	gMercProfiles[ 58 ].sSalary = 1500;
 	gMercProfiles[ 59 ].sSalary = 600;
@@ -2609,6 +2615,9 @@ void reapplySETTINGS()
 	// Disable Reinforcements
 	gGameExternalOptions.gfAllowReinforcements				= false;
 	gGameExternalOptions.gfAllowReinforcementsOnlyInCity	= false;
+
+	// WANNE: The new improved interrupt system (IIS) does not work with multiplayer, so disable it
+	gGameExternalOptions.fImprovedInterruptSystem			= false;
 
 	// Disable Real-Time Mode
 	// SANDRO - real-time sneak is in preferences
@@ -2829,7 +2838,26 @@ void recieveGRENADE (RPCParameters *rpcParameters)
 
 			// Do grenade animation (todo fix this for mortars)
 			if (gren->IsThrownGrenade)
+			{
+				{
+					Assert(pThrower->pThrowParams == NULL);
+
+					// not a mem leak
+					// will be freed in AdjustToNextAnimationFrame(SOLDIERTYPE*), case 461
+					pThrower->pThrowParams = (THROW_PARAMS*) malloc(sizeof(THROW_PARAMS));
+					pThrower->pThrowParams->dForceX = gren->dForceX;
+					pThrower->pThrowParams->dForceY = gren->dForceY;
+					pThrower->pThrowParams->dForceZ = gren->dForceZ;
+					pThrower->pThrowParams->dLifeSpan = gren->dLifeSpan;
+					pThrower->pThrowParams->dX = gren->dX;
+					pThrower->pThrowParams->dY = gren->dY;
+					pThrower->pThrowParams->dZ = gren->dZ;
+					pThrower->pThrowParams->ubActionCode = gren->ubActionCode;
+					pThrower->pThrowParams->uiActionData = gren->uiActionData;
+				}
+
 				HandleSoldierThrowItem( pThrower, gren->sTargetGridNo );
+			}
 		}
 	}
 	else
@@ -4071,12 +4099,18 @@ void UpdateSoldierFromNetwork  (RPCParameters *rpcParameters)
 void kick_player (void)
 {
 	if(is_server)
-	{
-		//manual overide command for server
-		const STR16 msg = MPClientMessage[74];
+	{		
+		CHAR16 Cmsg[255];
 
+		if (cMaxClients == 2)
+			swprintf(Cmsg, MPClientMessage[74], client_names[1],"<?>","<?>");
+		else if (cMaxClients == 3)
+			swprintf(Cmsg, MPClientMessage[74], client_names[1],client_names[2],"<?>");
+		else 
+			swprintf(Cmsg, MPClientMessage[74], client_names[1],client_names[2],client_names[3]);
+		
 		SGPRect CenterRect = { 100, 100, SCREEN_WIDTH - 100, 300 };
-		DoMessageBox( MSG_BOX_BASIC_STYLE, msg,  guiCurrentScreen, MSG_BOX_FLAG_FOUR_NUMBERED_BUTTONS | MSG_BOX_FLAG_USE_CENTERING_RECT, kick_callback,  &CenterRect );
+		DoMessageBox( MSG_BOX_BASIC_STYLE, Cmsg,  guiCurrentScreen, MSG_BOX_FLAG_FOUR_NUMBERED_BUTTONS | MSG_BOX_FLAG_USE_CENTERING_RECT, kick_callback,  &CenterRect );
 	}
 	else	
 		ScreenMsg( FONT_LTGREEN, MSG_INTERFACE, MPClientMessage[22] );
@@ -4085,10 +4119,34 @@ void kick_player (void)
 
 void kick_callback (UINT8 ubResult)
 {	
-	kickR kick;
-	kick.ubResult=ubResult+5;
-	
-	client->RPC("Snull_team",(const char*)&kick, (int)sizeof(kickR)*8, HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+	if (is_server)
+	{
+		// Pressed '1'
+		if(ubResult ==1)
+		{
+			// WANNE: Nothing should happen			
+		}
+		else 
+		{
+			if (ubResult <= cMaxClients)
+			{
+				kickR kick;
+				kick.ubResult=ubResult+5;
+				
+				client->RPC("Snull_team",(const char*)&kick, (int)sizeof(kickR)*8, HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+
+				// If the team that should be kicked has the turn, give the turn to the server
+				if (gTacticalStatus.ubCurrentTeam == kick.ubResult)
+				{					
+					EndTurn(0);
+				}
+			}
+			else
+			{
+				// The client to which we should give the turn doe not exists. Do nothinig!
+			}
+		}		
+	}
 }
 
 void null_team (RPCParameters *rpcParameters)
@@ -4106,6 +4164,12 @@ void null_team (RPCParameters *rpcParameters)
 	{
 		TacticalRemoveSoldier( cnt );
 	}
+
+	if (kick->ubResult==netbTeam)
+	{		
+		gTacticalStatus.uiFlags |= SHOW_ALL_MERCS;//hayden
+		ScreenMsg( FONT_YELLOW, MSG_MPSYSTEM, MPClientMessage[41] );
+	}	
 }
 
 void overide_turn (void)
@@ -4114,10 +4178,17 @@ void overide_turn (void)
 	{
 		//manual overide command for server
 		CHAR16 Cmsg[255];
-		swprintf(Cmsg, MPClientMessage[30], client_names[0],client_names[1],client_names[2],client_names[3]);
-
+		
+		if (cMaxClients == 2)
+			swprintf(Cmsg, MPClientMessage[30], client_names[1],"<?>","<?>");
+		else if (cMaxClients == 3)
+			swprintf(Cmsg, MPClientMessage[30], client_names[1],client_names[2],"<?>");
+		else 
+			swprintf(Cmsg, MPClientMessage[30], client_names[1],client_names[2],client_names[3]);
+			
 		SGPRect CenterRect = { 100, 100, SCREEN_WIDTH - 100, 300 };
-		DoMessageBox( MSG_BOX_BASIC_STYLE, Cmsg,  guiCurrentScreen, MSG_BOX_FLAG_FOUR_NUMBERED_BUTTONS | MSG_BOX_FLAG_USE_CENTERING_RECT, turn_callback,  &CenterRect );
+		
+		DoMessageBox( MSG_BOX_BASIC_STYLE, Cmsg,  guiCurrentScreen, MSG_BOX_FLAG_FOUR_NUMBERED_BUTTONS | MSG_BOX_FLAG_USE_CENTERING_RECT | MSG_BOX_FLAG_OK, turn_callback,  &CenterRect );
 	}
 	else	
 		ScreenMsg( FONT_LTGREEN, MSG_INTERFACE, MPClientMessage[22] );
@@ -4126,18 +4197,31 @@ void overide_turn (void)
 void turn_callback (UINT8 ubResult)
 {
 	if(is_server)
-	{
-		ScreenMsg( FONT_LTGREEN, MSG_INTERFACE, MPClientMessage[31],ubResult );
-	
-		if(!( gTacticalStatus.uiFlags & INCOMBAT ))
-		{
-			gTacticalStatus.uiFlags |= INCOMBAT;
-		}
-
+	{				
+		// Pressed '1'
 		if(ubResult ==1)
-			EndTurn( 0 );		
+		{
+			// WANNE: Nothing should happen. Do not give the turn to the server!
+			//EndTurn( 0 );
+		}
 		else 
-			EndTurn( ubResult+5 );
+		{
+			if (ubResult <= cMaxClients)
+			{
+				ScreenMsg( FONT_LTGREEN, MSG_INTERFACE, MPClientMessage[31],ubResult );
+	
+				if(!( gTacticalStatus.uiFlags & INCOMBAT ))
+				{
+					gTacticalStatus.uiFlags |= INCOMBAT;
+				}
+
+				EndTurn( ubResult+5 );
+			}
+			else
+			{
+				// The client to which we should give the turn doe not exists. Do nothinig!
+			}
+		}
 	}
 }
 
@@ -4473,7 +4557,7 @@ void recieve_heal (RPCParameters *rpcParameters)
 	pSoldier->bBleeding=data->bBleeding;
 	pSoldier->stats.bLife=data->bLife;
 
-#if BETAVERSION
+#ifdef BETAVERSION
 	ScreenMsg( FONT_LTGREEN, MSG_INTERFACE, L"healing..." );
 #endif
 }
@@ -4693,6 +4777,9 @@ void connect_client ( void )
 		
 		// Set fast loading of WWW sites
 		gfTemporaryDisablingOfLoadPendingFlag = TRUE;
+
+		// WANNE: This should fix the bug playing a "tilt" sound and showing the mini laptop graphic on the screen, when opening the laptop / option screen from map screen from map screen
+		gfDontStartTransitionFromLaptop = TRUE;
 										
 		//**********************
 

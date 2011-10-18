@@ -111,10 +111,10 @@ void InitCustomStrategicLayer ( void )
 void InitNPCs( void )
 {		
 
-//#ifdef LUA_GAME_INIT_NPCS
+#ifdef LUA_GAME_INIT_NPCS
 	LetLuaGameInit(1);
-//#else
-/*
+#else
+
 	MERCPROFILESTRUCT * pProfile;
 
 	// add the pilot at a random location!
@@ -283,16 +283,16 @@ void InitNPCs( void )
 			pSector->uiFlags |= SF_USE_ALTERNATE_MAP;
 		}
 	}
-*/
+
 	// init hospital variables
 	giHospitalTempBalance = 0;
 	giHospitalRefund = 0;
 	gbHospitalPriceModifier = 0;
 
 	// set up Devin so he will be placed ASAP
-	//gMercProfiles[ DEVIN ].bNPCData = 3;
+	gMercProfiles[ DEVIN ].bNPCData = 3;
 	
-//#endif
+#endif
 
 }
 
@@ -696,14 +696,14 @@ fFirstTimeInMapScreen = TRUE;
 		// this is for the "mercs climbing down from a rope" animation, NOT Skyrider!!
 		ResetHeliSeats( );
 
-//#ifdef LUA_GAME_INIT_NEW_GAME
+#ifdef LUA_GAME_INIT_NEW_GAME
 		
 		LetLuaGameInit(0);
 
 		#ifdef JA2UB
 		InitCustomStrategicLayer ( );
 		#endif
-/*#else
+#else
 		#ifdef JA2UB
 
 		#else
@@ -757,7 +757,6 @@ fFirstTimeInMapScreen = TRUE;
  		AddTransactionToPlayersBook( ANONYMOUS_DEPOSIT, 0, GetWorldTotalMin(), iStartingCash );
 		#endif
 #endif
-*/
 	
 		UINT32	uiDaysTimeMercSiteAvailable = Random( 2 ) + 1;
 
@@ -1113,7 +1112,8 @@ void ReStartingGame()
 	}
 
 
-	SoundStopAll( );
+	// WANNE: By disabling the following line, this should fix the bug, that the main music start again, whenever we click a button in the main menu
+	//SoundStopAll( );
 
 	//we are going to restart a game so initialize the variable so we can initialize a new game
 	InitNewGame( TRUE );

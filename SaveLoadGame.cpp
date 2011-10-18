@@ -134,6 +134,7 @@
 
 #include "LuaInitNPCs.h"
 #include "Vehicles.h"
+#include "Encyclopedia_Data.h"
 
 #include <vfs/Core/vfs.h>
 //rain
@@ -211,7 +212,7 @@ BOOLEAN		gfDisplaySaveGamesNowInvalidatedMsg = FALSE;
 
 BOOLEAN	gfUseConsecutiveQuickSaveSlots = FALSE;
 UINT32	guiCurrentQuickSaveNumber = 0;
-UINT32	guiLastSaveGameNum;
+UINT32	guiLastSaveGameNum = 1;
 BOOLEAN DoesAutoSaveFileExist( BOOLEAN fLatestAutoSave );
 
 UINT32	guiJA2EncryptionSet = 0;
@@ -2084,6 +2085,18 @@ BOOLEAN SOLDIERTYPE::Load(HWFILE hFile)
 		else
 			numBytesRead = ReadFieldByField(hFile, &this->aiData.bAimTime, 1, 1, numBytesRead);
 		numBytesRead = ReadFieldByField(hFile, &this->aiData.bShownAimTime, sizeof(aiData.bShownAimTime), sizeof(INT8), numBytesRead);
+		if ( guiCurrentSaveGameVersion >= IMPROVED_INTERRUPT_SYSTEM )
+			numBytesRead = ReadFieldByField(hFile, &this->aiData.ubInterruptCounter, sizeof(aiData.ubInterruptCounter), sizeof(UINT8), numBytesRead); // SANDRO - interrupt counter
+		else
+		{
+			//CHRISL: We have to make sure we add a buffer to account for the lack of ubInterruptCounter and that buffer needs to be a full DWORD in size
+			buffer = 0;
+			for(int i = 0; i < sizeof(aiData.ubInterruptCounter); i++)
+				buffer++;
+			while((buffer%4) > 0)
+				buffer++;
+			numBytesRead += buffer;
+		}
 		//CHRISL: We also need to make sure the structure aligns properly and that we don't need to read any extra
 		//	padding bytes
 		while((numBytesRead%__alignof(STRUCT_AIData)) > 0)
@@ -2474,7 +2487,7 @@ BOOLEAN OBJECTTYPE::Load( HWFILE hFile )
 		// The size can get any huge value, if we are using wrong items.xml on the savegame
 		// In that case, the "objectStack.resize(size) consumes ALL the memory on the system and then the game crashes because of not enough free memory!!!!
 		// When returning FALSE well tell there is something wrong and we can't load the savegame
-		if (size < 0 || size > 1000)
+		if (size < 0 || size >= 512)
 		{
 			return(FALSE);
 		}
@@ -2755,18 +2768,8 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 	
 	CHAR16	zString[128];
 
-
-	//sprintf(	saveDir, "%S", pMessageStrings[ MSG_SAVEDIRECTORY ] );
-
-#ifdef JA2BETAVERSION
-#ifndef CRIPPLED_VERSION
-	//AssertMsg( uiSizeOfGeneralInfo == 1024, String( "Saved General info is NOT 1024, it is %d.	DF 1.", uiSizeOfGeneralInfo ) );
-	//AssertMsg( sizeof( LaptopSaveInfoStruct ) == 7440, String( "LaptopSaveStruct is NOT 7440, it is %d.	DF 1.", sizeof( LaptopSaveInfoStruct ) ) );
-#endif
-#endif
-
-	if( ubSaveGameID > NUM_SAVE_GAMES /*NUM_SLOT*/ || ubSaveGameID == EARLIST_SPECIAL_SAVE )
-		return( FALSE );		//ddd
+	if( ubSaveGameID > NUM_SAVE_GAMES || ubSaveGameID == EARLIST_SPECIAL_SAVE )
+		return( FALSE );
 	alreadySaving = true;
 
 	//clear out the save game header
@@ -2778,11 +2781,9 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 		fWePausedIt = TRUE;
 	}
 
-
 	#ifdef JA2BETAVERSION
 		InitShutDownMapTempFileTest( TRUE, "SaveMapTempFile", ubSaveGameID );
 	#endif
-
 
 	//Place a message on the screen telling the user that we are saving the game
 	if ( ubSaveGameID >= SAVE__TIMED_AUTOSAVE_SLOT1 && ubSaveGameID < SAVE__TIMED_AUTOSAVE_SLOT5 + 1 )
@@ -2792,8 +2793,7 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 	}
 	else if ( ubSaveGameID == SAVE__END_TURN_NUM ) //SAVE__END_TURN_NUM_1 || ubSaveGameID == SAVE__END_TURN_NUM_2 )
 	{
-		//swprintf( zString, L"%s%d",pMessageStrings[ MSG_SAVE_AUTOSAVE_SAVING_TEXT ],ubSaveGameID );
-		swprintf( zString, L"%s",pMessageStrings[ MSG_SAVE_AUTOSAVE_SAVING_TEXT ] );
+		swprintf( zString, L"%s",pMessageStrings[ MSG_SAVE_END_TURN_SAVE_SAVING_TEXT ] );
 		iSaveLoadGameMessageBoxID = PrepareMercPopupBox( iSaveLoadGameMessageBoxID, BASIC_MERC_POPUP_BACKGROUND, BASIC_MERC_POPUP_BORDER, zString, 300, 0, 0, 0, &usActualWidth, &usActualHeight);
 	}
 	else	
@@ -3679,18 +3679,10 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 	#ifdef JA2BETAVERSION
 		SaveGameFilePosition( FileGetPos( hFile ), "New Vehicles" );
 	#endif
+	
 	}
 	
-	if( !SaveHiddenTownToSaveGameFile( hFile ) )
-	{
-		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing hidden town");
-		goto FAILED_TO_SAVE;
 
-	#ifdef JA2BETAVERSION
-		SaveGameFilePosition( FileGetPos( hFile ), "Hidden Town" );
-	#endif	
-
-	}
 
 	
 	if( !SaveDataSaveToSaveGameFile( hFile ) )
@@ -3704,20 +3696,58 @@ BOOLEAN SaveGame( int ubSaveGameID, STR16 pGameDesc )
 
 	}
 	
+if( !SaveNewEmailDataToSaveGameFile( hFile ) )
+	{
+		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing save data");
+		goto FAILED_TO_SAVE;
 
+	#ifdef JA2BETAVERSION
+		SaveGameFilePosition( FileGetPos( hFile ), "Save New Email Data" );
+	#endif	
+
+	}
+
+	if( !SaveHiddenTownToSaveGameFile( hFile ) )
+	{
+		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing hidden town");
+		goto FAILED_TO_SAVE;
+
+	#ifdef JA2BETAVERSION
+		SaveGameFilePosition( FileGetPos( hFile ), "Hidden Town" );
+	#endif	
+
+	}
 	
-	//Close the saved game file
+	if( !SaveEncyclopediaToSaveGameFile( hFile ) )
+	{
+		ScreenMsg( FONT_MCOLOR_WHITE, MSG_ERROR, L"ERROR writing Briefing Room & Encyclopedia");
+		goto FAILED_TO_SAVE;
+
+	#ifdef JA2BETAVERSION
+		SaveGameFilePosition( FileGetPos( hFile ), "Briefing Room & Encyclopedia" );
+	#endif	
+
+	}
+//Close the saved game file
 	FileClose( hFile );
 
-
-	//if we succesfully saved the game, mark this entry as the last saved game file
-	//if( ubSaveGameID < EARLIST_SPECIAL_SAVE && ubSaveGameID != SAVE__TIMED_AUTOSAVE_SLOT1 )
-	//{
-		if ( ubSaveGameID == 0 || ubSaveGameID < SAVE__ASSERTION_FAILURE )
-			gGameSettings.bLastSavedGameSlot = ubSaveGameID;
+	// This defines, which savegame is highlighted in the load screen
+	if (ubSaveGameID == SAVE__END_TURN_NUM)
+	{
+		if (guiLastSaveGameNum == 0)
+			gGameSettings.bLastSavedGameSlot = SAVE__END_TURN_NUM_1;
 		else
-			gGameSettings.bLastSavedGameSlot = -1;
-	//}
+			gGameSettings.bLastSavedGameSlot = SAVE__END_TURN_NUM_2;
+	}
+	else if ( ubSaveGameID >= 0 && (ubSaveGameID != SAVE__ASSERTION_FAILURE || ubSaveGameID != EARLIST_SPECIAL_SAVE))
+	{
+		gGameSettings.bLastSavedGameSlot = ubSaveGameID;
+	}
+	else
+	{
+		// No selection
+		gGameSettings.bLastSavedGameSlot = -1;
+	}
 
 	//Save the save game settings
 	SaveGameSettings();
@@ -3937,6 +3967,10 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 	guiJA2EncryptionSet = CalcJA2EncryptionSet( &SaveGameHeader );
 	guiCurrentSaveGameVersion = SaveGameHeader.uiSavedGameVersion;
 	guiBrokenSaveGameVersion = SaveGameHeader.uiSavedGameVersion;
+
+	// WANNE: Store the info
+	lastLoadedSaveGameDay = SaveGameHeader.uiDay;
+	lastLoadedSaveGameHour = SaveGameHeader.ubHour;
 
 	if(guiCurrentSaveGameVersion >= MOVED_GENERAL_INFO)
 	{
@@ -5159,13 +5193,19 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 		LoadGameFilePosition( FileGetPos( hFile ), "Load New Sytem Mercs Prfiles" );
 	#endif
 
+	uiRelEndPerc += 1;
+	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Final Checks..." );
+	RenderProgressBar( 0, 100 );
+	uiRelStartPerc = uiRelEndPerc;
 
 	if( guiCurrentSaveGameVersion >= 114 )
 	{
-	uiRelEndPerc += 1;
-	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Lua Global System..." );
-	RenderProgressBar( 0, 100 );
-	uiRelStartPerc = uiRelEndPerc;
+	
+		uiRelEndPerc += 1;
+		SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Lua Global System..." );
+		RenderProgressBar( 0, 100 );
+		uiRelStartPerc = uiRelEndPerc;	
+	
 		if( !LoadLuaGlobalFromLoadGameFile( hFile ) )
 		{
 			DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("LoadLuaGlobalFromLoadGameFile failed" ) );
@@ -5198,26 +5238,6 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 		LoadGameFilePosition( FileGetPos( hFile ), "New Vehicles" );
 	#endif
 	
-	if( guiCurrentSaveGameVersion >= HIDDENTOWN_DATATYPE_CHANGE)
-	{
-		uiRelEndPerc += 1;
-		SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Load Hidden Towns..." );
-		RenderProgressBar( 0, 100 );
-		uiRelStartPerc = uiRelEndPerc;
-
-		if( !LoadHiddenTownFromLoadGameFile( hFile ) )
-		{
-			DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("LoadHiddenTownFromLoadGameFile failed" ) );
-			FileClose( hFile );
-			return( FALSE );
-		}
-	}
-
-	#ifdef JA2BETAVERSION
-		LoadGameFilePosition( FileGetPos( hFile ), "Load Hidden Towns" );
-	#endif
-
-
 	if( guiCurrentSaveGameVersion >= NEW_SAVE_GAME_GENERAL_SAVE_INFO_DATA)
 	{
 		uiRelEndPerc += 1;
@@ -5238,15 +5258,48 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 		
 	}
 	
-	uiRelEndPerc += 1;
-	SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Final Checks..." );
-	RenderProgressBar( 0, 100 );
-	uiRelStartPerc = uiRelEndPerc;
+	if( guiCurrentSaveGameVersion >= NEW_EMAIL_SAVE_GAME)
+	{
+		uiRelEndPerc += 1;
+		SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Load New Email Data..." );
+		RenderProgressBar( 0, 100 );
+		uiRelStartPerc = uiRelEndPerc;
 
+		if( !LoadNewEmailDataFromLoadGameFile( hFile ) )
+		{
+			DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("LoadNewEmailDataFromLoadGameFile failed" ) );
+			FileClose( hFile );
+			return( FALSE );
+		}
+		
+	#ifdef JA2BETAVERSION
+		LoadGameFilePosition( FileGetPos( hFile ), "Load New Email Data" );
+	#endif		
+		
+	}
+
+	if( guiCurrentSaveGameVersion >= HIDDENTOWN_DATATYPE_CHANGE)
+	{
+		uiRelEndPerc += 1;
+		SetRelativeStartAndEndPercentage( 0, uiRelStartPerc, uiRelEndPerc, L"Load Hidden Towns..." );
+		RenderProgressBar( 0, 100 );
+		uiRelStartPerc = uiRelEndPerc;
+
+		if( !LoadHiddenTownFromLoadGameFile( hFile ) )
+		{
+			DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("LoadHiddenTownFromLoadGameFile failed" ) );
+			FileClose( hFile );
+			return( FALSE );
+		}
+
+	#ifdef JA2BETAVERSION
+		LoadGameFilePosition( FileGetPos( hFile ), "Load Hidden Towns" );
+	#endif
+
+	}
 #ifdef JA2UB	
 	//	New_UB_Inventory ();
 #endif
-
 	//
 	//Close the saved game file
 	//
@@ -5330,6 +5383,28 @@ BOOLEAN LoadSavedGame( int ubSavedGameID )
 			{
 				pSector->uiFlags |= SF_USE_ALTERNATE_MAP;
 			}
+		}
+	}
+	
+	// WANNE: There were some problems in older savegames, that the MERC are not available on the merc site. Just recalculate the correct number of mercs
+	// Players that have a bugged savegame and are above Day 50 get ALL Merc on the website!
+	if(guiCurrentSaveGameVersion < FIXED_MERC_NOT_AVAILABLE_ON_MERC_WEBSITE)
+	{
+		// WORKAROUND: If player passed day 30, make merc available on MERC website!
+		if (LaptopSaveInfo.gubLastMercIndex <= 6 && GetWorldDay() >= 30)
+		{
+			LaptopSaveInfo.gubLastMercIndex = 0;
+
+			for(UINT8 i=0; i<NUM_PROFILES; i++)
+			{
+				if ( gConditionsForMercAvailability[i].ProfilId != 0 && (gConditionsForMercAvailability[i].NewMercsAvailable == TRUE || gConditionsForMercAvailability[i].StartMercsAvailable == TRUE ))
+				{
+					LaptopSaveInfo.gubLastMercIndex ++;
+				}
+			}
+			
+			if (LaptopSaveInfo.gubLastMercIndex > 0)
+				LaptopSaveInfo.gubLastMercIndex = LaptopSaveInfo.gubLastMercIndex - 1;
 		}
 	}
 
@@ -6241,17 +6316,10 @@ BOOLEAN SaveEmailToSavedGame( HWFILE hFile )
 	//loop through all the email to find out the total number
 	while(pEmail)
 	{
-		gEmailT[ uiNumOfEmails ].EmailType = 0; //reset
-		gEmailT[ uiNumOfEmails ].EmailType = pEmail->EmailType;
-	
+		gEmailT[ uiNumOfEmails ].EmailVersion = 0; //reset
+		gEmailT[ uiNumOfEmails ].EmailVersion = pEmail->EmailVersion;
 		pEmail=pEmail->Next;
 		uiNumOfEmails++;
-	}
-	
-	FileWrite( hFile, &gEmailT, sizeof( gEmailT ) , &uiNumBytesWritten ); 
-	if( uiNumBytesWritten != sizeof( gEmailT ) )
-	{
-		return( FALSE );
 	}
 
 	uiSizeOfEmails = sizeof( Email ) * uiNumOfEmails;
@@ -6304,14 +6372,7 @@ BOOLEAN SaveEmailToSavedGame( HWFILE hFile )
 
 		// WANNE.MAIL: Fix
 		SavedEmail.iCurrentShipmentDestinationID = pEmail->iCurrentShipmentDestinationID;
-		
-		SavedEmail.EmailVersion = pEmail->EmailVersion;
-		//SavedEmail.EmailType = pEmail->EmailType;
-		
-	//	gEmailT[ cnt].EmailType = 0; //reset
-	//	gEmailT[ cnt ].EmailType = pEmail->EmailType;
-		
-		
+
 		// write the email header to the saved game file
 		FileWrite( hFile, &SavedEmail, sizeof( SavedEmailStruct ), &uiNumBytesWritten );
 		if( uiNumBytesWritten != sizeof( SavedEmailStruct ) )
@@ -6340,12 +6401,6 @@ BOOLEAN LoadEmailFromSavedGame( HWFILE hFile )
 
 	//Delete the existing list of emails
 	ShutDownEmailList();
-	
-	FileRead( hFile, &gEmailT, sizeof( gEmailT ) , &uiNumBytesRead ); 
-	if( uiNumBytesRead != sizeof( gEmailT )   )  
-	{
-		return( FALSE );
-	}
 
 	pEmailList = NULL;
 	//Allocate memory for the header node
@@ -6388,7 +6443,7 @@ BOOLEAN LoadEmailFromSavedGame( HWFILE hFile )
 
 		//CHRISL: Adjust this so we can change the SavedEmailStruct without hurting savegame compatability
  		//get the rest of the data from the email
-		INT32	numBytesRead = 0;//, temp, temp2;
+		INT32	numBytesRead = 0, temp;
 		numBytesRead = ReadFieldByField(hFile, &SavedEmail.usOffset, sizeof(SavedEmail.usOffset), sizeof(UINT16), numBytesRead);
 		numBytesRead = ReadFieldByField(hFile, &SavedEmail.usLength, sizeof(SavedEmail.usLength), sizeof(UINT16), numBytesRead);
 		numBytesRead = ReadFieldByField(hFile, &SavedEmail.ubSender, sizeof(SavedEmail.ubSender), sizeof(UINT8), numBytesRead);
@@ -6403,18 +6458,14 @@ BOOLEAN LoadEmailFromSavedGame( HWFILE hFile )
 		numBytesRead = ReadFieldByField(hFile, &SavedEmail.fRead, sizeof(SavedEmail.fRead), sizeof(BOOLEAN), numBytesRead);
 		numBytesRead = ReadFieldByField(hFile, &SavedEmail.fNew, sizeof(SavedEmail.fNew), sizeof(BOOLEAN), numBytesRead);
 		numBytesRead = ReadFieldByField(hFile, &SavedEmail.iCurrentIMPPosition, sizeof(SavedEmail.iCurrentIMPPosition), sizeof(INT32), numBytesRead);
-		numBytesRead = ReadFieldByField(hFile, &SavedEmail.EmailVersion, sizeof(SavedEmail.EmailVersion), sizeof(UINT8), numBytesRead);	
-	//	numBytesRead = ReadFieldByField(hFile, &SavedEmail.EmailType, sizeof(SavedEmail.EmailType), sizeof(UINT32), numBytesRead);	
-	
-	//	if(guiCurrentSaveGameVersion >= BR_EMAIL_DATA_CHANGE){
+		if(guiCurrentSaveGameVersion >= BR_EMAIL_DATA_CHANGE){
 			numBytesRead = ReadFieldByField(hFile, &SavedEmail.iCurrentShipmentDestinationID, sizeof(SavedEmail.iCurrentShipmentDestinationID), sizeof(INT16), numBytesRead);
 			//We need these extra 2 bytes so that the structure's total size is evenly divisible by 4
-	//		numBytesRead = ReadFieldByField(hFile, &temp, sizeof(INT16), sizeof(INT16), numBytesRead);
-	//	} else {
-	//		numBytesRead += sizeof(INT16);
-	//		numBytesRead += sizeof(INT16);
-	//	}
-			
+			numBytesRead = ReadFieldByField(hFile, &temp, sizeof(INT16), sizeof(INT16), numBytesRead);
+		} else {
+			numBytesRead += sizeof(INT16);
+			numBytesRead += sizeof(INT16);
+		}
 		//FileRead( hFile, &SavedEmail, sizeof( SavedEmailStruct ), &uiNumBytesRead );
 		//if( uiNumBytesRead != sizeof( SavedEmailStruct ) )
 		if(numBytesRead != sizeof( SavedEmailStruct ))
@@ -6450,10 +6501,6 @@ BOOLEAN LoadEmailFromSavedGame( HWFILE hFile )
 
 		// WANNE.MAIL: Fix
 		pTempEmail->iCurrentShipmentDestinationID = SavedEmail.iCurrentShipmentDestinationID;
-		
-		pTempEmail->EmailVersion = SavedEmail.EmailVersion;
-		
-		pTempEmail->EmailType = gEmailT[ cnt ].EmailType; //SavedEmail.EmailType;
 
 		//add the current email in
 		pEmail->Next = pTempEmail;
@@ -6645,12 +6692,15 @@ BOOLEAN LoadTacticalStatusFromSavedGame( HWFILE hFile )
 	if ( guiCurrentSaveGameVersion >= BUGFIX_NPC_DATA_FOR_BIG_MAPS )
 	{
 		numBytesRead = ReadFieldByField(hFile, &gTacticalStatus.ubLastRequesterSurgeryTargetID, sizeof(gTacticalStatus.ubLastRequesterSurgeryTargetID), sizeof(UINT8), numBytesRead);
+		if ( guiCurrentSaveGameVersion >= IMPROVED_INTERRUPT_SYSTEM )
+			numBytesRead = ReadFieldByField(hFile, &gTacticalStatus.ubInterruptPending, sizeof(gTacticalStatus.ubInterruptPending), sizeof(UINT8), numBytesRead);
 		while( (numBytesRead%4) != 0 )	// This is to make sure the total read is of DWORD length
 			numBytesRead = ReadFieldByField(hFile, &filler, sizeof(filler), sizeof(UINT8), numBytesRead);
 	}
 	else
 	{
-		numBytesRead++;
+		numBytesRead++;	//&gTacticalStatus.ubLastRequesterSurgeryTargetID added with BUGFIX_NPC_DATA_FOR_BIG_MAPS
+		numBytesRead++;	//&gTacticalStatus.ubInterruptPending added with IMPROVED_INTERRUPT_SYSTEM
 		while( (numBytesRead%4) != 0 )	// This is to make sure the total read is of DWORD length
 			numBytesRead++;
 	}
@@ -7066,15 +7116,6 @@ void CreateSavedGameFileNameFromNumber( UINT8 ubSaveGameID, STR pzNewFileName )
 	{
 			//The name of the file
 			sprintf( pzNewFileName , "%s\\Auto%02d.%S", gSaveDir, guiLastSaveGameNum, pMessageStrings[ MSG_SAVEEXTENSION ] );
-
-			//increment end turn number
-			guiLastSaveGameNum++;
-
-			//just have 2 saves
-			if( guiLastSaveGameNum == 2 )
-			{
-				guiLastSaveGameNum = 0;
-			}
 	}
 	else
 		sprintf( pzNewFileName , "%s\\%S%02d.%S", gSaveDir, pMessageStrings[ MSG_SAVE_NAME ], ubSaveGameID - SAVE__END_TURN_NUM_2, pMessageStrings[ MSG_SAVEEXTENSION ] );
@@ -7600,6 +7641,26 @@ BOOLEAN SaveGeneralInfo( HWFILE hFile )
 extern UINT32 guiRainLoop;
 //end rain
 
+void EnsureValidLoadScreen( UINT32* puiScreen ) 
+{
+	if (!puiScreen)
+		return;
+	
+	switch(*puiScreen)
+	{
+	case GAME_SCREEN:
+	case MAP_SCREEN:
+	case LAPTOP_SCREEN:
+		// These are valid screens
+		break;
+
+	default:
+		// By default go to the strategic map if not a valid screen otherwise
+		*puiScreen = MAP_SCREEN;
+		break;
+	}
+}
+
 BOOLEAN LoadGeneralInfo( HWFILE hFile )
 {
 	//UINT32	uiNumBytesRead;
@@ -7786,6 +7847,9 @@ BOOLEAN LoadGeneralInfo( HWFILE hFile )
 		FileClose( hFile );
 		return( FALSE );
 	}
+
+	// Sometimes autosaves have invalid screens references esp. when generated on assert
+	EnsureValidLoadScreen(&sGeneralInfo.uiCurrentScreen);
 
 	gMusicModeToPlay = sGeneralInfo.ubMusicMode;
 

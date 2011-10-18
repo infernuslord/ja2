@@ -243,6 +243,10 @@ BOOLEAN	RenderImage = TRUE;
 BOOLEAN DoAutoSave( int ubSaveGameID, STR16 pGameDesc );
 BOOLEAN AutoSaveToSlot[5];
 
+// WANNE: Used For auto save games
+UINT32	lastLoadedSaveGameDay = 0;
+UINT8	lastLoadedSaveGameHour = 0;
+
 #define MAX_PAGE_SLOT 12
 
 //Mouse regions for the currently selected save game
@@ -542,13 +546,22 @@ void InitMSysButtons(BOOLEAN delRegion)
 		MSYS_SetRegionUserData( &gSelectedSaveRegion[ i ], 0, i);
 		
 		if ( PAGE_SLOT == 0 && i == 0 )
-			swprintf( zString, pMessageStrings[100], VAL_SLOT_START + i );
+		{
+			//swprintf( zString, pMessageStrings[MSG_SAVE_QUICKSAVE_SLOT], VAL_SLOT_START + i );
+			swprintf( zString, pMessageStrings[MSG_SAVE_QUICKSAVE_SLOT] );
+		}
 		else if (  PAGE_SLOT == 0 && i >= SAVE__TIMED_AUTOSAVE_SLOT1 && i <= SAVE__TIMED_AUTOSAVE_SLOT5 )
-			swprintf( zString, pMessageStrings[101], VAL_SLOT_START + i );
+		{
+			swprintf( zString, pMessageStrings[MSG_SAVE_AUTOSAVE_SLOT], VAL_SLOT_START + i );
+		}
 		else if (  PAGE_SLOT == 0 && i >= SAVE__END_TURN_NUM_1 && i <= SAVE__END_TURN_NUM_2 )
-			swprintf( zString, pMessageStrings[102], VAL_SLOT_START + i );
-		else 
-			swprintf( zString, pMessageStrings[103], VAL_SLOT_START + i - SAVE__END_TURN_NUM_2 );	
+		{
+			swprintf( zString, pMessageStrings[MSG_SAVE_AUTOSAVE_ENDTURN_SLOT], VAL_SLOT_START - SAVE__TIMED_AUTOSAVE_SLOT5 - 1 + i );
+		}
+		else
+		{
+			swprintf( zString, pMessageStrings[MSG_SAVE_NORMAL_SLOT], VAL_SLOT_START + i - SAVE__END_TURN_NUM_2 );
+		}
 			
 		wcscpy( zString2,zString );
 		SetRegionFastHelpText( &gSelectedSaveRegion[ i ], zString2 );
@@ -1697,7 +1710,6 @@ BOOLEAN DisplaySaveGameEntry( INT32 bEntryID )//, UINT16 usPosY )
 	//else if its the currently selected location
 	else if( bEntryID == gbSelectedSaveLocation )
 	{
-
 		SetFontShadow( SAVE_LOAD_SELECTED_SHADOW_COLOR );			//130
 		ubFontColor = SAVE_LOAD_SELECTED_COLOR;//SAVE_LOAD_NORMAL_COLOR;
 		uiFont = SAVE_LOAD_SELECTED_FONT;
@@ -1946,13 +1958,13 @@ else
 		else if( bEntryID == SAVE__END_TURN_NUM_1 && PAGE_SLOT == 0 )
 		{
 			//display the empty spot
-			swprintf( zString, L"%s%d", pMessageStrings[ 97 ],SAVE__END_TURN_NUM_1);
+			swprintf( zString, L"%s%d", pMessageStrings[ MSG_SAVE_AUTOSAVE_ENDTURN_EMPTY_TEXT ],SAVE__END_TURN_NUM_1 - SAVE__TIMED_AUTOSAVE_SLOT5);
 			DrawTextToScreen( zString, usPosX, (UINT16)(usPosY+SLG_DATE_OFFSET_Y), 609, uiFont, ubFontColor, FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED	);
 		}
 		else if( bEntryID == SAVE__END_TURN_NUM_2 && PAGE_SLOT == 0 )
 		{
 			//display the empty spot
-			swprintf( zString, L"%s%d", pMessageStrings[ 97 ],SAVE__END_TURN_NUM_2);
+			swprintf( zString, L"%s%d", pMessageStrings[ MSG_SAVE_AUTOSAVE_ENDTURN_EMPTY_TEXT ],SAVE__END_TURN_NUM_2 - SAVE__TIMED_AUTOSAVE_SLOT5);
 			DrawTextToScreen( zString, usPosX, (UINT16)(usPosY+SLG_DATE_OFFSET_Y), 609, uiFont, ubFontColor, FONT_MCOLOR_BLACK, FALSE, CENTER_JUSTIFIED	);
 		}
 		else
@@ -2292,14 +2304,14 @@ void SelectedSaveRegionCallBack(MOUSE_REGION * pRegion, INT32 iReason )
 		//If we are saving and this is the auto save slot
 		if( gfSaveGame && bSelected == SAVE__END_TURN_NUM_1 && PAGE_SLOT == 0 )
 		{
-			swprintf( zString, L"%s %d", pMessageStrings[ 98 ],SAVE__END_TURN_NUM_1);
+			swprintf( zString, L"%s", pMessageStrings[ MSG_SAVE_AUTOSAVE_ENDTURN_TEXT_INFO ]);
 			//Display a pop up telling user what the quick save slot is
 			DoSaveLoadMessageBox( MSG_BOX_BASIC_STYLE, zString, SAVE_LOAD_SCREEN, MSG_BOX_FLAG_OK, RedrawSaveLoadScreenAfterMessageBox );			return;
 		}
 		
 		if( gfSaveGame && bSelected == SAVE__END_TURN_NUM_2 && PAGE_SLOT == 0 )
 		{
-			swprintf( zString, L"%s %d", pMessageStrings[ 98 ],SAVE__END_TURN_NUM_2);
+			swprintf( zString, L"%s", pMessageStrings[ MSG_SAVE_AUTOSAVE_ENDTURN_TEXT_INFO ]);
 			//Display a pop up telling user what the quick save slot is
 			DoSaveLoadMessageBox( MSG_BOX_BASIC_STYLE, zString, SAVE_LOAD_SCREEN, MSG_BOX_FLAG_OK, RedrawSaveLoadScreenAfterMessageBox );			return;
 		}
@@ -3344,6 +3356,34 @@ BOOLEAN LoadDataSaveFromLoadGameFile( HWFILE hFile )
 	{
 		return( FALSE );
 	}
+
+	// Set the slot, which will be the next auto save slot (current slot + 1)
+	if (AutoSaveToSlot[0] == TRUE)
+	{
+		AutoSaveToSlot[0] = FALSE;
+		AutoSaveToSlot[1] = TRUE;
+	}
+	else if (AutoSaveToSlot[1] == TRUE)
+	{
+		AutoSaveToSlot[1] = FALSE;
+		AutoSaveToSlot[2] = TRUE;
+	}
+	else if (AutoSaveToSlot[2] == TRUE)
+	{
+		AutoSaveToSlot[2] = FALSE;
+		AutoSaveToSlot[3] = TRUE;
+	}
+	else if (AutoSaveToSlot[3] == TRUE)
+	{
+		AutoSaveToSlot[3] = FALSE;
+		AutoSaveToSlot[4] = TRUE;
+	}
+	else if (AutoSaveToSlot[4] == TRUE)
+	{
+		AutoSaveToSlot[4] = FALSE;
+		AutoSaveToSlot[0] = TRUE;
+	}
+
 
 	return( TRUE );
 }

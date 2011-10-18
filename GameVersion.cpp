@@ -13,7 +13,12 @@
 #ifdef JA2EDITOR
 
 //MAP EDITOR BUILD VERSION
+#ifdef JA2UB
+CHAR16 zVersionLabel[256]		= { L"Unfinished Business v1.5 (15-10-2011) - Map Editor v1.13.4452 (Development Build)" }; 
+#else
 CHAR16 zVersionLabel[256]		= { L"Map Editor v1.13.4452 (Development Build)" }; 
+#endif
+
 #elif defined JA2BETAVERSION
 
 //BETA/TEST BUILD VERSION
@@ -27,7 +32,7 @@ CHAR16 zVersionLabel[256]		= { L"Beta v. 0.98" };
 
 	//RELEASE BUILD VERSION	
 	#ifdef JA2UB
-		CHAR16		zVersionLabel[256]		= { L"Release Unfinished Business v1.4a (15-06-2011) - v1.13.4462 (Development Build)" };
+		CHAR16		zVersionLabel[256]		= { L"Release Unfinished Business v1.5 (15-10-2011) - v1.13.4462 (Development Build)" };
 	#else
 	CHAR16		zVersionLabel[256]		= { L"Release v1.13.4462 (Development Build)" };
 	#endif

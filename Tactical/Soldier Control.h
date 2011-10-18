@@ -490,6 +490,7 @@ public:
 	INT8												fAIFlags;
 	INT16												bAimTime;	//100AP
 	INT8												bShownAimTime;
+	UINT8												ubInterruptCounter[MAX_NUM_SOLDIERS]; // SANDRO - interrupt counter added
 };
 
 class STRUCT_Flags//last edited at version 102
@@ -1439,6 +1440,7 @@ void HandlePlayerTogglingLightEffects( BOOLEAN fToggleValue );
 UINT8 GetSquadleadersCountInVicinity( SOLDIERTYPE * pSoldier, BOOLEAN fWithHigherLevel, BOOLEAN fDontCheckDistance );
 UINT16 NumberOfDamagedStats( SOLDIERTYPE * pSoldier );
 UINT8 RegainDamagedStats( SOLDIERTYPE * pSoldier, UINT16 usAmountRegainedHundredths );
+BOOLEAN ResolvePendingInterrupt( SOLDIERTYPE * pSoldier, UINT8 ubInterruptType );
 
 //typedef struct
 class OLDSOLDIERTYPE_101

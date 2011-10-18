@@ -142,7 +142,8 @@
 
 // Fonts
 #define CHAR_FONT BLOCKFONT2 // COMPFONT
-#define ETA_FONT BLOCKFONT2
+
+//#define ETA_FONT BLOCKFONT2
 
 // Colors
 #define CHAR_INFO_PANEL_BLOCK_COLOR 60
@@ -4628,6 +4629,8 @@ UINT32 MapScreenHandle(void)
 				
 				MAP_VERT_WIDTH = GetFontHeight(MAP_FONT);
 
+				ETA_FONT = BLOCKFONT2;
+
 				// Helicopter ETA box
 				MAP_HELICOPTER_ETA_POPUP_X			= (400 + iScreenWidthOffset);
 				MAP_HELICOPTER_ETA_POPUP_Y			= (250 + iScreenHeightOffset);
@@ -4670,6 +4673,8 @@ UINT32 MapScreenHandle(void)
 				MAP_VERT_INDEX_Y = (MAP_BORDER_Y + MAP_BORDER_Y_OFFSET + 36);
 				MAP_VERT_WIDTH = GetFontHeight(MAP_FONT);
 
+				ETA_FONT = BLOCKFONT2;
+
 				// Helicopter ETA box
 				MAP_HELICOPTER_ETA_POPUP_X			= (400 + iScreenWidthOffset);
 				MAP_HELICOPTER_ETA_POPUP_Y			= (250 + iScreenHeightOffset + 58);
@@ -4711,12 +4716,14 @@ UINT32 MapScreenHandle(void)
 				MAP_VERT_INDEX_Y = (MAP_BORDER_Y + MAP_BORDER_Y_OFFSET + 44);
 				MAP_VERT_WIDTH = GetFontHeight(MAP_FONT);
 
+				ETA_FONT = FONT12ARIAL;
+
 				// Helicopter ETA box
 				MAP_HELICOPTER_ETA_POPUP_X			= (400 + iScreenWidthOffset);
-				MAP_HELICOPTER_ETA_POPUP_Y			= (250 + iScreenHeightOffset + 140);
+				MAP_HELICOPTER_ETA_POPUP_Y			= (250 + iScreenHeightOffset + 120);
 				MAP_HELICOPTER_UPPER_ETA_POPUP_Y	= (50 + iScreenHeightOffset - 100);
 				MAP_HELICOPTER_ETA_POPUP_WIDTH		= 120;
-				MAP_HELICOPTER_ETA_POPUP_HEIGHT		= 68;
+				MAP_HELICOPTER_ETA_POPUP_HEIGHT		= 76;
 
 				// Map Level string
 				MAP_LEVEL_STRING_X	= (SCREEN_WIDTH - 208 - 187);
@@ -4876,9 +4883,9 @@ UINT32 MapScreenHandle(void)
        //----------- legion 2
 		for( iCounter2 = 1; iCounter2 < NUM_TOWNS; iCounter2++ )
 		{
-		//	if ( gfIconTown[iCounter2] != -1 && gfDrawHiddenTown[iCounter2] == TRUE )
-		//	{
-				VObjectDesc.fCreateFlags = VOBJECT_CREATE_FROMFILE;
+			//if ( gfDrawHiddenTown[iCounter2] == TRUE )
+			//{
+				//VObjectDesc.fCreateFlags = VOBJECT_CREATE_FROMFILE;
 				//FilenameForBPP("INTERFACE\\PRISON.sti", VObjectDesc.ImageFile);
 				
 				/*
@@ -4904,13 +4911,25 @@ UINT32 MapScreenHandle(void)
 					FilenameForBPP("INTERFACE\\PRISON.sti", VObjectDesc.ImageFile);
 				*/
 
+				VObjectDesc.fCreateFlags = VOBJECT_CREATE_FROMFILE;
+				
 				if ( gfIconTown[iCounter2] == TRUE )
+				{
 					strcpy(VObjectDesc.ImageFile, gHiddenIcon[iCounter2].IconSti);
+				}
 				else
+				{
 					FilenameForBPP("INTERFACE\\PRISON.sti", VObjectDesc.ImageFile);
+				}
+					
+				if (!FileExists(VObjectDesc.ImageFile))
+				{
+					FilenameForBPP("INTERFACE\\PRISON.sti", VObjectDesc.ImageFile);
+				}
+					
 					
 				CHECKF(AddVideoObject(&VObjectDesc, &guiIcon2[iCounter2]));
-		//	}
+			//}
 		 }
         //-------
 
@@ -5605,6 +5624,10 @@ UINT32 MapScreenHandle(void)
 	UpdatePausedStatesDueToTimeCompression( );
 
 	// is there a description to be displayed?
+	// BOB : if we're displaying the attachment popup, don't redraw the IDB
+	if (giActiveAttachmentPopup > -1)
+		gItemDescAttachmentPopups[giActiveAttachmentPopup]->show();
+	else
 	RenderItemDescriptionBox( );
 
 	// render clock
@@ -6963,6 +6986,14 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 						DeleteKeyRingPopup( );
 						fTeamPanelDirty = TRUE;
 					}
+					else if( fShowMapInventoryPool == TRUE )
+					{
+						// no item on cursor & not in either stack popup
+						if( gMPanelRegion.Cursor != EXTERN_CURSOR && !InSectorStackPopup() && !InItemStackPopup() )
+						{
+							fShowMapInventoryPool = FALSE;
+						}
+					}
 					else if( fShowInventoryFlag == TRUE )
 					{
 						if ( gMPanelRegion.Cursor != EXTERN_CURSOR && !InItemStackPopup() )
@@ -7233,6 +7264,30 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 						else
 						MapScreenMessage( 0, MSG_DEBUG, L"Mouse X,Y = %d,%d", MSYS_CurrentMX, MSYS_CurrentMY );
 					#endif
+					break;
+
+				case ',': 
+					if( fShowMapInventoryPool == TRUE )
+					{
+						// if can go to previous page, go there
+						if( iCurrentInventoryPoolPage > 0 )
+						{
+							iCurrentInventoryPoolPage--;
+							fMapPanelDirty = TRUE;
+						}
+					}
+					break;
+
+				case '.': 
+					if( fShowMapInventoryPool == TRUE )
+					{
+						// if can go to next page, go there
+						if( iCurrentInventoryPoolPage < ( iLastInventoryPoolPage ) )
+						{
+							iCurrentInventoryPoolPage++;
+							fMapPanelDirty = TRUE;
+						}
+					}
 					break;
 
 				case '/':
@@ -7637,24 +7692,13 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 						{
 							fDisableJustForIan = ! fDisableJustForIan;
 						}
-						else
-						{
-							// only handle border button keyboard equivalents if the button is visible!
-							if ( !fShowMapInventoryPool )
-							{
-								ToggleItemsFilter();
-							}
-						}
-					#else
-						// only handle border button keyboard equivalents if the button is visible!
-						if ( !fShowMapInventoryPool )
-						{
-							ToggleItemsFilter();
-						}
 					#endif
-
+					// only handle border button keyboard equivalents if the button is visible!
+					if ( !fShowMapInventoryPool )
+					{
+						ToggleItemsFilter();
+					}
 					break;
-
 				case 'K':
 					//CHRISL: Swap gunsling
 					if ( bSelectedInfoChar != -1 && fShowInventoryFlag && UsingNewInventorySystem() == true )
@@ -7675,13 +7719,8 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 					break;
 
 					// haydent
-				case 'k':
-					if (fAlt)
-					{
-						if (is_networked)
-							kick_player();
-					}
-					else if(gGameExternalOptions.fEnableInventoryPoolQ && fShowMapInventoryPool == TRUE)//dnl ch51 081009
+				case 'k':					
+					if(gGameExternalOptions.fEnableInventoryPoolQ && fShowMapInventoryPool == TRUE)//dnl ch51 081009
 					{
 						CopySectorInventoryToInventoryPoolQs(0);
 						//break;
@@ -7774,10 +7813,7 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 						#ifdef JA2TESTVERSION
 							fFoundOrta = !fFoundOrta;
 							fFoundTixa = !fFoundTixa;
-							
-							//gfHiddenTown[ TIXA ] = TRUE;
-							//gfHiddenTown[ ORTA ] = TRUE;
-							
+								
 							for( iCounter2 = 1; iCounter2 < NUM_TOWNS; iCounter2++ )
 								{
 									gfHiddenTown [ iCounter2 ] = TRUE; 
@@ -7837,6 +7873,16 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 					if( gfPreBattleInterfaceActive )
 					{ //activate autoresolve in prebattle interface.
 						ActivatePreBattleRetreatAction();
+					}
+					// WANNE: Only allow when mobile militia is allowed!
+					else if (gGameExternalOptions.gfAllowMilitiaGroups)
+					{
+						// only handle border button keyboard equivalents if the button is visible!
+						if ( !fShowMapInventoryPool )
+						{
+							// toggle show mobile restrictions filter
+							ToggleMobileFilter();
+						}
 					}
 					break;
 				case 's':
@@ -8006,7 +8052,17 @@ void GetMapKeyboardInput( UINT32 *puiNewEvent )
 						}
 					}
 					#endif
-					break;
+					// open selected sector inventory screen
+					// if showing item counts on the map, and not already in sector inventory
+					if ( fShowItemsFlag && !fShowMapInventoryPool )
+					{
+						// show sector inventory for selected sector
+						ChangeSelectedMapSector( sSelMapX, sSelMapY, ( INT8 ) iCurrentMapSectorZ );
+
+						fShowMapInventoryPool = TRUE;
+						CreateDestroyMapInventoryPoolButtons( TRUE );
+					}
+					break;				
 				case 'v':
 					if( fCtrl )
 					{
@@ -8375,7 +8431,7 @@ INT32 iCounter2 = 0;
         //----------- Legion 2
 		for( iCounter2 = 1; iCounter2 < NUM_TOWNS; iCounter2++ )
 		{
-			//if ( gfIconTown[iCounter2] != -1 && gfDrawHiddenTown[iCounter2] == TRUE )
+			//if ( gfDrawHiddenTown[iCounter2] == TRUE )
                 DeleteVideoObjectFromIndex(guiIcon2[iCounter2]);
 		}
         //-------
@@ -8458,6 +8514,8 @@ INT32 iCounter2 = 0;
 
 	if( !gfDontStartTransitionFromLaptop )
 	{
+		// WANNE: This code blocks never gets called, but this is fine, cause we don't need it. That seems to be an "old" unused code block!
+		
 		VOBJECT_DESC	VObjectDesc;
 		UINT32 uiLaptopOn;
 
@@ -8467,8 +8525,8 @@ INT32 iCounter2 = 0;
 		sprintf( VObjectDesc.ImageFile, "INTERFACE\\LaptopOn.sti" );
 		if( !AddVideoObject( &VObjectDesc, &uiLaptopOn ) )
 			AssertMsg( 0, "Failed to load data\\Interface\\LaptopOn.sti" );
-		BltVideoObjectFromIndex( FRAME_BUFFER, uiLaptopOn, 0, 465, 417, VO_BLT_SRCTRANSPARENCY, NULL );
-		InvalidateRegion( 465, 417, 480, 427 );
+		BltVideoObjectFromIndex( FRAME_BUFFER, uiLaptopOn, 0, iScreenWidthOffset + 465, iScreenHeightOffset + 417, VO_BLT_SRCTRANSPARENCY, NULL );
+		InvalidateRegion( iScreenWidthOffset + 465, iScreenHeightOffset + 417, iScreenWidthOffset + 480, iScreenHeightOffset + 427 );
 		ExecuteBaseDirtyRectQueue( );
 		EndFrameBufferRender( );
 		DeleteVideoObjectFromIndex( uiLaptopOn );
@@ -13058,7 +13116,7 @@ INT32 iCounter2 = 0;
         //----------- Legion 2
 		for( iCounter2 = 1; iCounter2 < NUM_TOWNS; iCounter2++ )
 		{
-			//if ( gfIconTown[iCounter2] != -1 && gfDrawHiddenTown[iCounter2] == TRUE )
+			//if ( gfDrawHiddenTown[iCounter2] == TRUE )
 				DeleteVideoObjectFromIndex(guiIcon2[iCounter2]);
 		}
         //-------
@@ -15102,7 +15160,8 @@ void HandleMilitiaRedistributionClick( void )
 		
 	//	fTownStillHidden = ( ( bTownId == TIXA ) && !gfHiddenTown[ TIXA ] ) || ( ( bTownId == ORTA ) && !gfHiddenTown[ ORTA ] );
 		
-		if( ( bTownId != BLANK_SECTOR ) && !gfHiddenTown[ bTownId ] ) //&& !fTownStillHidden )
+		// WANNE: if gfHiddenTown[townID] == TRUE, then it is not HIDDEN!!!
+		if( ( bTownId != BLANK_SECTOR ) && gfHiddenTown[ bTownId ] ) //&& !fTownStillHidden )
 		{
 			if ( MilitiaTrainingAllowedInSector( sSelMapX, sSelMapY, ( INT8 )iCurrentMapSectorZ ) )
 			{

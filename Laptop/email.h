@@ -436,11 +436,7 @@ typedef struct
 	BOOLEAN fNew;
 
 	INT32		iCurrentIMPPosition;
-	
-	UINT8 EmailVersion;
-	
-//	UINT32 EmailType;
-	
+
 	// WANNE.MAIL: Fix
 	INT16		iCurrentShipmentDestinationID;
 
@@ -573,6 +569,14 @@ typedef struct
 
 } EMAIL_MERC_LEVEL_UP_VALUES;
 
+typedef struct
+{
+	UINT8 uiIndex;
+	CHAR16	szMessage[MAIL_STRING_SIZE];
+	CHAR16	szSubject[EMAIL_SUBJECT_LENGTH];
+
+} EMAIL_MERC_INSURANCE_VALUES;
+
 #define EMAIL_INDEX 500
 
 typedef struct
@@ -581,6 +585,19 @@ typedef struct
 	CHAR16	szMessage[MAIL_STRING_SIZE][30];
 	CHAR16	szSubject[EMAIL_SUBJECT_LENGTH];
 } EMAIL_OTHER_VALUES;
+
+
+typedef struct
+{
+	UINT8 uiIndex;
+	UINT32	EmailType;
+	UINT8 EmailVersion;
+
+} EMAIL_TYPE;
+
+#define EMAIL_VAL 4000
+
+extern EMAIL_TYPE gEmailT[EMAIL_VAL];
 
 enum {
 	//------------------------------
@@ -639,23 +656,17 @@ enum {
 	TYPE_EMAIL_BOBBY_R_L1 = 11,
 };
 
-typedef struct
-{
-	UINT8 uiIndex;
-	UINT32	EmailType;
-
-} EMAIL_TYPE;
-
-#define EMAIL_VAL 4000
-
-extern EMAIL_TYPE gEmailT[EMAIL_VAL];
-
 extern EMAIL_MERC_AVAILABLE_VALUES EmailMercAvailableText[NUM_PROFILES];
 extern EMAIL_MERC_LEVEL_UP_VALUES EmailMercLevelUpText[NUM_PROFILES];
+extern EMAIL_MERC_INSURANCE_VALUES EmailInsuranceText[NUM_PROFILES];
+
 extern EMAIL_OTHER_VALUES EmailOtherText[EMAIL_INDEX];
 extern BOOLEAN ReadXMLEmail;
 extern void AddEmailTypeXML( INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition, UINT8 EmailType );
 extern void AddPreReadEmailTypeXML( INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, UINT8 EmailType );
+extern void AddEmailWithSpecialDataXML(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iFirstData, UINT32 uiSecondData, UINT8 EmailType );
+extern BOOLEAN SaveNewEmailDataToSaveGameFile( HWFILE hFile );
+extern BOOLEAN LoadNewEmailDataFromLoadGameFile( HWFILE hFile );
 
 #ifdef JA2UB
 extern void AddBobbyREmailJA2(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iCurrentIMPPosition, INT16 iCurrentShipmentDestinationID, UINT8 EmailType );

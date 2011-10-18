@@ -3802,7 +3802,10 @@ void GetKeyboardInput( UINT32 *puiNewEvent )
 						if ( !MercPtrs[ gusSelectedSoldier ]->MercInWater(	) && !(MercPtrs[ gusSelectedSoldier ]->flags.uiStatusFlags & SOLDIER_ROBOT ) )
 						{
 							//change selected merc to run
-							if ( MercPtrs[ gusSelectedSoldier ]->usUIMovementMode != WALKING && MercPtrs[ gusSelectedSoldier ]->usUIMovementMode != RUNNING )
+							if ( MercPtrs[ gusSelectedSoldier ]->usUIMovementMode != WALKING && MercPtrs[ gusSelectedSoldier ]->usUIMovementMode != RUNNING
+								 && MercPtrs[ gusSelectedSoldier ]->usUIMovementMode != WALKING_PISTOL_RDY
+								  && MercPtrs[ gusSelectedSoldier ]->usUIMovementMode != WALKING_RIFLE_RDY
+								   && MercPtrs[ gusSelectedSoldier ]->usUIMovementMode != WALKING_DUAL_RDY )
 							{
 								UIHandleSoldierStanceChange( (UINT8)gusSelectedSoldier, ANIM_STAND );
 								MercPtrs[ gusSelectedSoldier ]->flags.fUIMovementFast = 1;

@@ -543,6 +543,9 @@ void CreateDestroyMapInventoryPoolButtons( BOOLEAN fExitFromMapScreen )
 		// destroy buttons for map border
 		DeleteMapBorderButtons( );
 
+		// delete map level markers regions
+		DeleteMouseRegionsForLevelMarkers( );
+
 		fCreated = TRUE;
 
 		// also create the inventory slot
@@ -569,6 +572,9 @@ void CreateDestroyMapInventoryPoolButtons( BOOLEAN fExitFromMapScreen )
 		{
 			// recreate mapborder buttons
 			CreateButtonsForMapBorder( );
+
+			// recreate map level markers regions
+			CreateMouseRegionsForLevelMarkers( );
 		}
 		fCreated = FALSE;
 
@@ -1112,6 +1118,9 @@ void CreateMapInventoryButtons( void )
 										BUTTON_TOGGLE, MSYS_PRIORITY_HIGHEST,
 										(GUI_CALLBACK)BtnGenericMouseMoveButtonCallback, (GUI_CALLBACK)MapInventoryPoolPrevBtn );
 
+	// set up fast help text
+	SetButtonFastHelpText( guiMapInvenButton[ 0 ], pMapScreenInvenButtonHelpText[ 0 ] );
+	SetButtonFastHelpText( guiMapInvenButton[ 1 ], pMapScreenInvenButtonHelpText[ 1 ] );
 
 	//reset the current inventory page to be the first page
 	iCurrentInventoryPoolPage = 0;
@@ -1811,6 +1820,9 @@ void CreateMapInventoryPoolDoneButton( void )
 	guiMapInvenButton[ 2 ] = QuickCreateButton( guiMapInvenButtonImage[ 2 ], MAP_INV_X_OFFSET + 587 , (SCREEN_HEIGHT - 147),
 										BUTTON_TOGGLE, MSYS_PRIORITY_HIGHEST,
 										(GUI_CALLBACK)BtnGenericMouseMoveButtonCallback, (GUI_CALLBACK)MapInventoryPoolDoneBtn );
+
+	// set up fast help text
+	SetButtonFastHelpText( guiMapInvenButton[ 2 ], pMapScreenInvenButtonHelpText[ 2 ] );
 
 	return;
 }

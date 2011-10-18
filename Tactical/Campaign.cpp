@@ -1692,13 +1692,13 @@ void HourlyProgressUpdate(void)
 		}
 #endif
 		// at 50% make Mike available to the strategic AI
-		if ( ubCurrentProgress >= gGameExternalOptions.ubGameProgressMikeAvailable && gStrategicStatus.ubHighestProgress < gGameExternalOptions.ubGameProgressMikeAvailable )
+		if ( ubCurrentProgress >= gGameExternalOptions.ubGameProgressMikeAvailable && gStrategicStatus.ubHighestProgress <= gGameExternalOptions.ubGameProgressMikeAvailable )
 		{
 			SetFactTrue( FACT_MIKE_AVAILABLE_TO_ARMY );
 		}
 
 		// at 70% add Iggy to the world
-		if ( ubCurrentProgress >= gGameExternalOptions.ubGameProgressIggyAvaliable && gStrategicStatus.ubHighestProgress < gGameExternalOptions.ubGameProgressIggyAvaliable )
+		if ( ubCurrentProgress >= gGameExternalOptions.ubGameProgressIggyAvaliable && gStrategicStatus.ubHighestProgress <= gGameExternalOptions.ubGameProgressIggyAvaliable )
 		{
 			gMercProfiles[ IGGY ].sSectorX = 5;
 			gMercProfiles[ IGGY ].sSectorY = MAP_ROW_C;

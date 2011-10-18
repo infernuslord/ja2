@@ -1212,7 +1212,7 @@ BOOLEAN CheckForGunJam( SOLDIERTYPE * pSoldier )
 			// try to unjam gun 
 				if(EnoughPoints(pSoldier, APBPConstants[AP_UNJAM], APBPConstants[BP_UNJAM], FALSE))
 				{
-					DeductPoints(pSoldier, APBPConstants[AP_UNJAM], APBPConstants[BP_UNJAM]);
+					DeductPoints(pSoldier, APBPConstants[AP_UNJAM], APBPConstants[BP_UNJAM] );
 					INT8 bChanceMod;
 					
 					if ( Weapon[pSoldier->inv[pSoldier->ubAttackingHand].usItem].EasyUnjam )
@@ -1644,7 +1644,7 @@ BOOLEAN UseGunNCTH( SOLDIERTYPE *pSoldier , INT32 sTargetGridNo )
 				*/
 			}
 
-			DeductPoints( pSoldier, sAPCost, 0 );
+			DeductPoints( pSoldier, sAPCost, 0, AFTERACTION_INTERRUPT );
 		}
 
 	}
@@ -1656,12 +1656,12 @@ BOOLEAN UseGunNCTH( SOLDIERTYPE *pSoldier , INT32 sTargetGridNo )
 			// only deduct APs when the main gun fires
 			if ( pSoldier->ubAttackingHand == HANDPOS )
 			{
-				DeductPoints( pSoldier, sAPCost, 0 );
+				DeductPoints( pSoldier, sAPCost, 0, AFTERACTION_INTERRUPT );
 			}
 		}
 		else
 		{
-			DeductPoints( pSoldier, sAPCost, 0 );
+			DeductPoints( pSoldier, sAPCost, 0, AFTERACTION_INTERRUPT );
 		}
 
 		//PLAY SOUND
@@ -2209,7 +2209,7 @@ BOOLEAN UseGun( SOLDIERTYPE *pSoldier , INT32 sTargetGridNo )
 				*/
 			}
 
-			DeductPoints( pSoldier, sAPCost, 0 );
+			DeductPoints( pSoldier, sAPCost, 0, AFTERACTION_INTERRUPT );
 		}
 
 	}
@@ -2221,12 +2221,12 @@ BOOLEAN UseGun( SOLDIERTYPE *pSoldier , INT32 sTargetGridNo )
 			// only deduct APs when the main gun fires
 			if ( pSoldier->ubAttackingHand == HANDPOS )
 			{
-				DeductPoints( pSoldier, sAPCost, 0 );
+				DeductPoints( pSoldier, sAPCost, 0, AFTERACTION_INTERRUPT );
 			}
 		}
 		else
 		{
-			DeductPoints( pSoldier, sAPCost, 0 );
+			DeductPoints( pSoldier, sAPCost, 0, AFTERACTION_INTERRUPT );
 		}
 
 		//PLAY SOUND
@@ -2706,7 +2706,7 @@ BOOLEAN UseBlade( SOLDIERTYPE *pSoldier , INT32 sTargetGridNo )
 	// Deduct points!
  	sAPCost = CalcTotalAPsToAttack( pSoldier, sTargetGridNo, FALSE, pSoldier->aiData.bAimTime );
 
-	DeductPoints( pSoldier, sAPCost, 0 );
+	DeductPoints( pSoldier, sAPCost, 0, AFTERACTION_INTERRUPT );
 
 	// GET TARGET XY VALUES
 	ConvertGridNoToCenterCellXY( sTargetGridNo, &sXMapPos, &sYMapPos );
@@ -2905,7 +2905,7 @@ BOOLEAN UseHandToHand( SOLDIERTYPE *pSoldier, INT32 sTargetGridNo, BOOLEAN fStea
 	if (!fStealing)
 	{
  		sAPCost = CalcTotalAPsToAttack( pSoldier, sTargetGridNo, FALSE, pSoldier->aiData.bAimTime );
-		DeductPoints( pSoldier, sAPCost, 0 );
+		DeductPoints( pSoldier, sAPCost, 0, AFTERACTION_INTERRUPT );
 	}
 	// Steal from the enemy
 	else
@@ -2981,7 +2981,7 @@ BOOLEAN UseHandToHand( SOLDIERTYPE *pSoldier, INT32 sTargetGridNo, BOOLEAN fStea
 			// SANDRO - unable to steal from militia if they are not allowed to drop equipment
 			if (SOLDIER_CLASS_MILITIA(pTargetSoldier->ubSoldierClass) && (gGameExternalOptions.ubMilitiaDropEquipment != 2) )
 			{
-				DeductPoints( pSoldier, (APBPConstants[AP_STEAL_ITEM] / 5), 0 );
+				DeductPoints( pSoldier, (APBPConstants[AP_STEAL_ITEM] / 5), 0, AFTERACTION_INTERRUPT );
 				pSoldier->DoMercBattleSound( BATTLE_SOUND_CURSE1 );
 				return ( TRUE );
 			}
@@ -2995,7 +2995,7 @@ BOOLEAN UseHandToHand( SOLDIERTYPE *pSoldier, INT32 sTargetGridNo, BOOLEAN fStea
 			{
 				// first, charge extra Aps, because it's difficlut to pickup from other soldier
 				if (gGameExternalOptions.fEnhancedCloseCombatSystem)
-					DeductPoints( pSoldier, (GetBasicAPsToPickupItem( pSoldier ) * 2), 0 );
+					DeductPoints( pSoldier, (GetBasicAPsToPickupItem( pSoldier ) * 2), 0, AFTERACTION_INTERRUPT );
 
 				// The item that the enemy holds in his hand before the stealing
 				usOldItem = pTargetSoldier->inv[HANDPOS].usItem;
@@ -3007,7 +3007,7 @@ BOOLEAN UseHandToHand( SOLDIERTYPE *pSoldier, INT32 sTargetGridNo, BOOLEAN fStea
 				{
 					// charge Aps
 					if (gGameExternalOptions.fEnhancedCloseCombatSystem)
-						DeductPoints( pSoldier, GetBasicAPsToPickupItem( pSoldier ), 0 );
+						DeductPoints( pSoldier, GetBasicAPsToPickupItem( pSoldier ), 0, AFTERACTION_INTERRUPT );
 
 					ScreenMsg( FONT_MCOLOR_LTYELLOW, MSG_INTERFACE, Message[ STR_STOLE_SOMETHING ], pSoldier->name, ShortItemNames[ pTargetSoldier->inv[ubIndexRet].usItem ] );
 					if (pTargetSoldier->inv[ubIndexRet].MoveThisObjectTo(gTempObject, 1) == 0) {
@@ -3168,28 +3168,28 @@ BOOLEAN UseHandToHand( SOLDIERTYPE *pSoldier, INT32 sTargetGridNo, BOOLEAN fStea
 				{
 					if (HAS_SKILL_TRAIT( pSoldier, MARTIAL_ARTS_NT ) && ( gGameOptions.fNewTraitSystem ))
 					{
-						DeductPoints( pSoldier, max( 1, (INT16)((APBPConstants[AP_STEAL_ITEM] *  (100 - gSkillTraitValues.ubMAReducedAPsToSteal * NUM_SKILL_TRAITS( pSoldier, MARTIAL_ARTS_NT ))/ 100) + 0.5)), 200);
+						DeductPoints( pSoldier, max( 1, (INT16)((APBPConstants[AP_STEAL_ITEM] *  (100 - gSkillTraitValues.ubMAReducedAPsToSteal * NUM_SKILL_TRAITS( pSoldier, MARTIAL_ARTS_NT ))/ 100) + 0.5)), 200, AFTERACTION_INTERRUPT );
 					}
 					else
 					{
-						DeductPoints( pSoldier, APBPConstants[AP_STEAL_ITEM], 200 );
+						DeductPoints( pSoldier, APBPConstants[AP_STEAL_ITEM], 200, AFTERACTION_INTERRUPT );
 					}
 				}
 				// Only 1/7 of original AP cost, if the enemy has nothing to steal
 				else if ((fNoMoreItems == TRUE) || (fNoMoreItemInHand == TRUE))
 				{
-					DeductPoints( pSoldier, (APBPConstants[AP_STEAL_ITEM] / 7), 0 );
+					DeductPoints( pSoldier, (APBPConstants[AP_STEAL_ITEM] / 7), 0, AFTERACTION_INTERRUPT );
 				}
 			}
 			else
 			{
 				if (HAS_SKILL_TRAIT( pSoldier, MARTIAL_ARTS_NT ) && ( gGameOptions.fNewTraitSystem ))
 				{
-					DeductPoints( pSoldier, max( 1, (INT16)((APBPConstants[AP_STEAL_ITEM] *  (100 - gSkillTraitValues.ubMAReducedAPsToSteal * NUM_SKILL_TRAITS( pSoldier, MARTIAL_ARTS_NT ))/ 100) + 0.5)), 0);
+					DeductPoints( pSoldier, max( 1, (INT16)((APBPConstants[AP_STEAL_ITEM] *  (100 - gSkillTraitValues.ubMAReducedAPsToSteal * NUM_SKILL_TRAITS( pSoldier, MARTIAL_ARTS_NT ))/ 100) + 0.5)), 0, AFTERACTION_INTERRUPT );
 				}
 				else
 				{
-					DeductPoints( pSoldier, APBPConstants[AP_STEAL_ITEM], 0 );
+					DeductPoints( pSoldier, APBPConstants[AP_STEAL_ITEM], 0, AFTERACTION_INTERRUPT );
 				}
 			}
 						
@@ -3616,7 +3616,7 @@ BOOLEAN UseThrown( SOLDIERTYPE *pSoldier, INT32 sTargetGridNo )
 	sAPCost += GetAPsToChangeStance( pSoldier, ANIM_STAND );
 
 	HandleSoldierThrowItem( pSoldier, pSoldier->sTargetGridNo );
-	DeductPoints( pSoldier, sAPCost, 0 );
+	DeductPoints( pSoldier, sAPCost, 0, AFTERACTION_INTERRUPT );
 	pSoldier->inv[ HANDPOS ].RemoveObjectsFromStack(1);
 
 	/*
@@ -3746,12 +3746,12 @@ BOOLEAN UseLauncher( SOLDIERTYPE *pSoldier, INT32 sTargetGridNo )
 		// ONly deduct points once
 		if ( pSoldier->bDoBurst == 1 )
 		{
-			DeductPoints( pSoldier, sAPCost, 0 );
+			DeductPoints( pSoldier, sAPCost, 0, AFTERACTION_INTERRUPT );
 		}
 	}
 	else
 	{
-		DeductPoints( pSoldier, sAPCost, 0 );
+		DeductPoints( pSoldier, sAPCost, 0, AFTERACTION_INTERRUPT );
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -5363,7 +5363,7 @@ UINT32 CalcNewChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTi
 
 		UINT32 uiCap = (UINT32)iCombinedSkill;
 		// Add percent-based modifier from the gun and its attachments
-		uiCap += (uiCap * GetPercentCapModifier( pInHand, gAnimControl[ pSoldier->usAnimState ].ubEndHeight )) / 100;
+		uiCap += (INT32)(uiCap * GetPercentCapModifier( pInHand, gAnimControl[ pSoldier->usAnimState ].ubEndHeight )) / 100;
 
 		// Add bonuses from Sniper Skill. Applies only when using a scope at or above its "best" range.
 		INT16 sDifference = 99 - uiCap;
@@ -8081,15 +8081,25 @@ UINT32 AICalcChanceToHitGun(SOLDIERTYPE *pSoldier, INT32 sGridNo, INT16 ubAimTim
 		}
 
 		FLOAT dGunRange = (FLOAT)(GunRange( &(pSoldier->inv[pSoldier->ubAttackingHand]), pSoldier ) );
-		if ( (dGunRange * 1.1f) < d2DDistance)
+		FLOAT dMaxGunRange = dGunRange * gGameCTHConstants.MAX_EFFECTIVE_RANGE_MULTIPLIER;
+		if ( dMaxGunRange < d2DDistance)
 		{
 			// Weapon out of conceivable hit range. Reduce chance to hit to 0!
 			return (0);
 		}
 		else if ( dGunRange < d2DDistance)
 		{
-			// Just outside range. Reduce considerably!
-			return (uiChance / 2);
+			FLOAT dChance = (FLOAT)uiChance;
+			FLOAT dMaxChanceReduction = (dChance * gGameCTHConstants.MAX_EFFECTIVE_RANGE_REDUCTION);
+			if (gGameCTHConstants.MAX_EFFECTIVE_USE_GRADIENT)
+			{
+				// Just outside range. Reduce considerably!
+				return min(uiChance, (UINT)(dChance - (dMaxChanceReduction * ((d2DDistance - dGunRange) / (dMaxGunRange - dGunRange)))));
+			}
+			else
+			{
+				return (UINT)(dChance - dMaxChanceReduction);
+			}
 		}
 	}
 	return( uiChance );

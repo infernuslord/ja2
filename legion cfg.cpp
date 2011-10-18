@@ -717,7 +717,7 @@ void LoadGameLegionOptions()
 
 	//gGameLegionOptions.RISRAPORT  = iniReader.ReadBoolean("Laptop","RIS_RAPORT",  TRUE);
 	
-	gGameLegionOptions.OLDUBInventory = iniReader.ReadBoolean("Unfinished Business","OLD_UB_ITEMS", FALSE);	
+	gGameLegionOptions.OLDUBInventory = FALSE; //iniReader.ReadBoolean("Unfinished Business","OLD_UB_ITEMS", FALSE);	
 
 	
 	gGameLegionOptions.SWITCHINMORRISAREA_GRIDNOa = iniReader.ReadInteger("Unfinished Business","SWITCH_IN_MORRIS_AREA_GRIDNO", 15231);	

@@ -549,7 +549,7 @@ BOOLEAN CPostalService::DeliverShipment(UINT16 usShipmentID)
 			// Shipment from Bobby Ray
 			if (shs.sSenderID == BOBBYR_SENDER_ID)
 				AddEmail( BOBBYR_SHIPMENT_ARRIVED, BOBBYR_SHIPMENT_ARRIVED_LENGTH, BOBBY_R, GetWorldTotalMin(), -1, gusCurShipmentDestinationID, TYPE_EMAIL_EMAIL_EDT);	
-				// Shipment from John Kulba
+			// Shipment from John Kulba
 			else
 				AddEmail( JOHN_KULBA_GIFT_IN_DRASSEN, JOHN_KULBA_GIFT_IN_DRASSEN_LENGTH, JOHN_KULBA, GetWorldTotalMin(), -1, gusCurShipmentDestinationID, TYPE_EMAIL_EMAIL_EDT);
 #endif

@@ -5520,7 +5520,7 @@ GROUP* CreateNewEnemyGroupDepartingFromSectorUsingZLevel( UINT32 uiSector, UINT8
 	pNew->fVehicle = FALSE;
 	pNew->ubCreatedSectorID = pNew->ubOriginalSector;
 	pNew->ubSectorIDOfLastReassignment = 255;
-
+/*
 #ifdef JA2BETAVERSION
 	{
 		UINT16 str[ 512 ];
@@ -5543,7 +5543,7 @@ GROUP* CreateNewEnemyGroupDepartingFromSectorUsingZLevel( UINT32 uiSector, UINT8
 		}
 	}
 #endif
-
+*/
 	if( AddGroupToList( pNew ) )
 		return pNew;
 	return NULL;

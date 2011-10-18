@@ -921,6 +921,7 @@ BOOLEAN AddItemsToUnLoadedSector( INT16 sMapX, INT16 sMapY, INT8 bMapZ, INT32 sG
 }
 
 extern BOOLEAN gfInMeanwhile;
+extern BOOLEAN EnableModifiedFileSetCache(BOOLEAN value);
 
 BOOLEAN SaveCurrentSectorsInformationToTempItemFile( )
 {
@@ -945,6 +946,7 @@ BOOLEAN SaveCurrentSectorsInformationToTempItemFile( )
 		return( TRUE );
 	}
 
+	BOOLEAN cacheResetValue = EnableModifiedFileSetCache(TRUE);
 
 	//Save the Blood, smell and the revealed status for map elements
 	SaveBloodSmellAndRevealedStatesFromMapToTempFile();
@@ -952,12 +954,11 @@ BOOLEAN SaveCurrentSectorsInformationToTempItemFile( )
 	// handle all reachable before save
 	HandleAllReachAbleItemsInTheSector( gWorldSectorX, gWorldSectorY, gbWorldSectorZ );
 
-
-
 	//Save the Items to the the file
 	if( !SaveWorldItemsToTempItemFile( gWorldSectorX, gWorldSectorY, gbWorldSectorZ, guiNumWorldItems, gWorldItems ) )
 	{
 		DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("SaveCurrentSectorsInformationToTempItemFile:  failed in SaveWorldItemsToTempItemFile()" ) );
+		EnableModifiedFileSetCache(cacheResetValue);
 		return( FALSE );
 	}
 
@@ -965,6 +966,7 @@ BOOLEAN SaveCurrentSectorsInformationToTempItemFile( )
 	if( !SaveRottingCorpsesToTempCorpseFile( gWorldSectorX, gWorldSectorY, gbWorldSectorZ ) )
 	{
 		DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("SaveCurrentSectorsInformationToTempItemFile:  failed in SaveRottingCorpsesToTempCorpseFile()" ) );
+		EnableModifiedFileSetCache(cacheResetValue);
 		return( FALSE );
 	}
 
@@ -972,6 +974,7 @@ BOOLEAN SaveCurrentSectorsInformationToTempItemFile( )
 	if( !SaveDoorTableToDoorTableTempFile( gWorldSectorX, gWorldSectorY, gbWorldSectorZ ) )
 	{
 		DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("SaveCurrentSectorsInformationToTempItemFile:  failed in SaveDoorTableToDoorTableTempFile()" ) );
+		EnableModifiedFileSetCache(cacheResetValue);
 		return( FALSE );
 	}
 
@@ -979,6 +982,7 @@ BOOLEAN SaveCurrentSectorsInformationToTempItemFile( )
 	if( !SaveRevealedStatusArrayToRevealedTempFile( gWorldSectorX, gWorldSectorY, gbWorldSectorZ ) )
 	{
 		DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("SaveCurrentSectorsInformationToTempItemFile:  failed in SaveRevealedStatusArrayToRevealedTempFile()" ) );
+		EnableModifiedFileSetCache(cacheResetValue);
 		return( FALSE );
 	}
 
@@ -986,6 +990,7 @@ BOOLEAN SaveCurrentSectorsInformationToTempItemFile( )
 	if( !SaveDoorStatusArrayToDoorStatusTempFile( gWorldSectorX, gWorldSectorY, gbWorldSectorZ ) )
 	{
 		DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("SaveCurrentSectorsInformationToTempItemFile:  failed in SaveDoorStatusArrayToDoorStatusTempFile()" ) );
+		EnableModifiedFileSetCache(cacheResetValue);
 		return( FALSE );
 	}
 
@@ -993,6 +998,7 @@ BOOLEAN SaveCurrentSectorsInformationToTempItemFile( )
 	if( !NewWayOfSavingEnemyAndCivliansToTempFile( gWorldSectorX, gWorldSectorY, gbWorldSectorZ, TRUE, FALSE ) )
 	{
 		DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("SaveCurrentSectorsInformationToTempItemFile:  failed in NewWayOfSavingEnemyAndCivliansToTempFile( Enemy, Creature Team )" ) );
+		EnableModifiedFileSetCache(cacheResetValue);
 		return( FALSE );
 	}
 
@@ -1000,6 +1006,7 @@ BOOLEAN SaveCurrentSectorsInformationToTempItemFile( )
 	if( !NewWayOfSavingEnemyAndCivliansToTempFile( gWorldSectorX, gWorldSectorY, gbWorldSectorZ, FALSE, FALSE ) )
 	{
 		DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("SaveCurrentSectorsInformationToTempItemFile:  failed in NewWayOfSavingEnemyAndCivliansToTempFile( Civ Team )" ) );
+		EnableModifiedFileSetCache(cacheResetValue);
 		return( FALSE );
 	}
 
@@ -1007,6 +1014,7 @@ BOOLEAN SaveCurrentSectorsInformationToTempItemFile( )
 	if( !SaveSmokeEffectsToMapTempFile( gWorldSectorX, gWorldSectorY, gbWorldSectorZ ) )
 	{
 		DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("SaveCurrentSectorsInformationToTempItemFile:  failed in SaveSmokeEffectsToMapTempFile" ) );
+		EnableModifiedFileSetCache(cacheResetValue);
 		return( FALSE );
 	}
 
@@ -1014,6 +1022,7 @@ BOOLEAN SaveCurrentSectorsInformationToTempItemFile( )
 	if( !SaveLightEffectsToMapTempFile( gWorldSectorX, gWorldSectorY, gbWorldSectorZ ) )
 	{
 		DebugMsg( TOPIC_JA2, DBG_LEVEL_3, String("SaveCurrentSectorsInformationToTempItemFile:  failed in SaveLightEffectsToMapTempFile" ) );
+		EnableModifiedFileSetCache(cacheResetValue);
 		return( FALSE );
 	}
 
@@ -1028,6 +1037,8 @@ BOOLEAN SaveCurrentSectorsInformationToTempItemFile( )
 
 	//Save the time the player was last in the sector
 	SetLastTimePlayerWasInSector();
+
+	EnableModifiedFileSetCache(cacheResetValue);
 
 #ifdef JA2UB
 //Ja25 no meanwhile

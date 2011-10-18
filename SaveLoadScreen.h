@@ -11,6 +11,10 @@
 
 extern BOOLEAN AutoSaveToSlot[5];
 
+// WANNE: Used For auto save games
+extern	UINT32	lastLoadedSaveGameDay;
+extern	UINT8	lastLoadedSaveGameHour;
+
 extern	UINT16 	NUM_SLOT;
 extern	UINT32	SLG_SAVELOCATION_HEIGHT;
 extern	UINT32	SLG_GAP_BETWEEN_LOCATIONS;

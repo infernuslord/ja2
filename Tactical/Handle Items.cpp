@@ -4654,7 +4654,7 @@ void BoobyTrapMessageBoxCallBack( UINT8 ubExitValue )
 		{
 			// SANDRO was here, AP_DISARM_MINE changed to GetAPsToDisarmMine
 			if(EnoughPoints(gpBoobyTrapSoldier, GetAPsToDisarmMine( gpBoobyTrapSoldier ), APBPConstants[BP_DISARM_MINE], TRUE))
-				DeductPoints(gpBoobyTrapSoldier, GetAPsToDisarmMine( gpBoobyTrapSoldier ), APBPConstants[BP_DISARM_MINE]);
+				DeductPoints(gpBoobyTrapSoldier, GetAPsToDisarmMine( gpBoobyTrapSoldier ), APBPConstants[BP_DISARM_MINE], AFTERACTION_INTERRUPT);
 			else
 				return;
 		}
@@ -5734,9 +5734,7 @@ void SoldierStealItemFromSoldier( SOLDIERTYPE *pSoldier, SOLDIERTYPE *pOpponent,
 				if ( gGameExternalOptions.fEnhancedCloseCombatSystem )
 				{
 					if (pSoldier->bActionPoints >= GetBasicAPsToPickupItem( pSoldier ) )
-					{
-						DeductPoints( pSoldier, GetBasicAPsToPickupItem( pSoldier ), 0 );
-					
+					{					
 						// Make copy of item
 						gTempObject = pOpponent->inv[pTempItemPool->iItemIndex];
 						if ( ItemIsCool( &gTempObject ) )
@@ -5752,7 +5750,8 @@ void SoldierStealItemFromSoldier( SOLDIERTYPE *pSoldier, SOLDIERTYPE *pOpponent,
 						// add to merc records
 						if ( pSoldier->ubProfile != NO_PROFILE )
 							gMercProfiles[ pSoldier->ubProfile ].records.usItemsStolen++;
-
+						
+						DeductPoints( pSoldier, GetBasicAPsToPickupItem( pSoldier ), 0, AFTERACTION_INTERRUPT );
 					}
 					else
 					{

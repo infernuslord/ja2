@@ -6,6 +6,8 @@
 #include "mapscreen.h"
 #include "XML_Language.h"
 
+#include "Encyclopedia.h"
+
 #define STRING_LENGTH 255
 
 enum
@@ -46,6 +48,20 @@ enum
 };
 
 extern	CHAR16	XMLTacticalMessages[1000][MAX_MESSAGE_NAMES_CHARS];
+
+//Encyclopedia
+extern STR16 	pMenuStrings[];
+extern STR16	pLocationPageText[];
+extern STR16	pSectorPageText[];
+extern STR16	pEncyclopediaHelpText[];
+extern STR16	pEncyclopediaTypeText[];
+extern STR16	pEncyclopediaSkrotyText[];
+extern STR16	pEncyclopediaShortCharacterText[];
+extern STR16	pEncyclopediaHelpCharacterText[];
+extern STR16	pEncyclopediaShortInventoryText[];
+extern STR16	BoxFilter[];
+extern STR16	pOtherButtonsText[];
+extern STR16	pOtherButtonsHelpText[];
 
 //Editor
 //Editor Taskbar Creation.cpp
@@ -187,6 +203,7 @@ extern STR16 pMapScreenFastHelpTextList[];
 extern STR16 pMovementMenuStrings[];
 extern STR16 pUpdateMercStrings[];
 extern STR16 pMapScreenBorderButtonHelpText[];
+extern STR16 pMapScreenInvenButtonHelpText[];
 extern STR16 pMapScreenBottomFastHelp[];
 extern STR16 pMapScreenBottomText[];
 extern STR16 pMercDeadString[];
@@ -413,6 +430,14 @@ enum
 	MSG_SAVE_AUTOSAVE_FILENAME,		// 94
 	MSG_SAVE_END_TURN_SAVE_TEXT,	// 95
 	MSG_SAVE_AUTOSAVE_SAVING_TEXT,	// 96
+	MSG_SAVE_END_TURN_SAVE_SAVING_TEXT,	// 97
+	MSG_SAVE_AUTOSAVE_ENDTURN_EMPTY_TEXT,	//98
+	MSG_SAVE_AUTOSAVE_ENDTURN_TEXT_INFO,	//99
+	MSG_SAVE_QUICKSAVE_SLOT,				// 100
+	MSG_SAVE_AUTOSAVE_SLOT,					// 101
+	MSG_SAVE_AUTOSAVE_ENDTURN_SLOT,			// 102
+	MSG_SAVE_NORMAL_SLOT,					// 103
+	
 
 	TEXT_NUM_MSG,
 };
@@ -589,9 +614,6 @@ extern CHAR16		gWeaponStatsDesc[][ 17 ];
 // Note that I've inflated some of these to 20 to avoid issues.
 extern STR16		gzWeaponStatsFasthelp[ 32 ];
 extern STR16		gzWeaponStatsFasthelpTactical[ 32 ];
-extern STR16		gzAmmoStatsFasthelp[ 20 ];
-extern STR16		gzArmorStatsFasthelp[ 20 ];
-extern STR16		gzExplosiveStatsFasthelp[ 20 ];
 extern STR16		gzMiscItemStatsFasthelp[ 34 ];
 // HEADROCK HAM 4: New tooltip texts
 extern STR16		gzUDBButtonTooltipText[ 3 ];
@@ -1034,7 +1056,6 @@ extern		STR16			BobbyROrderFormText[];
 enum
 {
 	// Guns
-	BOBBYR_FILTER_GUNS_HEAVY,
 	BOBBYR_FILTER_GUNS_PISTOL,
 	BOBBYR_FILTER_GUNS_M_PISTOL,
 	BOBBYR_FILTER_GUNS_SMG,
@@ -1043,8 +1064,8 @@ enum
 	BOBBYR_FILTER_GUNS_AS_RIFLE,
 	BOBBYR_FILTER_GUNS_LMG,
 	BOBBYR_FILTER_GUNS_SHOTGUN,
+	BOBBYR_FILTER_GUNS_HEAVY,
 	// Ammo
-	//BOBBYR_FILTER_AMMO_HEAVY,
 	BOBBYR_FILTER_AMMO_PISTOL,
 	BOBBYR_FILTER_AMMO_M_PISTOL,
 	BOBBYR_FILTER_AMMO_SMG,
@@ -1053,6 +1074,7 @@ enum
 	BOBBYR_FILTER_AMMO_AS_RIFLE,
 	BOBBYR_FILTER_AMMO_LMG,
 	BOBBYR_FILTER_AMMO_SHOTGUN,
+	//BOBBYR_FILTER_AMMO_HEAVY,
 	// Used
 	BOBBYR_FILTER_USED_GUNS,
 	BOBBYR_FILTER_USED_ARMOR,

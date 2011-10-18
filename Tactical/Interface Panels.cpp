@@ -3363,11 +3363,11 @@ BOOLEAN UIHandleItemPlacement( UINT8 ubHandPos, UINT16 usOldItemIndex, UINT16 us
 			// Deduct points
 			if ( gpItemPointerSoldier->stats.bLife >= CONSCIOUSNESS )
 			{
-				DeductPoints( gpItemPointerSoldier,	2, 0 );
+				DeductPoints( gpItemPointerSoldier,	2, 0, UNTRIGGERED_INTERRUPT );
 			}
 			if ( gpSMCurrentMerc->stats.bLife >= CONSCIOUSNESS )
 			{
-				DeductPoints( gpSMCurrentMerc,	2, 0 );
+				DeductPoints( gpSMCurrentMerc,	2, 0, UNTRIGGERED_INTERRUPT );
 			}
 		}
 
@@ -7004,11 +7004,11 @@ void KeyRingSlotInvClickCallback( MOUSE_REGION * pRegion, INT32 iReason )
 							// Deduct points
 							if ( gpItemPointerSoldier->stats.bLife >= CONSCIOUSNESS )
 							{
-								DeductPoints( gpItemPointerSoldier,	2, 0 );
+								DeductPoints( gpItemPointerSoldier,	2, 0, UNTRIGGERED_INTERRUPT );
 							}
 							if ( gpItemPopupSoldier->stats.bLife >= CONSCIOUSNESS )
 							{
-								DeductPoints( gpItemPopupSoldier,	2, 0 );
+								DeductPoints( gpItemPopupSoldier,	2, 0, UNTRIGGERED_INTERRUPT );
 							}
 						}
 
@@ -7047,11 +7047,11 @@ void KeyRingSlotInvClickCallback( MOUSE_REGION * pRegion, INT32 iReason )
 						// Deduct points
 						if ( gpItemPointerSoldier && gpItemPointerSoldier->stats.bLife >= CONSCIOUSNESS )
 						{
-							DeductPoints( gpItemPointerSoldier,	2, 0 );
+							DeductPoints( gpItemPointerSoldier,	2, 0, UNTRIGGERED_INTERRUPT );
 						}
 						if ( gpSMCurrentMerc->stats.bLife >= CONSCIOUSNESS )
 						{
-							DeductPoints( gpSMCurrentMerc,	2, 0 );
+							DeductPoints( gpSMCurrentMerc,	2, 0, UNTRIGGERED_INTERRUPT );
 						}
 					}
 

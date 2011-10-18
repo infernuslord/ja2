@@ -1386,6 +1386,21 @@ BOOLEAN ExecuteOverhead( )
 									// Cancel reverse
 									pSoldier->bReverse = FALSE;
 
+									BOOLEAN fAimAfterMove = FALSE;
+									if ( pSoldier->usAnimState == SIDE_STEP_PISTOL_RDY || pSoldier->usAnimState == SIDE_STEP_RIFLE_RDY || 
+										pSoldier->usAnimState == WALKING_PISTOL_RDY || pSoldier->usAnimState == WALKING_RIFLE_RDY )
+									{
+										fAimAfterMove = TRUE;
+										pSoldier->usPendingAnimation = AIM_RIFLE_STAND;
+										pSoldier->ubPendingDirection = pSoldier->ubDirection;
+									}
+									else if ( pSoldier->usAnimState == SIDE_STEP_DUAL_RDY || pSoldier->usAnimState == WALKING_DUAL_RDY )
+									{
+										fAimAfterMove = TRUE;
+										pSoldier->usPendingAnimation = AIM_DUAL_STAND;
+										pSoldier->ubPendingDirection = pSoldier->ubDirection;
+									}
+
 									// OK, if we are the selected soldier, refresh some UI stuff
 									if ( pSoldier->ubID == (UINT8)gusSelectedSoldier )
 									{
@@ -1644,7 +1659,10 @@ BOOLEAN ExecuteOverhead( )
 											{
 												UnSetUIBusy( pSoldier->ubID );
 
-												pSoldier->SoldierGotoStationaryStance( );
+												if ( !fAimAfterMove ) // SANDRO - don't do this after movement with weapon raised
+												{
+													pSoldier->SoldierGotoStationaryStance( );
+												}
 											}
 										}
 									}
@@ -1793,7 +1811,10 @@ BOOLEAN ExecuteOverhead( )
 								dAngle = gdRadiansForAngle[ pSoldier->bMovementDirection ];
 
 								// For walking, base it on body type!
-								if ( pSoldier->usAnimState == WALKING )
+								if ( pSoldier->usAnimState == WALKING || 
+									 pSoldier->usAnimState == WALKING_PISTOL_RDY ||
+									 pSoldier->usAnimState == WALKING_RIFLE_RDY ||
+									 pSoldier->usAnimState == WALKING_DUAL_RDY )
 								{
 									pSoldier->MoveMerc( gubAnimWalkSpeeds[ pSoldier->ubBodyType ].dMovementChange, dAngle, TRUE );
 
@@ -1866,6 +1887,36 @@ BOOLEAN ExecuteOverhead( )
 				}
 			}
 		}
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// SANDRO - hack! - resolve possible pending interrupt
+		if(GetSoldier(&pSoldier, gusSelectedSoldier) && gGameExternalOptions.fImprovedInterruptSystem )
+		{
+			if ( pSoldier->bActive )
+			{
+				if ( ResolvePendingInterrupt( pSoldier, UNDEFINED_INTERRUPT ) )
+				{
+					fKeepMoving = FALSE;
+					pSoldier->AdjustNoAPToFinishMove( TRUE );
+					pSoldier->usPendingAnimation = NO_PENDING_ANIMATION;
+					pSoldier->ubPendingDirection = NO_PENDING_DIRECTION;
+
+					// "artificially" set lock ui flag in this case
+					if (pSoldier->bTeam == gbPlayerNum)
+					{
+						guiPendingOverrideEvent = LU_BEGINUILOCK;	
+						HandleTacticalUI( );
+					}
+
+					// return early
+					gubNPCAPBudget = 0;
+					gubNPCDistLimit = 0;
+
+					return( TRUE );
+				}
+			}
+		}
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		// Turn off auto bandage if we need to...
 		if ( gTacticalStatus.fAutoBandageMode )
@@ -2495,8 +2546,8 @@ BOOLEAN HandleGotoNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving, BOOLE
 			}
 			else
 			{
-				// Adjust AP/Breathing points to move
-				DeductPoints( pSoldier, sAPCost, sBPCost );
+				// Adjust AP/Breathing points to move				
+				DeductPoints( pSoldier, sAPCost, sBPCost, MOVEMENT_INTERRUPT );
 			}
 
 			// OK, let's check for monsters....
@@ -2755,7 +2806,7 @@ BOOLEAN HandleAtNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving )
 
 	// Set "interrupt occurred" flag to false so that we will know whether *this
 	// particular call* to HandleSight caused an interrupt
-	gTacticalStatus.fInterruptOccurred = FALSE;
+	gTacticalStatus.fInterruptOccurred = FALSE;	
 
 	if ( !(gTacticalStatus.uiFlags & LOADING_SAVED_GAME ) )
 	{
@@ -2777,6 +2828,14 @@ BOOLEAN HandleAtNewGridNo( SOLDIERTYPE *pSoldier, BOOLEAN *pfKeepMoving )
 		HandleSight(pSoldier,SIGHT_LOOK | SIGHT_RADIO | SIGHT_INTERRUPT);
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// SANDRO - if pending interrupt flag was set for movement type of interupt, resolve it here
+	if ( gGameExternalOptions.fImprovedInterruptSystem )
+	{
+		ResolvePendingInterrupt( pSoldier, MOVEMENT_INTERRUPT );
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	// ATE: Check if we have sighted anyone, if so, don't do anything else...
 	// IN other words, we have stopped from sighting...
 	if (gTacticalStatus.fInterruptOccurred)
@@ -4021,7 +4080,7 @@ void MakeCivHostile( SOLDIERTYPE *pSoldier, INT8 bNewSide )
 	{
 		return;
 	}
-//#if 0
+
 	// override passed-in value; default is hostile to player, allied to army
 	bNewSide = 1;
 
@@ -4116,7 +4175,6 @@ void MakeCivHostile( SOLDIERTYPE *pSoldier, INT8 bNewSide )
 		CheckForPotentialAddToBattleIncrement( pSoldier );
 	}
 	
-//#endif
 
 		//uses Lua
 		PROFILLUA2_ubProfile = pSoldier->ubProfile;
@@ -5840,6 +5898,7 @@ void CommonEnterCombatModeCode( )
 	gTacticalStatus.fLastBattleWon		= FALSE;
 	gTacticalStatus.fItemsSeenOnAttack	= FALSE;
 
+	gTacticalStatus.ubInterruptPending	= DISABLED_INTERRUPT;
 
 	// ATE: If we have an item pointer end it!
 	CancelItemPointer( );
@@ -5884,6 +5943,9 @@ void CommonEnterCombatModeCode( )
 				// if the last battle left a soldier at 0 points, he will not gain full points with
 				// carryover for this battle.	So we'll hit it again.
 				pSoldier->CalcNewActionPoints( );
+
+				// SANDRO - Improved Interrupt System - reset interrupt counter
+				memset(pSoldier->aiData.ubInterruptCounter,0,sizeof(pSoldier->aiData.ubInterruptCounter));
 
 				if ( pSoldier->ubProfile != NO_PROFILE )
 				{

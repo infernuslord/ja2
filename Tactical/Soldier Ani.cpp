@@ -597,6 +597,24 @@ BOOLEAN AdjustToNextAnimationFrame( SOLDIERTYPE *pSoldier )
 				{
 					UnSetUIBusy( pSoldier->ubID );
 				}
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				// SANDRO - if pending interrupt flag was set for after-attack type of interupt, try to resolve it now
+				else if ( gGameExternalOptions.fImprovedInterruptSystem )
+				{
+					if ( ResolvePendingInterrupt( pSoldier, AFTERACTION_INTERRUPT ) )
+					{
+						pSoldier->usPendingAnimation = NO_PENDING_ANIMATION;
+						pSoldier->ubPendingDirection = NO_PENDING_DIRECTION;
+						// "artificially" set lock ui flag in this case
+						if (pSoldier->bTeam == gbPlayerNum)
+						{
+							guiPendingOverrideEvent = LU_BEGINUILOCK;								
+							HandleTacticalUI( );
+						}
+						return( TRUE );		
+					}
+				}
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				break;
 
 			case 443:
@@ -1013,12 +1031,12 @@ BOOLEAN AdjustToNextAnimationFrame( SOLDIERTYPE *pSoldier )
 					{
 						//AXP 25.03.2007: MinAPsToThrow now actually returns the real cost, not 0
 						// ATE: Deduct points!
-						DeductPoints( pSoldier, MinAPsToThrow( pSoldier, pSoldier->sTargetGridNo, FALSE ), 0 );
+						DeductPoints( pSoldier, MinAPsToThrow( pSoldier, pSoldier->sTargetGridNo, FALSE ), 0, AFTERACTION_INTERRUPT );
 					}
 					else
 					{
 						// ATE: Deduct points!
-						DeductPoints( pSoldier, APBPConstants[AP_TOSS_ITEM], 0 );
+						DeductPoints( pSoldier, APBPConstants[AP_TOSS_ITEM], 0, AFTERACTION_INTERRUPT );
 					}
 
 					INT32 iRealObjectID = CreatePhysicalObject( pSoldier->pTempObject, pSoldier->pThrowParams->dLifeSpan,	pSoldier->pThrowParams->dX, pSoldier->pThrowParams->dY, pSoldier->pThrowParams->dZ, pSoldier->pThrowParams->dForceX, pSoldier->pThrowParams->dForceY, pSoldier->pThrowParams->dForceZ, pSoldier->ubID, pSoldier->pThrowParams->ubActionCode, pSoldier->pThrowParams->uiActionData, FALSE );
@@ -2031,6 +2049,28 @@ BOOLEAN AdjustToNextAnimationFrame( SOLDIERTYPE *pSoldier )
 
 			case 498:
 
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				// SANDRO - if pending interrupt flag was set for before-attack type of interupt, try to resolve it now
+				if ( gGameExternalOptions.fImprovedInterruptSystem )
+				{
+					if ( ResolvePendingInterrupt( pSoldier, BEFORESHOT_INTERRUPT ) )
+					{	
+						if ( pSoldier->flags.fTurningToShoot )
+							pSoldier->flags.fTurningToShoot = FALSE;
+
+						pSoldier->usPendingAnimation = NO_PENDING_ANIMATION;
+						pSoldier->ubPendingDirection = NO_PENDING_DIRECTION;
+						// "artificially" set lock ui flag in this case
+						if (pSoldier->bTeam == gbPlayerNum)
+						{
+							guiPendingOverrideEvent = LU_BEGINUILOCK;								
+							HandleTacticalUI( );
+						}
+						return( TRUE );				
+						break;
+					}
+				}
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				// CONDITONAL JUMP
 				// If we have a pending animation, play it, else continue
 				if ( pSoldier->usPendingAnimation != NO_PENDING_ANIMATION )
@@ -2622,6 +2662,14 @@ BOOLEAN AdjustToNextAnimationFrame( SOLDIERTYPE *pSoldier )
 					DebugAttackBusy( "@@@@@@@ Reducing attacker busy count for end of queen swipe" );
 					// ReduceAttackBusyCount( pSoldier->ubID, FALSE );
 				}
+				
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				// SANDRO - if pending interrupt flag was set for after-attack type of interupt, try to resolve it now
+				if ( gGameExternalOptions.fImprovedInterruptSystem )
+				{
+					ResolvePendingInterrupt( pSoldier, AFTERACTION_INTERRUPT );
+				}
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				break;
 
 			case 754:
@@ -3353,14 +3401,12 @@ BOOLEAN HandleSoldierDeath( SOLDIERTYPE *pSoldier , BOOLEAN *pfMadeCorpse )
 			}
 
 			//////////////////////////////////////////////////////////////
-			
-			// WANNE: This should fix crash in a MP game, when someone quits playing
-			if ( (is_networked && pSoldier->ubAttackerID < 254) || !is_networked )
+
 			{
 				// IF this guy has an attacker and he's a good guy, play sound
 				if ( ubAttacker != NOBODY )
 				{								
-					if ( MercPtrs[ pSoldier->ubAttackerID ]->bTeam == gbPlayerNum && gTacticalStatus.ubAttackBusyCount > 0 )
+					if ( MercPtrs[ pSoldier->ubAttackerID ] != NULL && MercPtrs[ pSoldier->ubAttackerID ]->bTeam == gbPlayerNum && gTacticalStatus.ubAttackBusyCount > 0 )
 					{
 						gTacticalStatus.fKilledEnemyOnAttack	= TRUE;
 						gTacticalStatus.ubEnemyKilledOnAttack = pSoldier->ubID;

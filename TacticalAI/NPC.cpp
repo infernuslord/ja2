@@ -52,6 +52,9 @@
 	#include "GameVersion.h"
 #endif
 	#include "Soldier Profile.h"
+	
+	#include "Encyclopedia.h"
+	
 //forward declarations of common classes to eliminate includes
 class OBJECTTYPE;
 class SOLDIERTYPE;
@@ -1858,6 +1861,7 @@ void Converse( UINT8 ubNPC, UINT8 ubMerc, INT8 bApproach, UINT32 uiApproachData 
 	if (zHiddenNames[ubNPC].Hidden == TRUE) 
 	{
 		zHiddenNames[ubNPC].Hidden = FALSE;
+		gEncyclopediaProfilesData[ubNPC].Hidden = TRUE; //encyclopedia
 	}
 
 

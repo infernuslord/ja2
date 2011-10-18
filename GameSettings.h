@@ -76,6 +76,8 @@ enum
 	TOPTION_SHOW_TACTICAL_FACE_GEAR,
 	TOPTION_SHOW_TACTICAL_FACE_ICONS,
 
+	TOPTION_DISABLE_CURSOR_SWAP,				// Disable cursor swapping every second between talk and quick exchange
+
 	// arynn: Debug/Cheat
 	TOPTION_CHEAT_MODE_OPTIONS_HEADER,
 	TOPTION_FORCE_BOBBY_RAY_SHIPMENTS,			// force all pending Bobby Ray shipments
@@ -308,7 +310,16 @@ typedef struct
 	BOOLEAN fCamoRemoving;
 	BOOLEAN fEnhancedCloseCombatSystem;
 
+	BOOLEAN fImprovedInterruptSystem;
+	UINT8 ubBasicPercentRegisterValueIIS;
+	UINT8 ubPercentRegisterValuePerLevelIIS;
+	UINT8 ubBasicReactionTimeLengthIIS;
+	BOOLEAN fAllowCollectiveInterrupts;
+	BOOLEAN fAllowInstantInterruptsOnSight;
+
 	UINT16 usAwardSpecialExpForQuests;
+
+	BOOLEAN fAllowWalkingWithWeaponRaised;
 	////////////////////////////////////
 
 	// Kaiden: Vehicle Inventory change - Added for INI Option
@@ -1003,6 +1014,11 @@ typedef struct
 	
 	INT32 iInitialMercArrivalLocation;
 	
+	BOOLEAN gBriefingRoom;
+	BOOLEAN gEncyclopedia;
+	
+	
+	
 } GAME_EXTERNAL_OPTIONS;
 
 typedef struct
@@ -1350,6 +1366,9 @@ typedef struct
 	UINT32 NORMAL_RECOIL_DISTANCE;
 	FLOAT MAX_BULLET_DEV;
 	BOOLEAN RANGE_EFFECTS_DEV;
+	FLOAT MAX_EFFECTIVE_RANGE_MULTIPLIER;
+	FLOAT MAX_EFFECTIVE_RANGE_REDUCTION;
+	BOOLEAN MAX_EFFECTIVE_USE_GRADIENT;
 
 } CTH_CONSTANTS;
 

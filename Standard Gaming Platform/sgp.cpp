@@ -1384,6 +1384,15 @@ void GetRuntimeSettings( )
 			CIniReader::RegisterFileForMerging(*it);
 		}
 	}
+	
+	std::list<vfs::String> merge_list_ub;
+	if(oProps.getStringListProperty(L"Ja2 Settings", L"MERGE_INI_FILES_UB", merge_list_ub, L""))
+	{
+		for(std::list<vfs::String>::iterator it = merge_list_ub.begin(); it != merge_list_ub.end(); ++it)
+		{
+			CIniReader::RegisterFileForMerging(*it);
+		}
+	}
 #endif
 
 #ifdef USE_VFS

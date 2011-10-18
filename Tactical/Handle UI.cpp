@@ -588,10 +588,13 @@ UINT32	HandleTacticalUI( void )
 		}
 	}
 
-	if ( ( GetJA2Clock( ) - guiUIInterfaceSwapCursorsTime ) > 1000 )
+	if ( !gGameSettings.fOptions[TOPTION_DISABLE_CURSOR_SWAP] )
 	{
-		gfOKForExchangeCursor = !gfOKForExchangeCursor;
-		guiUIInterfaceSwapCursorsTime = GetJA2Clock( );
+		if ( ( GetJA2Clock( ) - guiUIInterfaceSwapCursorsTime ) > 1000 )
+		{
+			gfOKForExchangeCursor = !gfOKForExchangeCursor;
+			guiUIInterfaceSwapCursorsTime = GetJA2Clock( );
+		}
 	}
 
 	// OK, do a check for on an int tile...
@@ -1224,7 +1227,7 @@ UINT32 UIHandleEnterPalEditMode( UI_EVENT *pUIEvent )
 
 UINT32 UIHandleEndTurn( UI_EVENT *pUIEvent )
 {
-//CHAR16	zString[128]; 
+CHAR16	zString[128]; 
 
 	// CANCEL FROM PLANNING MODE!
 	if ( InUIPlanMode( ) )
@@ -1249,12 +1252,15 @@ UINT32 UIHandleEndTurn( UI_EVENT *pUIEvent )
 		//if( FileExists( "..\\AutoSave.pls" ) && CanGameBeSaved() )
 		if (gGameSettings.fOptions[TOPTION_USE_AUTO_SAVE] == TRUE && CanGameBeSaved() )
 		{
-			//Save the game
-			//swprintf( zString, L"%s",pMessageStrings[ MSG_SAVE_END_TURN_SAVE_TEXT ]);
-			//DoAutoSave(SAVE__END_TURN_NUM,zString);
-			
 			guiPreviousOptionScreen = guiCurrentScreen;
-			SaveGame(SAVE__END_TURN_NUM, pMessageStrings[ MSG_SAVE_END_TURN_SAVE_TEXT ] ); 
+
+			//increment end turn number
+			guiLastSaveGameNum++;
+			if( guiLastSaveGameNum == 2 )
+				guiLastSaveGameNum = 0;
+			
+			swprintf( zString, L"%s%d",pMessageStrings[ MSG_SAVE_END_TURN_SAVE_TEXT ], guiLastSaveGameNum + 1);
+			SaveGame(SAVE__END_TURN_NUM, zString ); 
 		}
 
 	////ddd оптимизация для хода драников
@@ -1691,7 +1697,7 @@ UINT32 UIHandleMovementMenu( UI_EVENT *pUIEvent )
 				{
 				case MOVEMENT_MENU_RUN:
 
-					if ( pSoldier->usUIMovementMode != WALKING && pSoldier->usUIMovementMode != RUNNING )
+					if ( pSoldier->usUIMovementMode != WALKING && pSoldier->usUIMovementMode != RUNNING && pSoldier->usUIMovementMode != WALKING_PISTOL_RDY && pSoldier->usUIMovementMode != WALKING_RIFLE_RDY && pSoldier->usUIMovementMode != WALKING_DUAL_RDY )
 					{
 						UIHandleSoldierStanceChange( pSoldier->ubID, ANIM_STAND );
 						pSoldier->flags.fUIMovementFast = 1;
@@ -3873,6 +3879,9 @@ BOOLEAN HandleUIMovementCursor( SOLDIERTYPE *pSoldier, UINT32 uiCursorFlags, INT
 						switch ( pSoldier->usUIMovementMode )
 						{
 						case WALKING:
+						case WALKING_PISTOL_RDY:
+						case WALKING_RIFLE_RDY:
+						case WALKING_DUAL_RDY:
 
 							gUIDisplayActionPointsOffY = 10;
 							gUIDisplayActionPointsOffX = 10;
@@ -4636,6 +4645,9 @@ void SetMovementModeCursor( SOLDIERTYPE *pSoldier )
 			switch ( pSoldier->usUIMovementMode )
 			{
 			case WALKING:
+			case WALKING_PISTOL_RDY:
+			case WALKING_RIFLE_RDY:
+			case WALKING_DUAL_RDY:
 				guiNewUICursor = MOVE_WALK_UICURSOR;
 				break;
 
@@ -4696,6 +4708,9 @@ void SetConfirmMovementModeCursor( SOLDIERTYPE *pSoldier, BOOLEAN fFromMove )
 				switch ( pSoldier->usUIMovementMode )
 				{
 				case WALKING:
+				case WALKING_PISTOL_RDY:
+				case WALKING_RIFLE_RDY:
+				case WALKING_DUAL_RDY:
 					guiNewUICursor = ALL_MOVE_WALK_UICURSOR;
 					break;
 
@@ -4725,6 +4740,9 @@ void SetConfirmMovementModeCursor( SOLDIERTYPE *pSoldier, BOOLEAN fFromMove )
 				switch ( pSoldier->usUIMovementMode )
 				{
 				case WALKING:
+				case WALKING_PISTOL_RDY:
+				case WALKING_RIFLE_RDY:
+				case WALKING_DUAL_RDY:
 					guiNewUICursor = CONFIRM_MOVE_WALK_UICURSOR;
 					break;
 
@@ -4950,7 +4968,7 @@ BOOLEAN MakeSoldierTurn( SOLDIERTYPE *pSoldier, INT16 sXPos, INT16 sYPos )
 		// Setting "Last Target"
 
 		pSoldier->sLastTarget = sXPos + (MAXCOL * sYPos);
-		DeductPoints( pSoldier, sAPCost, 0 );
+		DeductPoints( pSoldier, sAPCost, 0, AFTERACTION_INTERRUPT );
 
 		return( TRUE );
 	}
@@ -6562,13 +6580,21 @@ BOOLEAN ValidQuickExchangePosition( )
 		}
 	}
 
-	if ( fOldOnValidGuy != fOnValidGuy )
+	if ( gGameSettings.fOptions[TOPTION_DISABLE_CURSOR_SWAP] )
 	{
-		// Update timer....
-		// ATE: Adjust clock for automatic swapping so that the 'feel' is there....
-		guiUIInterfaceSwapCursorsTime	= GetJA2Clock( );
-		// Default it!
-		gfOKForExchangeCursor = TRUE;
+		gfOKForExchangeCursor = FALSE;
+		fOnValidGuy = FALSE;
+	}
+	else
+	{
+		if ( fOldOnValidGuy != fOnValidGuy )
+		{
+			// Update timer....
+			// ATE: Adjust clock for automatic swapping so that the 'feel' is there....
+			guiUIInterfaceSwapCursorsTime	= GetJA2Clock( );
+			// Default it!
+			gfOKForExchangeCursor = TRUE;
+		}
 	}
 
 	// Update old value.....

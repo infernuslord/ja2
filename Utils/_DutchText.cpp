@@ -1,4 +1,4 @@
-// WANNE: Yes, this should be disabled, otherwise we get weird behavior when running the game with a VS 2005 build!
+ï»¿// WANNE: Yes, this should be disabled, otherwise we get weird behavior when running the game with a VS 2005 build!
 //#pragma setlocale("DUTCH")
 
 #ifdef PRECOMPILEDHEADERS
@@ -11,6 +11,7 @@
 		#include "Scheduling.h"
 		#include "EditorMercs.h"
 		#include "Item Statistics.h"
+		#include "Encyclopedia.h"
 	#endif
 #endif
 
@@ -121,6 +122,196 @@ CHAR16	XMLTacticalMessages[1000][MAX_MESSAGE_NAMES_CHARS] =
 {
 	L"",
 };
+//Encyclopedia
+
+STR16 pMenuStrings[] =
+{
+	//Encyclopedia
+	L"Locations", // 0
+	L"Characters",
+	L"Items",
+	L"Quests",
+	L"Menu 5",
+	L"Menu 6", //5
+	L"Menu 7", 
+	L"Menu 8",
+	L"Menu 9",
+	L"Menu 10",
+	L"Menu 11", //10
+	L"Menu 12",
+	L"Menu 13",
+	L"Menu 14",
+	L"Menu 15",
+	L"Menu 15", // 15
+	
+	//Briefing Room
+	L"Exit",
+};
+
+STR16	pOtherButtonsText[] =
+{
+	L"Briefing", 
+	L"Accept",
+};
+
+STR16	pOtherButtonsHelpText[] =
+{
+	L"Briefing",
+	L"Accept missions",
+};
+
+
+STR16	pLocationPageText[] =
+{
+	L"Prev page",
+	L"Photo", 
+	L"Next page",
+};
+
+STR16	pSectorPageText[] =
+{
+	L"<<",
+	L"Main page",
+	L">>",
+	L"Type: ",
+	L"Empty data",
+	L"Missing of defined missions. Add missions to the file TableData\\BriefingRoom\\BriefingRoom.xml. First mission has to be visible. Put value Hidden = 0.",
+};
+
+STR16	pEncyclopediaTypeText[] = 
+{
+	L"Unknown",// 0 - unknown
+	L"City", //1 - cities
+	L"SAM Site", //2 - SAM Site
+	L"Other location", //3 - other location
+	L"Mines", //4 - mines 
+	L"Military complex", //5 - military complex 
+	L"Laboratory complex",  //6 - laboratory complex 
+	L"Factory complex", //7 - factory complex 
+	L"Hospital", //8 - hospital 
+	L"Prison", //9 - prison
+    L"Airport", //10 - air port 
+};
+
+STR16	pEncyclopediaHelpCharacterText[] = 
+{
+	L"Show all",
+	L"Show AIM",
+	L"Show MERC",
+	L"Show RPC",
+	L"Show NPC",
+	L"Show Pojazd",
+	L"Show IMP",
+	L"Show EPC",
+	L"Filter",
+};
+
+STR16	pEncyclopediaShortCharacterText[] = 
+{
+	L"All",
+	L"AIM",
+	L"MERC",
+	L"RPC",
+	L"NPC",
+	L"Veh.",
+	L"IMP",
+	L"EPC",
+	L"Filter",
+};
+
+STR16	pEncyclopediaHelpText[] = 
+{
+	L"Show all",
+	L"Show cities",
+	L"Show SAM Sites",
+	L"Show other location",
+	L"Show mines",
+	L"Show military complex",
+	L"Show laboratory complex",
+	L"Show Factory complex",
+	L"Show hospital",
+	L"Show prison",
+	L"Show air port",
+};
+
+STR16	pEncyclopediaSkrotyText[] = 
+{
+	L"All",
+	L"City",
+	L"SAM",
+	L"Other",
+	L"Mine",
+	L"Mil.",
+	L"Lab.",
+	L"Fact.",
+	L"Hosp.",
+	L"Prison",
+	L"Air.",
+};
+
+STR16	pEncyclopediaShortInventoryText[] = 
+{
+	L"All", //0
+	L"Gun",
+	L"Ammo",
+	L"LBE",
+	L"Misc",
+	
+	L"All", //5
+	L"Gun",
+	L"Ammo",
+	L"LBE Gear",
+	L"Misc",
+};
+
+STR16			BoxFilter[] =
+{
+	// Guns
+	L"Heavy",
+	L"Pistol",
+	L"M. Pist.",
+	L"SMG",
+	L"Rifle",
+	L"S. Rifle",
+	L"A. Rifle",
+	L"MG",
+	L"Shotgun",
+
+	// Ammo
+	L"Pistol",
+	L"M. Pist.", //10
+	L"SMG",
+	L"Rifle",
+	L"S. Rifle",
+	L"A. Rifle",
+	L"MG",
+	L"Shotgun",
+
+	// Used
+	L"Guns",
+	L"Armor",
+	L"LBE Gear",
+	L"Misc", //20
+
+	// Armour
+	L"Helmets",
+	L"Vests",
+	L"Leggings",
+	L"Plates",
+
+	// Misc
+	L"Blades",
+	L"Th. Knife",
+	L"Melee",
+	L"Grenades",
+	L"Bombs",
+	L"Med.", //30
+	L"Kits",
+	L"Face",
+	L"LBE",
+	L"Misc.", //34
+};
+//-----------
 
 // Editor
 //Editor Taskbar Creation.cpp
@@ -1316,7 +1507,7 @@ CHAR16 Message[][STRING_LENGTH] =
 
 	L"%s's wapen vuurt geen salvo.",
 
-	L"Je hebt er al één van die vastgemaakt.",
+	L"Je hebt er al Ã©Ã©n van die vastgemaakt.",
 	L"Samen voegen?",
 
 	// Both %s's are item names
@@ -1433,7 +1624,7 @@ STR16 pAssignmentStrings[] =
 	L"Team 20",
 	L"Dienst", // on active duty
 	L"Dokter", // administering medical aid
-	L"Patiënt", // getting medical aid
+	L"PatiÃ«nt", // getting medical aid
 	L"Voertuig", // in a vehicle
 	L"Onderweg", // in transit - abbreviated form
 	L"Repareer", // repairing
@@ -1517,7 +1708,7 @@ STR16 pPersonnelAssignmentStrings[] =
 	L"Team 20",
 	L"Dienst", // on active duty
 	L"Dokter", // administering medical aid
-	L"Patiënt", // getting medical aid
+	L"PatiÃ«nt", // getting medical aid
 	L"Voertuig", // in a vehicle
 	L"Onderweg", // in transit - abbreviated form
 	L"Repareer", // repairing
@@ -1562,7 +1753,7 @@ STR16 pLongAssignmentStrings[] =
 	L"Team 20",
 	L"Dienst", // on active duty
 	L"Dokter", // administering medical aid
-	L"Patiënt", // getting medical aid
+	L"PatiÃ«nt", // getting medical aid
 	L"Voertuig", // in a vehicle
 	L"Onderweg", // in transit - abbreviated form
 	L"Repareer", // repairing
@@ -2097,7 +2288,7 @@ STR16 gpStrategicString[] =
 	L"",	//Unused
 	L"%s zijn ontdekt in sector %c%d en een ander team arriveert binnenkort.",	//STR_DETECTED_SINGULAR
 	L"%s zijn ontdekt in sector %c%d en andere teams arriveren binnenkort.",	//STR_DETECTED_PLURAL
-	L"Wil je een gezamenlijke aankomst coördineren?",					//STR_COORDINATE
+	L"Wil je een gezamenlijke aankomst coÃ¶rdineren?",					//STR_COORDINATE
 
 	//Dialog strings for enemies.
 
@@ -2347,78 +2538,6 @@ STR16		gzWeaponStatsFasthelpTactical[ 32 ] =
 	L"No Auto Mode!",
 	L"APs to Bash",
     L"",
-};
-
-STR16		gzAmmoStatsFasthelp[ 20 ] =
-{
-	L"Armor Penetration (Lower is better)",
-	L"Bullet Tumble (Higher is better)",
-	L"Pre-impact Explosion (Higher is better)",
-	L"Tracer Effect",
-	L"Anti-Tank",
-	L"Lockbuster",
-	L"Ignores Armor",
-	L"Acidic",
-	L"Range Modifier",
-	L"Damage Modifier",
-	L"To-Hit Modifier",
-	L"Autofire Penalty Modifier (Higher is better)",
-	L"Burst Penalty Modifier (Higher is better)",	// TODO.Translate
-	L"Reliability Modifier",
-	L"Loudness Modifier (Lower is better)",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-};
-
-STR16		gzArmorStatsFasthelp[ 20 ] =
-{
-	L"Protection",
-	L"Coverage (Higher is better)",
-	L"Degrade Rate (Lower is better)",
-	L"AP Modifier",
-	L"To-Hit Modifier",
-	L"Woodland Camo",
-	L"Urban Camo",
-	L"Desert Camo",
-	L"Snow Camo",
-	L"Stealth Modifier",
-	L"Vision Range Modifier",
-	L"Day Vision Range Modifier",
-	L"Night Vision Range Modifier",
-	L"Bright Light Vision Range Modifier",
-	L"Cave Vision Range Modifier",
-	L"Tunnel Vision Percentage",
-	L"Hearing Range Modifier",
-	L"",
-	L"",
-	L"",
-};
-
-STR16		gzExplosiveStatsFasthelp[ 20 ] =
-{
-	L"Damage",
-	L"Stun Damage",
-	L"Blast Loudness (Lower is better)",
-	L"Volatility!!! (Lower is better)",
-	L"Blast Radius",
-	L"Effect Start Radius",
-	L"Effect Final Radius ",
-	L"Effect Duration",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
 };
 
 STR16		gzMiscItemStatsFasthelp[ 34 ] =
@@ -2705,7 +2824,7 @@ CHAR16 TacticalStr[][ MED_STRING_LENGTH ] =
 	L"Salvo's (|B)",				// L"|Burst Mode",
 	L"Kijk/draai (|L)",			// L"|Look/Turn",
 	L"Gezond: %d/%d\nKracht: %d/%d\nMoraal: %s",		// L"Health: %d/%d\nEnergy: %d/%d\nMorale: %s",
-	L"Hé?",					//this means "what?" 
+	L"HÃ©?",					//this means "what?" 
 	L"Door",					//an abbrieviation for "Continued" 
 	L"%s is praat weer.",			// L"Mute off for %s.",
 	L"%s is stil.",				// L"Mute on for %s.",
@@ -2802,7 +2921,7 @@ STR16 pExitingSectorHelpText[] =
 	L"Als de overgebleven huurlingen uit deze sector trekken,\nwordt je automatisch in het landkaartscherm geplaatst,\nrekening houdend met de reistijd van je huurlingen.",
 
 	//If an EPC is the selected merc, it won't allow the merc to leave alone as the merc is being escorted.  The "single" button is disabled.
-	L"%s moet geëscorteerd worden door jouw huurlingen\nen kan de sector niet alleen verlaten.",
+	L"%s moet geÃ«scorteerd worden door jouw huurlingen\nen kan de sector niet alleen verlaten.",
 
 	//If only one conscious merc is left and is selected, and there are EPCs in the squad, the merc will be prohibited from leaving alone.
 	//There are several strings depending on the gender of the merc and how many EPCs are in the squad.
@@ -2828,7 +2947,7 @@ STR16 pExitingSectorHelpText[] =
 	//traverse the EPC while the escorting mercs aren't near enough (or dead, dying, or unconscious), this message will appear and the
 	//"exiting sector" interface will not appear.  This is just like the situation where
 	//This string is special, as it is not used as helptext.  Do not use the special newline character (\n) for this string.
-	L"%s wordt geëscorteerd door jouw huurlingen en kan de sector niet alleen verlaten. Je huurlingen moeten eerst in de buurt zijn.",
+	L"%s wordt geÃ«scorteerd door jouw huurlingen en kan de sector niet alleen verlaten. Je huurlingen moeten eerst in de buurt zijn.",
 };
 
 
@@ -3052,9 +3171,15 @@ STR16 pMapScreenBorderButtonHelpText[] =
 	L"Toon Luchtruim (|A)",
 	L"Toon |Items",
 	L"Toon Milities & Vijanden (|Z)",
-	L"Show Mobile Militia Restrictions", // HEADROCK HAM 4: Mobile Restrictions Button
+	L"Show Mobile Militia |Restrictions", // HEADROCK HAM 4: Mobile Restrictions Button // TODO.Translate
 };
 
+STR16 pMapScreenInvenButtonHelpText[] =
+{
+	L"Next (|.)",		// next page // TODO.Translate
+	L"Previous (|,)",		// previous page // TODO.Translate
+	L"Exit Sector Inventory (|E|s|c)",	// exit sector inventory // TODO.Translate
+};
 
 STR16 pMapScreenBottomFastHelp[] =
 {
@@ -3374,8 +3499,8 @@ STR16 pMapErrorString[] =
 	L"Deidranna's troepen zijn gezien in %s.",
 	L"Deidranna's troepen hebben zojuist %s overgenomen.",
 //26-30
-	L"Tenminste één huurling kon niet tot slapen gebracht worden.",
-	L"Tenminste één huurling kon niet wakker gemaakt worden.",
+	L"Tenminste Ã©Ã©n huurling kon niet tot slapen gebracht worden.",
+	L"Tenminste Ã©Ã©n huurling kon niet wakker gemaakt worden.",
 	L"De Militie verschijnt niet totdat hun training voorbij is.",
 	L"%s kan geen reisorders gegeven worden op dit moment.",
 	L"Milities niet binnen de stadsgrenzen kunnen niet verplaatst worden naar een andere sector.",
@@ -3396,9 +3521,9 @@ STR16 pMapErrorString[] =
 	L"Voertuig zit zonder brandstof!",
 	L"%s is te moe om te reizen.",
 	L"Niemand aan boord is in staat om het voertuig te besturen.",
-	L"Eén of meer teamleden kunnen zich op dit moment niet verplaatsen.",
+	L"EÃ©n of meer teamleden kunnen zich op dit moment niet verplaatsen.",
 //46-50
-	L"Eén of meer leden van de ANDERE huurlingen kunnen zich op dit moment niet verplaatsen.",
+	L"EÃ©n of meer leden van de ANDERE huurlingen kunnen zich op dit moment niet verplaatsen.",
 	L"Voertuig is te beschadigd!",
 	L"Let op dat maar twee huurlingen milities in een sector mogen trainen.",
 	L"De robot kan zich zonder bediening niet verplaatsen. Plaats ze in hetzelfde team.",
@@ -3473,8 +3598,8 @@ STR16 pMercSheLeaveString[] =
 
 STR16 pMercContractOverStrings[] =
 {
-	L"'s contract is geëindigd, hij is dus naar huis.",	// merc's contract is over and has departed
-	L"'s contract is geëindigd, ze is dus naar huis.", 		// merc's contract is over and has departed
+	L"'s contract is geÃ«indigd, hij is dus naar huis.",	// merc's contract is over and has departed
+	L"'s contract is geÃ«indigd, ze is dus naar huis.", 		// merc's contract is over and has departed
 	L"'s contract is opgezegd, hij is dus weg.", 		// merc's contract has been terminated
 	L"'s contract is opgezegd, ze is dus weg.",		// merc's contract has been terminated
 	L"M.E.R.C. krijgt nog teveel geld van je, %s is dus weggegaan.", // Your M.E.R.C. account is invalid so merc left
@@ -3487,9 +3612,9 @@ STR16 pImpPopUpStrings[] =
 	L"Ongeldige Autorisatiecode",
 	L"Je wil het gehele persoonlijkheidsonderzoek te herstarten. Zeker weten?",
 	L"Vul alsjeblieft de volledige naam en geslacht in",
-	L"Voortijdig onderzoek van je financiële status wijst uit dat je een persoonlijksheidsonderzoek niet kunt betalen.",
+	L"Voortijdig onderzoek van je financiÃ«le status wijst uit dat je een persoonlijksheidsonderzoek niet kunt betalen.",
 	L"Geen geldige optie op dit moment.",
-	L"Om een nauwkeurig profiel te maken, moet je ruimte hebben voor tenminste één teamlid.",
+	L"Om een nauwkeurig profiel te maken, moet je ruimte hebben voor tenminste Ã©Ã©n teamlid.",
 	L"Profiel is al gemaakt.",
 	L"Cannot load I.M.P. character from disk.",
 	L"You have already reached the maximum number of I.M.P. characters.",
@@ -3626,7 +3751,7 @@ STR16 pHistoryStrings[] =
 	L"Onderzoeker in Orta geeft wat raketwerpers.",			// ("Scientist in Orta donated a slew of rocket rifles.")
 	L"Koningin Deidranna kickt op lijken.",				// ("Queen Deidranna has a use for dead bodies.")
 	L"Frank vertelde over knokwedstrijden in San Mona.",		// ("Frank talked about fighting matches in San Mona.")
-	L"Een patiënt dacht dat ie iets in de mijnen zag.",		// ("A patient thinks he saw something in the mines.")
+	L"Een patiÃ«nt dacht dat ie iets in de mijnen zag.",		// ("A patient thinks he saw something in the mines.")
 	//36-40
 	L"Pers. ontmoet; Devin - verkoopt explosieven.",		// ("Met someone named Devin - he sells explosives.")
 	L"Beroemde ex-AIM huurling Mike ontmoet!",			// ("Ran into the famous ex-AIM merc Mike!")
@@ -3711,6 +3836,8 @@ STR16 pBookMarkStrings[] =
 	L"Bloemist",
 	L"Verzekering",
 	L"Stop",
+	L"Encyclopedia",
+	L"Briefing Room",
 };
 
 STR16 pBookmarkTitle[] =
@@ -3820,8 +3947,10 @@ STR16 pWebPagesTitles[] =
 	L"",
 	L"URL niet gevonden.",
 	L"Bobby Ray's - Recentelijke Zendingen",
-	L"",
-	L"",
+	L"Encyclopedia",
+	L"Encyclopedia - Data",
+	L"Briefing Room",
+	L"Briefing Room - Data",
 };
 
 STR16 pShowBookmarkString[] =
@@ -4056,7 +4185,7 @@ STR16			MercNoAccountText[] =
 	//Text on the buttons at the bottom of the screen
 	L"Open Rekening",
 	L"Afbreken",
-	L"Je hebt geen rekening. Wil je er één openen?",
+	L"Je hebt geen rekening. Wil je er Ã©Ã©n openen?",
 };
 
 
@@ -4114,13 +4243,13 @@ STR16			sFloristText[] =
 
 	// detail of the florist page
 
-	L"We zijn snel en efficiënt!",
+	L"We zijn snel en efficiÃ«nt!",
 	L"Volgende dag gebracht, wereldwijd, gegarandeerd. Enkele beperkingen zijn van toepassing.",
 	L"Laagste prijs in de wereld, gegarandeerd!",
 	L"Toon ons een lagere geadverteerde prijs voor een regeling en ontvang gratis een dozijn rozen.",
 	L"Flora, Fauna & Bloemen sinds 1981.",
 	L"Onze onderscheiden ex-bommenwerperpiloten droppen je boeket binnen een tien kilometer radius van de gevraagde locatie. Altijd!",
-	L"Laat ons al je bloemenfantasieën waarmaken.",
+	L"Laat ons al je bloemenfantasieÃ«n waarmaken.",
 	L"Laat Bruce, onze wereldberoemde bloemist, de verste bloemen met de hoogste kwaliteit uit onze eigen kassen uitzoeken.",
 	L"En onthoudt, als we het niet hebben, kunnen we het kweken - Snel!",
 };
@@ -4152,7 +4281,7 @@ STR16			sOrderFormText[] =
 	L"Fruitcake (indien beschikbaar)($10)",		//15
 	L"Persoonlijk Bericht:",
 	L"Wegens de grootte kaarten, mogen je berichten niet langer zijn dan 75 karakters.",
-	L"...of selecteer er één van de onze",
+	L"...of selecteer er Ã©Ã©n van de onze",
 
 	L"STANDAARDKAARTEN",
 	L"Factuurinformatie",	//20
@@ -4227,7 +4356,6 @@ STR16			BobbyROrderFormText[] =
 STR16			BobbyRFilter[] =
 {
 	// Guns
-	L"Heavy W.",
 	L"Pistol",
 	L"M. Pistol",
 	L"SMG",
@@ -4236,6 +4364,7 @@ STR16			BobbyRFilter[] =
 	L"AS Rifle",
 	L"MG",
 	L"Shotgun",
+	L"Heavy W.",
 
 	// Ammo
 	L"Pistol",
@@ -4262,7 +4391,7 @@ STR16			BobbyRFilter[] =
 	// Misc
 	L"Blades",
 	L"Th. Knives",
-	L"Punch. W.",
+	L"Blunt W.",
 	L"Grenades",
 	L"Bombs",
 	L"Med. Kits",
@@ -4279,7 +4408,7 @@ STR16			BobbyRText[] =
 {
 	L"Bestelling",				// Title
 	// instructions on how to order
-	L"Klik op de item(s). Voor meer dan één, blijf dan klikken. Rechtsklikken voor minder. Als je alles geselecteerd hebt, dat je wil bestellen, ga dan naar het bestelformulier.",
+	L"Klik op de item(s). Voor meer dan Ã©Ã©n, blijf dan klikken. Rechtsklikken voor minder. Als je alles geselecteerd hebt, dat je wil bestellen, ga dan naar het bestelformulier.",
 
 	//Text on the buttons to go the various links
 
@@ -4619,7 +4748,7 @@ STR16			AimScreenText[] =
 	// AIM disclaimers
 
 	L"A.I.M. en A.I.M.-logo zijn geregistreerde handelsmerken in de meeste landen.",
-	L"Dus denk er niet aan om ons te kopiëren.",
+	L"Dus denk er niet aan om ons te kopiÃ«ren.",
 	L"Copyright 1998-1999 A.I.M., Ltd.  All rights reserved.",
 
 	//Text for an advertisement that gets displayed on the AIM page
@@ -4829,7 +4958,7 @@ STR16		zMarksMapScreenText[] =
 	
 	// other items	
 	L"Medici",		// people acting a field medics and bandaging wounded mercs 
-	L"Patiënten", // people who are being bandaged by a medic 
+	L"PatiÃ«nten", // people who are being bandaged by a medic 
 	L"OK", // Continue on with the game after autobandage is complete 
 	L"Stop", // Stop autobandaging of patients by medics now 
 	L"Sorry. Optie niet mogelijk in deze demo.", // informs player this option/button has been disabled in the demo 
@@ -4874,7 +5003,7 @@ STR16 pMilitiaConfirmStrings[] =
 //Strings used in the popup box when withdrawing, or depositing money from the $ sign at the bottom of the single merc panel
 STR16	gzMoneyWithdrawMessageText[] = 
 {
-	L"Je kunt maximaal $20.000 in één keer opnemen.",
+	L"Je kunt maximaal $20.000 in Ã©Ã©n keer opnemen.",
 	L"Weet je zeker dat je %s wil storten op je rekening?",
 };
 
@@ -4929,6 +5058,7 @@ STR16		zOptionsToggleText[] =
 	L"Activate New CTH system",				// use NCTH
 	L"Show Face gear graphics",				// TODO.Translate
 	L"Show Face gear icons",
+	L"Disable Cursor Swap",		            // Disable Cursor Swap		// TODO.Translate
 	L"--Cheat Mode Options--",				// TOPTION_CHEAT_MODE_OPTIONS_HEADER,
 	L"Force Bobby Ray shipments",			// force all pending Bobby Ray shipments
 	L"-----------------",					// TOPTION_CHEAT_MODE_OPTIONS_END
@@ -5022,7 +5152,7 @@ STR16	zOptionsScreenHelpText[] =
 	L"When ON, you will hear rain noises when it is raining.",
 	L"When ON, the crows are present in game.",
 	L"When ON, a tooltip window is shown when pressing |A|l|t and hovering cursor over an enemy.",
-	L"When ON, game will be saved after each players turn.",
+	L"When ON, game will be saved in 2 alternate save slots after each players turn.",
 	L"When ON, Skyrider will not talk anymore.",
 	//L"When ON, game will run with much lower CPU usage.",
 	L"When ON, enhanced descriptions will be shown for items and weapons.",
@@ -5033,6 +5163,7 @@ STR16	zOptionsScreenHelpText[] =
 	L"When ON, New CTH system and cursor is used.",
 	L"When ON, you will see the equipped face gear on the merc portraits.",	// TODO.Translate
 	L"When ON, you will see icons for the equipped face gear on the merc portraits in the lower right corner.",
+	L"When ON, the cursor will not toggle between exchange position and other actions. Press |x to initiate quick exchange.",	// TODO.Translate
 	L"(text not rendered)TOPTION_CHEAT_MODE_OPTIONS_HEADER",
 	L"Force all pending Bobby Ray shipments",
 	L"(text not rendered)TOPTION_CHEAT_MODE_OPTIONS_END",
@@ -5143,7 +5274,7 @@ STR16	gzMPJScreenText[] =
 	L"Game Type",
 	L"Ping",
 	L"You must enter a player name.",
-	L"You must enter a valid server IP address.\n (eg 84.114.195.239).",
+	L"You must enter a valid server IP address. For example: 84.114.195.239",
 	L"You must enter a valid Server Port between 1 and 65535.",
 };
 
@@ -5433,19 +5564,20 @@ STR16 pMessageStrings[] =
 	L"You cannot use the Old Inventory and the New Attachment System at the same time.",
 	
 	// TODO.Translate
-	L"AutoSave #", //91		// Text des Auto Saves im Load Screen mit ID
-	L"This slot is reserved for Auto Saves.", //92	// The text, when the user clicks on the save screen on an auto save
+	L"Auto Save #", //91		// Text des Auto Saves im Load Screen mit ID
+	L"This Slot is reserved for Auto Saves, which can be enabled/disabled (AUTO_SAVE_EVERY_N_HOURS) in the ja2_options.ini.", //92	// The text, when the user clicks on the save screen on an auto save
 	L"Empty Auto Save Slot #", //93	// The text, when the auto save slot (1 - 5) is empty (not saved yet)
 	L"AutoSaveGame",		// 94	// The filename of the auto save, such as AutoSaveGame01 - AutoSaveGame05
-	L"End Turn Auto Save",	// 95	// The text for the tactical end turn auto save
-	L"Saving AutoSave #",	// 96	// The message box, when doing auto save
-	L"Empty Auto Save End Turn Slot #",	// 97	// The message box, when doing auto save
-	L"This slot is reserved for end turn Auto Saves .", //98	// The text, when the user clicks on the save screen on an auto save
-	L"End Turn AutoSave #", //99
-	L"Quick Slot#%d",
-	L"Strategic Map AutoSave Slot#%d",
-	L"End Turn Auto Save#%d",
-	L"Save Slot#%d", //103
+	L"End-Turn Save #",	// 95	// The text for the tactical end turn auto save
+	L"Saving Auto Save #",	// 96	// The message box, when doing auto save
+	L"Saving",	// 97	// The message box, when doing end turn auto save
+	L"Empty End-Turn Save Slot #",	// 98	// The message box, when doing auto save
+	L"This Slot is reserved for Tactical End-Turn Saves, which can be enabled/disabled in the Option Screen.", //99	// The text, when the user clicks on the save screen on an auto save
+	// Mouse tooltips
+	L"QuickSave.sav",	// 100
+	L"AutoSaveGame%02d.sav",	// 101
+	L"Auto%02d.sav",	// 102
+	L"SaveGame%02d.sav", //103
 };
 
 
@@ -5485,7 +5617,7 @@ STR16 pMapScreenJustStartedHelpText[] =
 
 STR16 pAntiHackerString[] = 
 {
-	L"Fout. Bestanden missen of zijn beschadigd. Spel wordt beëindigd.",
+	L"Fout. Bestanden missen of zijn beschadigd. Spel wordt beÃ«indigd.",
 };
 
 
@@ -5512,6 +5644,10 @@ STR16 gzLaptopHelpText[] =
 	L"McGillicutty's Mortuarium",
 	L"United Floral Service",
 	L"Verzekeringsagenten voor A.I.M. contracten",
+	//New Bookmarks
+	L"",
+	L"Encyclopedia",
+	L"Briefing Room",
 };
 
 
@@ -5599,7 +5735,7 @@ STR16	gzCreditNames[]=
 {
 	L"Chris Camfield",
 	L"Shaun Lyng",
-	L"Kris Märnes",
+	L"Kris MÃ¤rnes",
 	L"Ian Currie",
 	L"Linda Currie",
 	L"Eric \"WTF\" Cheng",
@@ -5623,7 +5759,7 @@ STR16	gzCreditNameTitle[]=
 	L"Producer/Co-ontwerper",				// Ian Currie "Producer/Co-designer" 
 	L"Co-ontwerper/Kaartontwerp",				// Linda Currie "Co-designer/Map Designer" 
 	L"Artiest",							// Eric \"WTF\" Cheng "Artist" 
-	L"Beta Coördinator, Ondersteuning",			// Lynn Holowka
+	L"Beta CoÃ¶rdinator, Ondersteuning",			// Lynn Holowka
 	L"Artiest Extraordinaire",				// Norman \"NRG\" Olsen
 	L"Geluidsgoeroe",						// George Brooks
 	L"Schermontwerp/Artiest",				// Andrew Stacey
@@ -5666,9 +5802,9 @@ STR16 sRepairsDoneString[] =
 
 STR16 zGioDifConfirmText[]=
 {
-	L"Je hebt de NOVICE-modus geselecteerd. Deze instelling is geschikt voor diegenen die Jagged Alliance voor de eerste keer spelen, voor diegenen die nog niet zo bekend zijn met strategy games, of voor diegenen die kortere gevechten in de game willen hebben.", //Je keuze beïnvloedt dingen in het hele verloop van de game, dus weet wat je doet. Weet je zeker dat je in de Novice-modus wilt spelen?",
-	L"Je hebt de EXPERIENCED-modus geselecteerd. Deze instelling is geschikt voor diegenen die al bekend zijn met Jagged Alliance of dergelijke games. Je keuze beïnvloedt dingen in het hele verloop van de game, dus weet wat je doet. Weet je zeker dat je in de Experienced-modus wilt spelen ?",
-	L"Je hebt de EXPERT-modus geselecteerd. We hebben je gewaarschuwd. Geef ons niet de schuld als je in een kist terugkomt. Je keuze beïnvloedt dingen in het hele verloop van de game, dus weet wat je doet. Weet je zeker dat je in de Expert-modus wilt spelen?",
+	L"Je hebt de NOVICE-modus geselecteerd. Deze instelling is geschikt voor diegenen die Jagged Alliance voor de eerste keer spelen, voor diegenen die nog niet zo bekend zijn met strategy games, of voor diegenen die kortere gevechten in de game willen hebben.", //Je keuze beÃ¯nvloedt dingen in het hele verloop van de game, dus weet wat je doet. Weet je zeker dat je in de Novice-modus wilt spelen?",
+	L"Je hebt de EXPERIENCED-modus geselecteerd. Deze instelling is geschikt voor diegenen die al bekend zijn met Jagged Alliance of dergelijke games. Je keuze beÃ¯nvloedt dingen in het hele verloop van de game, dus weet wat je doet. Weet je zeker dat je in de Experienced-modus wilt spelen ?",
+	L"Je hebt de EXPERT-modus geselecteerd. We hebben je gewaarschuwd. Geef ons niet de schuld als je in een kist terugkomt. Je keuze beÃ¯nvloedt dingen in het hele verloop van de game, dus weet wat je doet. Weet je zeker dat je in de Expert-modus wilt spelen?",
 	L"You have chosen INSANE mode. WARNING: Don't blame us if you get shipped back in little pieces... Deidranna WILL kick your ass.  Hard.  Your choice will affect things throughout the entire course of the game, so choose wisely. Are you sure you want to play in INSANE mode?",
 };
 
@@ -5722,7 +5858,7 @@ STR16 gzLateLocalizedString[] =
 	
 	L"%s is vol!",  //(ex "The ice cream truck is full")
 
-	L"%s heeft geen eerste hulp nodig, maar échte medische hulp of iets dergelijks.",
+	L"%s heeft geen eerste hulp nodig, maar Ã©chte medische hulp of iets dergelijks.",
 
 	//20
 	//Happens when you get shot in the legs, and you fall down.
@@ -5957,87 +6093,87 @@ STR16 New113HAMMessage[] =
 };
 
 // WANNE: This are the email texts, when one of the 4 new 1.13 MERC mercs have levelled up, that Speck sends
-// INFO: Do not replace the ± characters. They indicate the <B2> (-> Newline) from the edt files
+// INFO: Do not replace the Â± characters. They indicate the <B2> (-> Newline) from the edt files
 STR16	New113MERCMercMailTexts[] =
 {
 	// Gaston: Text from Line 39 in Email.edt
-	L"Hereby be informed that due to Gastons's past performance his fees for services rendered have undergone an increase. Personally, I'm not surprised. ± ± Speck T. Kline ± ",
+	L"Hereby be informed that due to Gastons's past performance his fees for services rendered have undergone an increase. Personally, I'm not surprised. Â± Â± Speck T. Kline Â± ",
 	// Stogie: Text from Line 43 in Email.edt
-	L"Please be advised that, as of this moment, Stogies's fees for services rendered have increased to coincide with the increase in his abilities. ± ± Speck T. Kline ± ", 
+	L"Please be advised that, as of this moment, Stogies's fees for services rendered have increased to coincide with the increase in his abilities. Â± Â± Speck T. Kline Â± ", 
 	// Tex: Text from Line 45 in Email.edt
-	L"Please be advised that Tex's experience entitles him to more equitable compensation. He's fees have therefore been increased to more accurately reflect his worth. ± ± Speck T. Kline ± ",
+	L"Please be advised that Tex's experience entitles him to more equitable compensation. He's fees have therefore been increased to more accurately reflect his worth. Â± Â± Speck T. Kline Â± ",
 	// Biggens: Text from Line 49 in Email.edt
-	L"Please take note. Due to the improved performance of Biggens his fees for services rendered have undergone an increase. ± ± Speck T. Kline ± ",
+	L"Please take note. Due to the improved performance of Biggens his fees for services rendered have undergone an increase. Â± Â± Speck T. Kline Â± ",
 };
 
 // TODO.Translate
 // WANNE: This is email text (each 2 line), when we left a message on AIM and now the merc is back
 STR16	New113AIMMercMailTexts[] =
 {
-	// Monk
+	// Monk: Text from Line 58
 	L"FW from AIM Server: Message from Victor Kolesnikov",
-	L"You want to talk to me? I have time.",
+	L"Hello. Monk here. Message received. I'm back if you want to see me. Â± Â± Waiting for your call. Â±",
 
-	// Brain
+	// Brain: Text from Line 60
 	L"FW from AIM Server: Message from Janno Allik",
-	L"I am back. Waiting for your call.",
+	L"Am now ready to consider tasks. There is a time and place for everything. Â± Â± Janno Allik Â±",
 
-	// Scream
+	// Scream: Text from Line 62
 	L"FW from AIM Server: Message from Lennart Vilde",
-	L"Sorry, I was out of office, now I am back.",
+	L"Lennart Vilde now available! Â±",
 
-	// Henning
+	// Henning: Text from Line 64
 	L"FW from AIM Server: Message from Henning von Branitz",
-	L"Back from business. You want my help?",
+	L"Have received your message, thanks. To discuss employment, contact me  at the AIM Website. Â± Â± Till then! Â± Â± Henning von Branitz Â±",
 
-	// Luc
+	// Luc: Text from Line 66
 	L"FW from AIM Server: Message from Luc Fabre",
-	L"Give me a call, if you are interested.",
+	L"Mesage received, merci! Am happy to consider your proposals. You know where to find me. Â± Â± Looking forward to hearing from you. Â±",
 
-	// Laura
+	// Laura: Text from Line 68
 	L"FW from AIM Server: Message from Dr. Laura Colin",
-	L"I am now available.",
+	L"Greetings! Good of you to leave a message  It sounds interesting. Â± Â± Visit AIM again I would be happy to hear more. Â± Â± Best regards! Â± Â± Dr. Laura Colin Â±",
 
-	// Grace
+	// Grace: Text from Line 70
 	L"FW from AIM Server: Message from Graziella Girelli",
-	L"Got your message. If you still want me, you know what to do.",
+	L"You wanted to contact me, but were not successful.Â± Â± A family gathering. I am sure you understand? I've now had enough of family and would be very happy if you would contact me again over the AIM Site. Â± Â± Ciao! Â±",
 
-	// Rudolf
+	// Rudolf: Text from Line 72
 	L"FW from AIM Server: Message from Rudolf Steiger",
-	L"Rudolf here. Call me back.",	
+	L"Do you know how many calls I get every day? Every tosser thinks he can call me.  Â± Â± But I'm back, if you have something of interest for me. Â±",
 
 	// WANNE: Generic mail, for additional merc made by modders, index >= 178
 	L"FW from AIM Server: Message about merc availability",
-	L"I got your message. Waiting for your call.±",
+	L"I got your message. Waiting for your call. Â±",
 };
 
 // WANNE: These are the missing skills from the impass.edt file
-// INFO: Do not replace the ± characters. They indicate the <B2> (-> Newline) from the edt files
+// INFO: Do not replace the Â± characters. They indicate the <B2> (-> Newline) from the edt files
 STR16 MissingIMPSkillsDescriptions[] =
 {
 	// Sniper
-	L"Sniper: De ogen van een havik, u kunnen de vleugels van een vlieg bij honderd werven ontspruiten! ± ",
+	L"Sniper: De ogen van een havik, u kunnen de vleugels van een vlieg bij honderd werven ontspruiten! Â± ",
 	// Camouflage
-	L"Camouflage: Naast u ringt synthetische zelfs blik! ± ",	
+	L"Camouflage: Naast u ringt synthetische zelfs blik! Â± ",	
 	// SANDRO - new strings for new traits added
 	// Ranger
-	L"Ranger: You are the one from Texas deserts, aren't you! ± ",	
+	L"Ranger: You are the one from Texas deserts, aren't you! Â± ",	
 	// Gunslinger
-	L"Gunslinger: With a handgun or two, you can be as lethal as the Billy Kid! ± ",
+	L"Gunslinger: With a handgun or two, you can be as lethal as the Billy Kid! Â± ",
 	// Squadleader
-	L"Squadleader: Natural leader and boss, you are the big shot no kidding! ± ",
+	L"Squadleader: Natural leader and boss, you are the big shot no kidding! Â± ",
 	// Technician
-	L"Technician: Fixing stuff, removing traps, planting bombs, that's your bussiness! ± ",
+	L"Technician: Fixing stuff, removing traps, planting bombs, that's your bussiness! Â± ",
 	// Doctor
-	L"Doctor: You can make a quick surgery with pocket-knife and chewing gum anywhere! ± ",
+	L"Doctor: You can make a quick surgery with pocket-knife and chewing gum anywhere! Â± ",
 	// Athletics
-	L"Athletics: Your speed and vitality is on top of possibilities! ± ",
+	L"Athletics: Your speed and vitality is on top of possibilities! Â± ",
 	// Bodybuilding
-	L"Bodybuilding: That big muscular figure which cannot be overlooked is you actually! ± ",
+	L"Bodybuilding: That big muscular figure which cannot be overlooked is you actually! Â± ",
 	// Demolitions
-	L"Demolitions: You can blow up a whole city just by common home stuff! ± ",
+	L"Demolitions: You can blow up a whole city just by common home stuff! Â± ",
 	// Scouting
-	L"Scouting: Nothing can escape your notice! ± ",
+	L"Scouting: Nothing can escape your notice! Â± ",
 };
 
 STR16 NewInvMessage[] = 
@@ -6112,7 +6248,7 @@ STR16 MPClientMessage[] =
 	L"'%s' (client %d - '%S') was killed by '%s' (client %d - '%S')",
 	L"Kicked client #%d - '%S'",
 	// 30
-	L"Start turn for client number: #1 - '%S' | #2 - '%S' | #3 - '%S' | #4 - '%S'",
+	L"Start a new turn for the selected client. #1: <Cancel>, #2: %S, #3: %S, #4: %S",
 	L"Starting turn for client #%d",
 	L"Requesting for realtime...",
 	L"Switched back to realtime.",
@@ -6164,12 +6300,13 @@ STR16 MPClientMessage[] =
 	L"%s's bomb was disarmed by &s",
 	L"You loose, what a shame",	// All over red rover
 	L"Spectator mode disabled",
-	L"Choose client number to kick:",
+	L"Choose client to kick from game. #1: <Cancel>, #2: %S, #3: %S, #4: %S",
 	// 75
 	L"Team #%d is wiped out.",
 	L"Client failed to start. Terminating.",
 	L"Client disconnected and shutdown.",
 	L"Client is not running.",
+	L"INFO: If the game is stuck (the opponents progress bar is not moving), notify the server to press ALT + E to give the turn back to you!",	// TODO.Translate
 };
 
 STR16 gszMPEdgesText[] =
@@ -6724,7 +6861,7 @@ STR16 szUDBGenExplosiveStatsExplanationsTooltipText[]=
 	L"\n \nThe amount of non-lethal (stun) damage caused\nby this explosive.\n \nNote that blast-type explosives deliver their damage\nonly once (when they go off), while prolonged effect\nexplosives deliver this amount of stun damage every\nturn until the effect dissipates.\n \nHigher is better.",
 	L"\n \nThis is the radius of the explosive blast caused by\nthis explosive item.\n \nTargets will suffer less damage the further they are\nfrom the center of the explosion.\n \nHigher is better.",
 	L"\n \nThis is the radius of the stun-blast caused by\nthis explosive item.\n \nTargets will suffer less damage the further they are\nfrom the center of the blast.\n \nHigher is better.",
-	L"\n \nThis is the distance that the noise from this\ntrap will travel. Soldiers within this distance\nare likely to hear the noise and be alerted.\n \nHigher is better.",
+	L"\n \nThis is the distance that the noise from this\ntrap will travel. Soldiers within this distance\nare likely to hear the noise and be alerted.\n \nLower is better.",
 	L"\n \nThis is the starting radius of the tear-gas\nreleased by this explosive item.\n \nEnemies caught within the radius will suffer\nthe listed damage and stun-damage each turn,\nunless wearing a gas mask.\n \nAlso note the end radius and duration\nof the effect (displayed below).\n \nHigher is better.",
 	L"\n \nThis is the starting radius of the mustard-gas\nreleased by this explosive item.\n \nEnemies caught within the radius will suffer\nthe listed damage and stun-damage each turn,\nunless wearing a gas mask.\n \nAlso note the end radius and duration\nof the effect (displayed below).\n \nHigher is better.",
 	L"\n \nThis is the starting radius of the light\nemitted by this explosive item.\n \nTiles close to the center of the effect will become\nvery bright, while tiles nearer the edge\nwill only be a little brighter than normal.\n \nAlso note the end radius and duration\nof the effect (displayed below).\n \nAlso remember that unlike other explosives with\ntimed effects, the light effect gets SMALLER\nover time, until it disappears.\n \nHigher is better.",

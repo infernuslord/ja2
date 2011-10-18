@@ -1,4 +1,4 @@
-// WANNE: Yes, this should be disabled, otherwise we get weird behavior when running the game with a VS 2005 build!
+ï»¿// WANNE: Yes, this should be disabled, otherwise we get weird behavior when running the game with a VS 2005 build!
 //#pragma setlocale("ENGLISH")
 
 #ifdef PRECOMPILEDHEADERS
@@ -11,6 +11,7 @@
 		#include "Scheduling.h"
 		#include "EditorMercs.h"
 		#include "Item Statistics.h"
+		#include "Encyclopedia.h"
 	#endif
 #endif
 
@@ -119,6 +120,197 @@ CHAR16	XMLTacticalMessages[1000][MAX_MESSAGE_NAMES_CHARS] =
 {
 	L"",
 };
+
+//Encyclopedia
+
+STR16 pMenuStrings[] =
+{
+	//Encyclopedia
+	L"Locations", // 0
+	L"Characters",
+	L"Items",
+	L"Quests",
+	L"Menu 5",
+	L"Menu 6", //5
+	L"Menu 7", 
+	L"Menu 8",
+	L"Menu 9",
+	L"Menu 10",
+	L"Menu 11", //10
+	L"Menu 12",
+	L"Menu 13",
+	L"Menu 14",
+	L"Menu 15",
+	L"Menu 15", // 15
+	
+	//Briefing Room
+	L"Exit",
+};
+
+STR16	pOtherButtonsText[] =
+{
+	L"Briefing", 
+	L"Accept",
+};
+
+STR16	pOtherButtonsHelpText[] =
+{
+	L"Briefing",
+	L"Accept missions",
+};
+
+
+STR16	pLocationPageText[] =
+{
+	L"Prev page",
+	L"Photo", 
+	L"Next page",
+};
+
+STR16	pSectorPageText[] =
+{
+	L"<<",
+	L"Main page",
+	L">>",
+	L"Type: ",
+	L"Empty data",
+	L"Missing of defined missions. Add missions to the file TableData\\BriefingRoom\\BriefingRoom.xml. First mission has to be visible. Put value Hidden = 0.",
+};
+
+STR16	pEncyclopediaTypeText[] = 
+{
+	L"Unknown",// 0 - unknown
+	L"City", //1 - city
+	L"SAM Site", //2 - SAM Site
+	L"Other Location", //3 - other location
+	L"Mine", //4 - mines 
+	L"Military Complex", //5 - military complex 
+	L"Laboratory Complex",  //6 - laboratory complex 
+	L"Factory Complex", //7 - factory complex 
+	L"Hospital", //8 - hospital 
+	L"Prison", //9 - prison
+    L"Airport", //10 - airport 
+};
+
+STR16	pEncyclopediaHelpCharacterText[] = 
+{
+	L"Show All",
+	L"Show AIM",
+	L"Show MERC",
+	L"Show RPC",
+	L"Show NPC",
+	L"Show Vehicle",
+	L"Show IMP",
+	L"Show EPC",
+	L"Filter",
+};
+
+STR16	pEncyclopediaShortCharacterText[] = 
+{
+	L"All",
+	L"AIM",
+	L"MERC",
+	L"RPC",
+	L"NPC",
+	L"Veh.",
+	L"IMP",
+	L"EPC",
+	L"Filter",
+};
+
+STR16	pEncyclopediaHelpText[] = 
+{
+	L"Show All",
+	L"Show City",
+	L"Show SAM Site",
+	L"Show Other Location",
+	L"Show Mine",
+	L"Show Military Complex",
+	L"Show Laboratory Complex",
+	L"Show Factory Complex",
+	L"Show Hospital",
+	L"Show Prison",
+	L"Show Airport",
+};
+
+STR16	pEncyclopediaSkrotyText[] = 
+{
+	L"All",
+	L"City",
+	L"SAM",
+	L"Other",
+	L"Mine",
+	L"Mil.",
+	L"Lab.",
+	L"Fact.",
+	L"Hosp.",
+	L"Prison",
+	L"Air.",
+};
+
+STR16	pEncyclopediaShortInventoryText[] = 
+{
+	L"All", //0
+	L"Gun",
+	L"Ammo",
+	L"LBE",
+	L"Misc",
+	
+	L"Show All", //5
+	L"Show Gun",
+	L"Show Ammo",
+	L"Show LBE Gear",
+	L"Show Misc",
+};
+
+STR16			BoxFilter[] =
+{
+	// Guns
+	L"Heavy",
+	L"Pistol",
+	L"M. Pist.",
+	L"SMG",
+	L"Rifle",
+	L"S. Rifle",
+	L"A. Rifle",
+	L"MG",
+	L"Shotg.",
+
+	// Ammo
+	L"Pistol",
+	L"M. Pist.", //10
+	L"SMG",
+	L"Rifle",
+	L"S. Rifle",
+	L"A. Rifle",
+	L"MG",
+	L"Shotg.",
+
+	// Used
+	L"Gun",
+	L"Armor",
+	L"LBE Gear",
+	L"Misc", //20
+
+	// Armour
+	L"Helmet",
+	L"Vest",
+	L"Legging",
+	L"Plate",
+
+	// Misc
+	L"Blade",
+	L"Th. Kn.",
+	L"Melee",
+	L"Grena.",
+	L"Bomb",
+	L"Med.", //30
+	L"Kit",
+	L"Face",
+	L"LBE",
+	L"Misc", //34
+};
+//-----------
 
 // Editor
 //Editor Taskbar Creation.cpp
@@ -2351,78 +2543,6 @@ STR16		gzWeaponStatsFasthelpTactical[ 32 ] =
     L"",
 };
 
-STR16			gzAmmoStatsFasthelp[ 20 ] =
-{
-	L"Armor Penetration (Lower is better)",
-	L"Bullet Tumble (Higher is better)",
-	L"Pre-impact Explosion (Higher is better)",
-	L"Tracer Effect",
-	L"Anti-Tank",
-	L"Lockbuster",
-	L"Ignores Armor",
-	L"Acidic",
-	L"Range Modifier",
-	L"Damage Modifier",
-	L"To-Hit Modifier",
-	L"Autofire Penalty Modifier (Higher is better)",
-	L"Burst Penalty Modifier (Higher is better)",
-	L"Reliability Modifier",
-	L"Loudness Modifier (Lower is better)",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-};
-
-STR16		gzArmorStatsFasthelp[ 20 ] =
-{
-	L"Protection",
-	L"Coverage (Higher is better)",
-	L"Degrade Rate (Lower is better)",
-	L"AP Modifier",
-	L"To-Hit Modifier",
-	L"Woodland Camo",
-	L"Urban Camo",
-	L"Desert Camo",
-	L"Snow Camo",
-	L"Stealth Modifier",
-	L"Vision Range Modifier",
-	L"Day Vision Range Modifier",
-	L"Night Vision Range Modifier",
-	L"Bright Light Vision Range Modifier",
-	L"Cave Vision Range Modifier",
-	L"Tunnel Vision Percentage",
-	L"Hearing Range Modifier",
-	L"",
-	L"",
-	L"",
-};
-
-STR16		gzExplosiveStatsFasthelp[ 20 ] =
-{
-	L"Damage",
-	L"Stun Damage",
-	L"Blast Loudness (Lower is better)",
-	L"Volatility!!! (Lower is better)",
-	L"Blast Radius",
-	L"Effect Start Radius",
-	L"Effect Final Radius ",
-	L"Effect Duration",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-};
-
 STR16		gzMiscItemStatsFasthelp[ 34 ] =
 {
 	L"Item Size Modifier (Lower is better)", // 0
@@ -3054,9 +3174,15 @@ STR16 pMapScreenBorderButtonHelpText[] =
 	L"Show |Airspace",
 	L"Show |Items",
 	L"Show Militia & Enemies (|Z)",
-	L"Show Mobile Militia Restrictions", // HEADROCK HAM 4: Mobile Restrictions Button
+	L"Show Mobile Militia |Restrictions", // HEADROCK HAM 4: Mobile Restrictions Button
 };
 
+STR16 pMapScreenInvenButtonHelpText[] =
+{
+	L"Next (|.)",		// next page
+	L"Previous (|,)",		// previous page
+	L"Exit Sector Inventory (|E|s|c)",	// exit sector inventory
+};
 
 STR16 pMapScreenBottomFastHelp[] =
 {
@@ -3709,6 +3835,8 @@ STR16 pBookMarkStrings[] =
 	L"Florist",
 	L"Insurance",
 	L"Cancel",
+	L"Encyclopedia",
+	L"Briefing Room",
 };
 
 STR16 pBookmarkTitle[] =
@@ -3818,8 +3946,10 @@ STR16 pWebPagesTitles[] =
 	L"",
 	L"URL not found.",
 	L"Bobby Ray's - Recent Shipments",
-	L"",
-	L"",
+	L"Encyclopedia",
+	L"Encyclopedia - Data",
+	L"Briefing Room",
+	L"Briefing Room - Data",
 };
 
 STR16 pShowBookmarkString[] =
@@ -4224,7 +4354,6 @@ STR16			BobbyROrderFormText[] =
 STR16			BobbyRFilter[] =
 {
 	// Guns
-	L"Heavy W.",
 	L"Pistol",
 	L"M. Pistol",
 	L"SMG",
@@ -4233,6 +4362,7 @@ STR16			BobbyRFilter[] =
 	L"AS Rifle",
 	L"MG",
 	L"Shotgun",
+	L"Heavy W.",
 
 	// Ammo
 	L"Pistol",
@@ -4259,7 +4389,7 @@ STR16			BobbyRFilter[] =
 	// Misc
 	L"Blades",
 	L"Th. Knives",
-	L"Punch. W.",
+	L"Blunt W.",
 	L"Grenades",
 	L"Bombs",
 	L"Med. Kits",
@@ -4915,7 +5045,7 @@ STR16		zOptionsToggleText[] =
 	L"Rain Noises",
 	L"Allow Crows",
 	L"Show Soldier Tooltips",
-	L"Auto Save",
+	L"Tactical End-Turn Save",
 	L"Silent Skyrider",
 	//L"Low CPU usage",
 	L"Enhanced Description Box",
@@ -4926,6 +5056,7 @@ STR16		zOptionsToggleText[] =
 	L"Use new Chance to Hit System",		// use NCTH
 	L"Show Face Gear Graphics",				
 	L"Show Face Gear Icons",
+	L"Disable Cursor Swap",		            // Disable Cursor Swap
 	L"--Cheat Mode Options--",				// TOPTION_CHEAT_MODE_OPTIONS_HEADER,
 	L"Force Bobby Ray shipments",			// force all pending Bobby Ray shipments
 	L"-----------------",					// TOPTION_CHEAT_MODE_OPTIONS_END
@@ -5019,7 +5150,7 @@ STR16	zOptionsScreenHelpText[] =
 	L"When ON, you will hear rain noises when it is raining.",
 	L"When ON, the crows are present in game.",
 	L"When ON, a tooltip window is shown when pressing |A|l|t and hovering cursor over an enemy.",
-	L"When ON, game will be saved in 2 alternate save slots after each players turn.\nTo load, press |C|t|r|l+|L (to open the Load Game screen) and then |A|l|t+|A or |A|l|t+|B.",
+	L"When ON, game will be saved in 2 alternate save slots after each players turn.",
 	L"When ON, Skyrider will not talk anymore.",
 	//L"When ON, game will run with much lower CPU usage.",
 	L"When ON, enhanced descriptions will be shown for items and weapons.",
@@ -5030,6 +5161,7 @@ STR16	zOptionsScreenHelpText[] =
 	L"When ON, the new chance to hit system and cursor is used.",
 	L"When ON, you will see the equipped face gear on the merc portraits.",
 	L"When ON, you will see icons for the equipped face gear on the merc portraits in the lower right corner.",
+	L"When ON, the cursor will not toggle between exchange position and other actions. Press |x to initiate quick exchange.",
 	L"(text not rendered)TOPTION_CHEAT_MODE_OPTIONS_HEADER",
 	L"Force all pending Bobby Ray shipments",
 	L"(text not rendered)TOPTION_CHEAT_MODE_OPTIONS_END",
@@ -5139,7 +5271,7 @@ STR16	gzMPJScreenText[] =
 	L"Game Type",
 	L"Ping",
 	L"You must enter a player name.",
-	L"You must enter a valid server IP address.\n (eg 84.114.195.239).",
+	L"You must enter a valid server IP address. For example: 84.114.195.239",
 	L"You must enter a valid Server Port between 1 and 65535.",	
 };
 
@@ -5424,20 +5556,20 @@ STR16 pMessageStrings[] =
 	L"Client",
 	L"You cannot use the Old Inventory and the New Attachment System at the same time.",	// 90
 	
-	// TODO.Translate
-	L"AutoSave #", //91		// Text des Auto Saves im Load Screen mit ID
-	L"This slot is reserved for Auto Saves.", //92	// The text, when the user clicks on the save screen on an auto save
+	L"Auto Save #", //91		// Text des Auto Saves im Load Screen mit ID
+	L"This Slot is reserved for Auto Saves, which can be enabled/disabled (AUTO_SAVE_EVERY_N_HOURS) in the ja2_options.ini.", //92	// The text, when the user clicks on the save screen on an auto save
 	L"Empty Auto Save Slot #", //93	// The text, when the auto save slot (1 - 5) is empty (not saved yet)
 	L"AutoSaveGame",		// 94	// The filename of the auto save, such as AutoSaveGame01 - AutoSaveGame05
-	L"End Turn Auto Save",	// 95	// The text for the tactical end turn auto save
-	L"Saving AutoSave #",	// 96	// The message box, when doing auto save
-	L"Empty Auto Save End Turn Slot #",	// 97	// The message box, when doing auto save
-	L"This slot is reserved for end turn Auto Saves .", //98	// The text, when the user clicks on the save screen on an auto save
-	L"End Turn AutoSave #", //99
-	L"Quick Slot#%d",
-	L"Strategic Map AutoSave Slot#%d",
-	L"End Turn Auto Save#%d",
-	L"Save Slot#%d", //103
+	L"End-Turn Save #",	// 95	// The text for the tactical end turn auto save
+	L"Saving Auto Save #",	// 96	// The message box, when doing auto save
+	L"Saving",	// 97	// The message box, when doing end turn auto save
+	L"Empty End-Turn Save Slot #",	// 98	// The message box, when doing auto save
+	L"This Slot is reserved for Tactical End-Turn Saves, which can be enabled/disabled in the Option Screen.", //99	// The text, when the user clicks on the save screen on an auto save
+	// Mouse tooltips
+	L"QuickSave.sav",	// 100
+	L"AutoSaveGame%02d.sav",	// 101
+	L"Auto%02d.sav",	// 102
+	L"SaveGame%02d.sav", //103
 };
 
 
@@ -5503,6 +5635,10 @@ STR16 gzLaptopHelpText[] =
 	L"McGillicutty's Mortuary",
 	L"United Floral Service",
 	L"Insurance Brokers for A.I.M. contracts",
+	//New Bookmarks
+	L"",
+	L"Encyclopedia",
+	L"Briefing Room",
 };
 
 
@@ -5590,7 +5726,7 @@ STR16	gzCreditNames[]=
 {
 	L"Chris Camfield",
 	L"Shaun Lyng",
-	L"Kris Märnes",
+	L"Kris MÃ¤rnes",
 	L"Ian Currie",
 	L"Linda Currie",
 	L"Eric \"WTF\" Cheng",
@@ -5952,17 +6088,17 @@ STR16 New113HAMMessage[] =
 };
 
 // WANNE: This are the email texts, when one of the 4 new 1.13 MERC mercs have levelled up, that Speck sends
-// INFO: Do not replace the ± characters. They indicate the <B2> (-> Newline) from the edt files
+// INFO: Do not replace the Â± characters. They indicate the <B2> (-> Newline) from the edt files
 STR16	New113MERCMercMailTexts[] =
 {
 	// Gaston: Text from Line 39 in Email.edt
-	L"Hereby be informed that due to Gastons's past performance his fees for services rendered have undergone an increase. Personally, I'm not surprised. ± ± Speck T. Kline ± ",
+	L"Hereby be informed that due to Gastons's past performance his fees for services rendered have undergone an increase. Personally, I'm not surprised. Â± Â± Speck T. Kline Â± ",
 	// Stogie: Text from Line 43 in Email.edt
-	L"Please be advised that, as of this moment, Stogies's fees for services rendered have increased to coincide with the increase in his abilities. ± ± Speck T. Kline ± ", 
+	L"Please be advised that, as of this moment, Stogies's fees for services rendered have increased to coincide with the increase in his abilities. Â± Â± Speck T. Kline Â± ", 
 	// Tex: Text from Line 45 in Email.edt
-	L"Please be advised that Tex's experience entitles him to more equitable compensation. He's fees have therefore been increased to more accurately reflect his worth. ± ± Speck T. Kline ± ",
+	L"Please be advised that Tex's experience entitles him to more equitable compensation. He's fees have therefore been increased to more accurately reflect his worth. Â± Â± Speck T. Kline Â± ",
 	// Biggens: Text from Line 49 in Email.edt
-	L"Please take note. Due to the improved performance of Biggens his fees for services rendered have undergone an increase. ± ± Speck T. Kline ± ",
+	L"Please take note. Due to the improved performance of Biggens his fees for services rendered have undergone an increase. Â± Â± Speck T. Kline Â± ",
 };
 
 // WANNE: This is email text (each 2 line), when we left a message on AIM and now the merc is back
@@ -5970,69 +6106,69 @@ STR16	New113AIMMercMailTexts[] =
 {
 	// Monk: Text from Line 58
 	L"FW from AIM Server: Message from Victor Kolesnikov",
-	L"Hello. Monk here. Message received. I'm back if you want to see me. ± ± Waiting for your call. ±",
+	L"Hello. Monk here. Message received. I'm back if you want to see me. Â± Â± Waiting for your call. Â±",
 
 	// Brain: Text from Line 60
 	L"FW from AIM Server: Message from Janno Allik",
-	L"Am now ready to consider tasks. There is a time and place for everything. ± ± Janno Allik ±",
+	L"Am now ready to consider tasks. There is a time and place for everything. Â± Â± Janno Allik Â±",
 
 	// Scream: Text from Line 62
 	L"FW from AIM Server: Message from Lennart Vilde",
-	L"Lennart Vilde now available! ±",
+	L"Lennart Vilde now available! Â±",
 
 	// Henning: Text from Line 64
 	L"FW from AIM Server: Message from Henning von Branitz",
-	L"Have received your message, thanks. To discuss employment, contact me  at the AIM Website. ± ± Till then! ± ± Henning von Branitz ±",
+	L"Have received your message, thanks. To discuss employment, contact me  at the AIM Website. Â± Â± Till then! Â± Â± Henning von Branitz Â±",
 
 	// Luc: Text from Line 66
 	L"FW from AIM Server: Message from Luc Fabre",
-	L"Mesage received, merci! Am happy to consider your proposals. You know where to find me. ± ± Looking forward to hearing from you ±",
+	L"Mesage received, merci! Am happy to consider your proposals. You know where to find me. Â± Â± Looking forward to hearing from you. Â±",
 
 	// Laura: Text from Line 68
 	L"FW from AIM Server: Message from Dr. Laura Colin",
-	L"Greetings! Good of you to leave a message  It sounds interesting. ± ± Visit AIM again I would be happy to hear more. ± ± Best regards! ± ± Dr. Laura Colin ±",
+	L"Greetings! Good of you to leave a message  It sounds interesting. Â± Â± Visit AIM again I would be happy to hear more. Â± Â± Best regards! Â± Â± Dr. Laura Colin Â±",
 
 	// Grace: Text from Line 70
 	L"FW from AIM Server: Message from Graziella Girelli",
-	L"You wanted to contact me, but were not successful.± ± A family gathering. I am sure you understand? I've now had enough of family and would be very happy if you would contact me again over the AIM Site. ± ± Ciao! ±",
+	L"You wanted to contact me, but were not successful.Â± Â± A family gathering. I am sure you understand? I've now had enough of family and would be very happy if you would contact me again over the AIM Site. Â± Â± Ciao! Â±",
 
 	// Rudolf: Text from Line 72
 	L"FW from AIM Server: Message from Rudolf Steiger",
-	L"Do you know how many calls I get every day? Every tosser thinks he can call me.  ± ± But I'm back, if you have something of interest for me.±",
+	L"Do you know how many calls I get every day? Every tosser thinks he can call me.  Â± Â± But I'm back, if you have something of interest for me. Â±",
 
 	// WANNE: Generic mail, for additional merc made by modders, index >= 178
 	L"FW from AIM Server: Message about merc availability",
-	L"I got your message. Waiting for your call.±",
+	L"I got your message. Waiting for your call. Â±",
 };
 
 // WANNE: These are the missing skills from the impass.edt file
-// INFO: Do not replace the ± characters. They indicate the <B2> (-> Newline) from the edt files
+// INFO: Do not replace the Â± characters. They indicate the <B2> (-> Newline) from the edt files
 STR16 MissingIMPSkillsDescriptions[] =
 {
 	// Sniper
-	L"Sniper: Eyes of a hawk, you can shoot the wings from a fly at a hundred yards! ± ",
+	L"Sniper: Eyes of a hawk, you can shoot the wings from a fly at a hundred yards! Â± ",
 	// Camouflage
-	L"Camouflage: Beside you, even bushes look synthetic! ± ",
+	L"Camouflage: Beside you, even bushes look synthetic! Â± ",
 	// SANDRO - new strings for new traits added
 	// MINTY - Altered the texts for more natural English, and added a little flavour too
 	// Ranger
-	L"Ranger: Those amateurs from Texas have nothing on you! ± ",	
+	L"Ranger: Those amateurs from Texas have nothing on you! Â± ",	
 	// Gunslinger
-	L"Gunslinger: With one handgun or two, you can be as lethal as Billy the Kid! ± ", 
+	L"Gunslinger: With one handgun or two, you can be as lethal as Billy the Kid! Â± ", 
 	// Squadleader
-	L"Squadleader: A natural leader, your squadmates look to you for inspiration! ± ",
+	L"Squadleader: A natural leader, your squadmates look to you for inspiration! Â± ",
 	// Technician
-	L"Technician: MacGyver's got nothing on you! Mechanical, electronic or explosive, you can fix it! ± ",
+	L"Technician: MacGyver's got nothing on you! Mechanical, electronic or explosive, you can fix it! Â± ",
 	// Doctor
-	L"Doctor: From grazes to gutshot, to amputations, you can heal them all! ± ",
+	L"Doctor: From grazes to gutshot, to amputations, you can heal them all! Â± ",
 	// Athletics
-	L"Athletics: Your speed and vitality are worthy of an Olympian! ± ",
+	L"Athletics: Your speed and vitality are worthy of an Olympian! Â± ",
 	// Bodybuilding
-	L"Bodybuilding: Arnie? What a wimp! You could beat him with one arm behind your back! ± ",
+	L"Bodybuilding: Arnie? What a wimp! You could beat him with one arm behind your back! Â± ",
 	// Demolitions
-	L"Demolitions: Sowing grenades like seeds, planting bombs, watching the limbs flying.. This is what you live for! ± ",
+	L"Demolitions: Sowing grenades like seeds, planting bombs, watching the limbs flying.. This is what you live for! Â± ",
 	// Scouting
-	L"Scouting: Nothing can escape your notice! ± ",	
+	L"Scouting: Nothing can escape your notice! Â± ",	
 };
 
 STR16 NewInvMessage[] = 
@@ -6107,7 +6243,7 @@ STR16 MPClientMessage[] =
 	L"'%s' (client %d - '%S') was killed by '%s' (client %d - '%S').",
 	L"Kicked client #%d - '%S'.",
 	// 30
-	L"Start turn for client number: #1 - '%S' | #2 - '%S' | #3 - '%S' | #4 - '%S'",
+	L"Start a new turn for the selected client. #1: <Cancel>, #2: %S, #3: %S, #4: %S",
 	L"Starting turn for client #%d.",
 	L"Requesting for realtime...",
 	L"Switched back to realtime.",
@@ -6159,12 +6295,13 @@ STR16 MPClientMessage[] =
 	L"%s's bomb was disarmed by &s",
 	L"You loose, what a shame",	// All over red rover
 	L"Spectator mode disabled",
-	L"Choose client number to kick:",
+	L"Choose client to kick from game. #1: <Cancel>, #2: %S, #3: %S, #4: %S",
 	// 75
 	L"Team #%d is wiped out.",
 	L"Client failed to start. Terminating.",
 	L"Client disconnected and shutdown.",
 	L"Client is not running.",
+	L"INFO: If the game is stuck (the opponents progress bar is not moving), notify the server to press ALT + E to give the turn back to you!",	
 };
 
 STR16 gszMPEdgesText[] =
@@ -6716,7 +6853,7 @@ STR16 szUDBGenExplosiveStatsExplanationsTooltipText[]=
 	L"\n \nThe amount of non-lethal (stun) damage caused\nby this explosive.\n \nNote that blast-type explosives deliver their damage\nonly once (when they go off), while prolonged effect\nexplosives deliver this amount of stun damage every\nturn until the effect dissipates.\n \nHigher is better.",
 	L"\n \nThis is the radius of the explosive blast caused by\nthis explosive item.\n \nTargets will suffer less damage the further they are\nfrom the center of the explosion.\n \nHigher is better.",
 	L"\n \nThis is the radius of the stun-blast caused by\nthis explosive item.\n \nTargets will suffer less damage the further they are\nfrom the center of the blast.\n \nHigher is better.",
-	L"\n \nThis is the distance that the noise from this\ntrap will travel. Soldiers within this distance\nare likely to hear the noise and be alerted.\n \nHigher is better.",
+	L"\n \nThis is the distance that the noise from this\ntrap will travel. Soldiers within this distance\nare likely to hear the noise and be alerted.\n \nLower is better.",
 	L"\n \nThis is the starting radius of the tear-gas\nreleased by this explosive item.\n \nEnemies caught within the radius will suffer\nthe listed damage and stun-damage each turn,\nunless wearing a gas mask.\n \nAlso note the end radius and duration\nof the effect (displayed below).\n \nHigher is better.",
 	L"\n \nThis is the starting radius of the mustard-gas\nreleased by this explosive item.\n \nEnemies caught within the radius will suffer\nthe listed damage and stun-damage each turn,\nunless wearing a gas mask.\n \nAlso note the end radius and duration\nof the effect (displayed below).\n \nHigher is better.",
 	L"\n \nThis is the starting radius of the light\nemitted by this explosive item.\n \nTiles close to the center of the effect will become\nvery bright, while tiles nearer the edge\nwill only be a little brighter than normal.\n \nAlso note the end radius and duration\nof the effect (displayed below).\n \nAlso remember that unlike other explosives with\ntimed effects, the light effect gets SMALLER\nover time, until it disappears.\n \nHigher is better.",

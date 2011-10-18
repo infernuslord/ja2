@@ -262,8 +262,11 @@ INT16 giCurrentIMPSlot = PLAYER_GENERATED_CHARACTER_ID;
 EMAIL_MERC_AVAILABLE_VALUES EmailMercAvailableText[NUM_PROFILES];
 EMAIL_MERC_LEVEL_UP_VALUES EmailMercLevelUpText[NUM_PROFILES];
 EMAIL_OTHER_VALUES EmailOtherText[EMAIL_INDEX];
-BOOLEAN ReadXMLEmail = TRUE;
-
+EMAIL_MERC_INSURANCE_VALUES EmailInsuranceText[NUM_PROFILES];
+BOOLEAN ReadXMLEmail = TRUE; // TRUE - read email from XML, FALSE - read email from EDT
+EMAIL_TYPE gEmailT[EMAIL_VAL];
+BOOLEAN SaveNewEmailDataToSaveGameFile( HWFILE hFile );
+BOOLEAN LoadNewEmailDataFromLoadGameFile( HWFILE hFile );
 
 // the enumeration of headers
 enum{
@@ -353,7 +356,6 @@ BOOLEAN ReplaceBiffNameWithProperMercName( CHAR16 *pFinishedString, EmailPtr pMa
 extern INT16 gusCurShipmentDestinationID;
 extern CPostalService gPostalService;
 
-EMAIL_TYPE gEmailT[EMAIL_VAL];
 
 void InitializeMouseRegions()
 {
@@ -761,6 +763,45 @@ void AddEmailWithSpecialData(INT32 iMessageOffset, INT32 iMessageLength, UINT8 u
 }
 
 //--- XML Read Mail ---
+
+void AddEmailWithSpecialDataXML(INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, INT32 iFirstData, UINT32 uiSecondData, UINT8 EmailType, UINT32 EmailAIM )
+{
+	CHAR16 pSubject[320];
+	//MessagePtr pMessageList;
+	//MessagePtr pMessage;
+	//CHAR16 pMessageString[320];
+	Email	FakeEmail;
+	UINT8 subjectLine = 0;
+	
+	if ( EmailType == TYPE_EMAIL_INSURANCE_COMPANY )
+	{
+		wcscpy( pSubject, EmailInsuranceText[iMessageLength].szSubject );
+	}
+	
+	// starts at iSubjectOffset amd goes iSubjectLength, reading in string
+	//LoadEncryptedDataFromFile("BINARYDATA\\Email.edt", pSubject, 640*(iMessageOffset), 640);
+
+	//Make a fake email that will contain the codes ( ie the merc ID )
+	FakeEmail.iFirstData = iFirstData;
+	FakeEmail.uiSecondData = uiSecondData;
+
+	//Replace the $mercname$ with the actual mercname
+	ReplaceMercNameAndAmountWithProperData( pSubject, &FakeEmail );
+
+	// add message to list
+	AddEmailMessage(iMessageOffset,iMessageLength, pSubject, iDate, ubSender, FALSE, iFirstData, uiSecondData, -1 , -1, EmailType, EmailAIM);
+
+	// if we are in fact int he laptop, redraw icons, might be change in mail status
+
+	if( fCurrentlyInLaptop == TRUE )
+	{
+	// redraw icons, might be new mail
+	DrawLapTopIcons();
+	}
+
+	return;
+}
+
 void AddPreReadEmailTypeXML( INT32 iMessageOffset, INT32 iMessageLength, UINT8 ubSender, INT32 iDate, UINT8 EmailType )
 {
 	CHAR16 pSubject[320];
@@ -1058,12 +1099,13 @@ void AddEmailMessage(INT32 iMessageOffset, INT32 iMessageLength,STR16 pSubject, 
 	// WANNE.MAIL: Fix
 	pTempEmail->iCurrentShipmentDestinationID = iCurrentShipmentDestinationID;
 
+
 	// set date and sender, Id
 	if(pEmail)
 	pTempEmail->iId=iId+1;
 	else
 		pTempEmail->iId=0;
-		
+	gEmailT[ (UINT32)pTempEmail->iId ].EmailVersion = EmailType;		
 	gEmailT[ (UINT32)pTempEmail->iId ].EmailType = EmailAIM;
 
 	// copy date and sender id's
@@ -3672,7 +3714,7 @@ BOOLEAN HandleMailSpecialMessages( UINT16 usMessageId, INT32 *iResults, EmailPtr
 
 	return fSpecialCase;
 }
-
+#ifdef JA2UB
 
 #define IMP_RESULTS_INTRO_LENGTH 9
 
@@ -3799,6 +3841,132 @@ BOOLEAN HandleMailSpecialMessages( UINT16 usMessageId, INT32 *iResults, EmailPtr
 #define IMP_RESULTS_END IMP_PORTRAIT_FEMALE_6 + 1
 #define IMP_RESULTS_END_LENGTH 3
 
+#else
+
+#define IMP_RESULTS_INTRO_LENGTH 9
+
+#define IMP_RESULTS_PERSONALITY_INTRO IMP_RESULTS_INTRO_LENGTH
+#define IMP_RESULTS_PERSONALITY_INTRO_LENGTH 5
+#define IMP_PERSONALITY_NORMAL IMP_RESULTS_PERSONALITY_INTRO + IMP_RESULTS_PERSONALITY_INTRO_LENGTH
+#define IMP_PERSONALITY_LENGTH 4
+#define IMP_PERSONALITY_HEAT IMP_PERSONALITY_NORMAL + IMP_PERSONALITY_LENGTH
+#define IMP_PERSONALITY_NERVOUS IMP_PERSONALITY_HEAT + IMP_PERSONALITY_LENGTH
+#define IMP_PERSONALITY_CLAUSTROPHOBIC IMP_PERSONALITY_NERVOUS + IMP_PERSONALITY_LENGTH
+#define IMP_PERSONALITY_NONSWIMMER IMP_PERSONALITY_CLAUSTROPHOBIC + IMP_PERSONALITY_LENGTH
+#define IMP_PERSONALITY_FEAR_OF_INSECTS IMP_PERSONALITY_NONSWIMMER + IMP_PERSONALITY_LENGTH
+#define IMP_PERSONALITY_FORGETFUL IMP_PERSONALITY_FEAR_OF_INSECTS + IMP_PERSONALITY_LENGTH + 1
+#define IMP_PERSONALITY_PSYCHO IMP_PERSONALITY_FORGETFUL + IMP_PERSONALITY_LENGTH
+#define IMP_RESULTS_ATTITUDE_INTRO IMP_PERSONALITY_PSYCHO + IMP_PERSONALITY_LENGTH + 1 
+#define IMP_RESULTS_ATTITUDE_LENGTH 5
+#define IMP_ATTITUDE_LENGTH 5
+#define IMP_ATTITUDE_NORMAL IMP_RESULTS_ATTITUDE_INTRO + IMP_RESULTS_ATTITUDE_LENGTH
+#define IMP_ATTITUDE_FRIENDLY IMP_ATTITUDE_NORMAL + IMP_ATTITUDE_LENGTH
+#define IMP_ATTITUDE_LONER IMP_ATTITUDE_FRIENDLY + IMP_ATTITUDE_LENGTH + 1
+#define IMP_ATTITUDE_OPTIMIST IMP_ATTITUDE_LONER + IMP_ATTITUDE_LENGTH + 1
+#define IMP_ATTITUDE_PESSIMIST IMP_ATTITUDE_OPTIMIST + IMP_ATTITUDE_LENGTH + 1
+#define IMP_ATTITUDE_AGGRESSIVE IMP_ATTITUDE_PESSIMIST + IMP_ATTITUDE_LENGTH + 1
+#define IMP_ATTITUDE_ARROGANT IMP_ATTITUDE_AGGRESSIVE + IMP_ATTITUDE_LENGTH + 1
+#define IMP_ATTITUDE_ASSHOLE IMP_ATTITUDE_ARROGANT + IMP_ATTITUDE_LENGTH + 1
+#define IMP_ATTITUDE_COWARD IMP_ATTITUDE_ASSHOLE + IMP_ATTITUDE_LENGTH
+#define IMP_RESULTS_SKILLS IMP_ATTITUDE_COWARD + IMP_ATTITUDE_LENGTH + 1
+#define IMP_RESULTS_SKILLS_LENGTH 7 
+#define IMP_SKILLS_IMPERIAL_SKILLS IMP_RESULTS_SKILLS + IMP_RESULTS_SKILLS_LENGTH + 1 
+#define IMP_SKILLS_IMPERIAL_MARK IMP_SKILLS_IMPERIAL_SKILLS + 1
+#define IMP_SKILLS_IMPERIAL_MECH IMP_SKILLS_IMPERIAL_SKILLS + 2
+#define IMP_SKILLS_IMPERIAL_EXPL IMP_SKILLS_IMPERIAL_SKILLS + 3
+#define IMP_SKILLS_IMPERIAL_MED  IMP_SKILLS_IMPERIAL_SKILLS + 4
+
+#define IMP_SKILLS_NEED_TRAIN_SKILLS IMP_SKILLS_IMPERIAL_MED + 1
+#define IMP_SKILLS_NEED_TRAIN_MARK IMP_SKILLS_NEED_TRAIN_SKILLS + 1
+#define IMP_SKILLS_NEED_TRAIN_MECH IMP_SKILLS_NEED_TRAIN_SKILLS + 2
+#define IMP_SKILLS_NEED_TRAIN_EXPL IMP_SKILLS_NEED_TRAIN_SKILLS + 3
+#define IMP_SKILLS_NEED_TRAIN_MED IMP_SKILLS_NEED_TRAIN_SKILLS + 4
+
+#define IMP_SKILLS_NO_SKILL IMP_SKILLS_NEED_TRAIN_MED + 1
+#define IMP_SKILLS_NO_SKILL_MARK  IMP_SKILLS_NO_SKILL + 1
+#define IMP_SKILLS_NO_SKILL_MECH  IMP_SKILLS_NO_SKILL + 2
+#define IMP_SKILLS_NO_SKILL_EXPL  IMP_SKILLS_NO_SKILL + 3
+#define IMP_SKILLS_NO_SKILL_MED   IMP_SKILLS_NO_SKILL + 4
+
+#define IMP_SKILLS_SPECIAL_INTRO IMP_SKILLS_NO_SKILL_MED + 1
+#define IMP_SKILLS_SPECIAL_INTRO_LENGTH 2
+#define IMP_SKILLS_SPECIAL_LOCK IMP_SKILLS_SPECIAL_INTRO + IMP_SKILLS_SPECIAL_INTRO_LENGTH
+#define IMP_SKILLS_SPECIAL_HAND IMP_SKILLS_SPECIAL_LOCK + 1
+#define IMP_SKILLS_SPECIAL_ELEC IMP_SKILLS_SPECIAL_HAND + 1
+#define IMP_SKILLS_SPECIAL_NIGHT IMP_SKILLS_SPECIAL_ELEC + 1
+#define IMP_SKILLS_SPECIAL_THROW IMP_SKILLS_SPECIAL_NIGHT + 1
+#define IMP_SKILLS_SPECIAL_TEACH IMP_SKILLS_SPECIAL_THROW + 1
+#define IMP_SKILLS_SPECIAL_HEAVY IMP_SKILLS_SPECIAL_TEACH + 1
+#define IMP_SKILLS_SPECIAL_AUTO IMP_SKILLS_SPECIAL_HEAVY + 1
+#define IMP_SKILLS_SPECIAL_STEALTH IMP_SKILLS_SPECIAL_AUTO + 1
+#define IMP_SKILLS_SPECIAL_AMBI IMP_SKILLS_SPECIAL_STEALTH + 1
+#define IMP_SKILLS_SPECIAL_THIEF IMP_SKILLS_SPECIAL_AMBI + 1
+#define IMP_SKILLS_SPECIAL_MARTIAL IMP_SKILLS_SPECIAL_THIEF + 1
+#define IMP_SKILLS_SPECIAL_KNIFE IMP_SKILLS_SPECIAL_MARTIAL + 1
+
+#define IMP_RESULTS_PHYSICAL IMP_SKILLS_SPECIAL_KNIFE + 1
+#define IMP_RESULTS_PHYSICAL_LENGTH 7
+
+#define IMP_PHYSICAL_SUPER IMP_RESULTS_PHYSICAL + IMP_RESULTS_PHYSICAL_LENGTH
+#define IMP_PHYSICAL_SUPER_LENGTH 1
+
+#define IMP_PHYSICAL_SUPER_HEALTH IMP_PHYSICAL_SUPER + IMP_PHYSICAL_SUPER_LENGTH
+#define IMP_PHYSICAL_SUPER_AGILITY IMP_PHYSICAL_SUPER_HEALTH + 1
+#define IMP_PHYSICAL_SUPER_DEXTERITY IMP_PHYSICAL_SUPER_AGILITY + 1
+#define IMP_PHYSICAL_SUPER_STRENGTH IMP_PHYSICAL_SUPER_DEXTERITY + 1
+#define IMP_PHYSICAL_SUPER_LEADERSHIP IMP_PHYSICAL_SUPER_STRENGTH + 1
+#define IMP_PHYSICAL_SUPER_WISDOM IMP_PHYSICAL_SUPER_LEADERSHIP + 1
+ 
+#define IMP_PHYSICAL_LOW IMP_PHYSICAL_SUPER_WISDOM + 1
+#define IMP_PHYSICAL_LOW_LENGTH 1
+
+#define IMP_PHYSICAL_LOW_HEALTH IMP_PHYSICAL_LOW + IMP_PHYSICAL_LOW_LENGTH
+#define IMP_PHYSICAL_LOW_AGILITY IMP_PHYSICAL_LOW_HEALTH + 1
+#define IMP_PHYSICAL_LOW_DEXTERITY IMP_PHYSICAL_LOW_AGILITY + 2
+#define IMP_PHYSICAL_LOW_STRENGTH IMP_PHYSICAL_LOW_DEXTERITY + 1
+#define IMP_PHYSICAL_LOW_LEADERSHIP IMP_PHYSICAL_LOW_STRENGTH + 1
+#define IMP_PHYSICAL_LOW_WISDOM IMP_PHYSICAL_LOW_LEADERSHIP + 1
+
+
+#define IMP_PHYSICAL_VERY_LOW IMP_PHYSICAL_LOW_WISDOM + 1
+#define IMP_PHYSICAL_VERY_LOW_LENGTH 1
+
+#define IMP_PHYSICAL_VERY_LOW_HEALTH IMP_PHYSICAL_VERY_LOW + IMP_PHYSICAL_VERY_LOW_LENGTH
+#define IMP_PHYSICAL_VERY_LOW_AGILITY IMP_PHYSICAL_VERY_LOW_HEALTH + 1
+#define IMP_PHYSICAL_VERY_LOW_DEXTERITY IMP_PHYSICAL_VERY_LOW_AGILITY + 1
+#define IMP_PHYSICAL_VERY_LOW_STRENGTH IMP_PHYSICAL_VERY_LOW_DEXTERITY + 1
+#define IMP_PHYSICAL_VERY_LOW_LEADERSHIP IMP_PHYSICAL_VERY_LOW_STRENGTH + 1
+#define IMP_PHYSICAL_VERY_LOW_WISDOM IMP_PHYSICAL_VERY_LOW_LEADERSHIP + 1
+
+
+#define IMP_PHYSICAL_END IMP_PHYSICAL_VERY_LOW_WISDOM + 1
+#define IMP_PHYSICAL_END_LENGTH 3
+
+#define IMP_RESULTS_PORTRAIT  IMP_PHYSICAL_END + IMP_PHYSICAL_END_LENGTH
+#define IMP_RESULTS_PORTRAIT_LENGTH 6
+
+
+#define IMP_PORTRAIT_MALE_1 IMP_RESULTS_PORTRAIT + IMP_RESULTS_PORTRAIT_LENGTH
+#define IMP_PORTRAIT_MALE_2 IMP_PORTRAIT_MALE_1 + 4
+#define IMP_PORTRAIT_MALE_3 IMP_PORTRAIT_MALE_2 + 4
+#define IMP_PORTRAIT_MALE_4 IMP_PORTRAIT_MALE_3 + 4
+#define IMP_PORTRAIT_MALE_5 IMP_PORTRAIT_MALE_4 + 4
+#define IMP_PORTRAIT_MALE_6 IMP_PORTRAIT_MALE_5 + 4
+
+#define IMP_PORTRAIT_FEMALE_1 IMP_PORTRAIT_MALE_6 + 4
+#define IMP_PORTRAIT_FEMALE_2 IMP_PORTRAIT_FEMALE_1 + 4
+#define IMP_PORTRAIT_FEMALE_3 IMP_PORTRAIT_FEMALE_2 + 4
+#define IMP_PORTRAIT_FEMALE_4 IMP_PORTRAIT_FEMALE_3 + 4
+#define IMP_PORTRAIT_FEMALE_5 IMP_PORTRAIT_FEMALE_4 + 4
+#define IMP_PORTRAIT_FEMALE_6 IMP_PORTRAIT_FEMALE_5 + 4
+ 
+
+
+#define IMP_RESULTS_END IMP_PORTRAIT_FEMALE_6 + 1
+#define IMP_RESULTS_END_LENGTH 3
+
+
+#endif
 
 void HandleIMPCharProfileResultsMessage( void)
 {
@@ -5403,7 +5571,8 @@ void PreProcessEmail( EmailPtr pMail )
 	int iEmailAIMMessage = 0;
 	int iEmailOther = 0;
 	int iEmailBobbyRMessage = 0;
-	
+	int iEmailInsurance = 0;
+	int iNew113CustomUserMerc = 0;	
   if ( pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT )
 	{	
 		if (pMail->usLength == MERC_UP_LEVEL_GASTON || pMail->usLength == MERC_UP_LEVEL_STOGIE ||
@@ -5415,6 +5584,12 @@ void PreProcessEmail( EmailPtr pMail )
 		else if (pMail->usLength >= 170 && pMail->usLength <= 177)
 		{
 			iNew113AIMMerc = pMail->usLength;
+			pMail->usLength = 2;
+		}
+		// User made merc
+		else if (pMail->usLength >= 178 && pMail->usLength <= 254)
+		{
+			iNew113CustomUserMerc = pMail->usLength;
 			pMail->usLength = 2;
 		}
 	}
@@ -5434,6 +5609,12 @@ void PreProcessEmail( EmailPtr pMail )
 	if ( pMail->EmailVersion == TYPE_EMAIL_AIM_AVAILABLE )
 	{
 		iEmailAIMMessage = pMail->usLength;
+		pMail->usLength = 2;	
+	}	
+	
+	if ( pMail->EmailVersion == TYPE_EMAIL_INSURANCE_COMPANY )
+	{
+		iEmailInsurance = pMail->usLength;
 		pMail->usLength = 2;	
 	}	
 	/*
@@ -5513,7 +5694,7 @@ void PreProcessEmail( EmailPtr pMail )
 			// ----------------
 			// New AIM Merc
 			// ----------------
-			// WANNE: We have a new 1.13 MERC merc (Text, Gaston, Stogie or Biggens)
+			// WANNE: We have a new 1.13 AIM Wildfire merc
 			if (iNew113AIMMerc != 0)
 			{				
 				wcscpy(pString, L"\0");
@@ -5560,7 +5741,22 @@ void PreProcessEmail( EmailPtr pMail )
 					}
 				}
 			}
-			
+
+			// --------------------------
+			// New Customer User Merc
+			// --------------------------
+			// WANNE: We have a new 1.13 AIM Wildfire merc
+			if (iNew113CustomUserMerc != 0 && pMail->EmailVersion == TYPE_EMAIL_EMAIL_EDT_NAME_MERC)
+			{	
+				wcscpy(pString, L"\0");
+
+				// Only output the mail text, not the subject, cause we already have the subject as text
+				if (iCounter == 1)
+				{
+					wcscpy( pString, New113AIMMercMailTexts[17] );
+				}
+			}
+
 			if (iCounter == 1)
 			{
 				if ( pMail->EmailVersion == TYPE_EMAIL_AIM_AVAILABLE )
@@ -5572,6 +5768,11 @@ void PreProcessEmail( EmailPtr pMail )
 				{
 					wcscpy(pString, L"\0");
 					wcscpy( pString, EmailMercLevelUpText[iEmailMERCMessage].szMessage);				
+				}
+				else if ( pMail->EmailVersion == TYPE_EMAIL_INSURANCE_COMPANY )
+				{
+					wcscpy(pString, L"\0");
+					wcscpy( pString, EmailInsuranceText[iEmailMERCMessage].szMessage);		
 				}
 				/*
 				else if ( pMail->EmailVersion == TYPE_EMAIL_BOBBY_R)
@@ -5602,6 +5803,12 @@ void PreProcessEmail( EmailPtr pMail )
 		{
 			pMail->usLength = iNew113AIMMerc;
 		}
+
+		// WANNE: Set the value back
+		if (iNew113CustomUserMerc != 0)
+		{
+			pMail->usLength = iNew113CustomUserMerc;
+		}
 	}
 	
 	
@@ -5619,8 +5826,12 @@ void PreProcessEmail( EmailPtr pMail )
 	if ( pMail->EmailVersion == TYPE_EMAIL_MERC_LEVEL_UP )
 		pMail->usLength = iEmailMERCMessage;
 		
-	//if ( pMail->EmailVersion == TYPE_EMAIL_OTHER )
-	//	pMail->usLength = iEmailOther;
+//	if ( pMail->EmailVersion == TYPE_EMAIL_OTHER )
+//		pMail->usLength = iEmailOther;
+		
+	if ( pMail->EmailVersion == TYPE_EMAIL_INSURANCE_COMPANY )
+		pMail->usLength = iEmailInsurance;
+	
 		
 		giPrevMessageId = giMessageId;
 
@@ -6139,9 +6350,61 @@ void AddAllEmails()
 }
 #endif
 
+BOOLEAN SaveNewEmailDataToSaveGameFile( HWFILE hFile )
+{
+	UINT32	uiNumBytesWritten;
 
+	FileWrite( hFile, &gEmailT, sizeof( gEmailT), &uiNumBytesWritten );
+	if( uiNumBytesWritten != sizeof( gEmailT ) )
+	{
+		return( FALSE );
+	}
+	
+	return( TRUE );
+}
 
-
-
-
-
+BOOLEAN LoadNewEmailDataFromLoadGameFile( HWFILE hFile )
+{
+	UINT32	uiNumBytesRead;
+	UINT32	uiNumOfEmails=0;
+	EmailPtr	pEmail = pEmailList;
+//	UINT32	cnt;
+	
+	FileRead( hFile, &gEmailT, sizeof( gEmailT), &uiNumBytesRead );
+	if( uiNumBytesRead != sizeof( gEmailT ) )
+	{
+		return( FALSE );
+	}
+/*
+	while(pEmail)
+	{
+		pEmail=pEmail->Next;
+		uiNumOfEmails++;
+	}
+	
+	for( cnt=0; cnt<uiNumOfEmails; cnt++)
+	{
+		if ( ReadXMLEmail == FALSE )
+		{
+			if ( gEmailT[ cnt ].EmailVersion == TYPE_EMAIL_AIM_AVAILABLE || gEmailT[ cnt ].EmailVersion == TYPE_EMAIL_MERC_LEVEL_UP ) 
+			{
+				gEmailT[ cnt ].EmailVersion = TYPE_EMAIL_EMAIL_EDT_NAME_MERC;
+			}
+		}
+		else
+		{
+			if ( gEmailT[ cnt ].EmailVersion == TYPE_EMAIL_EMAIL_EDT_NAME_MERC ) 
+			{
+				gEmailT[ cnt ].EmailVersion = TYPE_EMAIL_AIM_AVAILABLE;
+			}
+		}
+	}
+*/
+	while(pEmail)
+	{
+		pEmail->EmailVersion = gEmailT[ uiNumOfEmails ].EmailVersion;
+		pEmail=pEmail->Next;
+		uiNumOfEmails++;
+	}
+	return( TRUE );
+}

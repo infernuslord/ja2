@@ -20,19 +20,18 @@ extern	CHAR16		zTrackingNumber[16];
 //
 //		Keeps track of the saved game version.	Increment the saved game version whenever 
 //	you will invalidate the saved game file
-#define			SAVE_GAME_VERSION								126	//123		//114	//113	//112	//111	//110	//109	//108	//107	//106	//105	//104	//103	//102	//101	//100 // 99
+#define			SAVE_GAME_VERSION								130 //125 //124		//114	//113	//112	//111	//110	//109	//108	//107	//106	//105	//104	//103	//102	//101	//100 // 99
 
-#define			CURRENT_SAVEGAME_DATATYPE_VERSION				126
-#ifdef JA2UB
+#define			CURRENT_SAVEGAME_DATATYPE_VERSION				130
+
+#define			IMPROVED_INTERRUPT_SYSTEM						130	
+#define			ENCYCLOPEDIA_SAVEGAME_CHANGE					129	// Added encyclopedia
+#define			HIDDENTOWN_DATATYPE_CHANGE						128
+#define			NEW_EMAIL_SAVE_GAME								127
 #define			NEW_SAVE_GAME_GENERAL_SAVE_INFO_DATA			126
 #define			QUESTS_DATATYPE_CHANGE							125	// Before this, we had a maximum number of 30 quests (JA2 default) (by Jazz)
-#define			HIDDENTOWN_DATATYPE_CHANGE						124
-#else
-#define			NEW_SAVE_GAME_GENERAL_SAVE_INFO_DATA			125
-#define			QUESTS_DATATYPE_CHANGE							124	// Before this, we had a maximum number of 30 quests (JA2 default) (by Jazz)
-#endif
-
-#define			VEHICLES_DATATYPE_CHANGE						123	// Before this, vehicles were not externalized (by Jazz)
+#define			VEHICLES_DATATYPE_CHANGE						124	// Before this, vehicles were not externalized (by Jazz)
+#define			FIXED_MERC_NOT_AVAILABLE_ON_MERC_WEBSITE		123	// Before this, only Bubba was available on MERC website
 #define			FIXED_CREPITUS_IN_REALISTIC_GAME_MODE			122	// Before this, there was an initializing problem in GameInit.lua on startup, in which we could meet crepitus in Tixa underground map
 #define			FIXED_NPC_QUOTE_BUG								121	// Before this, we need to reload all npc quote information because it was not being saved and loaded correctly.
 #define			MOVED_GENERAL_INFO								120	// Before this, general game information was saved much later in the save game process.

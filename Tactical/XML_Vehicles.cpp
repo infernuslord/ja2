@@ -232,7 +232,7 @@ char temp;
 	pData->currentDepth--;
 }
 
-BOOLEAN ReadInNewCar(STR fileName, BOOLEAN localizedVersion)
+BOOLEAN ReadInNewVehicles(STR fileName, BOOLEAN localizedVersion)
 {
 	HWFILE		hFile;
 	UINT32		uiBytesRead;
@@ -312,7 +312,7 @@ void InitNewVehicles ()
 			gNewVehicle[ iCount ].bNewVehicle = FALSE;
 			gNewVehicle[ iCount ].NewPilot = -1;	
 			gNewVehicle[ iCount ].NewCarPortraits = -1;
-			gNewVehicle[ iCount ].szIconFace[MAX_MAIN_VEHICLE_CHARS] = '\0';
+			gNewVehicle[ iCount ].szIconFace[MAX_MAIN_VEHICLE_CHARS] = '\0';			
 			gNewVehicle[ iCount ].NewVehicleStrings[128] = '\0';
 			gNewVehicle[ iCount ].NewVehicleName[128] = '\0';
 			gNewVehicle[ iCount ].NewShortVehicleStrings[128] = '\0';	

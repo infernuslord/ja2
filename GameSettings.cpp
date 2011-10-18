@@ -201,6 +201,7 @@ BOOLEAN LoadGameSettings()
 		gGameSettings.fOptions[TOPTION_MERC_CASTS_LIGHT]                = iniReader.ReadBoolean("JA2 Game Settings","TOPTION_MERC_CASTS_LIGHT"                 ,  TRUE  );
 		gGameSettings.fOptions[TOPTION_HIDE_BULLETS]                    = iniReader.ReadBoolean("JA2 Game Settings","TOPTION_HIDE_BULLETS"                     ,  FALSE );
 		gGameSettings.fOptions[TOPTION_TRACKING_MODE]                   = iniReader.ReadBoolean("JA2 Game Settings","TOPTION_TRACKING_MODE"                    ,  TRUE  );
+		gGameSettings.fOptions[TOPTION_DISABLE_CURSOR_SWAP]             = iniReader.ReadBoolean("JA2 Game Settings","TOPTION_DISABLE_CURSOR_SWAP"              ,  FALSE );
 		gGameSettings.fOptions[NUM_ALL_GAME_OPTIONS]                    = iniReader.ReadBoolean("JA2 Game Settings","NUM_ALL_GAME_OPTIONS"                     ,  FALSE );
 
 
@@ -357,6 +358,7 @@ BOOLEAN	SaveGameSettings()
 	settings << "TOPTION_USE_NCTH                         = " << (gGameSettings.fOptions[TOPTION_USE_NCTH]							?    "TRUE" : "FALSE" ) << endl;
 	settings << "TOPTION_SHOW_TACTICAL_FACE_GEAR          = " << (gGameSettings.fOptions[TOPTION_SHOW_TACTICAL_FACE_GEAR]			?    "TRUE" : "FALSE" ) << endl;
 	settings << "TOPTION_SHOW_TACTICAL_FACE_ICONS         = " << (gGameSettings.fOptions[TOPTION_SHOW_TACTICAL_FACE_ICONS]			?    "TRUE" : "FALSE" ) << endl;
+	settings << "TOPTION_DISABLE_CURSOR_SWAP              = " << (gGameSettings.fOptions[TOPTION_DISABLE_CURSOR_SWAP]               ?    "TRUE" : "FALSE" ) << endl;
 	settings << "TOPTION_CHEAT_MODE_OPTIONS_HEADER        = " << (gGameSettings.fOptions[TOPTION_CHEAT_MODE_OPTIONS_HEADER]			?    "TRUE" : "FALSE" ) << endl;
 	settings << "TOPTION_FORCE_BOBBY_RAY_SHIPMENTS        = " << (gGameSettings.fOptions[TOPTION_FORCE_BOBBY_RAY_SHIPMENTS]			?    "TRUE" : "FALSE" ) << endl;
 	settings << "TOPTION_CHEAT_MODE_OPTIONS_END           = " << (gGameSettings.fOptions[TOPTION_CHEAT_MODE_OPTIONS_END]			?    "TRUE" : "FALSE" ) << endl;
@@ -476,6 +478,8 @@ void InitGameSettings()
 	gGameSettings.fOptions[ TOPTION_SHOW_TACTICAL_FACE_ICONS ]			= TRUE;
 
 	gGameSettings.fOptions[ TOPTION_REPORT_MISS_MARGIN ]				= FALSE;
+
+	gGameSettings.fOptions[ TOPTION_DISABLE_CURSOR_SWAP ]               = FALSE;
 
 	// arynn: Cheat/Debug Menu
 	gGameSettings.fOptions[ TOPTION_CHEAT_MODE_OPTIONS_HEADER ]			= FALSE;	
@@ -1000,6 +1004,8 @@ void LoadGameExternalOptions()
 
 	//################# Tactical Gameplay Settings ##################
 
+	gGameExternalOptions.fAllowWalkingWithWeaponRaised		= iniReader.ReadBoolean("Tactical Gameplay Settings","ALLOW_WALKING_WITH_WEAPON_RAISED", TRUE);
+
 	// WANNE: Externalized grid number of new merc when they arrive with the helicopter (by Jazz)
 	gGameExternalOptions.iInitialMercArrivalLocation		= iniReader.ReadInteger("Tactical Gameplay Settings","INITIAL_MERC_ARRIVAL_LOCATION", 4870 );
 
@@ -1131,13 +1137,21 @@ void LoadGameExternalOptions()
 	gGameExternalOptions.fCamoRemoving						= iniReader.ReadBoolean("Tactical Gameplay Settings", "CAMO_REMOVING", TRUE);
 
 	// SANDRO - Enhanced close combat system
-	gGameExternalOptions.fEnhancedCloseCombatSystem			= iniReader.ReadBoolean("Tactical Gameplay Settings", "ENHANCED_CLOSE_COMBAT_SYSTEM", FALSE);
+	gGameExternalOptions.fEnhancedCloseCombatSystem			= iniReader.ReadBoolean("Tactical Gameplay Settings", "ENHANCED_CLOSE_COMBAT_SYSTEM", TRUE);
 
 	// SANDRO - give special Exp for completing quests
 	gGameExternalOptions.usAwardSpecialExpForQuests			= iniReader.ReadInteger("Tactical Gameplay Settings", "AWARD_SPECIAL_EXP_POINTS_FOR_COMPLETING_QUESTS", 100, 0, 5000);
 
 	//tais: soldiers always wear any armour..
 	gGameExternalOptions.fSoldiersWearAnyArmour				= iniReader.ReadBoolean("Tactical Gameplay Settings", "SOLDIERS_ALWAYS_WEAR_ANY_ARMOR", FALSE);
+
+	// improved Interrupt System (info: multiplayer game ALWAYS use the old interrupt system, because the new one causes crashes, no problem so far)
+	gGameExternalOptions.fImprovedInterruptSystem			= iniReader.ReadBoolean("Tactical Gameplay Settings", "IMPROVED_INTERRUPT_SYSTEM", TRUE);
+	gGameExternalOptions.ubBasicPercentRegisterValueIIS		= iniReader.ReadInteger("Tactical Gameplay Settings", "BASIC_PERCENTAGE_APS_REGISTERED", 60, 0, 250);
+	gGameExternalOptions.ubPercentRegisterValuePerLevelIIS	= iniReader.ReadInteger("Tactical Gameplay Settings", "PERCENTAGE_APS_REGISTERED_PER_EXP_LEVEL", 4, 0, 100);
+	gGameExternalOptions.ubBasicReactionTimeLengthIIS		= iniReader.ReadInteger("Tactical Gameplay Settings", "BASIC_REACTION_TIME_LENGTH", 25, 5, 100);
+	gGameExternalOptions.fAllowCollectiveInterrupts			= iniReader.ReadBoolean("Tactical Gameplay Settings", "ALLOW_COLLECTIVE_INTERRUPTS", TRUE);
+	gGameExternalOptions.fAllowInstantInterruptsOnSight		= iniReader.ReadBoolean("Tactical Gameplay Settings", "ALLOW_INSTANT_INTERRUPTS_ON_SPOTTING", FALSE);
 
 	//################# Tactical Cover System Settings ##################
 
@@ -1302,9 +1316,9 @@ void LoadGameExternalOptions()
 	gGameExternalOptions.usNumKillsPerProgressPointInsane		= iniReader.ReadInteger("Strategic Progress Settings","NUM_KILLS_PER_PROGRESS_POINT_INSANE", 60, 1, 1000);
 
 	//Global game events 
-	gGameExternalOptions.ubGameProgressStartMadlabQuest			= iniReader.ReadInteger("Strategic Progress Settings","GAME_PROGRESS_START_MADLAB_QUEST",35, 1, 100);
-	gGameExternalOptions.ubGameProgressMikeAvailable			= iniReader.ReadInteger("Strategic Progress Settings","GAME_PROGRESS_MIKE_AVAILABLE",50, 1, 100);
-	gGameExternalOptions.ubGameProgressIggyAvaliable			= iniReader.ReadInteger("Strategic Progress Settings","GAME_PROGRESS_IGGY_AVAILABLE",70, 1, 100);
+	gGameExternalOptions.ubGameProgressStartMadlabQuest			= iniReader.ReadInteger("Strategic Progress Settings","GAME_PROGRESS_START_MADLAB_QUEST",35, 0, 100);
+	gGameExternalOptions.ubGameProgressMikeAvailable			= iniReader.ReadInteger("Strategic Progress Settings","GAME_PROGRESS_MIKE_AVAILABLE",50, 0, 100);
+	gGameExternalOptions.ubGameProgressIggyAvaliable			= iniReader.ReadInteger("Strategic Progress Settings","GAME_PROGRESS_IGGY_AVAILABLE",70, 0, 100);
 
 
 	//################# Strategic Event Settings ##################
@@ -1352,6 +1366,13 @@ void LoadGameExternalOptions()
 
 	// CHRISL: Determine how Skyrider should handle landing in enemy occupied sectors
 	gGameExternalOptions.ubSkyriderHotLZ					= iniReader.ReadInteger("Strategic Gameplay Settings", "ALLOW_SKYRIDER_HOT_LZ", 0);
+
+
+	//################# Laptop Settings ##################
+
+	gGameExternalOptions.gBriefingRoom						= iniReader.ReadBoolean("Laptop Settings", "BRIEFING_ROOM", FALSE);
+	gGameExternalOptions.gEncyclopedia						= iniReader.ReadBoolean("Laptop Settings", "ENCYCLOPEDIA", FALSE);
+
 
 	//################# Bobby Ray Settings ##################
 
@@ -1630,7 +1651,8 @@ void LoadGameExternalOptions()
 	//SaveGame slot by Jazz		
 	// WANNE: No need to make it external to switch between old/new. We always use the new save/load screen with more save slots
 	//gGameExternalOptions.fSaveGameSlot					= iniReader.ReadBoolean("Extension","SAVE_GAMES_SLOT",FALSE);
-	gGameExternalOptions.fSaveGameSlot						= TRUE;	
+	gGameExternalOptions.fSaveGameSlot						= TRUE;				
+
 	
 	// WANNE: This is just a debug setting. Only in debug version we set that property to TRUE.
 	// In Release version this should always be set to FALSE
@@ -1955,6 +1977,7 @@ void LoadGameAPBPConstants()
 	APBPConstants[AP_MODIFIER_SWAT] = DynamicAdjustAPConstants(iniReader.ReadInteger("APConstants","AP_MODIFIER_SWAT",0),0);
 	APBPConstants[AP_MODIFIER_CRAWL] = DynamicAdjustAPConstants(iniReader.ReadInteger("APConstants","AP_MODIFIER_CRAWL",4),4);
 	APBPConstants[AP_MODIFIER_PACK] = DynamicAdjustAPConstants(iniReader.ReadInteger("APConstants","AP_MODIFIER_PACK",4),4);
+	APBPConstants[AP_MODIFIER_READY] = DynamicAdjustAPConstants(iniReader.ReadInteger("APConstants","AP_MODIFIER_WEAPON_READY",1),4);
 	APBPConstants[AP_CHANGE_FACING] = DynamicAdjustAPConstants(iniReader.ReadInteger("APConstants","AP_CHANGE_FACING",4),4);
 	APBPConstants[AP_CHANGE_TARGET] = DynamicAdjustAPConstants(iniReader.ReadInteger("APConstants","AP_CHANGE_TARGET",2),2);
 	APBPConstants[AP_TOSS_ITEM] = DynamicAdjustAPConstants(iniReader.ReadInteger("APConstants","AP_TOSS_ITEM",32),32);
@@ -2055,6 +2078,7 @@ void LoadGameAPBPConstants()
 	APBPConstants[BP_MOVEMENT_SHORE] = iniReader.ReadInteger("BPConstants","BP_MOVEMENT_SHORE",50);
 	APBPConstants[BP_MOVEMENT_LAKE] = iniReader.ReadInteger("BPConstants","BP_MOVEMENT_LAKE",75);
 	APBPConstants[BP_MOVEMENT_OCEAN] = iniReader.ReadInteger("BPConstants","BP_MOVEMENT_OCEAN",100);
+	APBPConstants[BP_MOVEMENT_READY] = iniReader.ReadInteger("BPConstants","BP_MODIFIER_WEAPON_READY",30);
 	APBPConstants[BP_CROUCH] = iniReader.ReadInteger("BPConstants","BP_CROUCH",10);
 	APBPConstants[BP_PRONE] = iniReader.ReadInteger("BPConstants","BP_PRONE",10);
 	APBPConstants[BP_CLIMBROOF] = iniReader.ReadInteger("BPConstants","BP_CLIMBROOF",500);
@@ -2232,8 +2256,9 @@ void LoadCTHConstants()
 	gGameCTHConstants.NORMAL_RECOIL_DISTANCE							= iniReader.ReadInteger("Shooting Mechanism","NORMAL_RECOIL_DISTANCE",140, 10, 10000);
 	gGameCTHConstants.MAX_BULLET_DEV					 				= iniReader.ReadFloat("Shooting Mechanism","MAX_BULLET_DEV ",10.0, -1000.0, 1000.0);
 	gGameCTHConstants.RANGE_EFFECTS_DEV					 				= iniReader.ReadBoolean("Shooting Mechanism","RANGE_EFFECTS_DEV",  TRUE  );
-
-
+	gGameCTHConstants.MAX_EFFECTIVE_RANGE_MULTIPLIER	 				= iniReader.ReadFloat("Shooting Mechanism","MAX_EFFECTIVE_RANGE_MULTIPLIER",1.1f, 0.5f, 10.0f);
+	gGameCTHConstants.MAX_EFFECTIVE_RANGE_REDUCTION	 					= iniReader.ReadFloat("Shooting Mechanism","MAX_EFFECTIVE_RANGE_REDUCTION",0.5f, 0.0f, 1.0f);
+	gGameCTHConstants.MAX_EFFECTIVE_USE_GRADIENT						= iniReader.ReadBoolean("Shooting Mechanism","MAX_EFFECTIVE_USE_GRADIENT",  FALSE );
 }
 
 void FreeGameExternalOptions()

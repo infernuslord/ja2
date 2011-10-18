@@ -1,4 +1,4 @@
-// WANNE: Yes, this should be disabled, otherwise we get weird behavior when running the game with a VS 2005 build!
+Ôªø// WANNE: Yes, this should be disabled, otherwise we get weird behavior when running the game with a VS 2005 build!
 //#pragma setlocale("ITALIAN")
 
 #ifdef PRECOMPILEDHEADERS
@@ -11,6 +11,7 @@
 		#include "Scheduling.h"
 		#include "EditorMercs.h"
 		#include "Item Statistics.h"
+		#include "Encyclopedia.h"
 	#endif
 #endif
 
@@ -119,6 +120,196 @@ CHAR16	XMLTacticalMessages[1000][MAX_MESSAGE_NAMES_CHARS] =
 {
 	L"",
 };
+//Encyclopedia
+
+STR16 pMenuStrings[] =
+{
+	//Encyclopedia
+	L"Locations", // 0
+	L"Characters",
+	L"Items",
+	L"Quests",
+	L"Menu 5",
+	L"Menu 6", //5
+	L"Menu 7", 
+	L"Menu 8",
+	L"Menu 9",
+	L"Menu 10",
+	L"Menu 11", //10
+	L"Menu 12",
+	L"Menu 13",
+	L"Menu 14",
+	L"Menu 15",
+	L"Menu 15", // 15
+	
+	//Briefing Room
+	L"Exit",
+};
+
+STR16	pOtherButtonsText[] =
+{
+	L"Briefing", 
+	L"Accept",
+};
+
+STR16	pOtherButtonsHelpText[] =
+{
+	L"Briefing",
+	L"Accept missions",
+};
+
+
+STR16	pLocationPageText[] =
+{
+	L"Prev page",
+	L"Photo", 
+	L"Next page",
+};
+
+STR16	pSectorPageText[] =
+{
+	L"<<",
+	L"Main page",
+	L">>",
+	L"Type: ",
+	L"Empty data",
+	L"Missing of defined missions. Add missions to the file TableData\\BriefingRoom\\BriefingRoom.xml. First mission has to be visible. Put value Hidden = 0.",
+};
+
+STR16	pEncyclopediaTypeText[] = 
+{
+	L"Unknown",// 0 - unknown
+	L"City", //1 - cities
+	L"SAM Site", //2 - SAM Site
+	L"Other location", //3 - other location
+	L"Mines", //4 - mines 
+	L"Military complex", //5 - military complex 
+	L"Laboratory complex",  //6 - laboratory complex 
+	L"Factory complex", //7 - factory complex 
+	L"Hospital", //8 - hospital 
+	L"Prison", //9 - prison
+    L"Airport", //10 - air port 
+};
+
+STR16	pEncyclopediaHelpCharacterText[] = 
+{
+	L"Show all",
+	L"Show AIM",
+	L"Show MERC",
+	L"Show RPC",
+	L"Show NPC",
+	L"Show Pojazd",
+	L"Show IMP",
+	L"Show EPC",
+	L"Filter",
+};
+
+STR16	pEncyclopediaShortCharacterText[] = 
+{
+	L"All",
+	L"AIM",
+	L"MERC",
+	L"RPC",
+	L"NPC",
+	L"Veh.",
+	L"IMP",
+	L"EPC",
+	L"Filter",
+};
+
+STR16	pEncyclopediaHelpText[] = 
+{
+	L"Show all",
+	L"Show cities",
+	L"Show SAM Sites",
+	L"Show other location",
+	L"Show mines",
+	L"Show military complex",
+	L"Show laboratory complex",
+	L"Show Factory complex",
+	L"Show hospital",
+	L"Show prison",
+	L"Show air port",
+};
+
+STR16	pEncyclopediaSkrotyText[] = 
+{
+	L"All",
+	L"City",
+	L"SAM",
+	L"Other",
+	L"Mine",
+	L"Mil.",
+	L"Lab.",
+	L"Fact.",
+	L"Hosp.",
+	L"Prison",
+	L"Air.",
+};
+
+STR16	pEncyclopediaShortInventoryText[] = 
+{
+	L"All", //0
+	L"Gun",
+	L"Ammo",
+	L"LBE",
+	L"Misc",
+	
+	L"All", //5
+	L"Gun",
+	L"Ammo",
+	L"LBE Gear",
+	L"Misc",
+};
+
+STR16			BoxFilter[] =
+{
+	// Guns
+	L"Heavy",
+	L"Pistol",
+	L"M. Pist.",
+	L"SMG",
+	L"Rifle",
+	L"S. Rifle",
+	L"A. Rifle",
+	L"MG",
+	L"Shotgun",
+
+	// Ammo
+	L"Pistol",
+	L"M. Pist.", //10
+	L"SMG",
+	L"Rifle",
+	L"S. Rifle",
+	L"A. Rifle",
+	L"MG",
+	L"Shotgun",
+
+	// Used
+	L"Guns",
+	L"Armor",
+	L"LBE Gear",
+	L"Misc", //20
+
+	// Armour
+	L"Helmets",
+	L"Vests",
+	L"Leggings",
+	L"Plates",
+
+	// Misc
+	L"Blades",
+	L"Th. Knife",
+	L"Melee",
+	L"Grenades",
+	L"Bombs",
+	L"Med.", //30
+	L"Kits",
+	L"Face",
+	L"LBE",
+	L"Misc.", //34
+};
+//-----------
 
 // Editor
 //Editor Taskbar Creation.cpp
@@ -1258,14 +1449,14 @@ CHAR16 Message[][STRING_LENGTH] =
 
 	// In the following 8 strings, the %s is the merc's name, and the %d (if any) is a number.
 
-	L"%s Ë stato colpito alla testa e perde un punto di saggezza!",
-	L"%s Ë stato colpito alla spalla e perde un punto di destrezza!",
-	L"%s Ë stato colpito al torace e perde un punto di forza!",
-	L"%s Ë stato colpito alle gambe e perde un punto di agilit‡!",
-	L"%s Ë stato colpito alla testa e perde %d punti di saggezza!",
-	L"%s Ë stato colpito alle palle perde %d punti di destrezza!",
-	L"%s Ë stato colpito al torace e perde %d punti di forza!",
-	L"%s Ë stato colpito alle gambe e perde %d punti di agilit‡!",
+	L"%s √® stato colpito alla testa e perde un punto di saggezza!",
+	L"%s √® stato colpito alla spalla e perde un punto di destrezza!",
+	L"%s √® stato colpito al torace e perde un punto di forza!",
+	L"%s √® stato colpito alle gambe e perde un punto di agilit√†!",
+	L"%s √® stato colpito alla testa e perde %d punti di saggezza!",
+	L"%s √® stato colpito alle palle perde %d punti di destrezza!",
+	L"%s √® stato colpito al torace e perde %d punti di forza!",
+	L"%s √® stato colpito alle gambe e perde %d punti di agilit√†!",
 	L"Interrompete!",
 
 	// The first %s is a merc's name, the second is a string from pNoiseVolStr,
@@ -1302,17 +1493,17 @@ CHAR16 Message[][STRING_LENGTH] =
 
 	// In the following two lines, all %s's are merc names
 
-	L"Il travestimento di %s Ë stato scoperto.",
-	L"Il travestimento di %s Ë stato scoperto.",
+	L"Il travestimento di %s √® stato scoperto.",
+	L"Il travestimento di %s √® stato scoperto.",
 
 	// The first %s is a merc name and the second %s is an item name
 
-	L"La seconda arma Ë priva di munizioni!",
+	L"La seconda arma √® priva di munizioni!",
 	L"%s ha rubato il %s.",
 
 	// The %s is a merc name
 
-	L"L'arma di %s non puÚ pi˘ sparare a raffica.",
+	L"L'arma di %s non pu√≤ pi√π sparare a raffica.",
 
 	L"Ne avete appena ricevuto uno di quelli attaccati.",
 	L"Volete combinare gli oggetti?", 
@@ -1329,16 +1520,16 @@ CHAR16 Message[][STRING_LENGTH] =
 	//Ex:  You cannot use sun goggles and you gas mask at the same time.
 	L"Non potete usare %s e il vostro %s contemporaneamente.",
 
-	L"L'oggetto puntato dal vostro cursore puÚ essere combinato ad alcuni oggetti ponendolo in uno dei quattro slot predisposti.",
-	L"L'oggetto puntato dal vostro cursore puÚ essere combinato ad alcuni oggetti ponendolo in uno dei quattro slot predisposti. (Comunque, in questo caso, l'oggetto non Ë compatibile.)",
-	L"Il settore non Ë libero da nemici!",
+	L"L'oggetto puntato dal vostro cursore pu√≤ essere combinato ad alcuni oggetti ponendolo in uno dei quattro slot predisposti.",
+	L"L'oggetto puntato dal vostro cursore pu√≤ essere combinato ad alcuni oggetti ponendolo in uno dei quattro slot predisposti. (Comunque, in questo caso, l'oggetto non √® compatibile.)",
+	L"Il settore non √® libero da nemici!",
 	L"Vi dovete ancora dare %s %s", 
-	L"%s Ë stato colpito alla testa!",
+	L"%s √® stato colpito alla testa!",
 	L"Abbandonate la battaglia?",
-	L"Questo attaco sar‡ definitivo. Andate avanti?",
+	L"Questo attaco sar√† definitivo. Andate avanti?",
 	L"%s si sente molto rinvigorito!",
 	L"%s ha dormito di sasso!",
-	L"%s non Ë riuscito a catturare il %s!",
+	L"%s non √® riuscito a catturare il %s!",
 	L"%s ha riparato il %s",
 	L"Interrompete per ",
 	L"Vi arrendete?",
@@ -1600,7 +1791,7 @@ STR16 pLongAttributeStrings[] =
 {
   L"FORZA", 
 	L"DESTREZZA",  
-	L"AGILIT¿", 
+	L"AGILIT√Ä", 
 	L"SAGGEZZA", 
 	L"MIRA",
 	L"PRONTO SOCC.",
@@ -1659,9 +1850,9 @@ STR16 pGuardMenuStrings[] =
 	L"Conservare munizioni", // conserve ammo 
 	L"Astenersi dal fuoco", // fire only when the merc needs to 
 	L"Altre opzioni:", // other options available to merc
-	L"PuÚ ritrattare", // merc can retreat
-	L"PuÚ cercare rifugio",  // merc is allowed to seek cover
-	L"PuÚ assistere compagni di squadra", // merc can assist teammates
+	L"Pu√≤ ritrattare", // merc can retreat
+	L"Pu√≤ cercare rifugio",  // merc is allowed to seek cover
+	L"Pu√≤ assistere compagni di squadra", // merc can assist teammates
 	L"Fine", // done with this menu
 	L"Annulla", // cancel this menu
 };
@@ -1675,9 +1866,9 @@ STR16 pOtherGuardMenuStrings[] =
 	L" *Conservare munizioni*",
 	L" *Astenersi dal fuoco*",
 	L"Altre opzioni:",
-	L" *PuÚ ritrattare*",
-	L" *PuÚ cercare rifugio*",
-	L" *PuÚ assistere compagni di squadra*",
+	L" *Pu√≤ ritrattare*",
+	L" *Pu√≤ cercare rifugio*",
+	L" *Pu√≤ assistere compagni di squadra*",
 	L"Fine",
 	L"Annulla",
 };
@@ -1734,7 +1925,7 @@ STR16 pAttributeMenuStrings[] =
 {
 	L"Forza",
 	L"Destrezza",
-	L"Agilit‡",
+	L"Agilit√†",
 	L"Salute",
 	L"Mira",
 	L"Pronto socc.",
@@ -1788,7 +1979,7 @@ STR16 pPersonnelTitle[] =
 STR16 pPersonnelScreenStrings[] =
 {
 	L"Salute: ", // health of merc
-	L"Agilit‡: ", 
+	L"Agilit√†: ", 
 	L"Destrezza: ",
 	L"Forza: ",
 	L"Comando: ",
@@ -1811,7 +2002,7 @@ STR16 pPersonnelScreenStrings[] =
 	L"Battaglie:", // number of battles fought
 	L"Numero ferite:", // number of times merc has been wounded
 	L"Destrezza:",
-	L"Nessuna abilit‡",
+	L"Nessuna abilit√†",
 	L"Achievements:", // added by SANDRO
 };
 
@@ -1877,7 +2068,7 @@ STR16 pPersonnelRecordsHelpTexts[] =
 //These string correspond to enums used in by the SkillTrait enums in SoldierProfileType.h
 STR16 gzMercSkillText[] = 
 {
-	L"Nessuna abilit‡",
+	L"Nessuna abilit√†",
 	L"Forzare serrature",
 	L"Corpo a corpo",
 	L"Elettronica",
@@ -1888,7 +2079,7 @@ STR16 gzMercSkillText[] =
 	L"Armi automatiche",
 	L"Clandestino",
 	L"Ambidestro",
-	L"Furtivit‡",
+	L"Furtivit√†",
 	L"Arti marziali",
 	L"Coltelli",
 	L"Sniper",
@@ -2096,7 +2287,7 @@ STR16 gpStrategicString[] =
 
 	//Dialog strings for enemies.
 
-	L"Il nemico offre la possibilit‡ di arrendervi.",			//STR_ENEMY_SURRENDER_OFFER
+	L"Il nemico offre la possibilit√† di arrendervi.",			//STR_ENEMY_SURRENDER_OFFER
 	L"Il nemico ha catturato i vostri mercenari sopravvissuti.",	//STR_ENEMY_CAPTURED
 
 	//The text that goes on the autoresolve buttons							
@@ -2122,7 +2313,7 @@ STR16 gpStrategicString[] =
 	//These are the labels for the different types of enemies we fight in autoresolve.
 
 	L"Esercito",							//STR_AR_MILITIA_NAME,
-	L"»lite",								//STR_AR_ELITE_NAME,
+	L"√àlite",								//STR_AR_ELITE_NAME,
 	L"Truppa",								//STR_AR_TROOP_NAME,
 	L"Amministratore",								//STR_AR_ADMINISTRATOR_NAME,
 	L"Creatura",								//STR_AR_CREATURE_NAME,
@@ -2193,18 +2384,18 @@ STR16 gpStrategicString[] =
 
 	//Strings used for various popup message boxes.  Can be as long as desired.
 
-	L"Non sembra cosÏ bello qui. » inacessibile. Provate con una diversa postazione.",
+	L"Non sembra cos√¨ bello qui. √à inacessibile. Provate con una diversa postazione.",
 	L"Posizionate i vostri mercenari nella sezione illuminata della mappa.",
 
 	//This message is for mercs arriving in sectors.  Ex:  Red has arrived in sector A9.
 	//Don't uppercase first character, or add spaces on either end.
 
-	L"Ë arivato nel settore", 
+	L"√® arivato nel settore", 
 
 	//These entries are for button popup help text for the prebattle interface.  All popup help
 	//text supports the use of \n to denote new line.  Do not use spaces before or after the \n.
 	L"|Automaticamente svolge i combattimenti al vostro posto\nsenza caricare la mappa.",
-	L"Non Ë possibile utilizzare l'opzione di risoluzione automatica quando\nil giocatore sta attaccando.",
+	L"Non √® possibile utilizzare l'opzione di risoluzione automatica quando\nil giocatore sta attaccando.",
 	L"|Entrate nel settore per catturare il nemico.",
 	L"|Rimandate il gruppo al settore precedente.",				//singular version
 	L"|Rimandate tutti i gruppi ai loro settori precedenti.", //multiple groups with same previous sector
@@ -2219,9 +2410,9 @@ STR16 gpStrategicString[] =
 	//Note:  the minimum number of civilians eaten will be two.
 	L"Le creature attaccano e uccidono %d civili nel settore %s.",
 	//%s is the sector location -- ex:  A9: Omerta
-	L"I nemici attaccano i vostri mercenari nel settore %s. Nessuno dei vostri mercenari Ë in grado di combattere!",
+	L"I nemici attaccano i vostri mercenari nel settore %s. Nessuno dei vostri mercenari √® in grado di combattere!",
 	//%s is the sector location -- ex:  A9: Omerta
-	L"I nemici attaccano i vostri mercenari nel settore %s. Nessuno dei vostri mercenari Ë in grado di combattere!",
+	L"I nemici attaccano i vostri mercenari nel settore %s. Nessuno dei vostri mercenari √® in grado di combattere!",
 
 };
 
@@ -2342,78 +2533,6 @@ STR16		gzWeaponStatsFasthelpTactical[ 32 ] =
 	L"No Auto Mode!",
 	L"APs to Bash",
     L"",
-};
-
-STR16		gzAmmoStatsFasthelp[ 20 ] =
-{
-	L"Armor Penetration (Lower is better)",
-	L"Bullet Tumble (Higher is better)",
-	L"Pre-impact Explosion (Higher is better)",
-	L"Tracer Effect",
-	L"Anti-Tank",
-	L"Lockbuster",
-	L"Ignores Armor",
-	L"Acidic",
-	L"Range Modifier",
-	L"Damage Modifier",
-	L"To-Hit Modifier",
-	L"Autofire Penalty Modifier (Higher is better)",
-	L"Burst Penalty Modifier (Higher is better)",	// TODO.Translate
-	L"Reliability Modifier",
-	L"Loudness Modifier (Lower is better)",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-};
-
-STR16		gzArmorStatsFasthelp[ 20 ] =
-{
-	L"Protection",
-	L"Coverage (Higher is better)",
-	L"Degrade Rate (Lower is better)",
-	L"AP Modifier",
-	L"To-Hit Modifier",
-	L"Woodland Camo",
-	L"Urban Camo",
-	L"Desert Camo",
-	L"Snow Camo",
-	L"Stealth Modifier",
-	L"Vision Range Modifier",
-	L"Day Vision Range Modifier",
-	L"Night Vision Range Modifier",
-	L"Bright Light Vision Range Modifier",
-	L"Cave Vision Range Modifier",
-	L"Tunnel Vision Percentage",
-	L"Hearing Range Modifier",
-	L"",
-	L"",
-	L"",
-};
-
-STR16		gzExplosiveStatsFasthelp[ 20 ] =
-{
-	L"Damage",
-	L"Stun Damage",
-	L"Blast Loudness (Lower is better)",
-	L"Volatility!!! (Lower is better)",
-	L"Blast Radius",
-	L"Effect Start Radius",
-	L"Effect Final Radius ",
-	L"Effect Duration",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
-	L"",
 };
 
 STR16		gzMiscItemStatsFasthelp[ 34 ] =
@@ -2610,23 +2729,23 @@ CHAR16 TacticalStr[][ MED_STRING_LENGTH ] =
 	L"SERRATO",
 	L"APERTO",
 	L"FRACASSATO",
-	L"C'Ë un interruttore qui. Lo volete attivare?",
+	L"C'√® un interruttore qui. Lo volete attivare?",
 	L"Disattivate le trappole?",
 	L"Prec...",
 	L"Succ...",
-	L"Pi˘...",
+	L"Pi√π...",
 
 	// In the next 2 strings, %s is an item name
 
-	L"Il %s Ë stato posizionato sul terreno.",
-	L"Il %s Ë stato dato a %s.",
+	L"Il %s √® stato posizionato sul terreno.",
+	L"Il %s √® stato dato a %s.",
 
 	// In the next 2 strings, %s is a name
 
-	L"%s Ë stato pagato completamente.",
+	L"%s √® stato pagato completamente.",
 	L"Bisogna ancora dare %d a %s.",
 	L"Scegliete la frequenza di detonazione:",  	//in this case, frequency refers to a radio signal
-	L"Quante volte finchÈ la bomba non esploder‡:",	//how much time, in turns, until the bomb blows
+	L"Quante volte finch√© la bomba non esploder√†:",	//how much time, in turns, until the bomb blows
 	L"Stabilite la frequenza remota di detonazione:", 	//in this case, frequency refers to a radio signal
 	L"Disattivate le trappole?",
 	L"Rimuovete la bandiera blu?",
@@ -2637,19 +2756,19 @@ CHAR16 TacticalStr[][ MED_STRING_LENGTH ] =
 
 	L"Siete sicuri di volere attaccare %s ?",
 	L"Ah, i veicoli non possono cambiare posizione.",
-	L"Il robot non puÚ cambiare posizione.",
+	L"Il robot non pu√≤ cambiare posizione.",
 
 	// In the next 3 strings, %s is a name
 
-	L"%s non puÚ cambiare posizione.",
+	L"%s non pu√≤ cambiare posizione.",
 	L"%s non sono ricorsi al pronto soccorso qui.",	
 	L"%s non ha bisogno del pronto soccorso.",
-	L"Non puÚ muoversi l‡.",
-	L"La vostra squadra Ë al completo. Non c'Ë spazio per una recluta.",	//there's no room for a recruit on the player's team
+	L"Non pu√≤ muoversi l√†.",
+	L"La vostra squadra √® al completo. Non c'√® spazio per una recluta.",	//there's no room for a recruit on the player's team
 
 	// In the next string, %s is a name
 
-	L"%s Ë stato reclutato.",
+	L"%s √® stato reclutato.",
 
 	// Here %s is a name and %d is a number
 
@@ -2674,7 +2793,7 @@ CHAR16 TacticalStr[][ MED_STRING_LENGTH ] =
 
 	// In the next string, %s is a name
 
-	L"%s Ë scortato dalla squadra %d.",
+	L"%s √® scortato dalla squadra %d.",
 
 	// These messages are displayed during play to alert the player to a particular situation
 
@@ -2684,20 +2803,20 @@ CHAR16 TacticalStr[][ MED_STRING_LENGTH ] =
 
 	// These are different buttons that the player can turn on and off.
 
-	L"Modalit‡ furtiva (|Z)",
+	L"Modalit√† furtiva (|Z)",
 	L"Schermata della |mappa",
 	L"Fine del turno (|D)",
 	L"Parlato",
 	L"Muto",
-	L"Alza (|P|a|g|S|˘)",
+	L"Alza (|P|a|g|S|√π)",
 	L"Livello della vista (|T|a|b)",
 	L"Scala / Salta",
-	L"Abbassa (|P|a|g|G|i|˘)",
+	L"Abbassa (|P|a|g|G|i|√π)",
 	L"Esamina (|C|t|r|l)",
 	L"Mercenario precedente",
 	L"Prossimo mercenario (|S|p|a|z|i|o)",
 	L"|Opzioni",
-	L"Modalit‡ a raffica (|B)",
+	L"Modalit√† a raffica (|B)",
 	L"Guarda/Gira (|L)",
 	L"Salute: %d/%d\nEnergia: %d/%d\nMorale: %s",
 	L"Eh?",					//this means "what?" 
@@ -2717,12 +2836,12 @@ CHAR16 TacticalStr[][ MED_STRING_LENGTH ] =
 	L"Afferra",
 	L"Ricarica",
 	L"Dai",
-	L"%s Ë partito.",
-	L"%s Ë arrivato.",
+	L"%s √® partito.",
+	L"%s √® arrivato.",
 	L"%s ha esaurito i Punti Azione.",
-	L"%s non Ë disponibile.",
-	L"%s Ë tutto bendato.",
-	L"%s non Ë provvisto di bende.",
+	L"%s non √® disponibile.",
+	L"%s √® tutto bendato.",
+	L"%s non √® provvisto di bende.",
 	L"Nemico nel settore!",
 	L"Nessun nemico in vista.",
 	L"Punti Azione insufficienti.",
@@ -2740,7 +2859,7 @@ CHAR16 TacticalStr[][ MED_STRING_LENGTH ] =
 	L"Vai nel settore",
 	L"Vai alla mappa",
 	L"Non puoi uscire dal settore da questa parte.",
-	L"%s Ë troppo lontano.",
+	L"%s √® troppo lontano.",
 	L"Rimuovi le fronde degli alberi",
 	L"Mostra le fronde degli alberi",
 	L"CORVO",				//Crow, as in the large black bird
@@ -2756,8 +2875,8 @@ CHAR16 TacticalStr[][ MED_STRING_LENGTH ] =
 	L"Deposita/Preleva soldi",		//Help text over the $ button on the Single Merc Panel 
 	L"Nessuno ha bisogno del pronto soccorso.",
 	L"Bloccato.",											// Short form of JAMMED, for small inv slots
-	L"Non puÚ andare l‡.",					// used ( now ) for when we click on a cliff
-	L"Il sentiero Ë bloccato. Vuoi scambiare le posizioni con questa persona?",
+	L"Non pu√≤ andare l√†.",					// used ( now ) for when we click on a cliff
+	L"Il sentiero √® bloccato. Vuoi scambiare le posizioni con questa persona?",
 	L"La persona rifiuta di muoversi.",
 	// In the following message, '%s' would be replaced with a quantity of money (e.g. $200)
 	L"Sei d'accordo a pagare %s?",
@@ -2768,8 +2887,8 @@ CHAR16 TacticalStr[][ MED_STRING_LENGTH ] =
 	L"Risparmi Krott?",
 	L"Fuori dalla gittata dell'arma",
 	L"Minatore",
-	L"Il veicolo puÚ viaggiare solo tra i settori",
-	L"Non Ë in grado di fasciarsi da solo ora",
+	L"Il veicolo pu√≤ viaggiare solo tra i settori",
+	L"Non √® in grado di fasciarsi da solo ora",
 	L"Sentiero bloccato per %s",
 //	L"I tuoi mercenari, che erano stati catturati dall'esercito di Deidranna, sono stati imprigionati qui!",
 	L"I mercenari catturati dall'esercito di Deidranna, sono stati imprigionati qui!",
@@ -2779,34 +2898,34 @@ CHAR16 TacticalStr[][ MED_STRING_LENGTH ] =
 	L"Salute: %d/%d\nCarburante: %d/%d",
 	L"%s non riesce a vedere %s.",  // Cannot see person trying to talk to
 	L"Attachment removed",
-	L"Non puÚ guadagnare un altro veicolo poichË gi‡ avete 2",
+	L"Non pu√≤ guadagnare un altro veicolo poich√® gi√† avete 2",
 };
 
 //Varying helptext explains (for the "Go to Sector/Map" checkbox) what will happen given different circumstances in the "exiting sector" interface.
 STR16 pExitingSectorHelpText[] =
 {
 	//Helptext for the "Go to Sector" checkbox button, that explains what will happen when the box is checked.
-	L"Se selezionato, il settore adiacente verr‡ immediatamente caricato.",
+	L"Se selezionato, il settore adiacente verr√† immediatamente caricato.",
 	L"Se selezionato, sarete automaticamente posti nella schermata della mappa\nvisto che i vostri mercenari avranno bisogno di tempo per viaggiare.",
 
 	//If you attempt to leave a sector when you have multiple squads in a hostile sector.
-	L"Questo settore Ë occupato da nemicie non potete lasciare mercenari qui.\nDovete risolvere questa situazione prima di caricare qualsiasi altro settore.",
+	L"Questo settore √® occupato da nemicie non potete lasciare mercenari qui.\nDovete risolvere questa situazione prima di caricare qualsiasi altro settore.",
 
 	//Because you only have one squad in the sector, and the "move all" option is checked, the "go to sector" option is locked to on. 
 	//The helptext explains why it is locked.
-	L"Rimuovendo i vostri mercenari da questo settore,\nil settore adiacente verr‡ immediatamente caricato.",
+	L"Rimuovendo i vostri mercenari da questo settore,\nil settore adiacente verr√† immediatamente caricato.",
 	L"Rimuovendo i vostri mercenari da questo settore,\nverrete automaticamente postinella schermata della mappa\nvisto che i vostri mercenari avranno bisogno di tempo per viaggiare.",
 
 	//If an EPC is the selected merc, it won't allow the merc to leave alone as the merc is being escorted.  The "single" button is disabled.
-	L"%s ha bisogno di essere scortato dai vostri mercenari e non puÚ lasciare questo settore da solo.",
+	L"%s ha bisogno di essere scortato dai vostri mercenari e non pu√≤ lasciare questo settore da solo.",
 
 	//If only one conscious merc is left and is selected, and there are EPCs in the squad, the merc will be prohibited from leaving alone.
 	//There are several strings depending on the gender of the merc and how many EPCs are in the squad.
 	//DO NOT USE THE NEWLINE HERE AS IT IS USED FOR BOTH HELPTEXT AND SCREEN MESSAGES!
-	L"%s non puÚ lasciare questo settore da solo, perchÈ sta scortando %s.", //male singular
-	L"%s non puÚ lasciare questo settore da solo, perchÈ sta scortando %s.", //female singular
-	L"%s non puÚ lasciare questo settore da solo, perchÈ sta scortando altre persone.", //male plural
-	L"%s non puÚ lasciare questo settore da solo, perchÈ sta scortando altre persone.", //female plural
+	L"%s non pu√≤ lasciare questo settore da solo, perch√© sta scortando %s.", //male singular
+	L"%s non pu√≤ lasciare questo settore da solo, perch√© sta scortando %s.", //female singular
+	L"%s non pu√≤ lasciare questo settore da solo, perch√© sta scortando altre persone.", //male plural
+	L"%s non pu√≤ lasciare questo settore da solo, perch√© sta scortando altre persone.", //female plural
 
 	//If one or more of your mercs in the selected squad aren't in range of the traversal area, then the  "move all" option is disabled,
 	//and this helptext explains why.
@@ -2815,16 +2934,16 @@ STR16 pExitingSectorHelpText[] =
 	L"", //UNUSED
 
 	//Standard helptext for single movement.  Explains what will happen (splitting the squad)
-	L"Se selezionato, %s viagger‡ da solo, e\nautomaticamente verr‡ riassegnato a un'unica squadra.",
+	L"Se selezionato, %s viagger√† da solo, e\nautomaticamente verr√† riassegnato a un'unica squadra.",
 
 	//Standard helptext for all movement.  Explains what will happen (moving the squad)
-	L"Se selezionato, la vostra \nsquadra attualmente selezionata viagger‡, lasciando questo settore.",
+	L"Se selezionato, la vostra \nsquadra attualmente selezionata viagger√†, lasciando questo settore.",
 
 	//This strings is used BEFORE the "exiting sector" interface is created.  If you have an EPC selected and you attempt to tactically
 	//traverse the EPC while the escorting mercs aren't near enough (or dead, dying, or unconscious), this message will appear and the
 	//"exiting sector" interface will not appear.  This is just like the situation where
 	//This string is special, as it is not used as helptext.  Do not use the special newline character (\n) for this string.
-	L"%s Ë scortato dai vostri mercenari e non puÚ lasciare questo settore da solo. Gli altri vostri mercenari devono trovarsi nelle vicinanze prima che possiate andarvene.",
+	L"%s √® scortato dai vostri mercenari e non pu√≤ lasciare questo settore da solo. Gli altri vostri mercenari devono trovarsi nelle vicinanze prima che possiate andarvene.",
 };
 
 
@@ -2854,12 +2973,12 @@ STR16 sPreStatBuildString[] =
 STR16 sStatGainStrings[] =
 {
 	L"salute.",
-	L"agilit‡.",
+	L"agilit√†.",
 	L"destrezza.",
 	L"saggezza.",
 	L"pronto socc.",
-	L"abilit‡ esplosivi.",
-	L"abilit‡ meccanica.",
+	L"abilit√† esplosivi.",
+	L"abilit√† meccanica.",
 	L"mira.",
 	L"esperienza.",
 	L"forza.",
@@ -2896,7 +3015,7 @@ STR16 gsLoyalString[] =
 
 STR16 gsUndergroundString[] =
 {
-	L"non puÚ portare ordini di viaggio sottoterra.", 
+	L"non pu√≤ portare ordini di viaggio sottoterra.", 
 };
 
 STR16 gsTimeStrings[] =
@@ -2937,7 +3056,7 @@ STR16 pwTownInfoStrings[] =
 	L"Controllo", 					// how much of town is controlled
 	L"Nessuno", 					// none of this town
 	L"Miniera", 				// mine associated with this town
-	L"Lealt‡",					// 5 // the loyalty level of this town
+	L"Lealt√†",					// 5 // the loyalty level of this town
 	L"Addestrato", 					// the forces in the town trained by the player
 	L"",
 	L"Servizi principali", 				// main facilities in this town
@@ -2963,8 +3082,8 @@ STR16 pwMineStrings[] =
 	L"Stato",
 	L"Ammontare produzione",
 	L"Tipo di minerale",				// 10
-	L"Controllo della citt‡",
-	L"Lealt‡ della citt‡",
+	L"Controllo della citt√†",
+	L"Lealt√† della citt√†",
 //	L"Minatori",
 };
 
@@ -2977,7 +3096,7 @@ STR16 pwMiscSectorStrings[] =
 	L"# di oggetti",
 	L"Sconosciuto",
 	L"Controllato",
-	L"SÏ",
+	L"S√¨",
 	L"No",
 };
 
@@ -2985,8 +3104,8 @@ STR16 pwMiscSectorStrings[] =
 
 STR16 pMapInventoryErrorString[] =
 {
-	L"%s non Ë abbastanza vicino.",	//Merc is in sector with item but not close enough
-	L"Non puÚ selezionare quel mercenario.",  //MARK CARTER
+	L"%s non √® abbastanza vicino.",	//Merc is in sector with item but not close enough
+	L"Non pu√≤ selezionare quel mercenario.",  //MARK CARTER
 	L"%s non si trova nel settore per prendere quell'oggetto.",
 	L"Durante il combattimento, dovrete raccogliere gli oggetti manualmente.",
 	L"Durante il combattimento, dovrete rilasciare gli oggetti manualmente.",
@@ -3007,14 +3126,14 @@ STR16 pMapScreenFastHelpTextList[] =
 {
 	L"Per cambiare l'incarico di un mercenario, come, ad esempio, cambiare la squadra, dottore o riparare, cliccate dentro la colonna 'Compito'",
 	L"Per assegnare a un mercenario una destinazione in un altro settore, cliccate dentro la colonna 'Dest'",
-	L"Una volta che a un mercenario Ë stato ordinato di procedere, una compressione di tempo gli permetter‡ di muoversi.",
+	L"Una volta che a un mercenario √® stato ordinato di procedere, una compressione di tempo gli permetter√† di muoversi.",
 	L"Cliccando di sinistro, selezionerete il settore. Cliccando di sinistro un'altra volta, darete al mercenario ordini di movimento. Cliccando di destro, darete informazioni sommarie al settore.",
 	L"Premete 'h' in questo settore di questa schermata ogni volta che vorrete accedere a questa finestra d'aiuto.",
 	L"Test Text",
 	L"Test Text",
 	L"Test Text",
 	L"Test Text",
-	L"Non potrete fare molto in questa schermata finchÈ non arriverete ad Arulco. Quando avrete definito la vostra squadra, cliccate sul pulsante Compressione di Tempo in basso a destra. Questo diminuir‡ il tempo necessario alla vostra squadra per raggiungere Arulco.",
+	L"Non potrete fare molto in questa schermata finch√© non arriverete ad Arulco. Quando avrete definito la vostra squadra, cliccate sul pulsante Compressione di Tempo in basso a destra. Questo diminuir√† il tempo necessario alla vostra squadra per raggiungere Arulco.",
 };
 
 // movement menu text
@@ -3042,15 +3161,21 @@ STR16 pUpdateMercStrings[] =
 
 STR16 pMapScreenBorderButtonHelpText[] =
 {
-	L"Mostra citt‡ (|w)",
+	L"Mostra citt√† (|w)",
 	L"Mostra |miniere",
 	L"Mos|tra squadre & nemici",
 	L"Mostra spazio |aereo",
 	L"Mostra oggett|i",
 	L"Mostra esercito & nemici (|Z)",
-	L"Show Mobile Militia Restrictions", // HEADROCK HAM 4: Mobile Restrictions Button
+	L"Show Mobile Militia |Restrictions", // HEADROCK HAM 4: Mobile Restrictions Button // TODO.Translate
 };
 
+STR16 pMapScreenInvenButtonHelpText[] =
+{
+	L"Next (|.)",		// next page // TODO.Translate
+	L"Previous (|,)",		// previous page // TODO.Translate
+	L"Exit Sector Inventory (|E|s|c)",	// exit sector inventory // TODO.Translate
+};
 
 STR16 pMapScreenBottomFastHelp[] =
 {
@@ -3060,7 +3185,7 @@ STR16 pMapScreenBottomFastHelp[] =
 	L"Dilata tempo (|+)", 	// time compress more
 	L"Comprime tempo (|-)", 	// time compress less
 	L"Messaggio precedente (|S|u)\nIndietro (|P|a|g|S|u)", 	// previous message in scrollable list
-	L"Messaggio successivo (|G|i|˘)\nAvanti (|P|a|g|G|i|˘)", 	// next message in the scrollable list
+	L"Messaggio successivo (|G|i|√π)\nAvanti (|P|a|g|G|i|√π)", 	// next message in the scrollable list
 	L"Inizia/Ferma tempo (|S|p|a|z|i|o)",	// start/stop time compression
 };
 
@@ -3071,7 +3196,7 @@ STR16 pMapScreenBottomText[] =
 
 STR16 pMercDeadString[] =
 {
-	L"%s Ë morto.",
+	L"%s √® morto.",
 };
 
 
@@ -3268,12 +3393,12 @@ STR16 pTransactionAlternateText[] =
 
 STR16 pSkyriderText[] =
 {
-	L"Skyrider Ë stato pagato $%d", 			// skyrider was paid an amount of money
+	L"Skyrider √® stato pagato $%d", 			// skyrider was paid an amount of money
 	L"A Skyrider bisogna ancora dare $%d", 		// skyrider is still owed an amount of money
 	L"Skyrider ha finito il carburante",	// skyrider has finished refueling
 	L"",//unused
 	L"",//unused
-	L"Skyrider Ë di nuovo pronto a volare.", // Skyrider was grounded but has been freed
+	L"Skyrider √® di nuovo pronto a volare.", // Skyrider was grounded but has been freed
 	L"Skyrider non ha passeggeri. Se avete intenzione di trasportare mercenari in questo settore, assegnateli prima al Veicolo/Elicottero.",
 };
 
@@ -3294,8 +3419,8 @@ STR16 pMoralStrings[] =
 
 STR16 pLeftEquipmentString[] =
 { 
-	L"L'equipaggio di %s Ë ora disponibile a Omerta (A9).", 
-	L"L'equipaggio di %s Ë ora disponibile a Drassen (B13).",
+	L"L'equipaggio di %s √® ora disponibile a Omerta (A9).", 
+	L"L'equipaggio di %s √® ora disponibile a Drassen (B13).",
 };
 
 // Status that appears on the Map Screen
@@ -3324,85 +3449,85 @@ STR16 pEtaString[] =
 
 STR16 pTrashItemText[] =
 {
-	L"Non lo vedrete mai pi˘. Siete sicuri?", 	// do you want to continue and lose the item forever
+	L"Non lo vedrete mai pi√π. Siete sicuri?", 	// do you want to continue and lose the item forever
 	L"Questo oggetto sembra DAVVERO importante. Siete DAVVERO SICURISSIMI di volerlo gettare via?", // does the user REALLY want to trash this item
 };
 
 
 STR16 pMapErrorString[] = 
 {
-	L"La squadra non puÚ muoversi, se un mercenario dorme.",
+	L"La squadra non pu√≤ muoversi, se un mercenario dorme.",
 
 //1-5
 	L"Muovete la squadra al primo piano.",
-	L"Ordini di movimento? » un settore nemico!",
+	L"Ordini di movimento? √à un settore nemico!",
 	L"I mercenari devono essere assegnati a una squadra o a un veicolo per potersi muovere.",
 	L"Non avete ancora membri nella squadra.", 		// you have no members, can't do anything 
 	L"I mercenari non possono attenersi agli ordini.",			 		// merc can't comply with your order
 //6-10
-	L"ha bisogno di una scorta per muoversi. Inseritelo in una squadra che ne Ë provvista.", // merc can't move unescorted .. for a male
-	L"ha bisogno di una scorta per muoversi. Inseritela in una squadra che ne Ë provvista.", // for a female
+	L"ha bisogno di una scorta per muoversi. Inseritelo in una squadra che ne √® provvista.", // merc can't move unescorted .. for a male
+	L"ha bisogno di una scorta per muoversi. Inseritela in una squadra che ne √® provvista.", // for a female
 #ifdef JA2UB
-	L"Il mercenario non Ë ancora arrivato ad Tracona!",
+	L"Il mercenario non √® ancora arrivato ad Tracona!",
 #else
-	L"Il mercenario non Ë ancora arrivato ad Arulco!",
+	L"Il mercenario non √® ancora arrivato ad Arulco!",
 #endif
 	L"Sembra che ci siano negoziazioni di contratto da stabilire.",
 	L"",
 //11-15
-	L"Ordini di movimento? » in corso una battaglia!",
+	L"Ordini di movimento? √à in corso una battaglia!",
 	L"Siete stati vittima di un'imboscata da parte dai Bloodcat nel settore %s!",
 	L"Siete appena entrati in quella che sembra una tana di un Bloodcat nel settore %s!", 
 	L"", 
-	L"La zona SAM in %s Ë stata assediata.",
+	L"La zona SAM in %s √® stata assediata.",
 //16-20
-	L"La miniera di %s Ë stata assediata. La vostra entrata giornaliera Ë stata ridotta di %s per giorno.",
+	L"La miniera di %s √® stata assediata. La vostra entrata giornaliera √® stata ridotta di %s per giorno.",
 	L"Il nemico ha assediato il settore %s senza incontrare resistenza.",
 	L"Almeno uno dei vostri mercenari non ha potuto essere affidato a questo incarico.",
-	L"%s non ha potuto unirsi alla %s visto che Ë completamente pieno",
-	L"%s non ha potuto unirsi alla %s visto che Ë troppo lontano.",
+	L"%s non ha potuto unirsi alla %s visto che √® completamente pieno",
+	L"%s non ha potuto unirsi alla %s visto che √® troppo lontano.",
 //21-25
-	L"La miniera di %s Ë stata invasa dalle forze armate di Deidranna!",
+	L"La miniera di %s √® stata invasa dalle forze armate di Deidranna!",
 	L"Le forze armate di Deidranna hanno appena invaso la zona SAM in %s",
 	L"Le forze armate di Deidranna hanno appena invaso %s",
 	L"Le forze armate di Deidranna sono appena state avvistate in %s.",
 	L"Le forze armate di Deidranna sono appena partite per %s.",
 //26-30
-	L"Almeno uno dei vostri mercenari non puÚ riposarsi.",
-	L"Almeno uno dei vostri mercenari non Ë stato svegliato.",
-	L"L'esercito non si far‡ vivo finchÈ non avranno finito di esercitarsi.",
+	L"Almeno uno dei vostri mercenari non pu√≤ riposarsi.",
+	L"Almeno uno dei vostri mercenari non √® stato svegliato.",
+	L"L'esercito non si far√† vivo finch√© non avranno finito di esercitarsi.",
 	L"%s non possono ricevere ordini di movimento adesso.",
-	L"I militari che non si trovano entro i confini della citt‡ non possono essere spostati inquesto settore.",
+	L"I militari che non si trovano entro i confini della citt√† non possono essere spostati inquesto settore.",
 //31-35
 	L"Non potete avere soldati in %s.",
-	L"Un veicolo non puÚ muoversi se Ë vuoto!",
-	L"%s Ë troppo grave per muoversi!",
+	L"Un veicolo non pu√≤ muoversi se √® vuoto!",
+	L"%s √® troppo grave per muoversi!",
 	L"Prima dovete lasciare il museo!",
-	L"%s Ë morto!",
+	L"%s √® morto!",
 //36-40
-	L"%s non puÚ andare a %s perchÈ si sta muovendo",
-	L"%s non puÚ salire sul veicolo in quel modo",
-	L"%s non puÚ unirsi alla %s",
-	L"Non potete comprimere il tempo finchÈ non arruolerete nuovi mercenari!",
-	L"Questo veicolo puÚ muoversi solo lungo le strade!",
+	L"%s non pu√≤ andare a %s perch√© si sta muovendo",
+	L"%s non pu√≤ salire sul veicolo in quel modo",
+	L"%s non pu√≤ unirsi alla %s",
+	L"Non potete comprimere il tempo finch√© non arruolerete nuovi mercenari!",
+	L"Questo veicolo pu√≤ muoversi solo lungo le strade!",
 //41-45
-	L"Non potete riassegnare i mercenari che sono gi‡ in movimento",
-	L"Il veicolo Ë privo di benzina!",
-	L"%s Ë troppo stanco per muoversi.",
-	L"Nessuno a bordo Ë in grado di guidare il veicolo.",
-	L"Uno o pi˘ membri di questa squadra possono muoversi ora.",
+	L"Non potete riassegnare i mercenari che sono gi√† in movimento",
+	L"Il veicolo √® privo di benzina!",
+	L"%s √® troppo stanco per muoversi.",
+	L"Nessuno a bordo √® in grado di guidare il veicolo.",
+	L"Uno o pi√π membri di questa squadra possono muoversi ora.",
 //46-50
-	L"Uno o pi˘ degli altri mercenari non puÚ muoversi ora.",
-	L"Il veicolo Ë troppo danneggiato!",
+	L"Uno o pi√π degli altri mercenari non pu√≤ muoversi ora.",
+	L"Il veicolo √® troppo danneggiato!",
 	L"Osservate che solo due mercenari potrebbero addestrare i militari in questo settore.",
-	L"Il robot non puÚ muoversi senza il suo controller. Metteteli nella stessa squadra.",
+	L"Il robot non pu√≤ muoversi senza il suo controller. Metteteli nella stessa squadra.",
 };
 
 
 // help text used during strategic route plotting
 STR16 pMapPlotStrings[] =
 {
-	L"Cliccate di nuovo su una destinazione per confermare la vostra meta finale, oppure cliccate su un altro settore per fissare pi˘ tappe.",
+	L"Cliccate di nuovo su una destinazione per confermare la vostra meta finale, oppure cliccate su un altro settore per fissare pi√π tappe.",
 	L"Rotta di spostamento confermata.",
 	L"Destinazione immutata.",
 	L"Rotta di spostamento annullata.",
@@ -3415,9 +3540,9 @@ STR16 pBullseyeStrings[] =
 {
 	L"Cliccate sul settore dove desiderate che i mercenari arrivino.",
 	L"OK. I mercenari che stavano arrivando si sono dileguati a %s",
-	L"I mercenari non possono essere trasportati, lo spazio aereo non Ë sicuro!",
-	L"Annullato. Il settore d'arrivo Ë immutato",
-	L"Lo spazio aereo sopra %s non Ë pi˘ sicuro! Il settore d'arrivo Ë stato spostato a %s.",
+	L"I mercenari non possono essere trasportati, lo spazio aereo non √® sicuro!",
+	L"Annullato. Il settore d'arrivo √® immutato",
+	L"Lo spazio aereo sopra %s non √® pi√π sicuro! Il settore d'arrivo √® stato spostato a %s.",
 };
 
 
@@ -3442,9 +3567,9 @@ STR16 pMercHeLeaveString[] =
 	L"Volete che %s lasci il suo equipaggiamento dove si trova ora (%s) o in seguito a Drassen (B13) dopo aver preso il volo da Arulco?",
 	L"Volete che %s lasci il suo equipaggiamento dove si trova ora (%s) o in seguito a Omerta (A9) dopo aver preso il volo da Arulco?",
 #endif
-	L"sta per partire e spedir‡ il suo equipaggiamento a Omerta (A9).",
-	L"sta per partire e spedir‡ il suo equipaggiamento a Drassen (B13).",
-	L"%s sta per partire e spedir‡ il suo equipaggiamento a %s.",
+	L"sta per partire e spedir√† il suo equipaggiamento a Omerta (A9).",
+	L"sta per partire e spedir√† il suo equipaggiamento a Drassen (B13).",
+	L"%s sta per partire e spedir√† il suo equipaggiamento a %s.",
 };
 
 
@@ -3458,19 +3583,19 @@ STR16 pMercSheLeaveString[] =
 	L"Volete che %s lasci il suo equipaggiamento dove si trova ora (%s) o in seguito a Drassen (B13) dopo aver preso il volo da Arulco?",
 	L"Volete che %s lasci il suo equipaggiamento dove si trova ora (%s) o in seguito a Omerta (A9) dopo aver preso il volo da Arulco?",
 #endif
-	L"sta per partire e spedir‡ il suo equipaggiamento a Omerta (A9).",
-	L"sta per partire e spedir‡ il suo equipaggiamento a Drassen (B13).",
-	L"%s sta per partire e spedir‡ il suo equipaggiamento a %s.",
+	L"sta per partire e spedir√† il suo equipaggiamento a Omerta (A9).",
+	L"sta per partire e spedir√† il suo equipaggiamento a Drassen (B13).",
+	L"%s sta per partire e spedir√† il suo equipaggiamento a %s.",
 };
 
 
 STR16 pMercContractOverStrings[] =
 {
-	L": contratto scaduto. Egli Ë tornato a casa.", 		// merc's contract is over and has departed
-	L": contratto scaduto. Ella Ë tornata a casa.", 		// merc's contract is over and has departed
-	L": contratto terminato. Egli Ë partito.", 		// merc's contract has been terminated
-	L": contratto terminato. Ella Ë partita.",		// merc's contract has been terminated
-	L"Dovete al M.E.R.C. troppi soldi, cosÏ %s Ë partito.", // Your M.E.R.C. account is invalid so merc left
+	L": contratto scaduto. Egli √® tornato a casa.", 		// merc's contract is over and has departed
+	L": contratto scaduto. Ella √® tornata a casa.", 		// merc's contract is over and has departed
+	L": contratto terminato. Egli √® partito.", 		// merc's contract has been terminated
+	L": contratto terminato. Ella √® partita.",		// merc's contract has been terminated
+	L"Dovete al M.E.R.C. troppi soldi, cos√¨ %s √® partito.", // Your M.E.R.C. account is invalid so merc left
 };
 
 // Text used on IMP Web Pages
@@ -3483,7 +3608,7 @@ STR16 pImpPopUpStrings[] =
 	L"L'analisi preliminare del vostro stato finanziario mostra che non potete offrire un'analisi di profilo.",
 	L"Opzione non valida questa volta.",
 	L"Per completare un profilo accurato, dovete aver spazio per almeno uno dei membri della squadra.",
-	L"Profilo gi‡ completato.",
+	L"Profilo gi√† completato.",
 	L"Cannot load I.M.P. character from disk.",
 	L"You have already reached the maximum number of I.M.P. characters.",
 	L"You have already three I.M.P characters with the same gender on your team.",
@@ -3498,25 +3623,25 @@ STR16 pImpButtonText[] =
 {
 	L"Cosa offriamo", 			// about the IMP site
 	L"INIZIO", 			// begin profiling
-	L"Personalit‡", 		// personality section
+	L"Personalit√†", 		// personality section
 	L"Attributi", 		// personal stats/attributes section
 	L"Appearance", 			// changed from portrait 
 	L"Voce %d", 			// the voice selection
 	L"Fine", 			// done profiling
 	L"Ricomincio", 		// start over profiling
-	L"SÏ, scelgo la risposta evidenziata.", 
-	L"SÏ", 
+	L"S√¨, scelgo la risposta evidenziata.", 
+	L"S√¨", 
 	L"No",
 	L"Finito", 			// finished answering questions
 	L"Prec.", 			// previous question..abbreviated form
 	L"Avanti", 			// next question
-	L"SÃ, LO SONO.", 		// yes, I am certain 
+	L"S√å, LO SONO.", 		// yes, I am certain 
 	L"NO, VOGLIO RICOMINCIARE.", // no, I want to start over the profiling process
-	L"SÃ",
+	L"S√å",
 	L"NO",
 	L"Indietro", 			// back one page
 	L"Annulla", 			// cancel selection
-	L"SÏ, ne sono certo.",
+	L"S√¨, ne sono certo.",
 	L"No, lasciami dare un'altra occhiata.",
 	L"Immatricolazione", 			// the IMP site registry..when name and gender is selected
 	L"Analisi", 			// analyzing your profile results
@@ -3575,9 +3700,9 @@ STR16 pHistoryStrings[] =
 {
 	L"",																						// leave this line blank
 	//1-5
-	L"%s Ë stato assunto dall'A.I.M.", 										// merc was hired from the aim site
-	L"%s Ë stato assunto dal M.E.R.C.", 									// merc was hired from the aim site
-	L"%s morÏ.", 															// merc was killed
+	L"%s √® stato assunto dall'A.I.M.", 										// merc was hired from the aim site
+	L"%s √® stato assunto dal M.E.R.C.", 									// merc was hired from the aim site
+	L"%s mor√¨.", 															// merc was killed
 	L"Acconti stanziati al M.E.R.C.",								// paid outstanding bills at MERC
 	L"Assegno accettato da Enrico Chivaldori",	
 	//6-10
@@ -3589,8 +3714,8 @@ STR16 pHistoryStrings[] =
 	//11-15
 	L"Esteso contratto di %s di 1 settimana.", 					// Extented "mercs name"'s for a week
 	L"Esteso contratto di %s di 2 settimane.", 					// Extented "mercs name"'s 2 weeks
-	L"%s Ë stato congedato.", 													// "merc's name" was dismissed.
-	L"%s Ë partito.", 																		// "merc's name" quit.
+	L"%s √® stato congedato.", 													// "merc's name" was dismissed.
+	L"%s √® partito.", 																		// "merc's name" quit.
 	L"avventura iniziata.", 															// a particular quest started
 	//16-20
 	L"avventura completata.",
@@ -3601,14 +3726,14 @@ STR16 pHistoryStrings[] =
 	//21-25
 	L"%s ha lasciato la squadra per diventare la moglie di Daryl Hick",
 	L"contratto di %s scaduto.",
-	L"%s Ë stato arruolato.",
-	L"Enrico si Ë lamentato della mancanza di progresso",
+	L"%s √® stato arruolato.",
+	L"Enrico si √® lamentato della mancanza di progresso",
 	L"Vinta battaglia",
 	//26-30
 	L"%s miniera ha iniziato a esaurire i minerali",
 	L"%s miniera ha esaurito i minerali",
-	L"%s miniera Ë stata chiusa",
-	L"%s miniera Ë stata riaperta",
+	L"%s miniera √® stata chiusa",
+	L"%s miniera √® stata riaperta",
 	L"Trovata una prigione chiamata Tixa.",
 	//31-35
 	L"Sentito di una fabbrica segreta di armi chiamata Orta.",
@@ -3624,8 +3749,8 @@ STR16 pHistoryStrings[] =
 	L"Concessa a Kyle la licenza del negozio di pelle di Angel.",
 	//41-45
 	L"Madlab ha proposto di costruire un robot.",
-	L"Gabby puÚ effettuare operazioni di sabotaggio contro sistemi d'allarme.",
-	L"Keith Ë fuori dall'affare.",
+	L"Gabby pu√≤ effettuare operazioni di sabotaggio contro sistemi d'allarme.",
+	L"Keith √® fuori dall'affare.",
 	L"Howard ha fornito cianuro alla regina Deidranna.",
 	L"Incontrato Keith - si occupa di un po' di tutto a Cambria.",
 	//46-50
@@ -3641,13 +3766,13 @@ STR16 pHistoryStrings[] =
 	L"Alcuni vagabondi ci hanno dato una scheda elettronica.",
 	L"Corrotto Walter per aprire la porta del seminterrato.",
 	//56-60
-	L"Se Dave ha benzina, potr‡ fare il pieno gratis.",
+	L"Se Dave ha benzina, potr√† fare il pieno gratis.",
 	L"Corrotto Pablo.",
 	L"Kingpin tiene i soldi nella miniera di San Mona.",
 	L"%s ha vinto il Combattimento Estremo",
 	L"%s ha perso il Combattimento Estremo",
 	//61-65
-	L"%s Ë stato squalificato dal Combattimento Estremo",
+	L"%s √® stato squalificato dal Combattimento Estremo",
 	L"trovati moltissimi soldi nascosti nella miniera abbandonata.",
 	L"Incontrato assassino ingaggiato da Kingpin.",
 	L"Perso il controllo del settore",				//ENEMY_INVASION_CODE
@@ -3662,7 +3787,7 @@ STR16 pHistoryStrings[] =
 	L"Creature attaccate",			//CREATURE_ATTACK_CODE
 	L"Ucciso dai Bloodcat",			//BLOODCAT_AMBUSH_CODE
 	L"Massacrati dai Bloodcat",
-	L"%s Ë stato ucciso",
+	L"%s √® stato ucciso",
 	L"Data a Carmen la testa di un terrorista",
 	L"Massacro sinistro",
 	L"Ucciso %s",
@@ -3755,7 +3880,7 @@ STR16 pErrorStrings[] =
 	L"Il server non ha entrata NSD.",	
 	L"Controlla l'indirizzo LRU e prova di nuovo.",
 	L"OK",
-	L"Connessione intermittente all'host. Tempi d'attesa pi˘ lunghi per il trasferimento.",
+	L"Connessione intermittente all'host. Tempi d'attesa pi√π lunghi per il trasferimento.",
 };
 
 
@@ -3809,8 +3934,10 @@ STR16 pWebPagesTitles[] =
 	L"",
 	L"URL non ritrovato.",
 	L"Bobby Ray - Spedizioni recenti",
-	L"",
-	L"",
+	L"Encyclopedia",
+	L"Encyclopedia - Data",
+	L"Briefing Room",
+	L"Briefing Room - Data",
 };
 
 STR16 pShowBookmarkString[] =
@@ -3845,8 +3972,8 @@ STR16 pPersonelTeamStrings[] =
 	L"Squadra attuale",
 	L"Partenze",
 	L"Costo giornaliero:",
-	L"Costo pi˘ alto:",
-	L"Costo pi˘ basso:",
+	L"Costo pi√π alto:",
+	L"Costo pi√π basso:",
 	L"Ucciso in azione:",
 	L"Licenziato:",
 	L"Altro:",
@@ -3855,9 +3982,9 @@ STR16 pPersonelTeamStrings[] =
 
 STR16 pPersonnelCurrentTeamStatsStrings[] =
 {
-	L"Pi˘ basso",
+	L"Pi√π basso",
 	L"Normale",
-	L"Pi˘ alto",
+	L"Pi√π alto",
 };
 
 
@@ -3949,7 +4076,7 @@ STR16 pUpdatePanelButtons[] =
 CHAR16 LargeTacticalStr[][ LARGE_STRING_LENGTH ] =
 {
 	L"Siete stati sconfitti in questo settore!",
-	L"Il nemico, non avendo alcuna piet‡ delle anime della squadra, divorer‡ ognuno di voi!",
+	L"Il nemico, non avendo alcuna piet√† delle anime della squadra, divorer√† ognuno di voi!",
 	L"I membri inconscenti della vostra squadra sono stati catturati!",
 	L"I membri della vostra squadra sono stati fatti prigionieri dal nemico.",
 };
@@ -4011,7 +4138,7 @@ STR16			MercAccountPageText[] =
 STR16			MercInfo[] =
 {
 	L"Salute",
-	L"Agilit‡",
+	L"Agilit√†",
 	L"Destrezza",
 	L"Forza",
 	L"Comando",
@@ -4032,7 +4159,7 @@ STR16			MercInfo[] =
 	L"Al giorno",
 	L"Deceduto",
 
-	L"Sembra che state arruolando troppi mercenari. Il vostro limite Ë di 18.",
+	L"Sembra che state arruolando troppi mercenari. Il vostro limite √® di 18.",
 	L"Non disponibile",											
 };
 
@@ -4069,7 +4196,7 @@ STR16			MercHomePageText[] =
 STR16			sFuneralString[] =
 {
 	L"Impresa di pompe funebri di McGillicutty: Il dolore delle famiglie che hanno fornito il loro aiuto dal 1983.",
-	L"Precedentemente mercenario dell'A.I.M. Murray \"Pops\" McGillicutty Ë un impresario di pompe funebri qualificato e con molta esperienza.",
+	L"Precedentemente mercenario dell'A.I.M. Murray \"Pops\" McGillicutty √® un impresario di pompe funebri qualificato e con molta esperienza.",
 	L"Essendo coinvolto profondamente nella morte e nel lutto per tutta la sua vita, Pops sa quanto sia difficile affrontarli.",
 	L"L'impresa di pompe funebri di McGillicutty offre una vasta gamma di servizi funebri, da una spalla su cui piangere a ricostruzioni post-mortem per corpi mutilati o sfigurati.",
 	L"Lasciate che l'impresa di pompe funebri di McGillicutty vi aiuti e i vostri amati riposeranno in pace.",
@@ -4082,7 +4209,7 @@ STR16			sFuneralString[] =
 	L"CERIMONIALE FUNEBRE",
 
 	// The text that comes up when you click on any of the links ( except for send flowers ).
-	L"Purtroppo, il resto di questo sito non Ë stato completato a causa di una morte in famiglia. Aspettando la lettura del testamento e la riscossione dell'eredit‡, il sito verr‡ ultimato non appena possibile.",
+	L"Purtroppo, il resto di questo sito non √® stato completato a causa di una morte in famiglia. Aspettando la lettura del testamento e la riscossione dell'eredit√†, il sito verr√† ultimato non appena possibile.",
 	L"Vi porgiamo, comunque, le nostre condolianze in questo momento di dolore. Contatteci ancora.",
 };
 
@@ -4105,12 +4232,12 @@ STR16			sFloristText[] =
 
 	L"Siamo veloci ed efficienti!",
 	L"Consegna il giorno successivo in quasi tutto il mondo, garantito. Applicate alcune restrizioni.",
-	L"I prezzi pi˘ bassi in tutto il mondo, garantito!",
-	L"Mostrateci un prezzo concorrente pi˘ basso per qualsiasi progetto, e riceverete una dozzina di rose, gratuitamente.",
+	L"I prezzi pi√π bassi in tutto il mondo, garantito!",
+	L"Mostrateci un prezzo concorrente pi√π basso per qualsiasi progetto, e riceverete una dozzina di rose, gratuitamente.",
 	L"Flora, fauna & fiori in volo dal 1981.",
 	L"I nostri paracadutisti decorati ex-bomber lanceranno il vostro bouquet entro un raggio di dieci miglia dalla locazione richiesta. Sempre e ovunque!",
 	L"Soddisfiamo la vostra fantasia floreale.",
-	L"Lasciate che Bruce, il nostro esperto in composizioni floreali, selezioni con cura i fiori pi˘ freschi e della migliore qualit‡ dalle nostre serre pi˘ esclusive.",
+	L"Lasciate che Bruce, il nostro esperto in composizioni floreali, selezioni con cura i fiori pi√π freschi e della migliore qualit√† dalle nostre serre pi√π esclusive.",
 	L"E ricordate, se non l'abbiamo, possiamo coltivarlo - E subito!",
 };
 
@@ -4140,7 +4267,7 @@ STR16			sOrderFormText[] =
 	L"Bouquet appassito ($10)",
 	L"Torta di frutta (se disponibile 10$)",		//15
 	L"Sentimenti personali:",
-	L"Il vostro messaggio non puÚ essere pi˘ lungo di 75 caratteri.",
+	L"Il vostro messaggio non pu√≤ essere pi√π lungo di 75 caratteri.",
 	L"... oppure sceglietene uno dai nostri",
 
 	L"BIGLIETTI STANDARD",	
@@ -4164,7 +4291,7 @@ STR16		sFloristGalleryText[] =
 	L"Succ.",	//abbreviation for next
 
 	L"Clicca sul modello che vuoi ordinare.",
-	L"Ricorda: c'Ë un supplemento di 10$ per tutti i bouquet appassiti o schiacciati.",
+	L"Ricorda: c'√® un supplemento di 10$ per tutti i bouquet appassiti o schiacciati.",
 
 	//text on the button
 
@@ -4216,7 +4343,6 @@ STR16			BobbyROrderFormText[] =
 STR16			BobbyRFilter[] =
 {
 	// Guns
-	L"Heavy W.",
 	L"Pistol",
 	L"M. Pistol",
 	L"SMG",
@@ -4225,6 +4351,7 @@ STR16			BobbyRFilter[] =
 	L"AS Rifle",
 	L"MG",
 	L"Shotgun",
+	L"Heavy W.",
 
 	// Ammo
 	L"Pistol",
@@ -4251,7 +4378,7 @@ STR16			BobbyRFilter[] =
 	// Misc
 	L"Blades",
 	L"Th. Knives",
-	L"Punch. W.",
+	L"Blunt W.",
 	L"Grenades",
 	L"Bombs",
 	L"Med. Kits",
@@ -4267,7 +4394,7 @@ STR16			BobbyRText[] =
 {
 	L"Ordini:",				// Title
 	// instructions on how to order
-	L"Cliccate sull'oggetto. Sinistro per aggiungere pezzi, destro per toglierne. Una volta selezionata la quantit‡, procedete col nuovo ordine.",			
+	L"Cliccate sull'oggetto. Sinistro per aggiungere pezzi, destro per toglierne. Una volta selezionata la quantit√†, procedete col nuovo ordine.",			
 
 	//Text on the buttons to go the various links
 
@@ -4306,11 +4433,11 @@ STR16			BobbyRText[] =
 
 	//Popup that tells the player that they can only order 10 items at a time
 	
-	L"Darn! Quest'ordine qui accetter‡ solo 10 oggetti. Se avete intenzione di ordinare pi˘ merce (ed Ë quello che speriamo), fate un ordine a parte e accettate le nostre scuse.",
+	L"Darn! Quest'ordine qui accetter√† solo 10 oggetti. Se avete intenzione di ordinare pi√π merce (ed √® quello che speriamo), fate un ordine a parte e accettate le nostre scuse.",
 
 	// A popup that tells the user that they are trying to order more items then the store has in stock
 
-	L"Ci dispiace. Non disponiamo pi˘ di questo articolo. Riprovate pi˘ tardi.",
+	L"Ci dispiace. Non disponiamo pi√π di questo articolo. Riprovate pi√π tardi.",
 
 	//A popup that tells the user that the store is temporarily sold out
 
@@ -4325,7 +4452,7 @@ STR16			BobbyRaysFrontText[] =
 {
 	//Details on the web site
 
-	L"Questo Ë il negozio con la fornitura militare e le armi pi˘ recenti e potenti!",
+	L"Questo √® il negozio con la fornitura militare e le armi pi√π recenti e potenti!",
 	L"Possiamo trovare la soluzione perfetta per tutte le vostre esigenze riguardo agli esplosivi.",
 	L"Oggetti usati e riparati",
 
@@ -4413,7 +4540,7 @@ STR16			CharacterInfo[] =
 	// The various attributes of the merc
 
 	L"Salute",										
-	L"Agilit‡",										
+	L"Agilit√†",										
 	L"Destrezza",									
 	L"Forza",
 	L"Comando",
@@ -4510,9 +4637,9 @@ STR16			AimPopUpText[] =
 
 	//If you try to hire more mercs than game can support
 
-	L"Avete gi‡ una squadra di mercenari.",
+	L"Avete gi√† una squadra di mercenari.",
 
-	L"Messaggio gi‡ registrato",
+	L"Messaggio gi√† registrato",
 	L"Messaggio registrato",
 };
 
@@ -4652,7 +4779,7 @@ STR16 SKI_Text[ ] =
 	L"1 ORA",			// SINGULAR! The text underneath the inventory slot when an item is given to the dealer to be repaired
 	L"%d ORE",		// PLURAL!   The text underneath the inventory slot when an item is given to the dealer to be repaired
 	L"RIPARATO",		// Text appearing over an item that has just been repaired by a NPC repairman dealer
-	L"Non c'Ë abbastanza spazio nel vostro margine di ordine.",	//Message box that tells the user there is no more room to put there stuff
+	L"Non c'√® abbastanza spazio nel vostro margine di ordine.",	//Message box that tells the user there is no more room to put there stuff
 	L"%d MINUTI",		// The text underneath the inventory slot when an item is given to the dealer to be repaired
 	L"Lascia oggetto a terra.",
 };
@@ -4745,16 +4872,16 @@ STR16			zSaveLoadText[] =
 	L"Partita caricata con successo",
 	L"ERRORE durante il caricamento!",
 
-	L"La versione del gioco nel file della partita salvata Ë diverso dalla versione attuale. » abbastanza sicuro proseguire. Continuate?",
+	L"La versione del gioco nel file della partita salvata √® diverso dalla versione attuale. √à abbastanza sicuro proseguire. Continuate?",
 	L"I file della partita salvata potrebbero essere annullati. Volete cancellarli tutti?",
 
 	//Translators, the next two strings are for the same thing.  The first one is for beta version releases and the second one
 	//is used for the final version.  Please don't modify the "#ifdef JA2BETAVERSION" or the "#else" or the "#endif" as they are
 	//used by the compiler and will cause program errors if modified/removed.  It's okay to translate the strings though.
 #ifdef JA2BETAVERSION
-	L"La versionbe salvata Ë cambiata. Fateci avere un report, se incontrate problemi. Continuate?",
+	L"La versionbe salvata √® cambiata. Fateci avere un report, se incontrate problemi. Continuate?",
 #else
-	L"Tentativo di caricare una versione salvata pi˘ vecchia. Aggiornate e caricate automaticamente quella salvata?",
+	L"Tentativo di caricare una versione salvata pi√π vecchia. Aggiornate e caricate automaticamente quella salvata?",
 #endif
 
 	//Translators, the next two strings are for the same thing.  The first one is for beta version releases and the second one
@@ -4781,7 +4908,7 @@ STR16			zSaveLoadText[] =
 	L"Stile realistico",
 	L"Stile fantascientifico",
 
-	L"Difficolt‡",
+	L"Difficolt√†",
 	L"Platinum Mode", //Placeholder English
 	L"Bobby Ray's",
 	L"Good Selection",
@@ -4799,18 +4926,18 @@ STR16			zSaveLoadText[] =
 STR16		zMarksMapScreenText[] =
 {
 	L"Livello mappa",
-	L"Non avete soldati. Avete bisogno di addestrare gli abitanti della citt‡ per poter disporre di un esercito cittadino.",
+	L"Non avete soldati. Avete bisogno di addestrare gli abitanti della citt√† per poter disporre di un esercito cittadino.",
 	L"Entrata giornaliera",
 	L"Il mercenario ha l'assicurazione sulla vita", 
-	L"%s non Ë stanco.", 
-	L"%s si sta muovendo e non puÚ riposare", 
-	L"%s Ë troppo stanco, prova un po' pi˘ tardi.",
+	L"%s non √® stanco.", 
+	L"%s si sta muovendo e non pu√≤ riposare", 
+	L"%s √® troppo stanco, prova un po' pi√π tardi.",
 	L"%s sta guidando.",
-	L"La squadra non puÚ muoversi, se un mercenario dorme.",
+	L"La squadra non pu√≤ muoversi, se un mercenario dorme.",
 
 	// stuff for contracts
 	L"Visto che non potete pagare il contratto, non avete neanche i soldi per coprire il premio dell'assicurazione sulla vita di questo nercenario.",
-	L"%s premio dell'assicurazione coster‡ %s per %d giorno(i) extra. Volete pagare?",
+	L"%s premio dell'assicurazione coster√† %s per %d giorno(i) extra. Volete pagare?",
 	L"Settore inventario",
 	L"Il mercenario ha una copertura medica.",
 	
@@ -4819,13 +4946,13 @@ STR16		zMarksMapScreenText[] =
 	L"Pazienti", // people who are being bandaged by a medic 
 	L"Fine", // Continue on with the game after autobandage is complete 
 	L"Ferma", // Stop autobandaging of patients by medics now 
-	L"Siamo spiacenti. Questa opzione Ë stata disabilitata in questo demo.", // informs player this option/button has been disabled in the demo 
+	L"Siamo spiacenti. Questa opzione √® stata disabilitata in questo demo.", // informs player this option/button has been disabled in the demo 
 	L"%s non ha un kit di riparazione.",
 	L"%s non ha un kit di riparazione.",
 	L"Non ci sono abbastanza persone che vogliono essere addestrate ora.",
-	L"%s Ë pieno di soldati.",
+	L"%s √® pieno di soldati.",
 	L"Il mercenario ha un contratto a tempo determinato.", 
-	L"Il contratto del mercenario non Ë assicurato",
+	L"Il contratto del mercenario non √® assicurato",
 	// HEADROCK HAM 4: Prompt messages when turning on Mobile Militia Restrictions view.
 	L"You currently have no Mobile Militia. Return to this view mode once you've recruited some.",
 	L"This view shows where your Mobile Militia can and cannot go. GREY = Mobile Militia refuse to go here. RED = Mobile Militia can go here, but you've told them not to. YELLOW = Mobile Militia can enter this sector, but not leave. GREEN = Mobile Militia can go here freely. Right click a Green/Yellow sector to cycle its behavior.",
@@ -4840,17 +4967,17 @@ STR16 pLandMarkInSectorString[] =
 // confirm the player wants to pay X dollars to build a militia force in town
 STR16 pMilitiaConfirmStrings[] =
 {
-	L"Addestrare una squadra dell'esercito cittadino coster‡ $", // telling player how much it will cost
+	L"Addestrare una squadra dell'esercito cittadino coster√† $", // telling player how much it will cost
 	L"Approvate la spesa?", // asking player if they wish to pay the amount requested
 	L"Non potete permettervelo.", // telling the player they can't afford to train this town
 	L"Continuate ad aeddestrare i soldati in %s (%s %d)?", // continue training this town?
 	L"Costo $", // the cost in dollars to train militia
 	L"(S/N)",   // abbreviated yes/no
 	L"",	// unused
-	L"Addestrare l'esrecito cittadino nei settori di %d coster‡ $ %d. %s", // cost to train sveral sectors at once
+	L"Addestrare l'esrecito cittadino nei settori di %d coster√† $ %d. %s", // cost to train sveral sectors at once
 	L"Non potete permettervi il $%d per addestrare l'esercito cittadino qui.",
-	L"%s ha bisogno di una percentuale di %d affinchÈ possiate continuare ad addestrare i soldati.",
-	L"Non potete pi˘ addestrare i soldati a %s.",
+	L"%s ha bisogno di una percentuale di %d affinch√© possiate continuare ad addestrare i soldati.",
+	L"Non potete pi√π addestrare i soldati a %s.",
 	L"You cannot afford the $%d to train mobile militia here.", // HEADROCK HAM 3.6: Mobile Militia		// TODO.Translate
 	L"Continue training mobile militia in %s (%s %d)?", // HEADROCK HAM 3.6: Mobile Militia				// TODO.Translate
 	L"Training mobile militia in %d sectors will cost $ %d. %s", // HEADROCK HAM 3.6: Mobile Militia	// TODO.Translate
@@ -4878,7 +5005,7 @@ STR16		zOptionsToggleText[] =
 	L"Mettete in pausa il testo del dialogo",
 	L"Fumo dinamico",
 	L"Sangue e violenza",
-	L"Non Ë necessario usare il mouse!",
+	L"Non √® necessario usare il mouse!",
 	L"Vecchio metodo di selezione",
 	L"Mostra il percorso dei mercenari",
 	L"Mostra traiettoria colpi sbagliati",
@@ -4915,6 +5042,7 @@ STR16		zOptionsToggleText[] =
 	L"Activate New CTH system",				// use NCTH
 	L"Show Face gear graphics",				// TODO.Translate
 	L"Show Face gear icons",
+	L"Disable Cursor Swap",		            // Disable Cursor Swap		// TODO.Translate
 	L"--Cheat Mode Options--",				// TOPTION_CHEAT_MODE_OPTIONS_HEADER,
 	L"Force Bobby Ray shipments",			// force all pending Bobby Ray shipments
 	L"-----------------",					// TOPTION_CHEAT_MODE_OPTIONS_END
@@ -4958,16 +5086,16 @@ STR16	zOptionsScreenHelpText[] =
 	L"Disattivate questa opzione per muovere automaticamente il mouse sulle finestre a comparsa di conferma al loro apparire.",
 
 	//Old selection method
-	L"Attivate questa opzione per selezionare i personaggi e muoverli come nel vecchio JA (dato che la funzione Ë stata invertita).",
+	L"Attivate questa opzione per selezionare i personaggi e muoverli come nel vecchio JA (dato che la funzione √® stata invertita).",
 
 	//Show movement path
 	L"Attivate questa opzione per visualizzare i sentieri di movimento in tempo reale (oppure disattivatela utilizzando il tasto |M|A|I|U|S|C).",
 
 	//show misses
-	L"Attivate per far sÏ che la partita vi mostri dove finiscono i proiettili quando \"sbagliate\".",
+	L"Attivate per far s√¨ che la partita vi mostri dove finiscono i proiettili quando \"sbagliate\".",
 	
 	//Real Time Confirmation
-	L"Se attivata, sar‡ richiesto un altro clic su \"salva\" per il movimento in tempo reale.",
+	L"Se attivata, sar√† richiesto un altro clic su \"salva\" per il movimento in tempo reale.",
 
 	//Sleep/Wake notification
   L"Se attivata, verrete avvisati quando i mercenari in \"servizio\" vanno a riposare e quando rientrano in servizio.",
@@ -4976,16 +5104,16 @@ STR16	zOptionsScreenHelpText[] =
 	L"Se attivata, utilizza il sistema metrico di misurazione; altrimenti ricorre al sistema britannico.",
 
 	//Merc Lighted movement
-	L"Se attivata, il mercenario mostrer‡ il terreno su cui cammina. Disattivatela per un aggiornamento pi˘ veloce.",
+	L"Se attivata, il mercenario mostrer√† il terreno su cui cammina. Disattivatela per un aggiornamento pi√π veloce.",
 
 	//Smart cursor
-	L"Se attivata, muovendo il cursore vicino ai vostri mercenari li evidenzier‡ automaticamente.",
+	L"Se attivata, muovendo il cursore vicino ai vostri mercenari li evidenzier√† automaticamente.",
 
 	//snap cursor to the door
-	L"Se attivata, muovendo il cursore vicino a una porta far‡ posizionare automaticamente il cursore sopra di questa.",
+	L"Se attivata, muovendo il cursore vicino a una porta far√† posizionare automaticamente il cursore sopra di questa.",
 
 	//glow items 
-	L"Se attivata, l'opzione evidenzier‡ gli |Oggetti automaticamente.",
+	L"Se attivata, l'opzione evidenzier√† gli |Oggetti automaticamente.",
 
 	//toggle tree tops
 	L"Se attivata, mostra le |fronde degli alberi.",
@@ -4993,7 +5121,7 @@ STR16	zOptionsScreenHelpText[] =
 	//toggle wireframe
 	L"Se attivata, visualizza le |Strutture dei muri nascosti.",
 
-	L"Se attivata, il cursore di movimento verr‡ mostrato in 3D (|Home).",
+	L"Se attivata, il cursore di movimento verr√† mostrato in 3D (|Home).",
 
 	// Options for 1.13
 	L"When ON, the chance to hit is shown on the cursor.",
@@ -5008,7 +5136,7 @@ STR16	zOptionsScreenHelpText[] =
 	L"When ON, you will hear rain noises when it is raining.",
 	L"When ON, the crows are present in game.",
 	L"When ON, a tooltip window is shown when pressing |A|l|t and hovering cursor over an enemy.", 
-	L"When ON, game will be saved after each players turn.",
+	L"When ON, game will be saved in 2 alternate save slots after each players turn.",
 	L"When ON, Skyrider will not talk anymore.",
 	//L"When ON, game will run with much lower CPU usage.",
 	L"When ON, enhanced descriptions will be shown for items and weapons.",
@@ -5019,6 +5147,7 @@ STR16	zOptionsScreenHelpText[] =
 	L"When ON, New CTH system and cursor is used.",
 	L"When ON, you will see the equipped face gear on the merc portraits.",	// TODO.Translate
 	L"When ON, you will see icons for the equipped face gear on the merc portraits in the lower right corner.",
+	L"When ON, the cursor will not toggle between exchange position and other actions. Press |x to initiate quick exchange.",	// TODO.Translate
 	L"(text not rendered)TOPTION_CHEAT_MODE_OPTIONS_HEADER",
 	L"Force all pending Bobby Ray shipments",
 	L"(text not rendered)TOPTION_CHEAT_MODE_OPTIONS_END",
@@ -5052,15 +5181,15 @@ STR16	gzGIOScreenText[] =
 	L"Platinum", //Placeholder English
 	L"Opzioni delle armi",
 	L"Available Arsenal", // changed by SANDRO
-	L"Variet‡ di armi",
+	L"Variet√† di armi",
 	L"Normale",
-	L"Livello di difficolt‡",
+	L"Livello di difficolt√†",
 	L"Principiante",
 	L"Esperto",
 	L"Professionista",
 	L"Start",		// TODO.Translate
 	L"Annulla",
-	L"Difficolt‡ extra",
+	L"Difficolt√† extra",
 	L"Tempo illimitato",
 	L"Turni a tempo",
 	L"Disabilitato per Demo",
@@ -5130,7 +5259,7 @@ STR16	gzMPJScreenText[] =
 	L"Game Type",
 	L"Ping",
 	L"You must enter a player name.",
-	L"You must enter a valid server IP address.\n (eg 84.114.195.239).",
+	L"You must enter a valid server IP address. For example: 84.114.195.239",
 	L"You must enter a valid Server Port between 1 and 65535.",
 };
 
@@ -5252,7 +5381,7 @@ STR16 pDeliveryLocationStrings[] =
 STR16 pSkillAtZeroWarning[] =
 { //This string is used in the IMP character generation.  It is possible to select 0 ability
 	//in a skill meaning you can't use it.  This text is confirmation to the player.
-	L"Siete sicuri? Un valore di zero significa NESSUNA abilit‡.",
+	L"Siete sicuri? Un valore di zero significa NESSUNA abilit√†.",
 };
 
 STR16 pIMPBeginScreenStrings[] =
@@ -5302,7 +5431,7 @@ STR16 pMessageStrings[] =
 {
 	L"Vuoi uscire dalla partita?",
 	L"OK",
-	L"SÃ",
+	L"S√å",
 	L"NO",
 	L"ANNULLA",
 	L"RIASSUMI",
@@ -5334,21 +5463,21 @@ STR16 pMessageStrings[] =
 																		//SirTech
 	L"Versione",
 	L"Slot di salvataggio rapido vuoto",
-	L"Questo slot Ë riservato ai salvataggi rapidi fatti dalle schermate tattiche e dalla mappa utilizzando ALT+S.",
+	L"Questo slot √® riservato ai salvataggi rapidi fatti dalle schermate tattiche e dalla mappa utilizzando ALT+S.",
 	L"Aperto",
 	L"Chiuso",
 	L"Lo spazio su disco si sta esaurendo. Avete liberi solo %s MB e Jagged Alliance 2 v1.13 ne richiede %s.",
 	L"Arruolato %s dall'A.I.M.", 
 	L"%s ha preso %s.",		//'Merc name' has caught 'item' -- let SirTech know if name comes after item.
 	L"%s ha assunto della droga.", //'Merc name' has taken the drug
-	L"%s non ha alcuna abilit‡ medica",//'Merc name' has no medical skill.
+	L"%s non ha alcuna abilit√† medica",//'Merc name' has no medical skill.
 
 	//CDRom errors (such as ejecting CD while attempting to read the CD)
-	L"L'integrit‡ del gioco Ë stata compromessa.",
+	L"L'integrit√† del gioco √® stata compromessa.",
 	L"ERRORE: CD-ROM non valido",
 
 	//When firing heavier weapons in close quarters, you may not have enough room to do so.
-	L"Non c'Ë spazio per sparare da qui.",
+	L"Non c'√® spazio per sparare da qui.",
 	
 	//Can't change stance due to objects in the way...
 	L"Non potete cambiare posizione questa volta.",
@@ -5358,7 +5487,7 @@ STR16 pMessageStrings[] =
 	L"Getta",
 	L"Passa",
 
-	L"%s Ë passato a %s.", //"Item" passed to "merc".  Please try to keep the item %s before the merc %s, otherwise,
+	L"%s √® passato a %s.", //"Item" passed to "merc".  Please try to keep the item %s before the merc %s, otherwise,
 											 //must notify SirTech.
 	L"Nessun spazio per passare %s a %s.", //pass "item" to "merc".  Same instructions as above.
 
@@ -5370,10 +5499,10 @@ STR16 pMessageStrings[] =
 	L"Raggiunto il livello Cheat DUE",
 
 	//Toggling various stealth modes
-	L"Squadra in modalit‡ furtiva.",
-	L"Squadra non in modalit‡ furtiva.",
-	L"%s in modalit‡ furtiva.",
-	L"%s non in modalit‡ furtiva.",
+	L"Squadra in modalit√† furtiva.",
+	L"Squadra non in modalit√† furtiva.",
+	L"%s in modalit√† furtiva.",
+	L"%s non in modalit√† furtiva.",
 
 	//Wireframes are shown through buildings to reveal doors and windows that can't otherwise be seen in 
 	//an isometric engine.  You can toggle this mode freely in the game.
@@ -5388,17 +5517,17 @@ STR16 pMessageStrings[] =
 	L"Abbandona il seminterrato...",
 
 	L"di",		// used in the shop keeper inteface to mark the ownership of the item eg Red's gun
-	L"Modalit‡ segui disattiva.",
-	L"Modalit‡ segui attiva.",
+	L"Modalit√† segui disattiva.",
+	L"Modalit√† segui attiva.",
 	L"Cursore 3D disattivo.",
 	L"Cursore 3D attivo.",
 	L"Squadra %d attiva.",
 	L"Non potete permettervi di pagare a %s un salario giornaliero di %s",	//first %s is the mercs name, the seconds is a string containing the salary
 	L"Salta",
-	L"%s non puÚ andarsene da solo.",
-	L"Un salvataggio Ë stato chiamato SaveGame249.sav. Se necessario, rinominatelo da SaveGame01 a SaveGame10 e cosÏ potrete accedervi nella schermata di caricamento.",
+	L"%s non pu√≤ andarsene da solo.",
+	L"Un salvataggio √® stato chiamato SaveGame249.sav. Se necessario, rinominatelo da SaveGame01 a SaveGame10 e cos√¨ potrete accedervi nella schermata di caricamento.",
 	L"%s ha bevuto del %s",
-	L"Un pacco Ë arivato a Drassen.",
+	L"Un pacco √® arivato a Drassen.",
  	L"%s dovrebbe arrivare al punto designato di partenza (settore %s) nel giorno %d, approssimativamente alle ore %s.",		//first %s is mercs name, next is the sector location and name where they will be arriving in, lastely is the day an the time of arrival
 	L"Registro aggiornato.",
 	L"Grenade Bursts use Targeting Cursor (Spread fire enabled)",
@@ -5420,19 +5549,20 @@ STR16 pMessageStrings[] =
 	L"You cannot use the Old Inventory and the New Attachment System at the same time.",
 	
 	// TODO.Translate
-	L"AutoSave #", //91		// Text des Auto Saves im Load Screen mit ID
-	L"This slot is reserved for Auto Saves.", //92	// The text, when the user clicks on the save screen on an auto save
+	L"Auto Save #", //91		// Text des Auto Saves im Load Screen mit ID
+	L"This Slot is reserved for Auto Saves, which can be enabled/disabled (AUTO_SAVE_EVERY_N_HOURS) in the ja2_options.ini.", //92	// The text, when the user clicks on the save screen on an auto save
 	L"Empty Auto Save Slot #", //93	// The text, when the auto save slot (1 - 5) is empty (not saved yet)
 	L"AutoSaveGame",		// 94	// The filename of the auto save, such as AutoSaveGame01 - AutoSaveGame05
-	L"End Turn Auto Save",	// 95	// The text for the tactical end turn auto save
-	L"Saving AutoSave #",	// 96	// The message box, when doing auto save
-	L"Empty Auto Save End Turn Slot #",	// 97	// The message box, when doing auto save
-	L"This slot is reserved for end turn Auto Saves .", //98	// The text, when the user clicks on the save screen on an auto save
-	L"End Turn AutoSave #", //99
-	L"Quick Slot#%d",
-	L"Strategic Map AutoSave Slot#%d",
-	L"End Turn Auto Save#%d",
-	L"Save Slot#%d", //103
+	L"End-Turn Save #",	// 95	// The text for the tactical end turn auto save
+	L"Saving Auto Save #",	// 96	// The message box, when doing auto save
+	L"Saving",	// 97	// The message box, when doing end turn auto save
+	L"Empty End-Turn Save Slot #",	// 98	// The message box, when doing auto save
+	L"This Slot is reserved for Tactical End-Turn Saves, which can be enabled/disabled in the Option Screen.", //99	// The text, when the user clicks on the save screen on an auto save
+	// Mouse tooltips
+	L"QuickSave.sav",	// 100
+	L"AutoSaveGame%02d.sav",	// 101
+	L"Auto%02d.sav",	// 102
+	L"SaveGame%02d.sav", //103
 };
 
 
@@ -5441,13 +5571,13 @@ CHAR16 ItemPickupHelpPopup[][40] =
 	L"OK",
 	L"Scorrimento su",
 	L"Seleziona tutto",
-	L"Scorrimento gi˘",
+	L"Scorrimento gi√π",
 	L"Annulla",
 };
 
 STR16 pDoctorWarningString[] =
 {
-	L"%s non Ë abbstanza vicina per poter esser riparata.",
+	L"%s non √® abbstanza vicina per poter esser riparata.",
 	L"I vostri medici non sono riusciti a bendare completamente tutti.",
 };
 
@@ -5461,13 +5591,13 @@ STR16 pMilitiaButtonsHelpText[] =
 
 STR16 pMapScreenJustStartedHelpText[] =
 {
-	L"Andate all'A.I.M. e arruolate alcuni mercenari (*Hint* Ë nel Laptop)", // to inform the player to hired some mercs to get things going
+	L"Andate all'A.I.M. e arruolate alcuni mercenari (*Hint* √® nel Laptop)", // to inform the player to hired some mercs to get things going
 	L"Quando sarete pronti per partire per Arulco, cliccate sul pulsante nella parte in basso a destra dello schermo.", // to inform the player to hit time compression to get the game underway
 };
 
 STR16 pAntiHackerString[] = 
 {
-	L"Errore. File mancanti o corrotti. Il gioco verr‡ completato ora.",
+	L"Errore. File mancanti o corrotti. Il gioco verr√† completato ora.",
 };
 
 
@@ -5490,10 +5620,14 @@ STR16 gzLaptopHelpText[] =
 	L"Associazione Internazionale Mercenari",
 	L"Ordinativi di armi online dal sito di Bobby Ray",
 	L"Istituto del Profilo del Mercenario",
-	L"Centro pi˘ economico di reclutamento",
+	L"Centro pi√π economico di reclutamento",
 	L"Impresa di pompe funebri McGillicutty",
 	L"Servizio Fioristi Riuniti",
 	L"Contratti assicurativi per agenti A.I.M.",
+	//New Bookmarks
+	L"",
+	L"Encyclopedia",
+	L"Briefing Room",
 };
 
 
@@ -5504,7 +5638,7 @@ STR16	gzHelpScreenText[] =
 
 STR16 gzNonPersistantPBIText[] =
 {
-	L"» in corso una battaglia. Potete solo ritirarvi dalla schermata delle tattiche.",
+	L"√à in corso una battaglia. Potete solo ritirarvi dalla schermata delle tattiche.",
 	L"|Entra nel settore per continuare l'attuale battaglia in corso.",
 	L"|Automaticamente decide l'esito della battaglia in corso.",
 	L"Non potete decidere l'esito della battaglia in corso automaticamente, se siete voi ad attaccare.",
@@ -5519,8 +5653,8 @@ STR16 gzNonPersistantPBIText[] =
 STR16 gzMiscString[] =
 {
 	L"I vostri soldati continuano a combattere senza l'aiuto dei vostri mercenari...",
-	L"Il veicolo non ha pi˘ bisogno di carburante.",
-	L"La tanica della benzina Ë piena %d%%.",
+	L"Il veicolo non ha pi√π bisogno di carburante.",
+	L"La tanica della benzina √® piena %d%%.",
 	L"L'esercito di Deidrannaha riguadagnato il controllo completo su %s.",
 	L"Avete perso una stazione di rifornimento.",
 };
@@ -5581,7 +5715,7 @@ STR16	gzCreditNames[]=
 {
 	L"Chris Camfield",
 	L"Shaun Lyng",
-	L"Kris M‰rnes",
+	L"Kris M√§rnes",
 	L"Ian Currie",
 	L"Linda Currie",
 	L"Eric \"WTF\" Cheng",
@@ -5628,9 +5762,9 @@ STR16	gzCreditNameFunny[]=
 	L"",																			// Norman \"NRG\" Olsen
 	L"",																			// George Brooks
 	L"(Testa matta e amante del jazz)",						// Andrew Stacey
-	L"(il suo nome vero Ë Robert)",							// Scot Loving
+	L"(il suo nome vero √® Robert)",							// Scot Loving
 	L"(l'unica persona responsabile)",					// Andrew \"Big Cheese Doddle\" Emmons
-	L"(puÚ ora tornare al motocross)",	// Dave French
+	L"(pu√≤ ora tornare al motocross)",	// Dave French
 	L"(rubato da Wizardry 8)",							// Alex Meduna
 	L"",	// Joey \"Joeker\" Whelan",
 };
@@ -5649,13 +5783,13 @@ STR16 sRepairsDoneString[] =
 STR16 zGioDifConfirmText[]=
 {
 	//L"You have chosen NOVICE mode. This setting is appropriate for those new to Jagged Alliance, those new to strategy games in general, or those wishing shorter battles in the game. Your choice will affect things throughout the entire course of the game, so choose wisely. Are you sure you want to play in Novice mode?",
-	L"Avete selezionato la modalit‡ PRINCIPIANTE. Questo scenario Ë adatto a chi gioca per la prima volta a Jagged Alliance, a chi prova a giocare per la prima volta in generale o a chi desidera combattere battaglie pi˘ brevi nel gioco. La vostra decisione influir‡ sull'intero corso della partita; scegliete, quindi, con attenzione. Siete sicuri di voler giocare nella modalit‡ PRINCIPIANTE?",
+	L"Avete selezionato la modalit√† PRINCIPIANTE. Questo scenario √® adatto a chi gioca per la prima volta a Jagged Alliance, a chi prova a giocare per la prima volta in generale o a chi desidera combattere battaglie pi√π brevi nel gioco. La vostra decisione influir√† sull'intero corso della partita; scegliete, quindi, con attenzione. Siete sicuri di voler giocare nella modalit√† PRINCIPIANTE?",
 
 	//L"You have chosen EXPERIENCED mode. This setting is suitable for those already familiar with Jagged Alliance or similar games. Your choice will affect things throughout the entire course of the game, so choose wisely. Are you sure you want to play in Experienced mode?",
-	L"Avete selezionato la modalit‡ ESPERTO. Questo scenario Ë adatto a chi ha gi‡ una certa dimestichezza con Jagged Alliance o con giochi simili. La vostra decisione influir‡ sull'intero corso della partita; scegliete, quindi, con attenzione. Siete sicuri di voler giocare nella modalit‡ ESPERTO?",
+	L"Avete selezionato la modalit√† ESPERTO. Questo scenario √® adatto a chi ha gi√† una certa dimestichezza con Jagged Alliance o con giochi simili. La vostra decisione influir√† sull'intero corso della partita; scegliete, quindi, con attenzione. Siete sicuri di voler giocare nella modalit√† ESPERTO?",
 
 	//L"You have chosen EXPERT mode. We warned you. Don't blame us if you get shipped back in a body bag. Your choice will affect things throughout the entire course of the game, so choose wisely. Are you sure you want to play in Expert mode?",
-	L"Avete selezionato la modalit‡ PROFESSIONISTA. Siete avvertiti. Non malediteci, se vi ritroverete a brandelli. La vostra decisione influir‡ sull'intero corso della partita; scegliete, quindi, con attenzione. Siete sicuri di voler giocare nella modalit‡ PROFESSIONISTA?",
+	L"Avete selezionato la modalit√† PROFESSIONISTA. Siete avvertiti. Non malediteci, se vi ritroverete a brandelli. La vostra decisione influir√† sull'intero corso della partita; scegliete, quindi, con attenzione. Siete sicuri di voler giocare nella modalit√† PROFESSIONISTA?",
  
 	L"You have chosen INSANE mode. WARNING: Don't blame us if you get shipped back in little pieces... Deidranna WILL kick your ass.  Hard.  Your choice will affect things throughout the entire course of the game, so choose wisely. Are you sure you want to play in INSANE mode?",
 };
@@ -5665,7 +5799,7 @@ STR16 gzLateLocalizedString[] =
 	L"%S file di dati della schermata di caricamento non trovato...",
 
 	//1-5
-	L"Il robot non puÚ lasciare questo settore, se nessuno sta usando il controller.",
+	L"Il robot non pu√≤ lasciare questo settore, se nessuno sta usando il controller.",
 
 	//This message comes up if you have pending bombs waiting to explode in tactical.
 	L"Non potete comprimere il tempo ora. Aspettate le esplosioni!",
@@ -5677,7 +5811,7 @@ STR16 gzLateLocalizedString[] =
 	L"%s non ha abbastanza energia per cambiare posizione.",
 
 	//A message that pops up when a vehicle runs out of gas.
-	L"Il %s ha esaurito la benzina e ora Ë rimasto a piedi a %c%d.",
+	L"Il %s ha esaurito la benzina e ora √® rimasto a piedi a %c%d.",
 
 	//6-10
 
@@ -5708,37 +5842,37 @@ STR16 gzLateLocalizedString[] =
 	//"vs." is the abbreviation of versus.
 	L"%d contro %d",
 	
-	L"Il %s Ë pieno!",  //(ex "The ice cream truck is full")
+	L"Il %s √® pieno!",  //(ex "The ice cream truck is full")
 
-  L"%s non ha bisogno immediatamente di pronto soccorso o di fasciature, quanto piuttosto di cure mediche pi˘ serie e/o riposo.",
+  L"%s non ha bisogno immediatamente di pronto soccorso o di fasciature, quanto piuttosto di cure mediche pi√π serie e/o riposo.",
 
 	//20
 	//Happens when you get shot in the legs, and you fall down.
-	L"%s Ë stato colpito alla gamba e collassa!",
+	L"%s √® stato colpito alla gamba e collassa!",
 	//Name can't speak right now.
-	L"%s non puÚ parlare ora.",
+	L"%s non pu√≤ parlare ora.",
 
 	//22-24 plural versions 
-	L"%d l'esercito verde Ë stato promosso a veterano.",
-	L"%d l'esercito verde Ë stato promosso a regolare.",
-	L"%d l'esercito regolare Ë stato promosso a veterano.",
+	L"%d l'esercito verde √® stato promosso a veterano.",
+	L"%d l'esercito verde √® stato promosso a regolare.",
+	L"%d l'esercito regolare √® stato promosso a veterano.",
 
 	//25
 	L"Interruttore",
 
 	//26
 	//Name has gone psycho -- when the game forces the player into burstmode (certain unstable characters)
-	L"%s Ë impazzito!",
+	L"%s √® impazzito!",
 
 	//27-28
 	//Messages why a player can't time compress.
-	L"Non Ë al momento sicuro comprimere il tempo visto che avete dei mercenari nel settore %s.",
-	L"Non Ë al momento sicuro comprimere il tempo quando i mercenari sono nelle miniere infestate dalle creature.",
+	L"Non √® al momento sicuro comprimere il tempo visto che avete dei mercenari nel settore %s.",
+	L"Non √® al momento sicuro comprimere il tempo quando i mercenari sono nelle miniere infestate dalle creature.",
 
 	//29-31 singular versions 
-	L"1 esercito verde Ë stato promosso a veterano.",
-	L"1 esercito verde Ë stato promosso a regolare.",
-	L"1 eserciro regolare Ë stato promosso a veterano.",
+	L"1 esercito verde √® stato promosso a veterano.",
+	L"1 esercito verde √® stato promosso a regolare.",
+	L"1 eserciro regolare √® stato promosso a veterano.",
 
 	//32-34
 	L"%s non dice nulla.",
@@ -5754,30 +5888,30 @@ STR16 gzLateLocalizedString[] =
 
 	//37-38 "Name trips and falls"
 	L"%s trips and falls",
-	L"Questo oggetto non puÚ essere raccolto qui.",
+	L"Questo oggetto non pu√≤ essere raccolto qui.",
 
 	//39
-	L"Nessuno dei vostri rimanenti mercenari Ë in grado di combattere. L'esercito combatter‡ contro le creature da solo.",
+	L"Nessuno dei vostri rimanenti mercenari √® in grado di combattere. L'esercito combatter√† contro le creature da solo.",
 
 	//40-43
 	//%s is the name of merc.
-	L"%s Ë rimasto sprovvisto di kit medici!",
-	L"%s non Ë in grado di curare nessuno!",
-	L"%s Ë rimasto sprovvisto di forniture mediche!",
-	L"%s non Ë in grado di riparare niente!",
+	L"%s √® rimasto sprovvisto di kit medici!",
+	L"%s non √® in grado di curare nessuno!",
+	L"%s √® rimasto sprovvisto di forniture mediche!",
+	L"%s non √® in grado di riparare niente!",
 
 	//44-45
 	L"Tempo di riparazione",
-	L"%s non puÚ vedere questa persona.",
+	L"%s non pu√≤ vedere questa persona.",
 
 	//46-48
-	L"L'estensore della canna dell'arma di %s si Ë rotto!",
+	L"L'estensore della canna dell'arma di %s si √® rotto!",
 	L"No more than %d militia trainers are permitted in this sector.",		// TODO.Translate
   L"Siete sicuri?",
 
 	//49-50
 	L"Compressione del tempo",
-	L"La tanica della benzina del veicolo Ë ora piena.",
+	L"La tanica della benzina del veicolo √® ora piena.",
 
 	//51-52 Fast help text in mapscreen.
 	L"Continua la compressione del tempo (|S|p|a|z|i|o)",
@@ -5790,7 +5924,7 @@ STR16 gzLateLocalizedString[] =
 	//55 
 	L"Non potete comprimere il tempo mentre visualizzate l'inventario del settore.",
 
-	L"Il CD ddel gioco Jagged Alliance 2 v1.13 non Ë stato trovato. Il programma verr‡ terminato.",
+	L"Il CD ddel gioco Jagged Alliance 2 v1.13 non √® stato trovato. Il programma verr√† terminato.",
 
 	L"Oggetti combinati con successo.",
 	
@@ -5946,99 +6080,99 @@ STR16 New113HAMMessage[] =
 };
 
 // WANNE: This are the email texts, when one of the 4 new 1.13 MERC mercs have levelled up, that Speck sends
-// INFO: Do not replace the ± characters. They indicate the <B2> (-> Newline) from the edt files
+// INFO: Do not replace the ¬± characters. They indicate the <B2> (-> Newline) from the edt files
 STR16	New113MERCMercMailTexts[] =
 {
 	// Gaston: Text from Line 39 in Email.edt
-	L"Hereby be informed that due to Gastons's past performance his fees for services rendered have undergone an increase. Personally, I'm not surprised. ± ± Speck T. Kline ± ",
+	L"Hereby be informed that due to Gastons's past performance his fees for services rendered have undergone an increase. Personally, I'm not surprised. ¬± ¬± Speck T. Kline ¬± ",
 	// Stogie: Text from Line 43 in Email.edt
-	L"Please be advised that, as of this moment, Stogies's fees for services rendered have increased to coincide with the increase in his abilities. ± ± Speck T. Kline ± ", 
+	L"Please be advised that, as of this moment, Stogies's fees for services rendered have increased to coincide with the increase in his abilities. ¬± ¬± Speck T. Kline ¬± ", 
 	// Tex: Text from Line 45 in Email.edt
-	L"Please be advised that Tex's experience entitles him to more equitable compensation. He's fees have therefore been increased to more accurately reflect his worth. ± ± Speck T. Kline ± ",
+	L"Please be advised that Tex's experience entitles him to more equitable compensation. He's fees have therefore been increased to more accurately reflect his worth. ¬± ¬± Speck T. Kline ¬± ",
 	// Biggens: Text from Line 49 in Email.edt
-	L"Please take note. Due to the improved performance of Biggens his fees for services rendered have undergone an increase. ± ± Speck T. Kline ± ",
+	L"Please take note. Due to the improved performance of Biggens his fees for services rendered have undergone an increase. ¬± ¬± Speck T. Kline ¬± ",
 };
 
 // TODO.Translate
 // WANNE: This is email text (each 2 line), when we left a message on AIM and now the merc is back
 STR16	New113AIMMercMailTexts[] =
 {
-	// Monk
+	// Monk: Text from Line 58
 	L"FW from AIM Server: Message from Victor Kolesnikov",
-	L"You want to talk to me? I have time.",
+	L"Hello. Monk here. Message received. I'm back if you want to see me. ¬± ¬± Waiting for your call. ¬±",
 
-	// Brain
+	// Brain: Text from Line 60
 	L"FW from AIM Server: Message from Janno Allik",
-	L"I am back. Waiting for your call.",
+	L"Am now ready to consider tasks. There is a time and place for everything. ¬± ¬± Janno Allik ¬±",
 
-	// Scream
+	// Scream: Text from Line 62
 	L"FW from AIM Server: Message from Lennart Vilde",
-	L"Sorry, I was out of office, now I am back.",
+	L"Lennart Vilde now available! ¬±",
 
-	// Henning
+	// Henning: Text from Line 64
 	L"FW from AIM Server: Message from Henning von Branitz",
-	L"Back from business. You want my help?",
+	L"Have received your message, thanks. To discuss employment, contact me  at the AIM Website. ¬± ¬± Till then! ¬± ¬± Henning von Branitz ¬±",
 
-	// Luc
+	// Luc: Text from Line 66
 	L"FW from AIM Server: Message from Luc Fabre",
-	L"Give me a call, if you are interested.",
+	L"Mesage received, merci! Am happy to consider your proposals. You know where to find me. ¬± ¬± Looking forward to hearing from you. ¬±",
 
-	// Laura
+	// Laura: Text from Line 68
 	L"FW from AIM Server: Message from Dr. Laura Colin",
-	L"I am now available.",
+	L"Greetings! Good of you to leave a message  It sounds interesting. ¬± ¬± Visit AIM again I would be happy to hear more. ¬± ¬± Best regards! ¬± ¬± Dr. Laura Colin ¬±",
 
-	// Grace
+	// Grace: Text from Line 70
 	L"FW from AIM Server: Message from Graziella Girelli",
-	L"Got your message. If you still want me, you know what to do.",
+	L"You wanted to contact me, but were not successful.¬± ¬± A family gathering. I am sure you understand? I've now had enough of family and would be very happy if you would contact me again over the AIM Site. ¬± ¬± Ciao! ¬±",
 
-	// Rudolf
+	// Rudolf: Text from Line 72
 	L"FW from AIM Server: Message from Rudolf Steiger",
-	L"Rudolf here. Call me back.",	
+	L"Do you know how many calls I get every day? Every tosser thinks he can call me.  ¬± ¬± But I'm back, if you have something of interest for me. ¬±",
 
 	// WANNE: Generic mail, for additional merc made by modders, index >= 178
 	L"FW from AIM Server: Message about merc availability",
-	L"I got your message. Waiting for your call.±",
+	L"I got your message. Waiting for your call. ¬±",
 };
 
 // WANNE: These are the missing skills from the impass.edt file
-// INFO: Do not replace the ± characters. They indicate the <B2> (-> Newline) from the edt files
+// INFO: Do not replace the ¬± characters. They indicate the <B2> (-> Newline) from the edt files
 STR16 MissingIMPSkillsDescriptions[] =
 {
 	// Sniper
-	L"Sniper: Occhi di un hawk, potete sparare le ale da un mosca ad cento yarde! ± ",
+	L"Sniper: Occhi di un hawk, potete sparare le ale da un mosca ad cento yarde! ¬± ",
 	// Camouflage
-	L"Camuffamento: Oltre voi persino i cespugli sembrano sintetici! ± ",	
+	L"Camuffamento: Oltre voi persino i cespugli sembrano sintetici! ¬± ",	
 	// SANDRO - new strings for new traits added
 	// Ranger
-	L"Ranger: You are the one from Texas deserts, aren't you! ± ",	
+	L"Ranger: You are the one from Texas deserts, aren't you! ¬± ",	
 	// Gunslinger
-	L"Gunslinger: With a handgun or two, you can be as lethal as the Billy Kid! ± ",
+	L"Gunslinger: With a handgun or two, you can be as lethal as the Billy Kid! ¬± ",
 	// Squadleader
-	L"Squadleader: Natural leader and boss, you are the big shot no kidding! ± ",
+	L"Squadleader: Natural leader and boss, you are the big shot no kidding! ¬± ",
 	// Technician
-	L"Technician: Fixing stuff, removing traps, planting bombs, that's your bussiness! ± ",
+	L"Technician: Fixing stuff, removing traps, planting bombs, that's your bussiness! ¬± ",
 	// Doctor
-	L"Doctor: You can make a quick surgery with pocket-knife and chewing gum anywhere! ± ",
+	L"Doctor: You can make a quick surgery with pocket-knife and chewing gum anywhere! ¬± ",
 	// Athletics
-	L"Athletics: Your speed and vitality is on top of possibilities! ± ",
+	L"Athletics: Your speed and vitality is on top of possibilities! ¬± ",
 	// Bodybuilding
-	L"Bodybuilding: That big muscular figure which cannot be overlooked is you actually! ± ",
+	L"Bodybuilding: That big muscular figure which cannot be overlooked is you actually! ¬± ",
 	// Demolitions
-	L"Demolitions: You can blow up a whole city just by common home stuff! ± ",
+	L"Demolitions: You can blow up a whole city just by common home stuff! ¬± ",
 	// Scouting
-	L"Scouting: Nothing can escape your notice! ± ",
+	L"Scouting: Nothing can escape your notice! ¬± ",
 };
 
 STR16 NewInvMessage[] = 
 {
-	L"Non puÚ il fagotto della raccolta attualmente",
+	L"Non pu√≤ il fagotto della raccolta attualmente",
 	L"Nessun posto per mettere fagotto",
 	L"Fagotto non trovato",
 	L"La chiusura lampo funziona soltanto nel combattimento",
-	L"Non puÚ muoversi mentre la chiusura lampo del fagotto attiva",
+	L"Non pu√≤ muoversi mentre la chiusura lampo del fagotto attiva",
 	L"Siete sicuri voi desiderate vendere tutti gli articoli del settore?",
 	L"Siete sicuri voi desiderate cancellare tutti gli articoli del settore?",
-	L"Non puÚ arrampicarsi mentre portano uno zaino",
+	L"Non pu√≤ arrampicarsi mentre portano uno zaino",
 };
 
 // WANNE - MP: Multiplayer messages
@@ -6101,7 +6235,7 @@ STR16 MPClientMessage[] =
 	L"'%s' (client %d - '%S') was killed by '%s' (client %d - '%S')",
 	L"Kicked client #%d - '%S'",
 	// 30
-	L"Start turn for client number: #1 - '%S' | #2 - '%S' | #3 - '%S' | #4 - '%S'",
+	L"Start a new turn for the selected client. #1: <Cancel>, #2: %S, #3: %S, #4: %S",
 	L"Starting turn for client #%d",
 	L"Requesting for realtime...",
 	L"Switched back to realtime.",
@@ -6153,12 +6287,13 @@ STR16 MPClientMessage[] =
 	L"%s's bomb was disarmed by &s",
 	L"You loose, what a shame",	// All over red rover
 	L"Spectator mode disabled",
-	L"Choose client number to kick:",
+	L"Choose client to kick from game. #1: <Cancel>, #2: %S, #3: %S, #4: %S",
 	// 75
 	L"Team #%d is wiped out.",
 	L"Client failed to start. Terminating.",
 	L"Client disconnected and shutdown.",
 	L"Client is not running.",
+	L"INFO: If the game is stuck (the opponents progress bar is not moving), notify the server to press ALT + E to give the turn back to you!",	// TODO.Translate
 };
 
 STR16 gszMPEdgesText[] =
@@ -6437,7 +6572,7 @@ STR16 gzFacilityAssignmentStrings[]=
 
 STR16 Additional113Text[]=
 {
-	L"Jagged Alliance 2 v1.13 modalit‡ finestra richiede una profondit‡ di colore di 16bpp o meno.",
+	L"Jagged Alliance 2 v1.13 modalit√† finestra richiede una profondit√† di colore di 16bpp o meno.",
 
 	// TODO.Translate
 	// WANNE: Savegame slots validation against INI file
@@ -6712,7 +6847,7 @@ STR16 szUDBGenExplosiveStatsExplanationsTooltipText[]=
 	L"\n \nThe amount of non-lethal (stun) damage caused\nby this explosive.\n \nNote that blast-type explosives deliver their damage\nonly once (when they go off), while prolonged effect\nexplosives deliver this amount of stun damage every\nturn until the effect dissipates.\n \nHigher is better.",
 	L"\n \nThis is the radius of the explosive blast caused by\nthis explosive item.\n \nTargets will suffer less damage the further they are\nfrom the center of the explosion.\n \nHigher is better.",
 	L"\n \nThis is the radius of the stun-blast caused by\nthis explosive item.\n \nTargets will suffer less damage the further they are\nfrom the center of the blast.\n \nHigher is better.",
-	L"\n \nThis is the distance that the noise from this\ntrap will travel. Soldiers within this distance\nare likely to hear the noise and be alerted.\n \nHigher is better.",
+	L"\n \nThis is the distance that the noise from this\ntrap will travel. Soldiers within this distance\nare likely to hear the noise and be alerted.\n \nLower is better.",
 	L"\n \nThis is the starting radius of the tear-gas\nreleased by this explosive item.\n \nEnemies caught within the radius will suffer\nthe listed damage and stun-damage each turn,\nunless wearing a gas mask.\n \nAlso note the end radius and duration\nof the effect (displayed below).\n \nHigher is better.",
 	L"\n \nThis is the starting radius of the mustard-gas\nreleased by this explosive item.\n \nEnemies caught within the radius will suffer\nthe listed damage and stun-damage each turn,\nunless wearing a gas mask.\n \nAlso note the end radius and duration\nof the effect (displayed below).\n \nHigher is better.",
 	L"\n \nThis is the starting radius of the light\nemitted by this explosive item.\n \nTiles close to the center of the effect will become\nvery bright, while tiles nearer the edge\nwill only be a little brighter than normal.\n \nAlso note the end radius and duration\nof the effect (displayed below).\n \nAlso remember that unlike other explosives with\ntimed effects, the light effect gets SMALLER\nover time, until it disappears.\n \nHigher is better.",
@@ -6964,28 +7099,28 @@ STR16	gzNewLaptopMessages[]=
 
 STR16	zNewTacticalMessages[]=
 {
-	//L"Distanza dal bersaglio: %d caselle, Luminosit‡: %d/%d",
-	L"Colleghi il trasmettitore al tuo computer portatile.",
-	L"Non puoi permetterti di ingaggiare %s",
-	L"Per un periodo limitato, la tariffa qui sopra includer‡ i costi dell'intera missione, oltre all'equipaggiamento indicato sotto.",
-	L"Assolda %s adesso e approfitta della nostra nuova tariffa 'tutto incluso'. Compreso in questa incredibile offerta anche l'equipaggiamento personale del mercenario, senza alcun costo aggiuntivo.",
-	L"Tariffa",
-	L"C'Ë qualcun altro nel settore...",
-	//L"Gittata dell'arma: %d caselle, Probabilit‡ di colpire: %d percent",
-	L"Mostra nascondigli",
-	L"Linea di Vista",
-	L"Le nuove reclute non possono arrivare qui.",
-	L"PoichÈ il tuo portatile non ha un trasmettitore, non potrai assoldare nuovi mercenari. Forse questo sarebbe un buon momento per caricare una partita salvata o ricominciare daccapo!",
-	L"%s sente venire da sotto al corpo di Jerry il rumore di metallo che si accartoccia. E' un suono fastidioso, come se l'antenna del tuo portatile venisse schiacciata.",  //the %s is the name of a merc.
-	L"Dopo aver dato un'occhiata al biglietto lasciato dal Vice Comandante Morris, %s vede una possibilit‡. La nota contiene le coordinate per il lancio di missili contro diverse citt‡ ad Tracona. C'Ë anche la locazione della base di lancio: la fabbrica di missili.",
-	L"Guardando il pannello di controllo %s immagina che i numeri possano essere invertiti, cosicchÈ il missile distrugga proprio questa fabbrica. %s deve trovare una via di fuga. L'ascensore sembra offrire la soluzione pi˘ rapida...",
-	L"Questa Ë una partita a livello IRON MAN: non puoi salvare quando ci sono nemici nei dintorni.",
-	L"(Non puoi salvare durante il combattimento.)",
-	L"Il nome della campagna Ë pi˘ grande di 30 caratteri",
-	L"Campagna non trovata.",
-	L"Campagna: Default ( %S )",
-	L"Campagna: %S",
-	L"Hai selezionato la campagna %S. Questa campagna Ë una versione amatoriale della campagna originale di Unfinished Business. Sei sicuro di voler giocare la campagna %S?",
-	L"Per usare l'editor, selezionare una campagna diversa da quella di default.",
+	//L"Range to target: %d tiles, Brightness: %d/%d",
+	L"Attaching the transmitter to your laptop computer.",
+	L"You cannot afford to hire %s",
+	L"For a limited time, the above fee covers the cost of the entire mission and includes the equipment listed below.",
+	L"Hire %s now and take advantage of our unprecedented 'one fee covers all' pricing.  Also included in this unbelievable offer is the mercenary's personal equipment at no charge.",
+	L"Fee",
+	L"There is someone else in the sector...",
+	//L"Gun Range: %d tiles, Chance to hit: %d percent",
+	L"Display Cover",
+	L"Line of Sight",
+	L"New Recruits cannot arrive there.",
+	L"Since your laptop has no transmitter, you won't be able to hire new team members.  Perhaps this would be a good time to load a saved game or start over!",
+	L"%s hears the sound of crumpling metal coming from underneath Jerry's body.  It sounds disturbingly like your laptop antenna being crushed.",  //the %s is the name of a merc.  @@@  Modified
+	L"After scanning the note left behind by Deputy Commander Morris, %s senses an oppurtinity.  The note contains the coordinates for launching missiles against different towns in Tracona.  It also gives the coodinates of the origin - the missile facility.",
+	L"Noticing the control panel, %s figures the numbers can be reveresed, so that the missile might destroy this very facility.  %s needs to find an escape route.  The elevator appears to offer the fastest solution...",
+	L"This is an IRON MAN game and you cannot save when enemies are around.",	//	@@@  new text
+	L"(Cannot save during combat)", //@@@@ new text
+	L"The current campaign name is greater than 30 characters.",							// @@@ new text
+	L"The current campaign cannot be found.",																	// @@@ new text
+	L"Campaign: Default ( %S )",																							// @@@ new text
+	L"Campaign: %S",																													// @@@ new text
+	L"You have selected the campaign %S. This campaign is a player-modified version of the original Unfinished Business campaign. Are you sure you wish to play the %S campaign?",			// @@@ new text
+	L"In order to use the editor, please select a campaign other than the default.",		///@@new
 };
 #endif //ITALIAN
